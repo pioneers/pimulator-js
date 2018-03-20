@@ -23,7 +23,8 @@ def start():
         keep_going_lock = threading.Lock()
         set_keep_going(True)
 
-        robot_thread = threading.Thread(group=None, target=robot, name="robot thread")
+        robot_thread = threading.Thread(group=None, target=robot, 
+                                        name="robot thread", daemon=True)
         robot_thread.start()
         return True
 
@@ -42,6 +43,9 @@ def stop():
     else:
         return False
 
+def status():
+    return robot_thread, keep_going_lock, keep_going, state_lock, state
+
 def main():
     state_init()
 
@@ -51,11 +55,15 @@ def robot():
         update_state()
 
 def state_init():
-    """Initialize the state var"""
+    """Initialize the state var
+    
+    Do not erase state_lock if already exists"""
     global state_lock
     global state
-    state_lock = threading.Lock()
-    state = None
+
+    if state_lock is None:
+        state_lock = threading.Lock()
+        state = None
 
 def get_state():
     global state_lock
