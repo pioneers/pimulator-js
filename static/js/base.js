@@ -1,12 +1,25 @@
-function loadDoc() {
+function req(arg, act) {
     var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-          if (this.readyState == 4 && this.status == 200) {
-                 document.getElementById("demo").innerHTML = this.responseText;
-                }
-        };
-    xhttp.open("GET", "/time", true);
+    if (act) {
+        xhttp.onreadystatechange = function() {
+              if (this.readyState == 4 && this.status == 200) {
+                     document.getElementById("demo").innerHTML = this.responseText;
+                    }
+            };
+    }
+    xhttp.open("GET", arg, true);
     xhttp.send();
 }
 
-setInterval(loadDoc, 1000)
+function update() {
+    req("/state", true)
+}
+
+function stop() {
+    req("/stop", false)
+}
+
+function start() {
+    req("/start", false)
+}
+setInterval(update, 1000)

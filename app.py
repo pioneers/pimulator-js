@@ -1,9 +1,34 @@
-import datetime, time
+import datetime
+import time
+import robot
+
 from flask import Flask, render_template
 app = Flask(__name__)
 
+@app.route('/start')
+def start():
+    return str(robot.start())
+
+@app.route('/stop')
+def stop():
+    return str(robot.stop())
+
+@app.route('/state')
+def state():
+    return str(robot.get_state())
+
+@app.route('/status')
+def status():
+    return str(robot.status())
+
+@app.route('/init')
+def init():
+    robot.state_init()
+    return "Good"
+
 @app.route('/')
 def hello_world(name=None):
+    robot.state_init()
     return render_template('index.html', name=name)
 
 @app.route('/time')
