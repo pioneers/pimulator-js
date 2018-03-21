@@ -4,7 +4,10 @@ import signal
 import inspect
 import asyncio
 import os
-from termcolor import colored
+
+# For replit
+# from termcolor import colored
+colored = lambda x, y: x
 
 # Gamepad Options: use "arcade" or "tank"
 GAMEPAD_MODE = "tank"
