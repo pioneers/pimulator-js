@@ -23,6 +23,8 @@ def start():
         keep_going_lock = threading.Lock()
         set_keep_going(True)
 
+        # We utilize a daemon thread to such that the thread exits even if we
+        # do not exit gracefully from __main__
         robot_thread = threading.Thread(group=None, target=robot, 
                                         name="robot thread", daemon=True)
         robot_thread.start()
