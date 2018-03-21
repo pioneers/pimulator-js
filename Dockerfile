@@ -1,5 +1,5 @@
 # Begin with the Python 3.4 image
-FROM python:3.4-alpine
+FROM python:3.6.4-alpine
 
 MAINTAINER Scott Numamoto <scott.numamoto@pioneers.berkeley.edu>
 
