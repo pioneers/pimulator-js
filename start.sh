@@ -1,5 +1,5 @@
 #!/bin/bash
-docker run -p 5000:5000 -v /$(pwd):/code --name robot-server web-server
+docker run -p 5000:5000 -v /$(pwd):/code --rm --name robot-server web-server
 
 # Create a new container running the web-server image
 
@@ -14,6 +14,9 @@ docker run -p 5000:5000 -v /$(pwd):/code --name robot-server web-server
 # Mount the volume of the current directory to the folder /code inside the 
 # container
 # -v /$(pwd):/code
+
+# Delete the container after use to make clean up easier
+# --rm
 
 # Give the container the name robot-server
 # --name robot-server
