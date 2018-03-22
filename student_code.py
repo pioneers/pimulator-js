@@ -21,7 +21,7 @@ def teleop_main():
     if Robot.is_running(drive_fwd):
         return # wait until it completes
 
-    driving_mode = 0
+    driving_mode = 1
 
     if driving_mode == 0:
         """Driving straight. """
@@ -42,7 +42,4 @@ def teleop_main():
 
 
 # Do not delete the line below: it runs the simulator!
-# Simulator.simulate(teleop_setup, teleop_main)
-
-if __name__ == "__main__":
-    Simulator().simulate(teleop_setup, teleop_main)
+Simulator.simulate(teleop_setup, teleop_main)

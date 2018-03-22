@@ -4,10 +4,7 @@ import signal
 import inspect
 import asyncio
 import os
-
-# For replit
-# from termcolor import colored
-colored = lambda x, y: x
+from termcolor import colored
 
 # Gamepad Options: use "arcade" or "tank"
 GAMEPAD_MODE = "tank"
@@ -65,9 +62,8 @@ class RobotClass:
         self.rtheta = (self.Wr * 5 + self.rtheta) % 360
 
     def set_value(self, device, param, speed):
-        """Runtime API method for updating L/R motor speed. 
-        
-        Takes only L/R Motor as device name and speed bounded by [-1,1]."""
+        """Runtime API method for updating L/R motor speed. Takes only L/R
+           Motor as device name and speed bounded by [-1,1]."""
         if speed > 1.0 or speed < -1.0:
             raise ValueError("Speed cannot be great than 1.0 or less than -1.0.")
         if param != "duty_cycle":
@@ -94,7 +90,12 @@ class RobotClass:
         `Robot.run` with a `fn` argument that is currently running is a no-op.
         """
 
-        if self.is_running(fn):
+        if not inspect.isfunction(fn):
+            raise ValueError("First argument to Robot.run must be a function")
+        elif not inspect.iscoroutinefunction(fn):
+            raise ValueError("First argument to Robot.run must be defined with `async def`, not `def`")
+
+        if fn in self._coroutines_running:
             return
 
         self._coroutines_running.add(fn)
@@ -144,7 +145,7 @@ class GamepadClass:
         self.t0 = time.time()
         self.joystick_left_x = self.sets[set_num][0]
         self.joystick_left_y =  self.sets[set_num][1]
-        self.joystick_right_x =  self.sets[set_num][3]
+        self.joystick_right_x =  self.sets[set_num][2]
         self.joystick_right_y =  self.sets[set_num][3]
         self.durations = self.sets[set_num][4]         #lst of instr duration
         self.i = 0                                        #index of insturction
@@ -403,19 +404,15 @@ class RuntimeError(Exception):
 TIMEOUT_VALUE = 1 # seconds?
 
 def start_watchdog():
-    """Set a timer for TIMEOUT_VALUE seconds"""
     signal.alarm(TIMEOUT_VALUE)
 
 def feed_watchdog():
-    """Reset a timer for TIMEOUT_VALUE seconds"""
     signal.alarm(0) # is this redundant?
     signal.alarm(TIMEOUT_VALUE)
 
-def ensure_is_coroute_function(tag, val):
-    """Ensure val is a coroutine function."""
+def ensure_is_function(tag, val):
     if inspect.iscoroutinefunction(val):
         raise RuntimeError("{} is defined with `async def` instead of `def`".format(tag))
-    print("<1>", val)
     if not inspect.isfunction(val):
         raise RuntimeError("{} is not a function".format(tag))
 
@@ -423,6 +420,53 @@ def ensure_not_overridden(module, name):
     if hasattr(module, name):
         raise RuntimeError("Student code overrides `{}`, which is part of the API".format(name))
 
+def clarify_coroutine_warnings(exception_cell):
+    """
+    Python's default error checking will print warnings of the form:
+        RuntimeWarning: coroutine '???' was never awaited
+
+    This function will inject an additional clarification message about what
+    such a warning means.
+    """
+    import warnings
+
+    default_showwarning = warnings.showwarning
+
+    def custom_showwarning(message, category, filename, lineno, file=None, line=None):
+        default_showwarning(message, category, filename, lineno, line)
+
+        if str(message).endswith('was never awaited'):
+            coro_name = str(message).split("'")[-2]
+
+            print("""
+The PiE API has upgraded the above RuntimeWarning to a runtime error!
+
+This error typically occurs in one of the following cases:
+
+1. Calling `Actions.sleep` or anything in `Actions` without using `await`.
+
+Incorrect code:
+    async def my_coro():
+        Actions.sleep(1.0)
+
+Consider instead:
+    async def my_coro():
+        await Actions.sleep(1.0)
+
+2. Calling an `async def` function from inside `setup` or `loop` without using
+`Robot.run`.
+
+Incorrect code:
+    def loop():
+        my_coro()
+
+Consider instead:
+    def loop():
+        Robot.run(my_coro)
+""".format(coro_name=coro_name), file=file)
+            exception_cell[0] = message
+
+    warnings.showwarning = custom_showwarning
 
 def _ensure_strict_semantics(fn):
     """
@@ -479,104 +523,75 @@ Actions = ActionsClass(Robot)
 s = Screen(Robot, Gamepad)
 
 class Simulator:
-    def __init__(self):
-        # Start timeout_handder when the alarm goes off
-        signal.signal(signal.SIGALRM, Simulator.timeout_handler)
+    @staticmethod
+    def simulate(setup_fn=None, loop_fn=None):
+        def timeout_handler(signum, frame):
+            raise TimeoutError("studentCode timed out")
+        signal.signal(signal.SIGALRM, timeout_handler)
 
         # Need to pass a value by reference, so use a list as a kind of "pointer" cell
-        self.exception_cell = [None]
+        exception_cell = [None]
 
-        self.clarify_coroutine_warnings()
+        clarify_coroutine_warnings(exception_cell)
 
-    def timeout_handler(signum, frame):
-        """Take action if student code takes too long"""
-        raise TimeoutError("studentCode timed out")
-
-    async def main_loop(self, loop_fn):
-        while self.exception_cell[0] is None:
-            next_call = self.loop.time() + Robot.tick_rate # run at 20 Hz
-            loop_fn()
+        try:
+            start_watchdog()
             feed_watchdog()
 
-            # Simulator drawing operation
-            Robot.update_position()
-            s.draw()
+            if setup_fn is None:
+                try:
+                    import __main__
+                    setup_fn = __main__.setup
+                except AttributeError:
+                    raise RuntimeError("Student code failed to define `setup`")
 
-            sleep_time = max(next_call - self.loop.time(), 0.)
-            await asyncio.sleep(sleep_time)
+            if loop_fn is None:
+                try:
+                    import __main__
+                    loop_fn = __main__.loop
+                except AttributeError:
+                    raise RuntimeError("Student code failed to define `loop`")
 
-        raise self.exception_cell[0]
+            ensure_is_function("teleop_setup", setup_fn)
+            ensure_is_function("teleop_main", loop_fn)
 
-    def simulate(self, setup_fn=None, loop_fn=None):
-        start_watchdog()
-        feed_watchdog()
+            feed_watchdog()
 
-        ensure_is_coroute_function("teleop_setup", setup_fn)
-        ensure_is_coroute_function("teleop_main", loop_fn)
+            # Note that this implementation does not attempt to re-start student
+            # code on failure
 
-        feed_watchdog()
+            setup_fn()
+            feed_watchdog()
 
-        # Note that this implementation does not attempt to restart student
-        # code on failure
+            # Now time to start the main event loop
+            import asyncio
 
-        setup_fn()
-        feed_watchdog()
+            async def main_loop():
+                while exception_cell[0] is None:
+                    next_call = loop.time() + Robot.tick_rate # run at 20 Hz
+                    loop_fn()
+                    feed_watchdog()
 
-        # Start the main event loop
-        self.loop = asyncio.get_event_loop()
+                    # Simulator drawing operation
+                    Robot.update_position()
+                    s.draw()
 
-        def my_exception_handler(loop, context):
-            if exception_cell[0] is None:
-                exception_cell[0] = context['exception']
+                    sleep_time = max(next_call - loop.time(), 0.)
+                    await asyncio.sleep(sleep_time)
 
-        self.loop.set_exception_handler(my_exception_handler)
-        self.loop.run_until_complete(self.main_loop(loop_fn))
+                raise exception_cell[0]
 
-    def clarify_coroutine_warnings(self):
-        """ Inject an additional clarification message about coroutine warning.
+            loop = asyncio.get_event_loop()
 
-        Python's default error checking will print warnings of the form:
-            RuntimeWarning: coroutine '???' was never awaited
-        """
-        import warnings
+            def my_exception_handler(loop, context):
+                if exception_cell[0] is None:
+                    exception_cell[0] = context['exception']
 
-        default_showwarning = warnings.showwarning
-
-        def custom_showwarning(message, category, filename, lineno, file=None, line=None):
-            """Show the original warning along with our custom warning."""
-            default_showwarning(message, category, filename, lineno, line)
-
-            if str(message).endswith('was never awaited'):
-                coro_name = str(message).split("'")[-2]
-
-                display_message = ("The PiE API has upgraded the above "
-                        "RuntimeWarning to a runtime error!\n\n"
-
-                        "This error typically occurs in one of the these cases:\n\n"
-
-                        "1. Calling `Actions.sleep` or anything in `Actions` "
-                        "without using `await`.\n\n"
-
-                        "Incorrect code:\n"
-                        "   async def my_coro():\n"
-                        "       Actions.sleep(1.0)\n\n"
-
-                        "Consider instead:\n"
-                        "   async def my_coro():\n"
-                        "       await Actions.sleep(1.0)\n\n"
-
-                        "2. Calling an `async def` function from inside `setup` \n"
-                        "or `loop` without using `Robot.run`.\n\n"
-
-                        "Incorrect code:\n"
-                        "   def loop():\n"
-                        "       my_coro()\n\n"
-
-                        "Consider instead:\n"
-                        "   def loop():\n"
-                        "       Robot.run(my_coro)\n")
-
-                print(display_message.format(coro_name=coro_name), file=file)
-                self.exception_cell[0] = message
-
-        warnings.showwarning = custom_showwarning
+            loop.set_exception_handler(my_exception_handler)
+            loop.run_until_complete(main_loop())
+        except TimeoutError:
+            print("ERROR: student code timed out")
+            raise
+        except:
+            print("ERROR: student code terminated due to an exception")
+            raise

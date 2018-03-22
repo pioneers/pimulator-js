@@ -1,5 +1,7 @@
 import threading
 import time
+import pimulator
+import student_code
 
 robot_thread = None
 keep_going_lock = None
@@ -65,21 +67,28 @@ def state_init():
 
     if state_lock is None:
         state_lock = threading.Lock()
-        state = None
+        state = "initialized state"
 
 def get_state():
     global state_lock
     global state
+    print('<1>')
     state_lock.acquire()
+    print('<2>')
     result = state 
     state_lock.release()
+    print('<3>')
     return result
 
 def update_state():
     global state_lock
     global state
     state_lock.acquire()
-    state = str(time.ctime(time.time()))
+
+    student_code.teleop_main()
+    pimulator.Robot.update_position()
+    state = str((pimulator.Robot.X, pimulator.Robot.Y))
+
     state_lock.release()
     pass
 
