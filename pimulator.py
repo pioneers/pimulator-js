@@ -4,7 +4,13 @@ import signal
 import inspect
 import asyncio
 import os
-from termcolor import colored
+
+# termcolor is an optional package
+try:
+    from termcolor import colored
+except ModuleNotFoundError:
+    colored = lambda x, y: x
+
 
 # Gamepad Options: use "arcade" or "tank"
 GAMEPAD_MODE = "tank"
