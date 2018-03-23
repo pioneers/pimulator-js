@@ -1,17 +1,22 @@
+var screenUpdate;
+
 function req(arg, act) {
     var xhttp = new XMLHttpRequest();
     if (act) {
         xhttp.onreadystatechange = function() {
               if (this.readyState == 4 && this.status == 200) {
                   var state = JSON.parse(this.responseText);
-                console.log("StateX")
-                console.log(state.x)
+                  console.log("StateX")
+                  console.log(state.x)
                   document.getElementById("demo").innerHTML = String([state.x, state.y])
                   var robotRect = document.querySelector("rect")
-                console.log("SVG")
-                console.log(robotRect)
+                  console.log("SVG")
+                  console.log(robotRect)
                   robotRect.setAttributeNS(null, "x", state.x)
                   robotRect.setAttributeNS(null, "y", state.y)
+                  var rotateStr = "rotate(" + state.theta + " " + (state.x + 15) + " " + (state.y + 15) + ")"
+                  console.log(rotateStr)
+                  robotRect.setAttribute("transform", rotateStr)
                 console.log("Adjusted")
               }
         };
@@ -25,13 +30,13 @@ function update() {
 }
 
 function stop() {
-    req("/stop", false)
+    req("/stop", false);
+    clearInterval(screenUpdate);
 }
 
 function start() {
     req("/start", false)
+    screenUpdate = setInterval(update, 50);
 }
-
-setInterval(update, 3000);
 
 
