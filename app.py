@@ -2,7 +2,7 @@ import datetime
 import time
 import robot
 
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 app = Flask(__name__)
 
 @app.route('/start')
@@ -15,11 +15,8 @@ def stop():
 
 @app.route('/state')
 def state():
-    return str(robot.get_state())
-
-@app.route('/status')
-def status():
-    return str(robot.status())
+    result = robot.get_state()
+    return jsonify(x=result[0], y=result[1], theta=result[2])
 
 @app.route('/init')
 def init():

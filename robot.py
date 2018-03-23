@@ -47,9 +47,6 @@ def stop():
     else:
         return False
 
-def status():
-    return robot_thread, keep_going_lock, keep_going, state_lock, state
-
 def main():
     state_init()
 
@@ -57,6 +54,8 @@ def robot():
     """Continually update state"""
     while(get_keep_going()):
         update_state()
+        time.sleep(0.25)
+
 
 def state_init():
     """Initialize the state var
@@ -72,12 +71,9 @@ def state_init():
 def get_state():
     global state_lock
     global state
-    print('<1>')
     state_lock.acquire()
-    print('<2>')
     result = state 
     state_lock.release()
-    print('<3>')
     return result
 
 def update_state():
@@ -87,7 +83,7 @@ def update_state():
 
     student_code.teleop_main()
     pimulator.Robot.update_position()
-    state = str((pimulator.Robot.X, pimulator.Robot.Y))
+    state = pimulator.Robot.X, pimulator.Robot.Y, pimulator.Robot.dir
 
     state_lock.release()
     pass
