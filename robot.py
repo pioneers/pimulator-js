@@ -71,22 +71,38 @@ def state_init():
 def get_state():
     global state_lock
     global state
-    state_lock.acquire()
-    result = state 
-    state_lock.release()
-    return result
+    if state_lock:
+        state_lock.acquire()
+        result = state 
+        state_lock.release()
+        return result
+
+    # In the event state_init has not occured yet
+    # return only defaults
+    else:
+        return 72, 72, 0
 
 def update_state():
+    """Update the state of the robot.
+
+    Safely updates the state after obtaining the global state lock.
+    """
+
     global state_lock
     global state
-    state_lock.acquire()
+    if state_lock:
+        student_code.teleop_main()
+        pimulator.Robot.update_position()
 
-    student_code.teleop_main()
-    pimulator.Robot.update_position()
-    state = pimulator.Robot.X, pimulator.Robot.Y, pimulator.Robot.dir
+        state_lock.acquire()
+        state = pimulator.Robot.X, pimulator.Robot.Y, pimulator.Robot.dir
+        state_lock.release()
 
-    state_lock.release()
-    pass
+    # Gracefully handle attempts to update without initialization
+    # TODO perhaps this is something that would be best handled with
+    # object oriented programming.
+    else:
+        return
 
 def set_keep_going(val):
     """Safely set whether to keep going"""
