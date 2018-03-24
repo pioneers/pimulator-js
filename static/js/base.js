@@ -14,7 +14,7 @@ function req(arg, act) {
                   console.log(robotRect)
                   robotRect.setAttributeNS(null, "x", state.x)
                   robotRect.setAttributeNS(null, "y", state.y)
-                  var rotateStr = "rotate(" + state.theta + " " + (state.x + 15) + " " + (state.y + 15) + ")"
+                  var rotateStr = "rotate(" + state.theta + " " + (state.x + 15) + " " + (state.y + 20) + ")"
                   console.log(rotateStr)
                   robotRect.setAttribute("transform", rotateStr)
                 console.log("Adjusted")
