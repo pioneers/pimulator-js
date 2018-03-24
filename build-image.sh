@@ -1,2 +1,2 @@
 #!/bin/bash
-docker build -t web-server .
+docker build -t pie-bot-simulator-dev .
