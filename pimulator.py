@@ -1,4 +1,5 @@
 import math
+import warnings
 import time
 import signal
 import inspect
@@ -12,8 +13,6 @@ except ModuleNotFoundError:
     colored = lambda x, y: x
 
 
-# Gamepad Options: use "arcade" or "tank"
-GAMEPAD_MODE = "tank"
 SCREEN_HEIGHT = 48
 SCREEN_WIDTH = 48
 
@@ -27,9 +26,8 @@ class RobotClass:
     MAX_X = 143                 # maximum X value, inches, field is 12'x12'
     MAX_Y = 143                 # maximum Y value, inches, field is 12'x12'
     neg = -1                    # negate left motor calculation
-    symbol = '@'                # the character representation of the robot on the field
 
-    def __init__(self):
+    def __init__(self, queue=None):
         self.X = 72.0           # X position of the robot
         self.Y = 72.0           # Y position of the robot
         self.Wl = 0.0           # angular velocity of l wheel, degree/s
@@ -38,34 +36,46 @@ class RobotClass:
         self.rtheta = 0.0       # angular position of r wheel, degree
         self.dir = 0.0         # Direction of the robot facing, degree
 
-        self._coroutines_running = set()
+        # All asychronous functions currently running
+        self.running_coroutines = set()
 
-    """ Differential Drive Calculation Reference:
-    https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf
-    """
-    def update_position(self):
-        """Updates position of the  Robot using differential drive equations"""
-        lv = self.Wl * Robot.w_radius * Robot.neg
-        rv = self.Wr * Robot.w_radius
+        # Ensure we don't hit sync errors when updating our values
+        self.queue = queue
+
+    async def update_position(self):
+        """Updates position of the  Robot using differential drive equations
+        
+        Derived with reference to:
+        https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf
+        """
+        lv = self.Wl * RobotClass.w_radius * RobotClass.neg
+        rv = self.Wr * RobotClass.w_radius
         radian = math.radians(self.dir)
         if (lv == rv):
-            distance = rv * Robot.tick_rate
+            distance = rv * RobotClass.tick_rate
             dx = distance * math.cos(radian)
             dy = distance * math.sin(radian)
+            final_dir = None
 
         else:
-            rt = Robot.width/2 * (lv+rv)/(rv-lv)
-            Wt = (rv-lv)/Robot.width
-            theta = Wt * Robot.tick_rate
+            rt = RobotClass.width/2 * (lv+rv)/(rv-lv)
+            Wt = (rv-lv)/RobotClass.width
+            theta = Wt * RobotClass.tick_rate
             i = rt * (1 - math.cos(theta))
             j = math.sin(theta) * rt
             dx = i * math.sin(radian) + j * math.cos(radian)
             dy = i * math.cos(radian) + j * math.sin(radian)
-            self.dir = (self.dir + math.degrees(theta)) % 360
-        self.X = max(min(self.X + dx, Robot.MAX_X), 0)
-        self.Y = max(min(self.Y + dy, Robot.MAX_Y), 0)
+            self.dir= (self.dir + math.degrees(theta)) % 360
+
+        self.X = max(min(self.X + dx, RobotClass.MAX_X), 0)
+        self.Y = max(min(self.Y + dy, RobotClass.MAX_Y), 0)
         self.ltheta = (self.Wl * 5 + self.ltheta) % 360
         self.rtheta = (self.Wr * 5 + self.rtheta) % 360
+
+        if self.queue is not None:
+            await self.queue.put({'x':self.X,
+                             'y':self.Y,
+                             'dir':self.dir})
 
     def set_value(self, device, param, speed):
         """Runtime API method for updating L/R motor speed. Takes only L/R
@@ -80,6 +90,10 @@ class RobotClass:
             self.Wr = speed * 9
         else:
             raise KeyError("Cannot find device name: " + device)
+
+    def print_state(self):
+        form = "x = %.2f, y = %.2f, theta = %.2f"
+        print(form % (self.X, self.Y, self.dir))
 
     def run(self, fn, *args, **kwargs):
         """
@@ -101,16 +115,18 @@ class RobotClass:
         elif not inspect.iscoroutinefunction(fn):
             raise ValueError("First argument to Robot.run must be defined with `async def`, not `def`")
 
-        if fn in self._coroutines_running:
+        if fn in self.running_coroutines:
             return
 
-        self._coroutines_running.add(fn)
+        self.running_coroutines.add(fn)
 
+        # Calling a coroutine does not execute it
+        # Rather returns  acoroutine object
         future = fn(*args, **kwargs)
 
         async def wrapped_future():
             await future
-            self._coroutines_running.remove(fn)
+            self.running_coroutines.remove(fn)
 
         # asyncio.ensure_future(wrapped_future())
         asyncio.ensure_future(wrapped_future())
@@ -127,7 +143,7 @@ class RobotClass:
         elif not inspect.iscoroutinefunction(fn):
             raise ValueError("First argument to Robot.is_running must be defined with `async def`, not `def`")
 
-        return fn in self._coroutines_running
+        return fn in self.running_coroutines
 
 
 class GamepadClass:
@@ -335,144 +351,24 @@ class Camera:
         for x in formatted_list:
             print(x)
 
-
-class Screen:
-    """A visual representation of the field and menu"""
-
-    SCREEN_HEIGHT = 36
-    SCREEN_WIDTH = 36
-
-    def __init__(self, robot, gamepad):
-        self.robot = robot
-        self.gamepad = gamepad
-        self.camera = Camera(robot, gamepad)
-
-    def combiner(parts_list):
-        """Return a list of 5 strings that make up the menu_bar.
-
-        args:
-            parts_list: a list where each element is a list of 5 strings picturing an element
-        """
-
-        result = []
-        for y in range(5):
-            pre_segment = []
-            for x in range(len(parts_list)):
-                pre_segment.append(parts_list[x][y] + '  ')
-            line_str = ''.join(pre_segment)
-            result.append(line_str)
-        return result
-
-    def menu_bar(self):
-        """Print out the menubar."""
-        menu_bar_items = []
-        menu_bar_items.append(self.camera.left_wheel())
-        menu_bar_items.append(self.camera.right_wheel())
-        menu_bar_items.append(self.camera.left_joystick())
-        menu_bar_items.append(self.camera.right_joystick())
-        Camera.printer(Screen.combiner(menu_bar_items))
-
-    def clear_screen():
-        """Clear the previously drawn field"""
-        for x in range(40):
-            print()
-
-    def symbol(self):
-        """Returns a symbol that indicates the robots direction"""
-        robot_theta = self.robot.dir
-        index = round(robot_theta / 45) % 8
-        symbols = ['\u2192', '\u2197', '\u2191', '\u2196', '\u2190', '\u2199', '\u2193', '\u2198']
-        return symbols[index]
-
-    def draw(self):
-        """Draw the screen."""
-        Screen.clear_screen()
-        self.menu_bar()
-        ky = SCREEN_HEIGHT / 144.0  # screen scaling coefficient
-        kx = SCREEN_WIDTH / 144.0  # screen scaling coefficient
-        # print (self.robot.X*k)
-        for y in reversed(range(int(SCREEN_HEIGHT))):
-            line = ["."] * int(SCREEN_WIDTH)
-            for x in range(int(SCREEN_WIDTH)):
-                if ((self.robot.X * kx) // 1 == x and (self.robot.Y * ky) // 1 == y):
-                    line[x] = colored(self.symbol(), 'red')
-            print(' '.join(line))
-        print("__" * int(SCREEN_WIDTH))
-        print("X: %s, Y: %s, Theta: %s" % (self.robot.X, self.robot.Y, self.robot.dir))
-
-
-class TimeoutError(Exception):
-    pass
-
-class RuntimeError(Exception):
-    pass
-
 TIMEOUT_VALUE = 1 # seconds?
 
-def start_watchdog():
+def bound_exec(func):
+    """Ensures the function executes within TIMEOUT_VALUE seconds"""
     signal.alarm(TIMEOUT_VALUE)
+    func()
+    signal.alarm(0)
 
-def feed_watchdog():
-    signal.alarm(0) # is this redundant?
-    signal.alarm(TIMEOUT_VALUE)
+def timeout_handler(signum, frame):
+    raise TimeoutError("studentCode timed out")
 
 def ensure_is_function(tag, val):
-    if inspect.iscoroutinefunction(val):
-        raise RuntimeError("{} is defined with `async def` instead of `def`".format(tag))
     if not inspect.isfunction(val):
         raise RuntimeError("{} is not a function".format(tag))
 
 def ensure_not_overridden(module, name):
     if hasattr(module, name):
         raise RuntimeError("Student code overrides `{}`, which is part of the API".format(name))
-
-def clarify_coroutine_warnings(exception_cell):
-    """
-    Python's default error checking will print warnings of the form:
-        RuntimeWarning: coroutine '???' was never awaited
-
-    This function will inject an additional clarification message about what
-    such a warning means.
-    """
-    import warnings
-
-    default_showwarning = warnings.showwarning
-
-    def custom_showwarning(message, category, filename, lineno, file=None, line=None):
-        default_showwarning(message, category, filename, lineno, line)
-
-        if str(message).endswith('was never awaited'):
-            coro_name = str(message).split("'")[-2]
-
-            print("""
-The PiE API has upgraded the above RuntimeWarning to a runtime error!
-
-This error typically occurs in one of the following cases:
-
-1. Calling `Actions.sleep` or anything in `Actions` without using `await`.
-
-Incorrect code:
-    async def my_coro():
-        Actions.sleep(1.0)
-
-Consider instead:
-    async def my_coro():
-        await Actions.sleep(1.0)
-
-2. Calling an `async def` function from inside `setup` or `loop` without using
-`Robot.run`.
-
-Incorrect code:
-    def loop():
-        my_coro()
-
-Consider instead:
-    def loop():
-        Robot.run(my_coro)
-""".format(coro_name=coro_name), file=file)
-            exception_cell[0] = message
-
-    warnings.showwarning = custom_showwarning
 
 def _ensure_strict_semantics(fn):
     """
@@ -520,84 +416,82 @@ class ActionsClass:
 
 #######################################
 
-Robot = RobotClass()
-control_types = ['tank', 'arcade', 'other1', 'other2']
-control_type_index = control_types.index(GAMEPAD_MODE)
-assert (control_type_index != -1) , "Invalid gamepad mode"
-Gamepad = GamepadClass(control_type_index)
-Actions = ActionsClass(Robot)
-s = Screen(Robot, Gamepad)
-
 class Simulator:
-    @staticmethod
-    def simulate(setup_fn=None, loop_fn=None):
-        def timeout_handler(signum, frame):
-            raise TimeoutError("studentCode timed out")
+    def __init__(self, queue):
+        self.queue = queue
+        self.robot = RobotClass(self.queue)
+        self.init_gamepad()
+        self.actions = ActionsClass(self.robot)
+        self.load_student_code()
         signal.signal(signal.SIGALRM, timeout_handler)
 
-        # Need to pass a value by reference, so use a list as a kind of "pointer" cell
-        exception_cell = [None]
+    def init_gamepad(self):
+        control_types = ['tank', 'arcade', 'other1', 'other2']
+        GAMEPAD_MODE = "tank"
+        control_type_index = control_types.index(GAMEPAD_MODE)
+        assert (control_type_index != -1) , "Invalid gamepad mode"
+        self.gamepad = GamepadClass(control_type_index)
 
-        clarify_coroutine_warnings(exception_cell)
+    def load_student_code(self, student_code_file_name="student_code_file.py"):
+        """Load the student code from the file"""
 
-        try:
-            start_watchdog()
-            feed_watchdog()
+        # Load student code
+        student_code_file = open(student_code_file_name, 'r')
+        content = student_code_file.read()
+        student_code_file.close()
 
-            if setup_fn is None:
-                try:
-                    import __main__
-                    setup_fn = __main__.setup
-                except AttributeError:
-                    raise RuntimeError("Student code failed to define `setup`")
+        # Store the local environment into dictionary
+        env = {}
+        # Ensure the global Robot reflects the same robot Simulator is using
+        env['Robot'] = self.robot
+        env['Gamepad'] = self.gamepad
+        env['Actions'] = self.actions
+        exec(content, env)
 
-            if loop_fn is None:
-                try:
-                    import __main__
-                    loop_fn = __main__.loop
-                except AttributeError:
-                    raise RuntimeError("Student code failed to define `loop`")
+        # Eventually need to gracefully handle failures here
+        self.autonomous_setup = env['autonomous_setup']
+        self.autonomous_main = env['autonomous_main']
+        self.teleop_setup = env['teleop_setup']
+        self.teleop_main = env['teleop_main']
 
-            ensure_is_function("teleop_setup", setup_fn)
-            ensure_is_function("teleop_main", loop_fn)
+        ensure_is_function("teleop_setup", self.teleop_setup)
+        ensure_is_function("teleop_main", self.teleop_main)
 
-            feed_watchdog()
+    async def consistent_loop(self, loop_event, period, func):
+        """Execute the robot at specificed frequency.
+        
+        loop_event (Future): the loop_event this fucntion will execute in
+        period (int): the period in seconds to run func in 
+        func (function): the function to execute each loop
 
-            # Note that this implementation does not attempt to re-start student
-            # code on failure
+        func may take only TIMEOUT_VALUE seconds to finish execution
+        """
+        while True:
+            next_call = loop_event.time() + period
 
-            setup_fn()
-            feed_watchdog()
+            await self.loop_content(func)
 
-            # Now time to start the main event loop
-            import asyncio
+            sleep_time = max(next_call - loop_event.time(), 0.)
+            await asyncio.sleep(sleep_time)
 
-            async def main_loop():
-                while exception_cell[0] is None:
-                    next_call = loop.time() + Robot.tick_rate # run at 20 Hz
-                    loop_fn()
-                    feed_watchdog()
+    async def loop_content(self, func):
+        """Execute one cycle of the robot."""
+        bound_exec(func)
+        await self.robot.update_position()
+        self.robot.print_state()
 
-                    # Simulator drawing operation
-                    Robot.update_position()
-                    s.draw()
+    def simulate(self, loop_event):
+        """Simulate execution of the robot code.
 
-                    sleep_time = max(next_call - loop.time(), 0.)
-                    await asyncio.sleep(sleep_time)
+        Run setup_fn once before continuously looping loop_fn
+        """
+        if loop_event is None:
+            loop_event = asyncio.get_event_loop()
 
-                raise exception_cell[0]
+        bound_exec(self.teleop_setup)
 
-            loop = asyncio.get_event_loop()
+        loop_event.run_until_complete(self.robot.update_position())
 
-            def my_exception_handler(loop, context):
-                if exception_cell[0] is None:
-                    exception_cell[0] = context['exception']
-
-            loop.set_exception_handler(my_exception_handler)
-            loop.run_until_complete(main_loop())
-        except TimeoutError:
-            print("ERROR: student code timed out")
-            raise
-        except:
-            print("ERROR: student code terminated due to an exception")
-            raise
+        loop_event.run_until_complete(
+                self.consistent_loop(loop_event, self.robot.tick_rate, 
+                                     self.teleop_main))

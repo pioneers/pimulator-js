@@ -1,8 +1,8 @@
 import unittest
+import asyncio
+import timeout_decorator
 import time
 import pimulator
-import student_code
-import threading
 
 class RobotTestCase(unittest.TestCase):
     def setUp(self):
@@ -47,18 +47,34 @@ class RobotTestCase(unittest.TestCase):
 
 class SimulatorTestCase(unittest.TestCase):
     def setUp(self):
-        self.sim = pimulator.Simulator(threading.Lock())
+        self.queue = asyncio.Queue(maxsize=5)
+        self.loop_event = asyncio.get_event_loop()
+        self.sim = pimulator.Simulator(self.queue)
 
-    def test_time_out_setup(self):
-        long_wait = lambda: time.sleep(100)
-        self.assertRaises(TimeoutError, self.sim.simulate, long_wait, 
-                          long_wait)
+    def test_lock_blocks_update(self):
+        self.lock.acquire()
 
-    def test_time_out_main(self):
-        long_wait = lambda: time.sleep(100)
-        self.assertRaises(TimeoutError, self.sim.simulate, 
-                          student_code.teleop_setup, long_wait)
+        @timeout_decorator.timeout(1, use_signals=False)
+        def run_test_func():
+            self.sim.simulate()
 
+        with self.assertRaises(timeout_decorator.timeout_decorator.TimeoutError):
+            run_test_func()
+
+    def test_runs_fine(self):
+        """Ensure normal code executes without error"""
+
+        self.sim.simulate(self.loop_event)
+        assert False
+
+        async def check_result():
+            print("start wait for result")
+            result = await self.queue.get()
+            print("end wait for result")
+            self.assertFalse(result['x'] != 72.0 and result['y'] != 72.0 
+                             and result['dir'] != 0)
+
+        self.loop_event.run_until_complete(check_result())
         
 if __name__ == '__main__':
     unittest.main()
