@@ -7,6 +7,7 @@ import pimulator
 class RobotTestCase(unittest.TestCase):
     def setUp(self):
         self.robot = pimulator.RobotClass()
+        self.loop_event = asyncio.get_event_loop()
 
     def test_move_forward(self):
         self.robot.set_value("left_motor", "duty_cycle", 1)
@@ -19,7 +20,7 @@ class RobotTestCase(unittest.TestCase):
         self.assertEqual(72, original_y)
         self.assertEqual(0, self.robot.dir)
 
-        self.robot.update_position()
+        self.loop_event.run_until_complete(self.robot.update_position())
 
         self.assertEqual(original_y, self.robot.Y)
         self.assertTrue(original_x > self.robot.X)
@@ -36,7 +37,7 @@ class RobotTestCase(unittest.TestCase):
         self.assertEqual(72, original_y)
         self.assertEqual(0, self.robot.dir)
 
-        self.robot.update_position()
+        self.loop_event.run_until_complete(self.robot.update_position())
 
         self.assertEqual(original_y, self.robot.Y)
         self.assertEqual(original_x, self.robot.X)
@@ -51,30 +52,23 @@ class SimulatorTestCase(unittest.TestCase):
         self.loop_event = asyncio.get_event_loop()
         self.sim = pimulator.Simulator(self.queue)
 
-    def test_lock_blocks_update(self):
-        self.lock.acquire()
-
-        @timeout_decorator.timeout(1, use_signals=False)
-        def run_test_func():
-            self.sim.simulate()
-
-        with self.assertRaises(timeout_decorator.timeout_decorator.TimeoutError):
-            run_test_func()
-
     def test_runs_fine(self):
         """Ensure normal code executes without error"""
 
-        self.sim.simulate(self.loop_event)
-        assert False
-
         async def check_result():
-            print("start wait for result")
             result = await self.queue.get()
-            print("end wait for result")
             self.assertFalse(result['x'] != 72.0 and result['y'] != 72.0 
                              and result['dir'] != 0)
 
-        self.loop_event.run_until_complete(check_result())
+            # End the infinite looping of robot execution after passing the
+            # assertion
+            tasks[0].cancel()
+
+        tasks = [
+            asyncio.ensure_future(self.sim.simulate(self.loop_event)),
+            asyncio.ensure_future(check_result())
+        ]
+        self.loop_event.run_until_complete(asyncio.wait(tasks, timeout=1))
         
 if __name__ == '__main__':
     unittest.main()

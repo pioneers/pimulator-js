@@ -480,18 +480,11 @@ class Simulator:
         await self.robot.update_position()
         self.robot.print_state()
 
-    def simulate(self, loop_event):
+    async def simulate(self, loop_event):
         """Simulate execution of the robot code.
 
         Run setup_fn once before continuously looping loop_fn
         """
-        if loop_event is None:
-            loop_event = asyncio.get_event_loop()
-
         bound_exec(self.teleop_setup)
-
-        loop_event.run_until_complete(self.robot.update_position())
-
-        loop_event.run_until_complete(
-                self.consistent_loop(loop_event, self.robot.tick_rate, 
-                                     self.teleop_main))
+        await self.robot.update_position()
+        await self.consistent_loop(loop_event, self.robot.tick_rate, self.teleop_main)
