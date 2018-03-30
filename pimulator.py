@@ -1,9 +1,8 @@
 import math
+import asyncio
 import warnings
 import time
-import signal
 import inspect
-import asyncio
 import os
 
 # termcolor is an optional package
@@ -42,7 +41,7 @@ class RobotClass:
         # Ensure we don't hit sync errors when updating our values
         self.queue = queue
 
-    async def update_position(self):
+    def update_position(self):
         """Updates position of the  Robot using differential drive equations
         
         Derived with reference to:
@@ -73,9 +72,9 @@ class RobotClass:
         self.rtheta = (self.Wr * 5 + self.rtheta) % 360
 
         if self.queue is not None:
-            await self.queue.put({'x':self.X,
-                             'y':self.Y,
-                             'dir':self.dir})
+            self.queue.put({'x':self.X,
+                            'y':self.Y,
+                            'dir':self.dir})
 
     def set_value(self, device, param, speed):
         """Runtime API method for updating L/R motor speed. Takes only L/R
@@ -178,7 +177,6 @@ class GamepadClass:
         if  (timePassed >= self.durations[self.i]):
             self.i = (self.i + 1) % len(self.durations)
             self.t0 = now
-        #print(timePassed)
 
         if (device == "joystick_left_x"):
             return self.joystick_left_x[self.i]
@@ -353,12 +351,6 @@ class Camera:
 
 TIMEOUT_VALUE = 1 # seconds?
 
-def bound_exec(func):
-    """Ensures the function executes within TIMEOUT_VALUE seconds"""
-    signal.alarm(TIMEOUT_VALUE)
-    func()
-    signal.alarm(0)
-
 def timeout_handler(signum, frame):
     raise TimeoutError("studentCode timed out")
 
@@ -418,12 +410,18 @@ class ActionsClass:
 
 class Simulator:
     def __init__(self, queue):
+        """Initialize new Simulator
+
+        queue (queue.Queue): communicates robot state between threads
+            To gracefully handle when student code takes too long to run,
+            i.e. times out, the queue must be initialized with a  timeout
+        """
+
         self.queue = queue
         self.robot = RobotClass(self.queue)
         self.init_gamepad()
         self.actions = ActionsClass(self.robot)
         self.load_student_code()
-        signal.signal(signal.SIGALRM, timeout_handler)
 
     def init_gamepad(self):
         control_types = ['tank', 'arcade', 'other1', 'other2']
@@ -457,34 +455,37 @@ class Simulator:
         ensure_is_function("teleop_setup", self.teleop_setup)
         ensure_is_function("teleop_main", self.teleop_main)
 
-    async def consistent_loop(self, loop_event, period, func):
+    def consistent_loop(self, period, func):
         """Execute the robot at specificed frequency.
         
-        loop_event (Future): the loop_event this fucntion will execute in
         period (int): the period in seconds to run func in 
         func (function): the function to execute each loop
 
         func may take only TIMEOUT_VALUE seconds to finish execution
         """
         while True:
-            next_call = loop_event.time() + period
+            next_call = time.time() + period
 
-            await self.loop_content(func)
+            self.loop_content(func)
 
-            sleep_time = max(next_call - loop_event.time(), 0.)
-            await asyncio.sleep(sleep_time)
+            sleep_time = max(next_call - time.time(), 0.)
+            time.sleep(sleep_time)
 
-    async def loop_content(self, func):
+    def loop_content(self, func):
         """Execute one cycle of the robot."""
-        bound_exec(func)
-        await self.robot.update_position()
-        self.robot.print_state()
+        func()
+        self.robot.update_position()
+        # self.robot.print_state()
 
-    async def simulate(self, loop_event):
+    def simulate(self):
         """Simulate execution of the robot code.
 
         Run setup_fn once before continuously looping loop_fn
         """
-        bound_exec(self.teleop_setup)
-        await self.robot.update_position()
-        await self.consistent_loop(loop_event, self.robot.tick_rate, self.teleop_main)
+        self.teleop_setup()
+        self.robot.update_position()
+        self.consistent_loop(self.robot.tick_rate, self.teleop_main)
+
+def main(queue):
+    simulator = Simulator(queue)
+    simulator.simulate()
