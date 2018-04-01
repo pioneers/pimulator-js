@@ -29,5 +29,10 @@ def hello_world(name=None):
 def get_time():
     return str(datetime.datetime.now())
 
+
+@app.route('/okay')
+def ewkay():
+    return "okay"
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

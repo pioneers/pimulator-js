@@ -1,5 +1,8 @@
 #!/bin/bash
-docker run -p 5000:5000 --rm pie-bot-simulator
+
+export PROJECT_ID="$(gcloud config get-value project -q)"
+export DOCKER_IMAGE_NAME="gcr.io/${PROJECT_ID}/pie-bot-simulator"
+docker run -p 5000:5000 --rm ${DOCKER_IMAGE_NAME}
 
 # Create a new container running the web-server image
 

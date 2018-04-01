@@ -1,14 +1,13 @@
 #!/bin/bash
-docker build --file Dockerfile -t pie-bot-simulator ../
 
-# docker build
-# create a new Docker image
+# Get the Google Cloud Project ID
+export PROJECT_ID="$(gcloud config get-value project -q)"
 
-# --file Dockerfile-Release
-# rather than the default Dockefile, build from Dockerfile-Release
+# Create the image name
+export DOCKER_IMAGE_NAME="gcr.io/${PROJECT_ID}/pie-bot-simulator"
 
-# -t pie-bot-simulator
-# Give the image the following name
+# Build the actual image - see the other start.sh for info on the arguments
+docker build --file Dockerfile -t ${DOCKER_IMAGE_NAME} ../
 
-# .
-# Use . as the reference dir
+gcloud docker -- push ${DOCKER_IMAGE_NAME}
+
