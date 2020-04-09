@@ -34,9 +34,11 @@ function stop() {
     clearInterval(screenUpdate);
 }
 
-function start() {
-    req("/start", false)
+function start_teleop() {
+    req("/start_teleop", false)
     screenUpdate = setInterval(update, 50);
 }
-
-
+function start_auto(){
+  req("/start_auto", false)
+  screenUpdate = setInterval(update, 50)
+}

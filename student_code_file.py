@@ -1,5 +1,8 @@
+import sys
+
 def autonomous_setup():
-    pass
+    print("Autonomous mode has started!")
+    Robot.run(autonomous_actions)
 
 def autonomous_main():
     pass
@@ -26,3 +29,14 @@ def teleop_main():
         left_y = left_y * abs(left_y)
         Robot.set_value("left_motor", "duty_cycle", max(min(-(left_y + turningSpeed), 1.0), -1.0))
         Robot.set_value("right_motor", "duty_cycle", max(min(left_y - turningSpeed, 1.0), -1.0))
+
+async def autonomous_actions():
+    Robot.set_value("left_motor", "duty_cycle", -1.0)
+    Robot.set_value("right_motor", "duty_cycle", -1.0)
+    await Actions.sleep(1.0)
+    Robot.set_value("left_motor", "duty_cycle", -1.0)
+    Robot.set_value("right_motor", "duty_cycle", 1.0)
+    await Actions.sleep(0.5)
+    Robot.set_value("left_motor", "duty_cycle", 1.0)
+    Robot.set_value("right_motor", "duty_cycle", 1.0)
+    await Actions.sleep(1.0)

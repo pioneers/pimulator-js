@@ -1,13 +1,18 @@
 import datetime
 import time
 import robot
-
 from flask import Flask, render_template, jsonify
 app = Flask(__name__)
 
-@app.route('/start')
-def start():
-    return str(robot.start())
+@app.route('/start_teleop')
+def start_teleop():
+    print('Starting Teleop Mode!')
+    return str(robot.start(auto=0))
+
+@app.route('/start_auto')
+def start_auto():
+    print('Starting Autonomous Mode!')
+    return str(robot.start(auto=1))
 
 @app.route('/stop')
 def stop():
