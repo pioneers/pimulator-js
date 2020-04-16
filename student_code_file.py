@@ -11,7 +11,7 @@ def teleop_setup():
     pass
 
 def teleop_main():
-    driving_mode = 1
+    driving_mode = 2
 
     if driving_mode == 0:
         # Driving straight
@@ -19,12 +19,12 @@ def teleop_main():
         Robot.set_value("right_motor", "duty_cycle", -0.7)
     elif driving_mode == 1:
         # Tank Drive
-        Robot.set_value("left_motor", "duty_cycle", Gamepad.get_value("joystick_left_y"))
+        Robot.set_value("left_motor", "duty_cycle", -Gamepad.get_value("joystick_left_y"))
         Robot.set_value("right_motor", "duty_cycle", -Gamepad.get_value("joystick_right_y"))
     elif driving_mode == 2:
         # Arcade Drive
-        turningSpeed =  Gamepad.get_value("joystick_left_x")
-        left_y = -Gamepad.get_value("joystick_left_y")
+        turningSpeed =  Gamepad.get_value("joystick_left_y")
+        left_y = -Gamepad.get_value("joystick_left_x")
         turningSpeed = turningSpeed * abs(turningSpeed)
         left_y = left_y * abs(left_y)
         Robot.set_value("left_motor", "duty_cycle", max(min(-(left_y + turningSpeed), 1.0), -1.0))

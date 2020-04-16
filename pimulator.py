@@ -4,9 +4,13 @@ import warnings
 import time
 import inspect
 import os
+from pynput import keyboard
+from pynput.keyboard import Listener
+import __future__
 import threading
 import multiprocessing
-# termcolor is an optional package
+
+#termcolor is an optional package
 try:
     from termcolor import colored
 except ModuleNotFoundError:
@@ -48,7 +52,7 @@ class RobotClass:
         Derived with reference to:
         https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf
         """
-        lv = self.Wl * RobotClass.w_radius # * RobotClass.neg
+        lv = self.Wl * RobotClass.w_radius
         rv = self.Wr * RobotClass.w_radius
         radian = math.radians(self.dir)
         if (lv == rv):
@@ -161,32 +165,68 @@ class GamepadClass:
              [ 3,  3,  3,  3]]
             ]
 
+    
+    INVALID_COMBINATIONS = [
+        {keyboard.KeyCode(char='w'), keyboard.KeyCode(char='s')},
+        {keyboard.KeyCode(char='a'), keyboard.KeyCode(char='d')},
+        {keyboard.Key.up, keyboard.Key.down},
+        {keyboard.Key.left, keyboard.Key.right}
+    ]
+
+    COMBINATIONS1 = [
+        keyboard.KeyCode(char='w'),
+        keyboard.KeyCode(char='d'),
+        keyboard.KeyCode(char='a'),
+        keyboard.KeyCode(char='s')
+    ]
+
+    COMBINATIONS2 = [
+        keyboard.Key.up,
+        keyboard.Key.left,
+        keyboard.Key.right,
+        keyboard.Key.down
+    ]
 
     def __init__(self, set_num):
         self.set_num = set_num
-        self.t0 = time.time()
-        self.joystick_left_x = self.sets[set_num][0]
-        self.joystick_left_y =  self.sets[set_num][1]
-        self.joystick_right_x =  self.sets[set_num][2]
-        self.joystick_right_y =  self.sets[set_num][3]
-        self.durations = self.sets[set_num][4]         #lst of instr duration
-        self.i = 0                                        #index of insturction
+        # self.t0 = time.time()
+        # self.joystick_left_x = self.sets[set_num][0]
+        # self.joystick_left_y =  self.sets[set_num][1]
+        # self.joystick_right_x =  self.sets[set_num][2]
+        # self.joystick_right_y =  self.sets[set_num][3]
+        # self.durations = self.sets[set_num][4]         #lst of instr duration
+        # self.i = 0                                        #index of insturction
+        self.joystick_left_x =0
+        self.joystick_left_y = 0
+        self.joystick_right_x = 0
+        self.joystick_right_y = 0
 
     def get_value(self, device):
-        now = time.time()
-        timePassed = now - self.t0
-        if  (timePassed >= self.durations[self.i]):
-            self.i = (self.i + 1) % len(self.durations)
-            self.t0 = now
+        # now = time.time()
+        # timePassed = now - self.t0
+        # if  (timePassed >= self.durations[self.i]):
+        #     self.i = (self.i + 1) % len(self.durations)
+        #     self.t0 = now
+
+        # if (device == "joystick_left_x"):
+        #     return self.joystick_left_x[self.i]
+        # if (device == "joystick_left_y"):
+        #     return self.joystick_left_y[self.i]
+        # if (device == "joystick_right_x"):
+        #     return self.joystick_right_x[self.i]
+        # if (device == "joystick_right_y"):
+        #     return self.joystick_right_y[self.i]
+        # else:
+        #     raise KeyError("Cannot find input: " + device)
 
         if (device == "joystick_left_x"):
-            return self.joystick_left_x[self.i]
+            return self.joystick_left_x
         if (device == "joystick_left_y"):
-            return self.joystick_left_y[self.i]
+            return self.joystick_left_y
         if (device == "joystick_right_x"):
-            return self.joystick_right_x[self.i]
+            return self.joystick_right_x
         if (device == "joystick_right_y"):
-            return self.joystick_right_y[self.i]
+            return self.joystick_right_y
         else:
             raise KeyError("Cannot find input: " + device)
 
@@ -242,7 +282,7 @@ class Camera:
         self.robot = robot
         self.gamepad = gamepad
 
-    def direction(theta, label='*'):
+    def direction(self, theta, label='*'):
         """Generate a string that indicates pointing in a theta direction"""
         result = Camera.base.copy()
         result[2 * Camera.width + 4] = label
@@ -285,7 +325,7 @@ class Camera:
 
     def robot_direction(self):
         """Return a list of strings picturing the direction the robot is traveling in from an overhead view"""
-        return Camera.direction(self.robot.dir, Robot.symbol)
+        return Camera.direction(self.robot.dir, self.robot.symbol)
 
     def left_joystick(self):
         """Return a list of strings picturing the left joystick of the gamepad"""
@@ -295,7 +335,7 @@ class Camera:
         """Return a list of strings picturing the right joystick of the gamepad"""
         return Camera.direction(self.gamepad.rtheta(), 'R')
 
-    def wheel(theta, label='*'):
+    def wheel(self, theta, label='*'):
         """Generate a string picturing a wheel at position theta
 
         Args:
@@ -333,7 +373,7 @@ class Camera:
         """Return a list of strings picturing the left wheel"""
         return [colored(x, 'red') for x in Camera.wheel(self.robot.ltheta, 'L')]
 
-    def str_format(list_img):
+    def str_format(self, list_img):
         """Return a list of 5 strings each of length 9
 
         Args:
@@ -345,12 +385,12 @@ class Camera:
             result.append(''.join(segment))
         return result
 
-    def printer(formatted_list):
+    def printer(self, formatted_list):
         """Print a list of strings to graphically resemble it"""
         for x in formatted_list:
             print(x)
 
-TIMEOUT_VALUE = 1 # seconds?
+TIMEOUT_VALUE = .1 # seconds?
 
 def timeout_handler(signum, frame):
     raise TimeoutError("studentCode timed out")
@@ -423,6 +463,7 @@ class Simulator:
         self.init_gamepad()
         self.actions = ActionsClass(self.robot)
         self.load_student_code()
+        self.current = set()
 
     def init_gamepad(self):
         control_types = ['tank', 'arcade', 'other1', 'other2']
@@ -474,33 +515,107 @@ class Simulator:
 
     def loop_content(self, func):
         """Execute one cycle of the robot."""
+        
         func()
+        
+        
         self.robot.update_position()
-        # self.robot.print_state()
 
     def simulate_teleop(self):
         """Simulate execution of the robot code.
 
         Run setup_fn once before continuously looping loop_fn
         """
-        self.teleop_setup()
-        self.robot.update_position()
+        teleop_thread = threading.Thread(group=None, target=self.keyboard_control,
+                                        name="keyboard thread", daemon=True)
+      
+        teleop_thread.start()
         self.consistent_loop(self.robot.tick_rate, self.teleop_main)
+
+    
+    def on_press(self, key):
+        if len(self.current) == 0:
+            if (key in self.gamepad.COMBINATIONS1) or (key in self.gamepad.COMBINATIONS2):
+                self.current.add(key)
+                self.translate_to_movement()
+                
+        elif len(self.current) >= 1:
+            if key in self.current:
+                return
+            elem = self.current.pop()
+            self.current.add(elem)
+            # if ((elem in self.gamepad.COMBINATIONS1) and (key in self.gamepad.COMBINATIONS2)) or ((elem in self.gamepad.COMBINATIONS2) and (key in self.gamepad.COMBINATIONS1)):
+            if {elem, key} not in GamepadClass.INVALID_COMBINATIONS:
+                self.current.add(key)
+                self.translate_to_movement()
+    
+    def on_release(self, key):
+        try:
+            self.current.remove(key)
+        except:
+            return
+        if key == keyboard.KeyCode(char='w'):
+            self.gamepad.joystick_left_y = 0
+        elif key == keyboard.KeyCode(char='a'):
+            self.gamepad.joystick_left_x = 0
+        elif key == keyboard.KeyCode(char='d'):
+                self.gamepad.joystick_left_x = 0
+        elif key == keyboard.KeyCode(char='s'):
+            self.gamepad.joystick_left_y = 0
+        elif key == keyboard.Key.down:
+                self.gamepad.joystick_right_y = 0
+        elif key == keyboard.Key.up:
+            self.gamepad.joystick_right_y = 0
+        elif key == keyboard.Key.right:
+                self.gamepad.joystick_right_x = 0
+        elif key == keyboard.Key.left:
+                self.gamepad.joystick_right_x = 0
+            # self.change_movement(key)
+        
+    
+    def translate_to_movement(self):
+        if len(self.current) == 0:
+            self.robot.update_position()
+        for k in self.current:
+            if k == keyboard.KeyCode(char='w'):
+                self.gamepad.joystick_left_y = 1
+            elif k == keyboard.KeyCode(char='d'):
+                self.gamepad.joystick_left_x = -1
+                
+            elif k == keyboard.KeyCode(char='a'):
+                self.gamepad.joystick_left_x = 1
+
+            elif k == keyboard.KeyCode(char='s'):
+                self.gamepad.joystick_left_y = -1
+
+            elif k == keyboard.Key.up:
+                self.gamepad.joystick_right_y = 1
+               
+            elif k == keyboard.Key.right:
+                self.gamepad.joystick_right_x = 1
+                
+            elif k == keyboard.Key.left:
+                self.gamepad.joystick_right_x = -1
+
+            elif k == keyboard.Key.down:
+                self.gamepad.joystick_right_y = -1
+        self.robot.update_position()
+    
+    def keyboard_control(self):
+        with Listener(on_press=self.on_press, on_release=self.on_release) as l:
+            l.join()
 
     def simulate_auto(self):
         auto_thread = threading.Thread(group=None, target=self.autonomous_setup,
                                         name="autonomous code thread", daemon=True)
-        # auto_thread = multiprocessing.Process(group=None, target=autonomous_setup_toplevel, args=(self,),
-        #                                 name="autonomous code thread", daemon=True)
         auto_thread.start()
         self.consistent_loop(self.robot.tick_rate,self.robot.update_position)
 
-def autonomous_setup_toplevel(sim):
-    sim.autonomous_setup()
-
 def main(queue, auto):
+    
     simulator = Simulator(queue)
     if auto:
         simulator.simulate_auto()
+    
     else:
         simulator.simulate_teleop()

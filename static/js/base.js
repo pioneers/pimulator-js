@@ -8,7 +8,7 @@ function req(arg, act) {
                   var state = JSON.parse(this.responseText);
                   console.log("StateX")
                   console.log(state.x)
-                  document.getElementById("demo").innerHTML = String([state.x, state.y])
+                  document.getElementById("demo").innerHTML = state.x.toFixed(2) + ", " + state.y.toFixed(2)
                   var robotRect = document.querySelector("rect")
                   console.log("SVG")
                   console.log(robotRect)
