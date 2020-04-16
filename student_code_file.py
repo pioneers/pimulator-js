@@ -1,5 +1,3 @@
-import sys
-
 def autonomous_setup():
     print("Autonomous mode has started!")
     Robot.run(autonomous_actions)
