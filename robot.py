@@ -18,17 +18,19 @@ def start(auto=0):
     if robot_thread:
         return False
     else:
-        global state_queue
+        global state_queue, robot_on
         state_queue = queue.Queue(5)
         pimulator.robot_on = True
 
         # We utilize a daemon thread to such that the thread exits even if we
         # do not exit gracefully from __main__
-        robot_thread = threading.Thread(group=None, target=pimulator.main, args=(state_queue,auto),
+        robot_thread = threading.Thread(group=None, target=pimulator.main, args=(state_queue,auto,stop),
                                         name="robot thread", daemon=True)
+        # robot_thread = multiprocessing.Process(group=None, target=pimulator.main, args=(state_queue,auto),
+        #                                 name="robot thread", daemon=True)
         robot_thread.start()
         print("robot started")
-        
+
         return True
 
 def stop():
@@ -48,4 +50,4 @@ def get_state():
     Attempt fails if no state is added after 3 seconds
     """
 
-    return state_queue.get(timeout=0.1)
+    return state_queue.get(timeout=0.5)

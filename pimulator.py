@@ -9,13 +9,13 @@ from pynput.keyboard import Listener
 import __future__
 import threading
 import multiprocessing
-
-#termcolor is an optional package
+# termcolor is an optional package
 try:
     from termcolor import colored
 except ModuleNotFoundError:
     colored = lambda x, y: x
 
+code_str = ""
 robot_on = False
 SCREEN_HEIGHT = 48
 SCREEN_WIDTH = 48
@@ -476,10 +476,11 @@ class Simulator:
         """Load the student code from the file"""
 
         # Load student code
-        student_code_file = open(student_code_file_name, 'r')
-        content = student_code_file.read()
-        student_code_file.close()
-
+        # student_code_file = open(student_code_file_name, 'r')
+        # content = student_code_file.read()
+        # student_code_file.close()
+        content = code_str
+        
         # Store the local environment into dictionary
         env = {}
         # Ensure the global Robot reflects the same robot Simulator is using
@@ -497,7 +498,7 @@ class Simulator:
         ensure_is_function("teleop_setup", self.teleop_setup)
         ensure_is_function("teleop_main", self.teleop_main)
 
-    def consistent_loop(self, period, func):
+    def consistent_loop(self, period, func, runtime):
         """Execute the robot at specificed frequency.
 
         period (int): the period in seconds to run func in
@@ -505,7 +506,9 @@ class Simulator:
 
         func may take only TIMEOUT_VALUE seconds to finish execution
         """
-        while robot_on:
+        global robot_on
+        end_time = time.time() + runtime
+        while robot_on and ((time.time() < end_time) or (runtime <= 0)):
             next_call = time.time() + period
 
             self.loop_content(func)
@@ -530,9 +533,8 @@ class Simulator:
                                         name="keyboard thread", daemon=True)
       
         teleop_thread.start()
-        self.consistent_loop(self.robot.tick_rate, self.teleop_main)
+        self.consistent_loop(self.robot.tick_rate, self.teleop_main, -1)
 
-    
     def on_press(self, key):
         if len(self.current) == 0:
             if (key in self.gamepad.COMBINATIONS1) or (key in self.gamepad.COMBINATIONS2):
@@ -605,17 +607,18 @@ class Simulator:
         with Listener(on_press=self.on_press, on_release=self.on_release) as l:
             l.join()
 
-    def simulate_auto(self):
+    def simulate_auto(self, stop_fn):
         auto_thread = threading.Thread(group=None, target=self.autonomous_setup,
                                         name="autonomous code thread", daemon=True)
         auto_thread.start()
-        self.consistent_loop(self.robot.tick_rate,self.robot.update_position)
+        self.consistent_loop(self.robot.tick_rate,self.robot.update_position, 30)
+        stop_fn()
 
-def main(queue, auto):
+def main(queue, auto, stop_fn):
     
     simulator = Simulator(queue)
     if auto:
-        simulator.simulate_auto()
+        simulator.simulate_auto(stop_fn)
     
     else:
         simulator.simulate_teleop()

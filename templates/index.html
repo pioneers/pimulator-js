@@ -6,14 +6,14 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
+    
     <title>PiE Robotics Simulator</title>
   </head>
 
   <body>
     <h1>PiE Robotics Simulator</h1>
 
-    <svg width="200" height="200" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <svg width="200" height="200" version="1.1" xmlns="http://www.w3.org/2000/svg" style="border:1px solid black">
       <rect x="70"
             y="10"
             width="30"
@@ -34,7 +34,68 @@
     <button type="button" onclick="start_auto()">Autonomous Simulation </button>
     <button type="button" onclick="stop()">stop simulation</button>
 
+    <!-- File input code -->
+    <!-- <input type="file" id="input" accept="py">
+    <p id="warning"></p>
+    <p id="contents">   </p> -->
+
+    <div style="margin-top:20px">
+    <!-- Create a simple CodeMirror instance -->
+    <script src="{{ url_for('static', filename='js/codemirror.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/codemirror.css') }}">
+    <script src="{{ url_for('static', filename='js/python.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <button type="button" onclick="codemirror_send()">Upload code</button>
+    <script>
+      var cm = CodeMirror(document.body, {
+        value: "",
+        mode:  "python",
+        lineNumbers: true,
+        indentUnit: 4
+      });
+      
+      cm.setSize(width="60%", height="1000px");
+      var xhr=new XMLHttpRequest();
+      xhr.open("GET","{{ url_for('static', filename='student_code_file.py') }}");
+      xhr.onload=function(){
+        cm.setValue(xhr.responseText);
+      }
+      xhr.send();
+
+      function codemirror_send(){
+        send_code(btoa(cm.getValue()))
+      }
+    </script>
+    </div>
+
     <script src="{{ url_for('static', filename='js/base.js') }}"></script>
+
+    <!-- Auto Func
+    <script>
+      function handleFileSelect(evt) {
+        var files = evt.target.files; // FileList object
+
+          // Only process python files.
+          // if (!files[0].type.match('text/plain')) {
+          //   document.getElementById("warning").innerHTML = "wrong file type";
+          // } else {
+            document.getElementById("warning").innerHTML = "py file loaded";
+
+
+            var reader = new FileReader();
+            reader.onload = function(file) {
+              // document.getElementById("contents").innerHTML = "<a href='" + reader.result + "'>link</a>";
+              // var splitStr = dataURL.split("base64,", 2)
+              // send_code(reader.result);
+              send_code(btoa(reader.result));
+            }
+            reader.readAsBinaryString(files[0]);
+          // }
+      }
+
+      document.getElementById('input').addEventListener('change', handleFileSelect, false);
+    </script> -->
+
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

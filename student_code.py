@@ -38,6 +38,3 @@ async def autonomous_actions():
     Robot.set_value("left_motor", "duty_cycle", 1.0)
     Robot.set_value("right_motor", "duty_cycle", 1.0)
     await Actions.sleep(1.0)
-    Robot.set_value("left_motor", "duty_cycle", 0.0)
-    Robot.set_value("right_motor", "duty_cycle", 0.0)
-    await Actions.sleep(1.0)
