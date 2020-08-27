@@ -2,6 +2,7 @@ var screenUpdate;
 
 function req(arg, act) {
     var xhttp = new XMLHttpRequest();
+    var scaleFactor = 2;
     if (act) {
         xhttp.onreadystatechange = function() {
               if (this.readyState == 4 && this.status == 200) {
@@ -14,7 +15,7 @@ function req(arg, act) {
                 //   console.log(robotRect)
                   robotRect.setAttributeNS(null, "x", state.x)
                   robotRect.setAttributeNS(null, "y", state.y)
-                  var rotateStr = "rotate(" + state.theta + " " + (state.x + 15) + " " + (state.y + 20) + ")"
+                  var rotateStr = "rotate(" + state.theta + " " + (state.x + 15*scaleFactor) + " " + (state.y + 20*scaleFactor) + ")"
                 //   console.log(rotateStr)
                   robotRect.setAttribute("transform", rotateStr)
                 // console.log("Adjusted")

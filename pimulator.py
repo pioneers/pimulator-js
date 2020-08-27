@@ -19,21 +19,22 @@ code_str = ""
 robot_on = False
 SCREEN_HEIGHT = 48
 SCREEN_WIDTH = 48
+scale_factor = 2
 
 #######################################
 class RobotClass:
     """The MODEL for this simulator. Stores robot data and handles position
        calculations & Runtime API calls """
     tick_rate = 0.05             # in s
-    width = 12                  # width of robot , inches
-    w_radius = 2                # radius of a wheel, inches
-    MAX_X = 143                 # maximum X value, inches, field is 12'x12'
-    MAX_Y = 143                 # maximum Y value, inches, field is 12'x12'
+    width = 12 * scale_factor                  # width of robot , inches
+    w_radius = 2 * scale_factor                # radius of a wheel, inches
+    MAX_X = 143 * scale_factor                 # maximum X value, inches, field is 12'x12'
+    MAX_Y = 143 * scale_factor                 # maximum Y value, inches, field is 12'x12'
     neg = -1                    # negate left motor calculation
 
     def __init__(self, queue=None):
-        self.X = 72.0           # X position of the robot
-        self.Y = 72.0           # Y position of the robot
+        self.X = 72.0 * scale_factor           # X position of the robot
+        self.Y = 72.0 * scale_factor           # Y position of the robot
         self.Wl = 0.0           # angular velocity of l wheel, degree/s
         self.Wr = 0.0           # angular velocity of r wheel, degree/s
         self.ltheta = 0.0       # angular position of l wheel, degree
@@ -53,7 +54,7 @@ class RobotClass:
         https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf
         """
         lv = self.Wl * RobotClass.w_radius
-        rv = self.Wr * RobotClass.w_radius
+        rv = self.Wr * RobotClass.w_radius * RobotClass.neg
         radian = math.radians(self.dir)
         if (lv == rv):
             distance = rv * RobotClass.tick_rate
