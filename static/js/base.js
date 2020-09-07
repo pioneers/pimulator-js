@@ -1,22 +1,22 @@
 var simulator;
 
 function update(state) {
-  /*
-  Update the state (position and direction) of the robot.
-  Example of state: {x:72, y:72, theta:0}
-  */
-  // console.log("StateX")
-  // console.log(state.x)
-  document.getElementById("demo").innerHTML = state.x.toFixed(2) + ", " + state.y.toFixed(2)
-  var robotRect = document.querySelector("rect")
-  // console.log("SVG")
-  // console.log(robotRect)
-  robotRect.setAttributeNS(null, "x", state.x)
-  robotRect.setAttributeNS(null, "y", state.y)
-  var rotateStr = "rotate(" + state.theta + " " + (state.x + 15*scaleFactor) + " " + (state.y + 20*scaleFactor) + ")"
-  // console.log(rotateStr)
-  robotRect.setAttribute("transform", rotateStr)
-  // console.log("Adjusted")
+    /*
+    Update the state (position and direction) of the robot.
+    Example of state: {x:72, y:72, theta:0}
+    */
+    // console.log("StateX")
+    // console.log(state.x)
+    document.getElementById("demo").innerHTML = state.x.toFixed(2) + ", " + state.y.toFixed(2)
+    var robotRect = document.querySelector("rect")
+    // console.log("SVG")
+    // console.log(robotRect)
+    robotRect.setAttributeNS(null, "x", state.x)
+    robotRect.setAttributeNS(null, "y", state.y)
+    var rotateStr = "rotate(" + state.theta + " " + (state.x + 15*scaleFactor) + " " + (state.y + 20*scaleFactor) + ")"
+    // console.log(rotateStr)
+    robotRect.setAttribute("transform", rotateStr)
+    // console.log("Adjusted")
 };
 
 function start(auto=0) {
@@ -27,8 +27,8 @@ function start(auto=0) {
     if (simulator != null) {
         return;
     }
-    else {        
-        simulator = Simulator();
+    else {
+        simulator = Simulator(auto);
 
         // We utilize a daemon thread to such that the thread exits even if we
         // do not exit gracefully from __main__
@@ -45,5 +45,5 @@ function stop() {
     */
     simulator.stop();
     simulator = null;
-    update({x:72, y:72, theta:0});
+    update({x:140, y:140, theta:0});
 };
