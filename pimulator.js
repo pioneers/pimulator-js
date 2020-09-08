@@ -439,7 +439,7 @@ class Simulator{
     }
 
     keyboardControl(){
-        /* TODO: Listen for key presses somehow and  */
+        /* TODO: Listen for key presses somehow in teleop */
         // with Listener(on_press=this.on_press, on_release=this.on_release) as l:
         //     l.join()
     }
