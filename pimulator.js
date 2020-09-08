@@ -170,31 +170,31 @@ class GamepadClass{
 
     constructor(setNum) {
         this.setNum = setNum;
-        this.joystickLeftX = 0;
-        this.joystickLeftY = 0;
-        this.joystickRightX = 0;
-        this.joystickRightY = 0;
+        this.joystick_left_x = 0;
+        this.joystick_left_y = 0;
+        this.joystick_right_x = 0;
+        this.joystick_right_y = 0;
 
         /*
         # this.t0 = time.time()
-        # this.joystickLeftX = this.sets[setNum][0]
-        # this.joystickLeftY =  this.sets[setNum][1]
-        # this.joystickRightX =  this.sets[setNum][2]
-        # this.joystickRightY =  this.sets[setNum][3]
+        # this.joystick_left_x = this.sets[setNum][0]
+        # this.joystick_left_y =  this.sets[setNum][1]
+        # this.joystick_right_x =  this.sets[setNum][2]
+        # this.joystick_right_y =  this.sets[setNum][3]
         # this.durations = this.sets[setNum][4]         #lst of instr duration
         # this.i = 0                                        #index of insturction
         */
     }
 
     getValue(device) {
-        if (device === "joystickLeftX") {
-            return this.joystickLeftX;
-        } else if (device === "joystickLeftY") {
-            return this.joystickLeftY;
-        } else if (device === "joystickRightX") {
-            return this.joystickRightX;
-        } else if (device === "joystickRightY") {
-            return this.joystickRightY;
+        if (device === "joystick_left_x") {
+            return this.joystick_left_x;
+        } else if (device === "joystick_left_y") {
+            return this.joystick_left_y;
+        } else if (device === "joystick_right_x") {
+            return this.joystick_right_x;
+        } else if (device === "joystick_right_y") {
+            return this.joystick_right_y;
         } else {
             throw new Error("Cannot find input: " + device);
         }
@@ -203,13 +203,13 @@ class GamepadClass{
 
     ltheta(this){
         return this.theta(
-                    this.getValue("joystickLeftX"),
-                        -this.getValue("joystickLeftY"))}
+                    this.getValue("joystick_left_x"),
+                        -this.getValue("joystick_left_y"))}
 
     rtheta(this){
         return this.theta(
-                    this.getValue("joystickRightX"),
-                        -this.getValue("joystickRightY"))}
+                    this.getValue("joystick_right_x"),
+                        -this.getValue("joystick_right_y"))}
 
 
     static theta(x, y){
@@ -392,21 +392,21 @@ class Simulator{
           return null;
         }
         if (keyCode === 87) { // w
-            this.gamepad.joystickLeftY = 0;
+            this.gamepad.joystick_left_y = 0;
         } else if (keyCode === 65) { // a
-            this.gamepad.joystickLeftX = 0;
+            this.gamepad.joystick_left_x = 0;
         } else if (keyCode === 83) { // s
-            this.gamepad.joystickLeftY = 0;
+            this.gamepad.joystick_left_y = 0;
         } else if (keyCode === 68) { // d
-            this.gamepad.joystickLeftX = 0;
+            this.gamepad.joystick_left_x = 0;
         } else if (keyCode === 38) { // up
-            this.gamepad.joystickRightY = 0;
+            this.gamepad.joystick_right_y = 0;
         } else if (keyCode === 40) { // down
-            this.gamepad.joystickRightY = 0;
+            this.gamepad.joystick_right_y = 0;
         } else if (keyCode === 37) { // left
-            this.gamepad.joystickRightX = 0;
+            this.gamepad.joystick_right_x = 0;
         } else if (keyCode === 39) { // right
-            this.gamepad.joystickRightX = 0;
+            this.gamepad.joystick_right_x = 0;
         }
       //this.changeMovement(keyCode)
     }
@@ -418,29 +418,30 @@ class Simulator{
         var k;
         for (k of this.current) {
             if (keyCode === 87) { // w
-                this.gamepad.joystickLeftY = 1;
+                this.gamepad.joystick_left_y = 1;
             } else if (keyCode === 65) { // a
-                this.gamepad.joystickLeftX = 1;
+                this.gamepad.joystick_left_x = 1;
             } else if (keyCode === 83) { // s
-                this.gamepad.joystickLeftY = -1;
+                this.gamepad.joystick_left_y = -1;
             } else if (keyCode === 68) { // d
-                this.gamepad.joystickLeftX = -1;
+                this.gamepad.joystick_left_x = -1;
             } else if (keyCode === 38) { // up
-                this.gamepad.joystickRightY = 1;
+                this.gamepad.joystick_right_y = 1;
             } else if (keyCode === 40) { // down
-                this.gamepad.joystickRightY = -1;
+                this.gamepad.joystick_right_y = -1;
             } else if (keyCode === 37) { // left
-                this.gamepad.joystickRightX = -1;
+                this.gamepad.joystick_right_x = -1;
             } else if (keyCode === 39) { // right
-                this.gamepad.joystickRightX = 1;
+                this.gamepad.joystick_right_x = 1;
             }
         }
         this.robot.updatePosition();
     }
 
     keyboardControl(){
-        with Listener(on_press=this.on_press, on_release=this.on_release) as l:
-            l.join()
+        /* TODO: Listen for key presses somehow and  */
+        // with Listener(on_press=this.on_press, on_release=this.on_release) as l:
+        //     l.join()
     }
 
     simulate_teleop(){
