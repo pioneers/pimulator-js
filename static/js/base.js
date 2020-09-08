@@ -1,4 +1,4 @@
-var simulator;
+var simulator = new Simulator();
 
 function update(state) {
     /*
@@ -24,12 +24,16 @@ function start(auto=0) {
     Start the robot thread
     Return if started robot thread
     */
-    if (simulator != null) {
+    if (simulator.isRunning) {
         return;
     }
     else {
-        simulator = Simulator(auto);
-
+        if (auto === 0) {
+            simulator.simulate_teleop();
+        }
+        else if (auto === 1) {
+            simulator.simulate_auto();
+        }
         // We utilize a daemon thread to such that the thread exits even if we
         // do not exit gracefully from __main__
         // robotWorker = new Worker("{{ url_for('static', filename='js/pimulator.js') }}");
