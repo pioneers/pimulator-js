@@ -14,7 +14,6 @@
 //     from termcolor import colored
 // except ModuleNotFoundError:
 //     colored = lambda x, y: x
-import * from Math
 
 const SCREENHEIGHT = 48
 const SCREENWIDTH = 48
@@ -114,51 +113,26 @@ class RobotClass {
         console.log('x = ${this.X.toFixed(2)}, y = ${this.Y.toFixed(2)}, theta = ${this.dir.toFixed(2)}');
     }
 
-    run(this, fn, *args, **kwargs){
-        /*"""
+    run(fn) {
+        /*
         Starts a "coroutine", i.e. a series of actions that proceed
         independently of the main loop of code.
-
-        The first argument must be a function defined with `async def`.
-
-        The remaining arguments are then passed to that function before it is
-        called.
-
-        Multiple simultaneous coroutines that use the same robot actuators will
-        lead to surprising behavior. To help guard against errors, calling
-        `Robot.run` with a `fn` argument that is currently running is a no-op.
-        """
-
-        if not inspect.isfunction(fn):
-            raise ValueError("First argument to Robot.run must be a function")
-        elif not inspect.iscoroutinefunction(fn):
-            raise ValueError("First argument to Robot.run must be defined with `async def`, not `def`")
-
-        //#if fn in this.runningCoroutines:
-        //#    return
-
-        #this.runningCoroutines.add(fn)
-
-        # Calling a coroutine does not execute it
-        # Rather returns  acoroutine object
-        #future = fn(*args, **kwargs)
-
-        #async def wrappedFuture():
-            #await future
-            #this.runningCoroutines.remove(fn)
-        asyncio.run(fn(*args, **kwargs))
-        #asyncio.ensureFuture(wrappedFuture())
-        #asyncio.ensureFuture(wrappedFuture())
-     */
+        */
+        if (!(typeof fn === "function")) {
+            throw new Error("First argument to Robot.isRunning must be a function");
+        }
+        fn()
    }
     isRunning(fn) {
         /* Returns True if the given `fn` is already running as a coroutine.
 
         See: Robot.run*/
         if (!(typeof fn === "function")) {
-          throw new Error("First argument to Robot.isRunning must be a function");
-        } else if (!())
+            throw new Error("First argument to Robot.isRunning must be a function");
+        }
+        return this.runningCoroutines.has(fn)
     }
+}
 
 class GamepadClass{
           //  #0, #1, #2, #3
@@ -173,7 +147,7 @@ class GamepadClass{
         left    37  ArrowLeft
         right   39  ArrowRight
     */
-    var INVALIDCOMBINATIONS = [
+    INVALIDCOMBINATIONS = [
         {keyboard.KeyCode(char='w'), keyboard.KeyCode(char='s')},
         {keyboard.KeyCode(char='a'), keyboard.KeyCode(char='d')},
         {keyboard.Key.up, keyboard.Key.down},
@@ -239,8 +213,8 @@ class GamepadClass{
 
 
     static theta(x, y){
-        """Convert cartesian to polar coordinates and return the radius."""
-        if (x == 0 and y == 0) return "Neutral";
+        /* Convert cartesian to polar coordinates and return the radius. */
+        if (x == 0 && y == 0) return "Neutral";
         if (x == 0) {
             if (y > 0) return 90.0;
             else return 270.0;
@@ -250,6 +224,8 @@ class GamepadClass{
         else return theta + 180.0;
     }
 }
+
+/*
 function isFunction(functionToCheck) {
  return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
 }
@@ -267,10 +243,7 @@ function ensure_not_overridden(module, name){
     if hasAttribute(module, name) raise new Error("Student code overrides ${name}, which is part of the API")}
 
 function _ensure_strict_semantics(fn){
-    /*"""
-    (Internal): provides additional error checking for the PiE API
-    """
-    */
+    */ /* (Internal): provides additional error checking for the PiE API */ /*
     if (!inspect.iscoroutinefunction(fn)){
         throw new Error("Internal runtime error: _ensure_strict_semantics can only be applied to `async def` functions")}
 
@@ -296,25 +269,8 @@ function _ensure_strict_semantics(fn){
       }
     return wrapped_fn
 }
+*/
 
-class ActionsClass{
-    /*"""
-    This class contains a series of pre-specified actions that a robot can
-    perform. These actions should be used inside a coroutine using an `await`
-    statement, e.g. `await Actions.sleep(1.0)`
-    """ */
-
-    constructor(this, robot){
-        this._robot = robot}
-
-    @_ensure_strict_semantics
-    async def sleep(this, seconds):
-        // """
-        //Waits for specified number of `seconds`
-        //"""
-
-        await asyncio.sleep(seconds)
-}
 //#######################################
 
 class Simulator{
@@ -361,6 +317,7 @@ class Simulator{
             exec(content, env)
             `);
         });
+        env = pyodide.pyimport("env");
 
         //# Eventually need to gracefully handle failures here
         this.autonomous_setup = env['autonomous_setup']
@@ -368,11 +325,11 @@ class Simulator{
         this.teleop_setup = env['teleop_setup']
         this.teleop_main = env['teleop_main']
 
-        ensure_is_function("teleop_setup", this.teleop_setup)
-        ensure_is_function("teleop_main", this.teleop_main)
+        // ensure_is_function("teleop_setup", this.teleop_setup)
+        // ensure_is_function("teleop_main", this.teleop_main)
     }
 
-    async consistent_loop(period, func, runtime){
+    consistent_loop(period, func, runtime){
         /* Execute the robot at specificed frequency.
 
         period (int): the period in seconds to run func in
@@ -382,35 +339,24 @@ class Simulator{
         */
         period = period * 1000;
         runtime = runtime * 1000;
-        end_time = new Date() + runtime;
-        while (this.isRunning && ((new Date() < end_time) || (runtime <= 0))){
-            next_call  = new Date() + period
 
-            this.loopContent(func)
-
-            sleep_time = max(next_call - new Date(), 0.)
-            await sleep(sleep_time)
-          }
+        this.interval = setInterval(function() {this.loop_content(func)}, period);
+        setTimeout(function() { this.stop(); }, runtime);
     }
 
     loopContent(func) {
         /* Execute one cycle of the robot.
         */
-        func()
-        this.robot.updatePosition()
+        func();
+        this.robot.updatePosition();
         return null;
     }
-    // simulate_teleop(){
-    //     /*"""Simulate execution of the robot code.
-    //
-    //     Run setup_fn once before continuously looping loop_fn
-    //     """*/
-    //     teleop_thread = threading.Thread(group=null, target=this.keyboard_control,
-    //                                     name="keyboard thread", daemon=True)
-    //
-    //     teleop_thread.start()
-    //     this.consistent_loop(this.robot.tickRate, this.teleop_main, -1)
-    // }}
+
+    stop() {
+        if (this.interval !== null) {
+            clearInterval(this.interval);
+        }
+    }
 
     onPress(keyCode) {
         /* Handling the events associated with pressing a key. Keyboard inputs are inputted as
@@ -496,22 +442,24 @@ class Simulator{
         with Listener(on_press=this.on_press, on_release=this.on_release) as l:
             l.join()
     }
-    simulateAuto(stop_fn){
+
+    simulate_teleop(){
+        /* Simulate execution of the robot code.
+
+        Run setup_fn once before continuously looping loop_fn */
+        teleop_thread = threading.Thread(group=null, target=this.keyboard_control,
+                                        name="keyboard thread", daemon=True)
+    
+        teleop_thread.start()
+        this.consistent_loop(this.robot.tickRate, this.teleop_main, -1)
+    }
+
+    simulateAuto(stop_fn) {
         is_running = true
         auto_thread = threading.Thread(group=null, target=this.autonomous_setup,
                                         name="autonomous code thread", daemon=True)
         auto_thread.start()
-        this.consistent_loop(this.robot.tickRate,this.robot.updatePosition, 30)
+        this.consistent_loop(this.robot.tickRate, this.robot.updatePosition, 30)
         stop_fn()
     }
 }
-def main(auto, stop_fn){
-
-    simulator = new Simulator()
-    if (auto){
-        simulator.simulateAuto(stop_fn)
-    }
-    else{
-        simulator.simulate_teleop()
-      }
-    }
