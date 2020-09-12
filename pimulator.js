@@ -147,7 +147,28 @@ class GamepadClass{
         left    37  ArrowLeft
         right   39  ArrowRight
     */
-    INVALIDCOMBINATIONS = [
+    INVALID_COMBINATIONS = [
+      new SortedSet([87, 83]), //w, s
+      new SortedSet([65, 68]), //a, d
+      new SortedSet([38, 40]), //up, down
+      new SortedSet([37, 39])  //left, right
+    ]
+
+    COMBINATIONS1 = [
+      87, //w
+      68, //d
+      65, //a
+      83  //s
+    ]
+
+    COMBINATIONS2 = [
+      38, //up
+      37, //left
+      39, //right
+      40  //down
+    ]
+
+    /*INVALIDCOMBINATIONS = [
         {keyboard.KeyCode(char='w'), keyboard.KeyCode(char='s')},
         {keyboard.KeyCode(char='a'), keyboard.KeyCode(char='d')},
         {keyboard.Key.up, keyboard.Key.down},
@@ -166,7 +187,7 @@ class GamepadClass{
         keyboard.Key.left,
         keyboard.Key.right,
         keyboard.Key.down
-    ]
+    ]*/
 
     constructor(setNum) {
         this.setNum = setNum;
@@ -283,7 +304,7 @@ class Simulator{
         this.initGamepad()
         this.actions = ActionsClass(this.robot)
         this.loadStudentCode()
-        this.current = set()
+        this.current = []
         this.isRunning = false
     }
 
@@ -376,7 +397,7 @@ class Simulator{
             let elem = this.current.pop();
             this.current.push(elem);
             let tuple = SortedSet([keyCode, elem]);
-            if (!GamepadClass.INVALIDCOMBINATIONS.includes(tuple)) {
+            if (!GamepadClass.INVALID_COMBINATIONS.includes(tuple)) {
                 this.current.push(keyCode);
                 this.translateToMovement();
             }
@@ -450,7 +471,7 @@ class Simulator{
         Run setup_fn once before continuously looping loop_fn */
         teleop_thread = threading.Thread(group=null, target=this.keyboard_control,
                                         name="keyboard thread", daemon=True)
-    
+
         teleop_thread.start()
         this.consistent_loop(this.robot.tickRate, this.teleop_main, -1)
     }
