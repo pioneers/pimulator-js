@@ -19,9 +19,6 @@ const SCREENHEIGHT = 48
 const SCREENWIDTH = 48
 var scaleFactor = 2
 
-var SortedSet = require("collections/sorted-set");
-
-
 class RobotClass {
     /*The MODEL for this simulator. Stores robot data and handles position
        calculations & Runtime API calls """*/
@@ -148,10 +145,10 @@ class GamepadClass{
         right   39  ArrowRight
     */
     INVALID_COMBINATIONS = [
-      new SortedSet([87, 83]), //w, s
-      new SortedSet([65, 68]), //a, d
-      new SortedSet([38, 40]), //up, down
-      new SortedSet([37, 39])  //left, right
+      [87, 83], //w, s
+      [65, 68], //a, d
+      [38, 40], //up, down
+      [37, 39]  //left, right
     ]
 
     COMBINATIONS1 = [
@@ -383,7 +380,7 @@ class Simulator{
         /* Handling the events associated with pressing a key. Keyboard inputs are inputted as
            KEYCODE. */
            // assumes this.current is a pseudo-set (underlying implementation is an array)
-           // assumes INVALIDCOMBINATIONS is an array of SortedSets
+           // assumes INVALIDCOMBINATIONS is an array of arrays (sorted)
         keyCode = toLowercase(keyCode); //code this -> convert to lowercase if keyCode is a letter, else return arg
         if (this.current.length === 0) {
             if ((this.gamepad.COMBINATIONS.includes(keyCode)) || (this.gamepad.COMBINATIONS2.includes(keyCode))) {
@@ -396,7 +393,11 @@ class Simulator{
             }
             let elem = this.current.pop();
             this.current.push(elem);
-            let tuple = SortedSet([keyCode, elem]);
+            if (keyCode < elem) {
+              let tuple = [keyCode, elem];
+            } else {
+              let tuple = [elem, keyCode];
+            }
             if (!GamepadClass.INVALID_COMBINATIONS.includes(tuple)) {
                 this.current.push(keyCode);
                 this.translateToMovement();
