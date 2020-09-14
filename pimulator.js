@@ -357,7 +357,12 @@ class Simulator{
         */
         period = period * 1000;
         runtime = runtime * 1000;
-
+        let down = document.addEventListener('keydown', function down(e) {
+           this.onPress(e.keyCode)
+        })
+        let up document.addEventListener('keyup', function  up(e) {
+           this.onRelease(e.keyCode)
+        })
         this.interval = setInterval(function() {this.loop_content(func)}, period);
         setTimeout(function() { this.stop(); }, runtime);
     }
@@ -374,6 +379,8 @@ class Simulator{
         if (this.interval !== null) {
             clearInterval(this.interval);
         }
+        document.removeEventListener('keydown', down);
+        document.removeEventListener('keyup', up);
     }
 
     onPress(keyCode) {
@@ -381,7 +388,7 @@ class Simulator{
            KEYCODE. */
            // assumes this.current is a pseudo-set (underlying implementation is an array)
            // assumes INVALIDCOMBINATIONS is an array of arrays (sorted)
-        keyCode = toLowercase(keyCode); //code this -> convert to lowercase if keyCode is a letter, else return arg
+        keyCode = toLowercase(keyCode); //FIXME: code this -> convert to lowercase if keyCode is a letter, else return arg
         if (this.current.length === 0) {
             if ((this.gamepad.COMBINATIONS.includes(keyCode)) || (this.gamepad.COMBINATIONS2.includes(keyCode))) {
                 this.current.push(keyCode);
@@ -430,7 +437,6 @@ class Simulator{
         } else if (keyCode === 39) { // right
             this.gamepad.joystick_right_x = 0;
         }
-      //this.changeMovement(keyCode)
     }
 
     translateToMovement() {
@@ -460,20 +466,26 @@ class Simulator{
         this.robot.updatePosition();
     }
 
-    keyboardControl(){
-        /* TODO: Listen for key presses somehow in teleop */
-        // with Listener(on_press=this.on_press, on_release=this.on_release) as l:
+    /*keyboardControl(){
+        // TODO: Listen for key presses somehow in teleop //
+        // with Listener(on_press=t his.on_press, on_release=this.on_release) as l:
         //     l.join()
-    }
+
+
+        setTimeout(() => {
+
+        }, 30000);
+    }*/
 
     simulate_teleop(){
         /* Simulate execution of the robot code.
 
         Run setup_fn once before continuously looping loop_fn */
-        teleop_thread = threading.Thread(group=null, target=this.keyboard_control,
-                                        name="keyboard thread", daemon=True)
 
-        teleop_thread.start()
+        //teleop_thread = threading.Thread(group=null, target=this.keyboard_control,
+        //                                name="keyboard thread", daemon=True)
+
+        //teleop_thread.start()
         this.consistent_loop(this.robot.tickRate, this.teleop_main, -1)
     }
 
