@@ -45,7 +45,7 @@ class RobotClass {
       this.queue = queue;
     }
 
-    updatePosition(this) {
+    updatePosition() {
         /* Updates position of the  Robot using differential drive equations
 
         Derived with reference to:
