@@ -80,16 +80,17 @@
       cm.setSize(width="60%", height="1000px");
 
       var code = getCookie("code");
-      if (code === null) {
+      if (code == "" || code === null) {
+        console.log("entered if statement")
         var xhr=new XMLHttpRequest();
         xhr.open("GET","{{ url_for('static', filename='student_code_file.py') }}");
-        xhr.onload=function(){
-          code = xhr.responseText
+        xhr.onload = () => {
+          code = xhr.responseText;
+          setCookie("code", code)
+          cm.setValue(code);
         }
         xhr.send();
-        setCookie("code", code)
       }
-      cm.setValue(code);
 
       function uploadCode() {
         setCookie("code", cm.getValue());
