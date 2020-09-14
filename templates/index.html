@@ -79,14 +79,14 @@
       });
       cm.setSize(width="60%", height="1000px");
 
-      var code = getCookie("code");
+      // var code = getCookie("code");
+      var code = "";
       if (code == "" || code === null) {
-        console.log("entered if statement")
         var xhr=new XMLHttpRequest();
         xhr.open("GET","{{ url_for('static', filename='student_code_file.py') }}");
         xhr.onload = () => {
           code = xhr.responseText;
-          setCookie("code", code)
+          // setCookie("code", code)
           cm.setValue(code);
         }
         xhr.send();

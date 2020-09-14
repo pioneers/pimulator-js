@@ -320,10 +320,11 @@ class Simulator{
         */
 
         // Load student code
-        content = getCookie("code");
+        // content = getCookie("code");
+        let content = code;
 
         //# Store the local environment into dictionary
-        env = {}
+        let env = {}
         //# Ensure the global Robot reflects the same robot Simulator is using
         env['Robot'] = this.robot
         env['Gamepad'] = this.gamepad
