@@ -361,7 +361,7 @@ class Simulator{
         let down = document.addEventListener('keydown', function down(e) {
            this.onPress(e.keyCode)
         })
-        let up document.addEventListener('keyup', function  up(e) {
+        let up = document.addEventListener('keyup', function  up(e) {
            this.onRelease(e.keyCode)
         })
         this.interval = setInterval(function() {this.loop_content(func)}, period);
