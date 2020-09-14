@@ -219,12 +219,12 @@ class GamepadClass{
     }
 
 
-    ltheta(this){
+    ltheta(){
         return this.theta(
                     this.getValue("joystick_left_x"),
                         -this.getValue("joystick_left_y"))}
 
-    rtheta(this){
+    rtheta(){
         return this.theta(
                     this.getValue("joystick_right_x"),
                         -this.getValue("joystick_right_y"))}
@@ -314,7 +314,7 @@ class Simulator{
         this.gamepad = GamepadClass(control_type_index)
       }
 
-    loadStudentCode(this, studentCodeFileName="student_code_file.py"){
+    loadStudentCode(studentCodeFileName="student_code_file.py"){
         /*
         Load the student code from the file
         */
