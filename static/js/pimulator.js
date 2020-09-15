@@ -39,7 +39,7 @@ class RobotClass {
       this.dir = 0.0;          // Direction of the robot facing, degree
 
       // All asychronous functions currently running
-      this.runningCoroutines = set();
+      this.runningCoroutines = new Set();
 
       // Ensure we don't hit sync errors when updating our values
       this.queue = queue;
@@ -118,12 +118,15 @@ class RobotClass {
         if (!(typeof fn === "function")) {
             throw new Error("First argument to Robot.isRunning must be a function");
         }
+        this.runningCoroutines.add(fn)
         fn()
    }
     isRunning(fn) {
         /* Returns True if the given `fn` is already running as a coroutine.
 
-        See: Robot.run*/
+        See: Robot.run
+        
+        TODO: Fully implement */
         if (!(typeof fn === "function")) {
             throw new Error("First argument to Robot.isRunning must be a function");
         }
@@ -297,9 +300,8 @@ class Simulator{
         Initialize new Simulator
         */
 
-        this.robot = RobotClass()
+        this.robot = new RobotClass()
         this.initGamepad()
-        this.actions = ActionsClass(this.robot)
         this.loadStudentCode()
         this.current = []
         this.isRunning = false
@@ -308,10 +310,10 @@ class Simulator{
     initGamepad(){
         const control_types = ['tank', 'arcade', 'other1', 'other2']
         const GAMEPAD_MODE = "tank"
-        let control_type_index = control_types.index(GAMEPAD_MODE)
-        if (control_type_index != -1) {
+        let control_type_index = control_types.indexOf(GAMEPAD_MODE)
+        if (control_type_index == -1) {
             throw new Error("Invalid gamepad mode")}
-        this.gamepad = GamepadClass(control_type_index)
+        this.gamepad = new GamepadClass(control_type_index)
       }
 
     loadStudentCode(studentCodeFileName="student_code_file.py"){
@@ -321,22 +323,21 @@ class Simulator{
 
         // Load student code
         // content = getCookie("code");
-        let content = code;
+        var content = code;
 
         //# Store the local environment into dictionary
-        let env = {}
+        var env = {}
         //# Ensure the global Robot reflects the same robot Simulator is using
         env['Robot'] = this.robot
         env['Gamepad'] = this.gamepad
-        env['Actions'] = this.actions
 
         languagePluginLoader.then(function () {
-        pyodide.runPython(`
-            from js import content, env
-            exec(content, env)
-            `);
+            pyodide.runPython(`
+                from js import content, env
+                exec(content, env)
+                `);
+            env = pyodide.pyimport("env");
         });
-        env = pyodide.pyimport("env");
 
         //# Eventually need to gracefully handle failures here
         this.autonomous_setup = env['autonomous_setup']
