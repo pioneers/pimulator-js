@@ -302,7 +302,7 @@ class Simulator{
 
         this.robot = new RobotClass()
         this.initGamepad()
-        this.loadStudentCode()
+        // this.loadStudentCode()
         this.current = []
         this.isRunning = false
     }
@@ -331,13 +331,12 @@ class Simulator{
         env['Robot'] = this.robot
         env['Gamepad'] = this.gamepad
 
-        languagePluginLoader.then(function () {
-            pyodide.runPython(`
-                from js import content, env
-                exec(content, env)
-                `);
-            env = pyodide.pyimport("env");
-        });
+        pyodide.runPython(`
+            from js import content, env
+            exec(content, env)
+        `);
+
+        env = pyodide.pyimport("env");
 
         //# Eventually need to gracefully handle failures here
         this.autonomous_setup = env['autonomous_setup']

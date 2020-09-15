@@ -1,5 +1,15 @@
 var simulator = new Simulator();
 
+function uploadCode() {
+    if (typeof pyodide != "undefined" && typeof pyodide.version != "undefined") {
+        simulator.loadStudentCode();
+        alert("Code uploaded");
+    }
+    else {
+        alert("Simulator has not finished loading. Try again in a moment.")
+    }
+};
+
 function update(state) {
     /*
     Update the state (position and direction) of the robot.
