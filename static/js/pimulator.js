@@ -331,7 +331,7 @@ class Simulator{
         content = code;
 
         //# Store the local environment into dictionary
-        // env = {}
+        env = {}
         //# Ensure the global Robot reflects the same robot Simulator is using
         env['Robot'] = this.robot
         env['Gamepad'] = this.gamepad
@@ -493,7 +493,7 @@ class Simulator{
         this.consistent_loop(this.robot.tickRate, this.teleop_main, -1);
     }
 
-    simulateAuto(stop_fn) {
+    simulateAuto() {
         this.isRunning = true
         auto_thread = threading.Thread(group=null, target=this.autonomous_setup,
                                         name="autonomous code thread", daemon=True)
