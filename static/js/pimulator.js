@@ -337,11 +337,6 @@ class Simulator{
         env['Gamepad'] = this.gamepad
 
         pyodide.runPython(`
-            import js
-            print(js.__dict__)
-        `);
-
-        pyodide.runPython(`
             from js import content, env
             env = dict(env)
             exec(content, env)
