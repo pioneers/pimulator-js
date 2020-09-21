@@ -125,7 +125,7 @@ class RobotClass {
         /* Returns True if the given `fn` is already running as a coroutine.
 
         See: Robot.run
-        
+
         TODO: Fully implement */
         if (!(typeof fn === "function")) {
             throw new Error("First argument to Robot.isRunning must be a function");
@@ -293,7 +293,12 @@ function _ensure_strict_semantics(fn){
 */
 
 //#######################################
-
+function down(e){
+   this.onPress(e.keyCode)
+}
+function up(e){
+  this.onPress(e.keyCode)
+}
 class Simulator{
     constructor() {
         /*
@@ -358,12 +363,8 @@ class Simulator{
         */
         period = period * 1000;
         runtime = runtime * 1000;
-        let down = document.addEventListener('keydown', function down(e) {
-           this.onPress(e.keyCode)
-        })
-        let up = document.addEventListener('keyup', function  up(e) {
-           this.onRelease(e.keyCode)
-        })
+        document.addEventListener('keydown', down )
+        document.addEventListener('keyup', up)
         this.interval = setInterval(function() {this.loop_content(func)}, period);
         setTimeout(function() { this.stop(); }, runtime);
     }
