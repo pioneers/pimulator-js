@@ -361,7 +361,7 @@ class Simulator{
         return null;
     }
 
-    consistent_loop(period, func, runtime){
+    consistentLoop(period, func, runtime){
         /* Execute the robot at specificed frequency.
 
         period (int): the period in seconds to run func in
@@ -374,8 +374,6 @@ class Simulator{
 
         this.interval = setInterval(this.loopContent(func), period);
     }
-
-
 
     stop() {
         if (this.isRunning == true) {
@@ -497,7 +495,7 @@ class Simulator{
         //teleop_thread.start()
         console.log("Simulate Teleop")
         this.isRunning = true;
-        this.consistent_loop(this.robot.tickRate, this.teleop_main, 30);
+        this.consistentLoop(this.robot.tickRate, this.teleop_main, 30);
     }
 
     simulateAuto() {
@@ -507,7 +505,7 @@ class Simulator{
         auto_thread = threading.Thread(group=null, target=this.autonomous_setup,
                                         name="autonomous code thread", daemon=True)
         auto_thread.start()
-        this.consistent_loop(this.robot.tickRate, this.robot.updatePosition, 30)
+        this.consistentLoop(this.robot.tickRate, this.robot.updatePosition, 30)
         setTimeout(function() { this.stop(); }, 30*1000);
     }
 }
