@@ -293,12 +293,7 @@ function _ensure_strict_semantics(fn){
 */
 
 //#######################################
-function down(e){
-   this.onPress(e.keyCode)
-}
-function up(e){
-  this.onPress(e.keyCode)
-}
+
 class Simulator{
     constructor() {
         /*
@@ -358,7 +353,11 @@ class Simulator{
         // ensure_is_function("teleop_setup", this.teleop_setup)
         // ensure_is_function("teleop_main", this.teleop_main)
     }
-
+    down(e){
+       this.onPress(e.keyCode)
+    }
+    up(e){
+      this.onPress(e.keyCode)}
     consistent_loop(period, func, runtime){
         /* Execute the robot at specificed frequency.
 
@@ -369,8 +368,7 @@ class Simulator{
         */
         period = period * 1000;
         runtime = runtime * 1000;
-        document.addEventListener('keydown', down )
-        document.addEventListener('keyup', up)
+
         this.interval = setInterval(function() {this.loop_content(func)}, period);
         setTimeout(function() { this.stop(); }, runtime);
     }
@@ -391,12 +389,14 @@ class Simulator{
         document.removeEventListener('keyup', up);
     }
 
+
     onPress(keyCode) {
         /* Handling the events associated with pressing a key. Keyboard inputs are inputted as
            KEYCODE. */
            // assumes this.current is a pseudo-set (underlying implementation is an array)
            // assumes INVALIDCOMBINATIONS is an array of arrays (sorted)
         keyCode = toLowercase(keyCode); //FIXME: code this -> convert to lowercase if keyCode is a letter, else return arg
+        print(keyCode)
         if (this.current.length === 0) {
             if ((this.gamepad.COMBINATIONS.includes(keyCode)) || (this.gamepad.COMBINATIONS2.includes(keyCode))) {
                 this.current.push(keyCode);
@@ -422,6 +422,7 @@ class Simulator{
     }
 
     onRelease(keyCode) {
+        console.log(keyCode)
         try {
           this.current.filter(k => k === keyCode);
         }
@@ -492,9 +493,11 @@ class Simulator{
 
         //teleop_thread = threading.Thread(group=null, target=this.keyboard_control,
         //                                name="keyboard thread", daemon=True)
-
+        document.addEventListener('keydown', this.down )
+        document.addEventListener('keyup', this.up)
         //teleop_thread.start()
-        this.consistent_loop(this.robot.tickRate, this.teleop_main, -1)
+        console.log("Starting Teleop")
+        this.consistent_loop(this.robot.tickRate, this.teleop_main, 30)
     }
 
     simulateAuto(stop_fn) {
