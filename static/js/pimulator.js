@@ -489,7 +489,8 @@ class Simulator{
         //                                name="keyboard thread", daemon=True)
 
         //teleop_thread.start()
-        this.consistent_loop(this.robot.tickRate, this.teleop_main, -1)
+        this.isRunning = true;
+        this.consistent_loop(this.robot.tickRate, this.teleop_main, -1);
     }
 
     simulateAuto(stop_fn) {
