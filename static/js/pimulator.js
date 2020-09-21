@@ -300,11 +300,11 @@ class Simulator{
         Initialize new Simulator
         */
 
-        this.robot = new RobotClass()
-        this.initGamepad()
+        this.robot = new RobotClass();
+        this.initGamepad();
         // this.loadStudentCode()
-        this.current = []
-        this.isRunning = false
+        this.current = [];
+        this.isRunning = false;
     }
 
     initGamepad(){
@@ -330,11 +330,6 @@ class Simulator{
         //# Ensure the global Robot reflects the same robot Simulator is using
         env['Robot'] = this.robot
         env['Gamepad'] = this.gamepad
-
-        pyodide.runPython(`
-            import js
-            print(js.__dict__)
-        `);
 
         pyodide.runPython(`
             from js import content, env
@@ -370,7 +365,6 @@ class Simulator{
         runtime = runtime * 1000;
 
         this.interval = setInterval(function() {this.loop_content(func)}, period);
-        setTimeout(function() { this.stop(); }, runtime);
     }
 
     loopContent(func) {
@@ -382,11 +376,12 @@ class Simulator{
     }
 
     stop() {
-        if (this.interval !== null) {
+        if (this.isRunning == true) {
+            this.isRunning = false
             clearInterval(this.interval);
+            document.removeEventListener('keydown', down);
+            document.removeEventListener('keyup', up);
         }
-        document.removeEventListener('keydown', down);
-        document.removeEventListener('keyup', up);
     }
 
 
@@ -496,16 +491,17 @@ class Simulator{
         document.addEventListener('keydown', this.down )
         document.addEventListener('keyup', this.up)
         //teleop_thread.start()
-        console.log("Starting Teleop")
-        this.consistent_loop(this.robot.tickRate, this.teleop_main, 30)
+        console.log("Simulate Teleop")
+        this.isRunning = true;
+        this.consistent_loop(this.robot.tickRate, this.teleop_main, 30);
     }
 
     simulateAuto(stop_fn) {
-        is_running = true
+        this.isRunning = true
         auto_thread = threading.Thread(group=null, target=this.autonomous_setup,
                                         name="autonomous code thread", daemon=True)
         auto_thread.start()
         this.consistent_loop(this.robot.tickRate, this.robot.updatePosition, 30)
-        stop_fn()
+        setTimeout(function() { this.stop(); }, 30*1000);
     }
 }
