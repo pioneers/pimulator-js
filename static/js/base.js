@@ -39,10 +39,10 @@ function start(auto=0) {
     }
     else {
         if (auto === 0) {
-            simulator.simulate_teleop();
+            simulator.simulateTeleop();
         }
         else if (auto === 1) {
-            simulator.simulate_auto();
+            simulator.simulateAuto();
         }
         // We utilize a daemon thread to such that the thread exits even if we
         // do not exit gracefully from __main__
