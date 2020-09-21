@@ -305,11 +305,11 @@ class Simulator{
         Initialize new Simulator
         */
 
-        this.robot = new RobotClass()
-        this.initGamepad()
+        this.robot = new RobotClass();
+        this.initGamepad();
         // this.loadStudentCode()
-        this.current = []
-        this.isRunning = false
+        this.current = [];
+        this.isRunning = false;
     }
 
     initGamepad(){
@@ -367,7 +367,6 @@ class Simulator{
         document.addEventListener('keydown', down )
         document.addEventListener('keyup', up)
         this.interval = setInterval(function() {this.loop_content(func)}, period);
-        setTimeout(function() { this.stop(); }, runtime);
     }
 
     loopContent(func) {
@@ -379,11 +378,12 @@ class Simulator{
     }
 
     stop() {
-        if (this.interval !== null) {
+        if (this.isRunning == true) {
+            this.isRunning = false
             clearInterval(this.interval);
+            document.removeEventListener('keydown', down);
+            document.removeEventListener('keyup', up);
         }
-        document.removeEventListener('keydown', down);
-        document.removeEventListener('keyup', up);
     }
 
     onPress(keyCode) {
@@ -494,11 +494,11 @@ class Simulator{
     }
 
     simulateAuto(stop_fn) {
-        is_running = true
+        this.isRunning = true
         auto_thread = threading.Thread(group=null, target=this.autonomous_setup,
                                         name="autonomous code thread", daemon=True)
         auto_thread.start()
         this.consistent_loop(this.robot.tickRate, this.robot.updatePosition, 30)
-        stop_fn()
+        setTimeout(function() { this.stop(); }, 30*1000);
     }
 }
