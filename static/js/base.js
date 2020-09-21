@@ -34,11 +34,7 @@ function start(auto=0) {
     Start the robot thread
     Return if started robot thread
     */
-<<<<<<< HEAD
-    if (simulator.isRunning == null) {
-=======
     if (simulator.isRunning == true) {
->>>>>>> 3932ad4f940510fb03d330d92c5de9e6fb08af08
         return;
     }
     else {

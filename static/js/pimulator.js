@@ -353,6 +353,15 @@ class Simulator{
     }
     up(e){
       this.onPress(e.keyCode)}
+
+    loopContent(func) {
+        /* Execute one cycle of the robot.
+        */
+        func();
+        this.robot.updatePosition();
+        return null;
+    }
+
     consistent_loop(period, func, runtime){
         /* Execute the robot at specificed frequency.
 
@@ -364,16 +373,10 @@ class Simulator{
         period = period * 1000;
         runtime = runtime * 1000;
 
-        this.interval = setInterval(function() {this.loop_content(func)}, period);
+        this.interval = setInterval(this.loopContent(func), period);
     }
 
-    loopContent(func) {
-        /* Execute one cycle of the robot.
-        */
-        func();
-        this.robot.updatePosition();
-        return null;
-    }
+
 
     stop() {
         if (this.isRunning == true) {
