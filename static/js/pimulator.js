@@ -207,7 +207,7 @@ class GamepadClass{
         */
     }
 
-    getValue(device) {
+    get_value(device) {
         if (device === "joystick_left_x") {
             return this.joystick_left_x;
         } else if (device === "joystick_left_y") {
@@ -328,16 +328,22 @@ class Simulator{
 
         // Load student code
         // content = getCookie("code");
-        var content = code;
+        content = code;
 
         //# Store the local environment into dictionary
-        var env = {}
+        // env = {}
         //# Ensure the global Robot reflects the same robot Simulator is using
         env['Robot'] = this.robot
         env['Gamepad'] = this.gamepad
 
         pyodide.runPython(`
+            import js
+            print(js.__dict__)
+        `);
+
+        pyodide.runPython(`
             from js import content, env
+            env = dict(env)
             exec(content, env)
         `);
 
