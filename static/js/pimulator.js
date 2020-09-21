@@ -294,6 +294,16 @@ function _ensure_strict_semantics(fn){
 }
 */
 
+/**
+ * Event listeners for key presses
+ */
+function down(e){
+    simulator.onPress(e.keyCode)
+}
+function up(e){
+    simulator.onRelease(e.keyCode)
+}
+
 //#######################################
 
 class Simulator{
@@ -349,18 +359,12 @@ class Simulator{
         // ensure_is_function("teleop_setup", this.teleop_setup)
         // ensure_is_function("teleop_main", this.teleop_main)
     }
-    down(e){
-       this.onPress(e.keyCode)
-    }
-    up(e){
-      this.onPress(e.keyCode)}
 
     loopContent(func) {
         /* Execute one cycle of the robot.
         */
         func();
         this.robot.updatePosition();
-        return null;
     }
 
     consistentLoop(period, func, runtime){
@@ -495,8 +499,8 @@ class Simulator{
         this.loadStudentCode();
         this.isRunning = true;
 
-        document.addEventListener('keydown', this.down )
-        document.addEventListener('keyup', this.up)
+        document.addEventListener('keydown', down)
+        document.addEventListener('keyup', up)
         console.log("Simulate Teleop")
         this.consistentLoop(this.robot.tickRate, this.teleop_main, 30);
     }
