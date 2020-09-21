@@ -34,19 +34,15 @@ function start(auto=0) {
     Start the robot thread
     Return if started robot thread
     */
-<<<<<<< HEAD
-    if (simulator.isRunning == null) {
-=======
     if (simulator.isRunning == true) {
->>>>>>> 3932ad4f940510fb03d330d92c5de9e6fb08af08
         return;
     }
     else {
         if (auto === 0) {
-            simulator.simulate_teleop();
+            simulator.simulateTeleop();
         }
         else if (auto === 1) {
-            simulator.simulate_auto();
+            simulator.simulateAuto();
         }
         // We utilize a daemon thread to such that the thread exits even if we
         // do not exit gracefully from __main__

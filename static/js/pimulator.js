@@ -299,8 +299,7 @@ class Simulator{
         /*
         Initialize new Simulator
         */
-
-        this.robot = new RobotClass();
+        this.robot = null
         this.initGamepad();
         // this.loadStudentCode()
         this.current = [];
@@ -481,13 +480,15 @@ class Simulator{
         }, 30000);
     }*/
 
-    simulate_teleop(){
+    simulateTeleop(){
         /* Simulate execution of the robot code.
 
         Run setup_fn once before continuously looping loop_fn */
 
         //teleop_thread = threading.Thread(group=null, target=this.keyboard_control,
         //                                name="keyboard thread", daemon=True)
+        this.robot = new RobotClass();
+
         document.addEventListener('keydown', this.down )
         document.addEventListener('keyup', this.up)
         //teleop_thread.start()
@@ -497,6 +498,8 @@ class Simulator{
     }
 
     simulateAuto() {
+        this.robot = new RobotClass();
+
         this.isRunning = true
         auto_thread = threading.Thread(group=null, target=this.autonomous_setup,
                                         name="autonomous code thread", daemon=True)
