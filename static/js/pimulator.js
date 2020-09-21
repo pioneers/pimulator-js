@@ -53,10 +53,12 @@ class RobotClass {
         let lv = this.Wl * this.wRadius;
         let rv = this.Wr * this.wRadius * this.neg;
         let radian = Math.PI*this.dir/180;
+        let dx;
+        let dy;
         if (lv == rv) {
             let distance = rv * this.tickRate
-            let dx = distance * Math.cos(radian)
-            let dy = distance * Math.sin(radian)
+            dx = distance * Math.cos(radian)
+            dy = distance * Math.sin(radian)
             //let finalDir = null
           }
         else {
@@ -65,8 +67,8 @@ class RobotClass {
             let theta = wt * this.tickRate;
             let i = rt * (1 - Math.cos(theta));
             let j = Math.sin(theta) * rt;
-            let dx = i * Math.sin(radian) + j * Math.cos(radian);
-            let dy = i * Math.cos(radian) + j * Math.sin(radian);
+            dx = i * Math.sin(radian) + j * Math.cos(radian);
+            dy = i * Math.cos(radian) + j * Math.sin(radian);
             this.dir= (this.dir + theta*180*Math.PI) % 360;
           }
         this.X = Math.max(Math.min(this.X + dx, this.MAXX), 0);
@@ -88,12 +90,12 @@ class RobotClass {
         if (speed > 1.0 || speed < -1.0){
             throw new Error("Speed cannot be great than 1.0 or less than -1.0.");
         }
-        if (param !== "dutyCycle") {
-            throw new Error('"dutyCycle" is the only currently supported parameter');
+        if (param !== "duty_cycle") {
+            throw new Error('"duty_cycle" is the only currently supported parameter');
         }
-        if (device === "leftMotor") {
+        if (device === "left_motor") {
             this.Wl = speed * 9;
-        } else if (device === "rightMotor") {
+        } else if (device === "right_motor") {
             this.Wr = speed * 9;
         } else {
             throw new Error("Cannot find device name: " + device);
@@ -299,7 +301,7 @@ class Simulator{
         /*
         Initialize new Simulator
         */
-        this.robot = null
+        this.robot = null;
         this.initGamepad();
         // this.loadStudentCode()
         this.current = [];
@@ -325,7 +327,7 @@ class Simulator{
         content = code;
 
         //# Store the local environment into dictionary
-        env = {}
+        // env = {}
         //# Ensure the global Robot reflects the same robot Simulator is using
         env['Robot'] = this.robot
         env['Gamepad'] = this.gamepad
@@ -488,23 +490,25 @@ class Simulator{
 
         //teleop_thread = threading.Thread(group=null, target=this.keyboard_control,
         //                                name="keyboard thread", daemon=True)
+        //teleop_thread.start()
         this.robot = new RobotClass();
+        this.loadStudentCode();
+        this.isRunning = true;
 
         document.addEventListener('keydown', this.down )
         document.addEventListener('keyup', this.up)
-        //teleop_thread.start()
         console.log("Simulate Teleop")
-        this.isRunning = true;
         this.consistentLoop(this.robot.tickRate, this.teleop_main, 30);
     }
 
     simulateAuto() {
         this.robot = new RobotClass();
-
+        this.loadStudentCode();
         this.isRunning = true
-        auto_thread = threading.Thread(group=null, target=this.autonomous_setup,
-                                        name="autonomous code thread", daemon=True)
-        auto_thread.start()
+
+        // auto_thread = threading.Thread(group=null, target=this.autonomous_setup,
+        //                                 name="autonomous code thread", daemon=True)
+        // auto_thread.start()
         this.consistentLoop(this.robot.tickRate, this.robot.updatePosition, 30)
         setTimeout(function() { this.stop(); }, 30*1000);
     }

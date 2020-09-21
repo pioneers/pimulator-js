@@ -2,8 +2,8 @@ var simulator = new Simulator();
 
 function uploadCode() {
     if (typeof pyodide != "undefined" && typeof pyodide.version != "undefined") {
-        simulator.loadStudentCode();
-        alert("Code uploaded");
+        code = cm.getValue();
+        // alert("Code uploaded");
     }
     else {
         alert("Simulator has not finished loading. Try again in a moment.")
