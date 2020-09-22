@@ -298,10 +298,94 @@ function _ensure_strict_semantics(fn){
  * Event listeners for key presses
  */
 function down(e){
-    simulator.onPress(e.keyCode)
+    onPress(e.keyCode)
 }
 function up(e){
-    simulator.onRelease(e.keyCode)
+    onRelease(e.keyCode)
+}
+
+function onPress(keyCode) {
+    /* Handling the events associated with pressing a key. Keyboard inputs are inputted as
+       KEYCODE. */
+       // assumes this.current is a pseudo-set (underlying implementation is an array)
+       // assumes INVALIDCOMBINATIONS is an array of arrays (sorted)
+    // keyCode = keyCode.toLowerCase(); //FIXME: code this -> convert to lowercase if keyCode is a letter, else return arg
+    if (simulator.current.length === 0) {
+        if ((simulator.gamepad.COMBINATIONS1.includes(keyCode)) || (simulator.gamepad.COMBINATIONS2.includes(keyCode))) {
+            simulator.current.push(keyCode);
+            translateToMovement(keyCode);
+        }
+    } else if (simulator.current.length >= 1) {
+        if (simulator.current.includes(keyCode)) {
+          return null;
+        }
+        let elem = simulator.current.pop();
+        simulator.current.push(elem);
+        if (keyCode < elem) {
+          var tuple = [keyCode, elem];
+        } else {
+          var tuple = [elem, keyCode];
+        }
+        if (!simulator.gamepad.INVALID_COMBINATIONS.includes(tuple)) {
+            simulator.current.push(keyCode);
+            translateToMovement(keyCode);
+        }
+    }
+    return null;
+}
+
+function onRelease(keyCode) {
+    console.log(keyCode)
+    try {
+      simulator.current.filter(k => k === keyCode);
+    }
+    catch(err) {
+      return null;
+    }
+    if (keyCode === 87) { // w
+        simulator.gamepad.joystick_left_y = 0;
+    } else if (keyCode === 65) { // a
+        simulator.gamepad.joystick_left_x = 0;
+    } else if (keyCode === 83) { // s
+        simulator.gamepad.joystick_left_y = 0;
+    } else if (keyCode === 68) { // d
+        simulator.gamepad.joystick_left_x = 0;
+    } else if (keyCode === 38) { // up
+        simulator.gamepad.joystick_right_y = 0;
+    } else if (keyCode === 40) { // down
+        simulator.gamepad.joystick_right_y = 0;
+    } else if (keyCode === 37) { // left
+        simulator.gamepad.joystick_right_x = 0;
+    } else if (keyCode === 39) { // right
+        simulator.gamepad.joystick_right_x = 0;
+    }
+}
+
+function translateToMovement(keyCode) {
+    if (simulator.current.length === 0) {
+      simulator.robot.updatePosition();
+    }
+    var k;
+    for (k of simulator.current) {
+        if (keyCode === 87) { // w
+            simulator.gamepad.joystick_left_y = 1;
+        } else if (keyCode === 65) { // a
+            simulator.gamepad.joystick_left_x = 1;
+        } else if (keyCode === 83) { // s
+            simulator.gamepad.joystick_left_y = -1;
+        } else if (keyCode === 68) { // d
+            simulator.gamepad.joystick_left_x = -1;
+        } else if (keyCode === 38) { // up
+            simulator.gamepad.joystick_right_y = 1;
+        } else if (keyCode === 40) { // down
+            simulator.gamepad.joystick_right_y = -1;
+        } else if (keyCode === 37) { // left
+            simulator.gamepad.joystick_right_x = -1;
+        } else if (keyCode === 39) { // right
+            simulator.gamepad.joystick_right_x = 1;
+        }
+    }
+    simulator.robot.updatePosition();
 }
 
 //#######################################
@@ -389,103 +473,6 @@ class Simulator{
             document.removeEventListener('keyup', up);
         }
     }
-
-
-    onPress(keyCode) {
-        /* Handling the events associated with pressing a key. Keyboard inputs are inputted as
-           KEYCODE. */
-           // assumes this.current is a pseudo-set (underlying implementation is an array)
-           // assumes INVALIDCOMBINATIONS is an array of arrays (sorted)
-        keyCode = toLowercase(keyCode); //FIXME: code this -> convert to lowercase if keyCode is a letter, else return arg
-        print(keyCode)
-        if (this.current.length === 0) {
-            if ((this.gamepad.COMBINATIONS.includes(keyCode)) || (this.gamepad.COMBINATIONS2.includes(keyCode))) {
-                this.current.push(keyCode);
-                this.translateToMovement();
-            }
-        } else if (this.current.length >= 1) {
-            if (this.current.includes(keyCode)) {
-              return null;
-            }
-            let elem = this.current.pop();
-            this.current.push(elem);
-            if (keyCode < elem) {
-              let tuple = [keyCode, elem];
-            } else {
-              let tuple = [elem, keyCode];
-            }
-            if (!GamepadClass.INVALID_COMBINATIONS.includes(tuple)) {
-                this.current.push(keyCode);
-                this.translateToMovement();
-            }
-        }
-        return null;
-    }
-
-    onRelease(keyCode) {
-        console.log(keyCode)
-        try {
-          this.current.filter(k => k === keyCode);
-        }
-        catch(err) {
-          return null;
-        }
-        if (keyCode === 87) { // w
-            this.gamepad.joystick_left_y = 0;
-        } else if (keyCode === 65) { // a
-            this.gamepad.joystick_left_x = 0;
-        } else if (keyCode === 83) { // s
-            this.gamepad.joystick_left_y = 0;
-        } else if (keyCode === 68) { // d
-            this.gamepad.joystick_left_x = 0;
-        } else if (keyCode === 38) { // up
-            this.gamepad.joystick_right_y = 0;
-        } else if (keyCode === 40) { // down
-            this.gamepad.joystick_right_y = 0;
-        } else if (keyCode === 37) { // left
-            this.gamepad.joystick_right_x = 0;
-        } else if (keyCode === 39) { // right
-            this.gamepad.joystick_right_x = 0;
-        }
-    }
-
-    translateToMovement() {
-        if (this.current.length === 0) {
-          this.robot.updatePosition();
-        }
-        var k;
-        for (k of this.current) {
-            if (keyCode === 87) { // w
-                this.gamepad.joystick_left_y = 1;
-            } else if (keyCode === 65) { // a
-                this.gamepad.joystick_left_x = 1;
-            } else if (keyCode === 83) { // s
-                this.gamepad.joystick_left_y = -1;
-            } else if (keyCode === 68) { // d
-                this.gamepad.joystick_left_x = -1;
-            } else if (keyCode === 38) { // up
-                this.gamepad.joystick_right_y = 1;
-            } else if (keyCode === 40) { // down
-                this.gamepad.joystick_right_y = -1;
-            } else if (keyCode === 37) { // left
-                this.gamepad.joystick_right_x = -1;
-            } else if (keyCode === 39) { // right
-                this.gamepad.joystick_right_x = 1;
-            }
-        }
-        this.robot.updatePosition();
-    }
-
-    /*keyboardControl(){
-        // TODO: Listen for key presses somehow in teleop //
-        // with Listener(on_press=t his.on_press, on_release=this.on_release) as l:
-        //     l.join()
-
-
-        setTimeout(() => {
-
-        }, 30000);
-    }*/
 
     simulateTeleop(){
         /* Simulate execution of the robot code.
