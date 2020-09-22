@@ -58,5 +58,5 @@ function stop() {
     Stop the robot thread
     */
     simulator.stop();
-    update({x:140, y:140, dir:0});
+    update({x:144, y:144, dir:0});
 };
