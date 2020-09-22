@@ -13,7 +13,7 @@ function uploadCode() {
 function update(state) {
     /*
     Update the state (position and direction) of the robot.
-    Example of state: {x:72, y:72, theta:0}
+    Example of state: {x:72, y:72, dir:0}
     */
     // console.log("StateX")
     // console.log(state.x)
@@ -23,7 +23,7 @@ function update(state) {
     // console.log(robotRect)
     robotRect.setAttributeNS(null, "x", state.x)
     robotRect.setAttributeNS(null, "y", state.y)
-    var rotateStr = "rotate(" + state.theta + " " + (state.x + 15*scaleFactor) + " " + (state.y + 20*scaleFactor) + ")"
+    var rotateStr = "rotate(" + state.dir + " " + (state.x + 15*scaleFactor) + " " + (state.y + 20*scaleFactor) + ")"
     // console.log(rotateStr)
     robotRect.setAttribute("transform", rotateStr)
     // console.log("Adjusted")
@@ -58,5 +58,5 @@ function stop() {
     Stop the robot thread
     */
     simulator.stop();
-    update({x:140, y:140, theta:0});
+    update({x:140, y:140, dir:0});
 };

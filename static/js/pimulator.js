@@ -71,17 +71,18 @@ class RobotClass {
             dy = i * Math.cos(radian) + j * Math.sin(radian);
             this.dir= (this.dir + theta*180*Math.PI) % 360;
           }
-        this.X = Math.max(Math.min(this.X + dx, this.MAXX), 0);
-        this.Y = Math.max(Math.min(this.Y + dy, this.MAXY), 0);
+        this.X = Math.max(Math.min(this.X + dx, this.MaxX), 0);
+        this.Y = Math.max(Math.min(this.Y + dy, this.MaxY), 0);
         this.ltheta = (this.Wl * 5 + this.ltheta) % 360;
         this.rtheta = (this.Wr * 5 + this.rtheta) % 360;
 
-        /*if (this.queue !== null) {
-            this.queue.enqueue({
-                            'x':this.X,
-                            'y':this.Y,
-                            'dir':this.dir});
-            }*/
+        let newState = {
+            x:this.X,
+            y:this.Y,
+            dir:this.dir
+        };
+
+        update(newState);
     }
 
     set_value(device, param, speed) {
@@ -310,38 +311,56 @@ function onPress(keyCode) {
        // assumes this.current is a pseudo-set (underlying implementation is an array)
        // assumes INVALIDCOMBINATIONS is an array of arrays (sorted)
     // keyCode = keyCode.toLowerCase(); //FIXME: code this -> convert to lowercase if keyCode is a letter, else return arg
-    if (simulator.current.length === 0) {
-        if ((simulator.gamepad.COMBINATIONS1.includes(keyCode)) || (simulator.gamepad.COMBINATIONS2.includes(keyCode))) {
-            simulator.current.push(keyCode);
-            translateToMovement(keyCode);
-        }
-    } else if (simulator.current.length >= 1) {
-        if (simulator.current.includes(keyCode)) {
-          return null;
-        }
-        let elem = simulator.current.pop();
-        simulator.current.push(elem);
-        if (keyCode < elem) {
-          var tuple = [keyCode, elem];
-        } else {
-          var tuple = [elem, keyCode];
-        }
-        if (!simulator.gamepad.INVALID_COMBINATIONS.includes(tuple)) {
-            simulator.current.push(keyCode);
-            translateToMovement(keyCode);
-        }
+
+    if (keyCode === 87) { // w
+        simulator.gamepad.joystick_left_y = 1;
+    } else if (keyCode === 65) { // a
+        simulator.gamepad.joystick_left_x = -1;
+    } else if (keyCode === 83) { // s
+        simulator.gamepad.joystick_left_y = -1;
+    } else if (keyCode === 68) { // d
+        simulator.gamepad.joystick_left_x = 1;
+    } else if (keyCode === 38) { // up
+        simulator.gamepad.joystick_right_y = 1;
+    } else if (keyCode === 40) { // down
+        simulator.gamepad.joystick_right_y = -1;
+    } else if (keyCode === 37) { // left
+        simulator.gamepad.joystick_right_x = -1;
+    } else if (keyCode === 39) { // right
+        simulator.gamepad.joystick_right_x = 1;
     }
-    return null;
+  
+    // if (simulator.current.length === 0) {
+    //     if ((simulator.gamepad.COMBINATIONS1.includes(keyCode)) || (simulator.gamepad.COMBINATIONS2.includes(keyCode))) {
+    //         simulator.current.push(keyCode);
+    //         translateToMovement(keyCode);
+    //     }
+    // } else if (simulator.current.length >= 1) {
+    //     if (simulator.current.includes(keyCode)) {
+    //       return null;
+    //     }
+    //     let elem = simulator.current.pop();
+    //     simulator.current.push(elem);
+    //     if (keyCode < elem) {
+    //       var tuple = [keyCode, elem];
+    //     } else {
+    //       var tuple = [elem, keyCode];
+    //     }
+    //     if (!simulator.gamepad.INVALID_COMBINATIONS.includes(tuple)) {
+    //         simulator.current.push(keyCode);
+    //         translateToMovement(keyCode);
+    //     }
+    // }
+    // return null;
 }
 
 function onRelease(keyCode) {
-    console.log(keyCode)
-    try {
-      simulator.current.filter(k => k === keyCode);
-    }
-    catch(err) {
-      return null;
-    }
+    // try {
+    //   simulator.current.filter(k => k === keyCode);
+    // }
+    // catch(err) {
+    //   return null;
+    // }
     if (keyCode === 87) { // w
         simulator.gamepad.joystick_left_y = 0;
     } else if (keyCode === 65) { // a
@@ -448,7 +467,7 @@ class Simulator{
         /* Execute one cycle of the robot.
         */
         func();
-        this.robot.updatePosition();
+        simulator.robot.updatePosition();
     }
 
     consistentLoop(period, func, runtime){
@@ -461,8 +480,7 @@ class Simulator{
         */
         period = period * 1000;
         runtime = runtime * 1000;
-
-        this.interval = setInterval(this.loopContent(func), period);
+        this.interval = setInterval(this.loopContent, period, func);
     }
 
     stop() {
