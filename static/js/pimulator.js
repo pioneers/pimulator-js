@@ -24,7 +24,7 @@ class RobotClass {
        calculations & Runtime API calls """*/
     tickRate = 0.05;          // in s
     width = 12 * scaleFactor;                  // width of robot , inches
-    wRadius = 2 * scaleFactor;                // radius of a wheel, inches
+    wRadius = 2  * scaleFactor;                // radius of a wheel, inches
     MaxX = 143 * scaleFactor;                 // maximum X value, inches, field is 12'x12'
     MaxY = 143 * scaleFactor;                 // maximum Y value, inches, field is 12'x12'
     neg = -1;                    // negate left motor calculation
@@ -32,11 +32,11 @@ class RobotClass {
     constructor(queue=null) {
       this.X = 72.0 * scaleFactor;           // X position of the robot
       this.Y = 72.0 * scaleFactor;           // Y position of the robot
-      this.Wl = 0.0;           // angular velocity of l wheel, degree/s
-      this.Wr = 0.0;           // angular velocity of r wheel, degree/s
-      this.ltheta = 0.0;       // angular position of l wheel, degree
-      this.rtheta = 0.0;       // angular position of r wheel, degree
-      this.dir = 0.0;          // Direction of the robot facing, degree
+      this.Wl = 0.0;           // angular velocity of l wheel, radians/s
+      this.Wr = 0.0;           // angular velocity of r wheel, radians/s
+      this.ltheta = 0.0;       // angular position of l wheel, degrees
+      this.rtheta = 0.0;       // angular position of r wheel, degrees
+      this.dir = 0.0;          // Direction of the robot facing, degrees
 
       // All asychronous functions currently running
       this.runningCoroutines = new Set();
@@ -69,7 +69,7 @@ class RobotClass {
             let j = Math.sin(theta) * rt;
             dx = i * Math.sin(radian) + j * Math.cos(radian);
             dy = i * Math.cos(radian) + j * Math.sin(radian);
-            this.dir= (this.dir + theta*Math.PI) % 360;
+            this.dir= (this.dir + theta*180/Math.PI) % 360;
           }
         this.X = Math.max(Math.min(this.X + dx, this.MaxX), 0);
         this.Y = Math.max(Math.min(this.Y + dy, this.MaxY), 0);
