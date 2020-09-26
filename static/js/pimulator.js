@@ -56,7 +56,7 @@ class RobotClass {
         let dx;
         let dy;
         if (lv == rv) {
-            let distance = rv * this.tickRate
+            let distance = rv * this.tickRate;
             dx = distance * Math.cos(radian)
             dy = distance * Math.sin(radian)
             //let finalDir = null
@@ -69,7 +69,7 @@ class RobotClass {
             let j = Math.sin(theta) * rt;
             dx = i * Math.sin(radian) + j * Math.cos(radian);
             dy = i * Math.cos(radian) + j * Math.sin(radian);
-            this.dir= (this.dir + theta*180*Math.PI) % 360;
+            this.dir= (this.dir + theta*Math.PI) % 360;
           }
         this.X = Math.max(Math.min(this.X + dx, this.MaxX), 0);
         this.Y = Math.max(Math.min(this.Y + dy, this.MaxY), 0);
@@ -329,7 +329,7 @@ function onPress(keyCode) {
     } else if (keyCode === 39) { // right
         simulator.gamepad.joystick_right_x = 1;
     }
-  
+
     // if (simulator.current.length === 0) {
     //     if ((simulator.gamepad.COMBINATIONS1.includes(keyCode)) || (simulator.gamepad.COMBINATIONS2.includes(keyCode))) {
     //         simulator.current.push(keyCode);

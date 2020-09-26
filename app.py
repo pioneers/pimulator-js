@@ -1,9 +1,7 @@
 import datetime
 import time
-import robot
 from base64 import b64decode
 from flask import Flask, render_template, jsonify
-import pimulator
 app = Flask(__name__)
 
 @app.route('/')
