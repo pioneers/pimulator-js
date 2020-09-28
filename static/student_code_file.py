@@ -28,16 +28,16 @@ def teleop_main():
         Robot.set_value("left_motor", "duty_cycle", max(min(-(left_y - turningSpeed), 1.0), -1.0))
         Robot.set_value("right_motor", "duty_cycle", max(min(left_y + turningSpeed, 1.0), -1.0))
 
-async def autonomous_actions():
+def autonomous_actions():
     Robot.set_value("left_motor", "duty_cycle", -1.0)
     Robot.set_value("right_motor", "duty_cycle", -1.0)
-    await Actions.sleep(1.0)
+    Robot.sleep(1.0)
     Robot.set_value("left_motor", "duty_cycle", -1.0)
     Robot.set_value("right_motor", "duty_cycle", 1.0)
-    await Actions.sleep(0.5)
+    Robot.sleep(0.5)
     Robot.set_value("left_motor", "duty_cycle", 1.0)
     Robot.set_value("right_motor", "duty_cycle", 1.0)
-    await Actions.sleep(1.0)
+    Robot.sleep(1.0)
     Robot.set_value("left_motor", "duty_cycle", 0.0)
     Robot.set_value("right_motor", "duty_cycle", 0.0)
-    await Actions.sleep(1.0)
+    Robot.sleep(1.0)

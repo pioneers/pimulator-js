@@ -33,8 +33,8 @@
       x and y coordinates updated here
     </div>
 
-    <button type="button" onclick="start_teleop()">Teleop simulation</button>
-    <button type="button" onclick="start_auto()">Autonomous Simulation </button>
+    <button type="button" onclick="start(auto=0)">Teleop simulation</button>
+    <button type="button" onclick="start(auto=1)">Autonomous Simulation </button>
     <button type="button" onclick="stop()">stop simulation</button>
 
     <!-- File input code -->
@@ -42,63 +42,65 @@
     <p id="warning"></p>
     <p id="contents">   </p> -->
 
+    <!-- Import and initialize Pyodide -->
+    <script src="https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js"></script>
+    <script>
+      var content = "";
+      var env = {};
+      languagePluginLoader.then(() => function () {});
+    </script>
+        
     <div style="margin-top:20px">
     <!-- Create a simple CodeMirror instance -->
     <script src="{{ url_for('static', filename='js/codemirror.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/codemirror.css') }}">
     <script src="{{ url_for('static', filename='js/python.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <button type="button" onclick="codemirror_send()">Upload code</button>
+
+    <button type="button" onclick="uploadCode()">Upload code</button>
     <script>
+      function setCookie(name, value) {
+          document.cookie = name + "=" + (value || "");
+      }
+      function getCookie(name) {
+          let nameEQ = name + "=";
+          let ca = document.cookie.split(';');
+          for(let i=0; i < ca.length; i++) {
+              let c = ca[i];
+              while (c.charAt(0)==' ') c = c.substring(1,c.length);
+              if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+          }
+          return null;
+      }
+      function eraseCookie(name) {   
+          document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      }
+
       var cm = CodeMirror(document.body, {
         value: "",
         mode:  "python",
         lineNumbers: true,
         indentUnit: 4
       });
-      
       cm.setSize(width="60%", height="1000px");
-      var xhr=new XMLHttpRequest();
-      xhr.open("GET","{{ url_for('static', filename='student_code_file.py') }}");
-      xhr.onload=function(){
-        cm.setValue(xhr.responseText);
-      }
-      xhr.send();
 
-      function codemirror_send(){
-        send_code(btoa(cm.getValue()))
+      // var code = getCookie("code");
+      var code = "";
+      if (code == "" || code === null) {
+        var xhr=new XMLHttpRequest();
+        xhr.open("GET","{{ url_for('static', filename='student_code_file.py') }}");
+        xhr.onload = () => {
+          code = xhr.responseText;
+          // setCookie("code", code)
+          cm.setValue(code);
+        }
+        xhr.send();
       }
     </script>
     </div>
 
+    <script src="{{ url_for('static', filename='js/pimulator.js') }}"></script>
     <script src="{{ url_for('static', filename='js/base.js') }}"></script>
-
-    <!-- Auto Func
-    <script>
-      function handleFileSelect(evt) {
-        var files = evt.target.files; // FileList object
-
-          // Only process python files.
-          // if (!files[0].type.match('text/plain')) {
-          //   document.getElementById("warning").innerHTML = "wrong file type";
-          // } else {
-            document.getElementById("warning").innerHTML = "py file loaded";
-
-
-            var reader = new FileReader();
-            reader.onload = function(file) {
-              // document.getElementById("contents").innerHTML = "<a href='" + reader.result + "'>link</a>";
-              // var splitStr = dataURL.split("base64,", 2)
-              // send_code(reader.result);
-              send_code(btoa(reader.result));
-            }
-            reader.readAsBinaryString(files[0]);
-          // }
-      }
-
-      document.getElementById('input').addEventListener('change', handleFileSelect, false);
-    </script> -->
-
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
