@@ -493,7 +493,7 @@ class Simulator{
 
     simulateTeleop(){
         /* Simulate execution of the robot code.
-        Run setup_fn once before continuously looping loop_fn 
+        Run setup_fn once before continuously looping loop_fn
         TODO: Run teleop_setup once before looping teleop_main */
 
         this.robot = new RobotClass();
@@ -510,7 +510,13 @@ class Simulator{
         this.robot = new RobotClass();
         this.loadStudentCode();
         this.isRunning = true;
+        if (window.Worker) {
+            var worker = new Worker("auto.js");
+            worker.postMessage({robot:this.robot, start:true})
+            worker.onmessage = function(e) {
 
+            }
+        }
         // auto_thread = threading.Thread(group=null, target=this.autonomous_setup,
         //                                 name="autonomous code thread", daemon=True)
         // auto_thread.start()
