@@ -16,7 +16,9 @@
 //     colored = lambda x, y: x
 var code = null;
 this.onmessage = function(e) {
+    console.log("Test")
     if (e.data.start === true && code !== null){
+          console.log("Test")
           var simulator = new Simulator();
           if (e.data.mode === "auto") simulator.simulateAuto();
           else simulator.simulateTeleop();

@@ -1,12 +1,13 @@
 var running = false;
-if (window.Worker) {
-      var worker = new Worker("robot.js");
-      worker.postMessage({start:false})
-      worker.onmessage = function(e) {
-          running = e.data.robot.isRunning
-          update(e.data.robot)
-      }
-  }
+
+var worker = new Worker("robot.js");
+worker.postMessage({start:false})
+worker.onmessage = function(e) {
+    console.log("Steps")
+    running = e.data.robot.isRunning
+    update(e.data.robot)
+}
+
 var simulator = new Simulator();
 
 function uploadCode() {
