@@ -1,6 +1,6 @@
 var running = false;
 
-var worker = new Worker("robot.js");
+var worker = new Worker("static/js/robot.js");
 worker.postMessage({start:false})
 worker.onmessage = function(e) {
     console.log("Steps")

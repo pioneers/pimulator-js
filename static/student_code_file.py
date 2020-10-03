@@ -43,4 +43,4 @@ def autonomous_actions():
     Robot.sleep(1.0)
     Robot.set_value("left_motor", "duty_cycle", 0.0)
     Robot.set_value("right_motor", "duty_cycle", 0.0)
-    Robot.sleep(1.0
+    Robot.sleep(1.0)
