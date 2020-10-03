@@ -14,6 +14,17 @@
 //     from termcolor import colored
 // except ModuleNotFoundError:
 //     colored = lambda x, y: x
+var code = null;
+this.onmessage = function(e) {
+    if (e.data.start === true && code !== null){
+          var simulator = new Simulator();
+          if (e.data.mode === "auto") simulator.simulateAuto();
+          else simulator.simulateTeleop();
+    }
+    else if (e.data.code !== null){
+        code = e.data.code;
+    }
+}
 
 const SCREENHEIGHT = 48
 const SCREENWIDTH = 48
@@ -22,9 +33,9 @@ var scaleFactor = 2
 class RobotClass {
     /*The MODEL for this simulator. Stores robot data and handles position
        calculations & Runtime API calls """*/
-    tickRate = 0.05;          // in s
+    tickRate = 50;          // in ms
     width = 12 * scaleFactor;                  // width of robot , inches
-    wRadius = 2 * scaleFactor;                // radius of a wheel, inches
+    wRadius = 2  * scaleFactor;                // radius of a wheel, inches
     MaxX = 143 * scaleFactor;                 // maximum X value, inches, field is 12'x12'
     MaxY = 143 * scaleFactor;                 // maximum Y value, inches, field is 12'x12'
     neg = -1;                    // negate left motor calculation
@@ -32,11 +43,11 @@ class RobotClass {
     constructor(queue=null) {
       this.X = 72.0 * scaleFactor;           // X position of the robot
       this.Y = 72.0 * scaleFactor;           // Y position of the robot
-      this.Wl = 0.0;           // angular velocity of l wheel, degree/s
-      this.Wr = 0.0;           // angular velocity of r wheel, see/s
-      this.ltheta = 0.0;       // angular position of l wheel, degree
-      this.rtheta = 0.0;       // angular position of r wheel, degree
-      this.dir = 0.0;          // Direction of the robot facing, degreesdegree
+      this.Wl = 0.0;           // angular velocity of l wheel, radians/s
+      this.Wr = 0.0;           // angular velocity of r wheel, radians/s
+      this.ltheta = 0.0;       // angular position of l wheel, degrees
+      this.rtheta = 0.0;       // angular position of r wheel, degrees
+      this.dir = 0.0;          // Direction of the robot facing, degrees
 
       // All asychronous functions currently running
       this.runningCoroutines = new Set();
@@ -47,7 +58,6 @@ class RobotClass {
 
     updatePosition() {
         /* Updates position of the  Robot using differential drive equations
-
         Derived with reference to:
         https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf*/
         let lv = this.Wl * this.wRadius;
@@ -56,7 +66,7 @@ class RobotClass {
         let dx;
         let dy;
         if (lv == rv) {
-            let distance = rv * this.tickRate
+            let distance = rv * this.tickRate/1000;
             dx = distance * Math.cos(radian)
             dy = distance * Math.sin(radian)
             //let finalDir = null
@@ -64,12 +74,12 @@ class RobotClass {
         else {
             let rt = this.width/2 * (lv+rv)/(rv-lv);
             let wt = (rv-lv)/this.width;
-            let theta = wt * this.tickRate;
+            let theta = wt * this.tickRate/1000;
             let i = rt * (1 - Math.cos(theta));
             let j = Math.sin(theta) * rt;
             dx = i * Math.sin(radian) + j * Math.cos(radian);
             dy = i * Math.cos(radian) + j * Math.sin(radian);
-            this.dir= (this.dir + theta*180/180*Math.PI) % 360;
+            this.dir= (this.dir + theta*180/Math.PI) % 360;
           }
         this.X = Math.max(Math.min(this.X + dx, this.MaxX), 0);
         this.Y = Math.max(Math.min(this.Y + dy, this.MaxY), 0);
@@ -82,7 +92,7 @@ class RobotClass {
             dir:this.dir
         };
 
-        update(newState);
+        postMessage({robot:simulator.robot})
     }
 
     set_value(device, param, speed) {
@@ -103,10 +113,25 @@ class RobotClass {
         }
     }
 
-    async sleep(duration) {
+    sleep(duration) {
         /* Autonomous code pauses execution for <duration> seconds
         */
-        await new Promise(resolve => setTimeout(resolve, duration*1000));
+        // await new Promise(resolve => setTimeout(resolve, duration*1000));
+        let ms = duration*1000;
+        let start = new Date().getTime();
+        let cur = start;
+        let tick = start;
+        this.updatePosition();
+
+        let numUpdates = 1;
+        while (cur < start + ms) {
+            cur = new Date().getTime();
+            if (cur - tick >= this.tickRate) {
+                this.updatePosition();
+                tick = tick + this.tickRate;
+                numUpdates++;
+            }
+        }
     }
 
     printState() {
@@ -126,9 +151,7 @@ class RobotClass {
    }
     isRunning(fn) {
         /* Returns True if the given `fn` is already running as a coroutine.
-
         See: Robot.run
-
         TODO: Fully implement */
         if (!(typeof fn === "function")) {
             throw new Error("First argument to Robot.isRunning must be a function");
@@ -177,14 +200,12 @@ class GamepadClass{
         {keyboard.Key.up, keyboard.Key.down},
         {keyboard.Key.left, keyboard.Key.right}
     ];
-
     COMBINATIONS1 = [
         keyboard.KeyCode(char='w'),
         keyboard.KeyCode(char='d'),
         keyboard.KeyCode(char='a'),
         keyboard.KeyCode(char='s')
     ];
-
     COMBINATIONS2 = [
         keyboard.Key.up,
         keyboard.Key.left,
@@ -253,24 +274,18 @@ class GamepadClass{
 function isFunction(functionToCheck) {
  return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
 }
-
 TIMEOUT_VALUE = .1 // seconds
-
 function timeout_handler(signum, frame){
     throw new Error("Student code timed out");
   }
-
 function ensure_is_function(tag, val)
     {if (!isFunction(val)) throw new Error("${tag} is not a function";}
-
 function ensure_not_overridden(module, name){
     if hasAttribute(module, name) raise new Error("Student code overrides ${name}, which is part of the API")}
-
 function _ensure_strict_semantics(fn){
     */ /* (Internal): provides additional error checking for the PiE API */ /*
     if (!inspect.iscoroutinefunction(fn)){
         throw new Error("Internal runtime error: _ensure_strict_semantics can only be applied to `async def` functions")}
-
     function wrapped_fn(*args, **kwargs){
         //# Ensure that this function is called directly out of the event loop,
         //# and not out of the `setup` and `loop` functions.
@@ -470,16 +485,12 @@ class Simulator{
         simulator.robot.updatePosition();
     }
 
-    consistentLoop(period, func, runtime){
+    consistentLoop(period, func){
         /* Execute the robot at specificed frequency.
-
-        period (int): the period in seconds to run func in
+        period (int): the period in ms to run func in
         func (function): the function to execute each loop
-
         func may take only TIMEOUT_VALUE seconds to finish execution
         */
-        period = period * 1000;
-        runtime = runtime * 1000;
         this.interval = setInterval(this.loopContent, period, func);
     }
 
@@ -494,31 +505,32 @@ class Simulator{
 
     simulateTeleop(){
         /* Simulate execution of the robot code.
+        Run setup_fn once before continuously looping loop_fn
+        TODO: Run teleop_setup once before looping teleop_main */
 
-        Run setup_fn once before continuously looping loop_fn */
-
-        //teleop_thread = threading.Thread(group=null, target=this.keyboard_control,
-        //                                name="keyboard thread", daemon=True)
-        //teleop_thread.start()
         this.robot = new RobotClass();
         this.loadStudentCode();
         this.isRunning = true;
 
-        document.addEventListener('keydown', down)
-        document.addEventListener('keyup', up)
-        console.log("Simulate Teleop")
-        this.consistentLoop(this.robot.tickRate, this.teleop_main, 30);
+        document.addEventListener('keydown', down);
+        document.addEventListener('keyup', up);
+        console.log("Simulate Teleop");
+        this.consistentLoop(this.robot.tickRate, this.teleop_main);
     }
 
     simulateAuto() {
         this.robot = new RobotClass();
         this.loadStudentCode();
-        this.isRunning = true
+        this.isRunning = true;
 
         // auto_thread = threading.Thread(group=null, target=this.autonomous_setup,
         //                                 name="autonomous code thread", daemon=True)
         // auto_thread.start()
-        this.consistentLoop(this.robot.tickRate, this.robot.updatePosition, 30)
+        this.autonomous_setup()
+        this.consistentLoop(this.robot.tickRate, function(){
+            env = pyodide.pyimport("env");
+            this.robot = env["Robot"];
+        }.bind(this));
         setTimeout(function() { this.stop(); }, 30*1000);
     }
 }
