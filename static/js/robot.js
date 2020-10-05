@@ -1,19 +1,9 @@
-// import math
-// import asyncio
-// import warnings
-// import time
-// import inspect
-// import os
-// from pynput import keyboard
-// from pynput.keyboard import Listener
-// import __future__
-// import threading
-// import multiprocessing
-// # termcolor is an optional package
-// try:
-//     from termcolor import colored
-// except ModuleNotFoundError:
-//     colored = lambda x, y: x
+importScripts("https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js");
+
+var content = "";
+var env = {};
+languagePluginLoader.then(() => function () {});
+
 var code = null;
 var mode = null;
 
