@@ -1,13 +1,20 @@
 var running = false;
 
-var worker = new Worker("robot.js");
+var worker = new Worker("static/js/robot.js");
 worker.postMessage({start:false})
 worker.onmessage = function(e) {
     console.log("Steps")
     running = e.data.robot.isRunning
     update(e.data.robot)
 }
-
+function down(e){
+    worker.postMessage({keypress: true, keyCode: e.keyCode, up: false});
+}
+function up(e){
+    worker.postMessage({keypress: true, keyCode: e.keyCode, up: true});
+}
+document.addEventListener('keydown', down);
+document.addEventListener('keyup', up);
 var simulator = new Simulator();
 
 function uploadCode() {

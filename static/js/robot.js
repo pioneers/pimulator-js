@@ -15,16 +15,24 @@
 // except ModuleNotFoundError:
 //     colored = lambda x, y: x
 var code = null;
+var mode = null;
+
 this.onmessage = function(e) {
-    console.log("Test")
-    if (e.data.start === true && code !== null){
-          console.log("Test")
-          var simulator = new Simulator();
-          if (e.data.mode === "auto") simulator.simulateAuto();
-          else simulator.simulateTeleop();
+    if (e.data.start === true && code !== null && e.data.keypress === null){
+        var simulator = new Simulator();
+        if (e.data.mode === "auto") simulator.simulateAuto();
+        else simulator.simulateTeleop();
     }
     else if (e.data.code !== null){
         code = e.data.code;
+    }
+    if (mode === "teleop" && e.data.keypress === true){
+        if (e.data.up === true){
+            up(e.data.keyCode);
+        }
+        else if (e.data.up === false){
+            down(e.data.keyCode);
+        }
     }
 }
 
@@ -315,11 +323,11 @@ function _ensure_strict_semantics(fn){
 /**
  * Event listeners for key presses
  */
-function down(e){
-    onPress(e.keyCode)
+function down(key){
+    onPress(key)
 }
-function up(e){
-    onRelease(e.keyCode)
+function up(key){
+    onRelease(key)
 }
 
 function onPress(keyCode) {
@@ -513,9 +521,8 @@ class Simulator{
         this.robot = new RobotClass();
         this.loadStudentCode();
         this.isRunning = true;
+        mod
 
-        document.addEventListener('keydown', down);
-        document.addEventListener('keyup', up);
         console.log("Simulate Teleop");
         this.consistentLoop(this.robot.tickRate, this.teleop_main);
     }
@@ -524,7 +531,7 @@ class Simulator{
         this.robot = new RobotClass();
         this.loadStudentCode();
         this.isRunning = true;
-
+        mode = "auto"
         // auto_thread = threading.Thread(group=null, target=this.autonomous_setup,
         //                                 name="autonomous code thread", daemon=True)
         // auto_thread.start()
