@@ -1,9 +1,8 @@
 var running = false;
-
+var savedCode = null
 var worker = new Worker("static/js/robot.js");
 worker.postMessage({start:false})
 worker.onmessage = function(e) {
-    console.log("Steps")
     running = e.data.robot.isRunning
     update(e.data.robot)
 }
@@ -20,6 +19,7 @@ var simulator = new Simulator();
 function uploadCode() {
     if (typeof pyodide != "undefined" && typeof pyodide.version != "undefined") {
         code = cm.getValue();
+        savedCode = code;
         worker.postMessage({code:code, start:false})
         // alert("Code uploaded");
     }
@@ -40,7 +40,7 @@ function update(state) {
     // console.log("SVG")
     // console.log(robotRect)
     robotRect.setAttributeNS(null, "x", state.X)
-    robotRect.setAttributeNS(null, "y", state.y)
+    robotRect.setAttributeNS(null, "y", state.Y)
     var rotateStr = "rotate(" + state.dir + " " + (state.X + 15*scaleFactor) + " " + (state.Y + 20*scaleFactor) + ")"
     // console.log(rotateStr)
     robotRect.setAttribute("transform", rotateStr)
@@ -75,12 +75,14 @@ function stop() {
     /*
     Stop the robot thread
     */
-    worker = new Worker("robot.js")
+    update({X:144,Y:144,dir:0})
+    worker.terminate()
+    worker = new Worker("/static/js/robot.js")
     worker.postMessage({start:false})
+    worker.postMessage({code:savedCode, start:false})
     worker.onmessage = function(e) {
         running = e.data.robot.isRunning
         update(e.data.robot)
     }
     running = false
-    update({x:144, y:144, dir:0});
 };

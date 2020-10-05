@@ -20,7 +20,6 @@ this.onmessage = function(e) {
         console.log("Upload Succesful")
     }
     if (mode === "teleop" && e.data.keypress === true){
-        console.log("Send Key Presses")
         if (e.data.up === true){
             up(e.data.keyCode);
         }
@@ -99,7 +98,7 @@ class RobotClass {
             dir:this.dir
         };
 
-        postMessage({robot:sim.robot})
+        postMessage({robot:{X:sim.robot.X,Y:sim.robot.Y,dir:sim.robot.dir}})
     }
 
     set_value(device, param, speed) {
