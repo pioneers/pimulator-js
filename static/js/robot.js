@@ -6,23 +6,30 @@ languagePluginLoader.then(() => function () {});
 
 var code = null;
 var mode = null;
-
+var sim = null;
 this.onmessage = function(e) {
-    if (e.data.start === true && code !== null && e.data.keypress === null){
+    if (e.data.start === true && code !== null && e.data.keypress === undefined){
+        console.log("Successfully Sending Messages")
         var simulator = new Simulator();
-        if (e.data.mode === "auto") simulator.simulateAuto();
-        else simulator.simulateTeleop();
+        sim = simulator
+        if (e.data.mode === "auto") sim.simulateAuto();
+        else sim.simulateTeleop();
     }
-    else if (e.data.code !== null){
+    else if (e.data.code !== undefined){
         code = e.data.code;
+        console.log("Upload Succesful")
     }
     if (mode === "teleop" && e.data.keypress === true){
+        console.log("Send Key Presses")
         if (e.data.up === true){
             up(e.data.keyCode);
         }
         else if (e.data.up === false){
             down(e.data.keyCode);
         }
+    }
+    if(e.data.start === true && code === null){
+        console.log("Please submit code first");
     }
 }
 
@@ -92,7 +99,7 @@ class RobotClass {
             dir:this.dir
         };
 
-        postMessage({robot:simulator.robot})
+        postMessage({robot:sim.robot})
     }
 
     set_value(device, param, speed) {
@@ -328,21 +335,21 @@ function onPress(keyCode) {
     // keyCode = keyCode.toLowerCase(); //FIXME: code this -> convert to lowercase if keyCode is a letter, else return arg
 
     if (keyCode === 87) { // w
-        simulator.gamepad.joystick_left_y = 1;
+        sim.gamepad.joystick_left_y = 1;
     } else if (keyCode === 65) { // a
-        simulator.gamepad.joystick_left_x = -1;
+        sim.gamepad.joystick_left_x = -1;
     } else if (keyCode === 83) { // s
-        simulator.gamepad.joystick_left_y = -1;
+        sim.gamepad.joystick_left_y = -1;
     } else if (keyCode === 68) { // d
-        simulator.gamepad.joystick_left_x = 1;
+        sim.gamepad.joystick_left_x = 1;
     } else if (keyCode === 38) { // up
-        simulator.gamepad.joystick_right_y = 1;
+        sim.gamepad.joystick_right_y = 1;
     } else if (keyCode === 40) { // down
-        simulator.gamepad.joystick_right_y = -1;
+        sim.gamepad.joystick_right_y = -1;
     } else if (keyCode === 37) { // left
-        simulator.gamepad.joystick_right_x = -1;
+        sim.gamepad.joystick_right_x = -1;
     } else if (keyCode === 39) { // right
-        simulator.gamepad.joystick_right_x = 1;
+        sim.gamepad.joystick_right_x = 1;
     }
 
     // if (simulator.current.length === 0) {
@@ -377,49 +384,49 @@ function onRelease(keyCode) {
     //   return null;
     // }
     if (keyCode === 87) { // w
-        simulator.gamepad.joystick_left_y = 0;
+        sim.gamepad.joystick_left_y = 0;
     } else if (keyCode === 65) { // a
-        simulator.gamepad.joystick_left_x = 0;
+        sim.gamepad.joystick_left_x = 0;
     } else if (keyCode === 83) { // s
-        simulator.gamepad.joystick_left_y = 0;
+        sim.gamepad.joystick_left_y = 0;
     } else if (keyCode === 68) { // d
-        simulator.gamepad.joystick_left_x = 0;
+        sim.gamepad.joystick_left_x = 0;
     } else if (keyCode === 38) { // up
-        simulator.gamepad.joystick_right_y = 0;
+        sim.gamepad.joystick_right_y = 0;
     } else if (keyCode === 40) { // down
-        simulator.gamepad.joystick_right_y = 0;
+        sim.gamepad.joystick_right_y = 0;
     } else if (keyCode === 37) { // left
-        simulator.gamepad.joystick_right_x = 0;
+        sim.gamepad.joystick_right_x = 0;
     } else if (keyCode === 39) { // right
-        simulator.gamepad.joystick_right_x = 0;
+        sim.gamepad.joystick_right_x = 0;
     }
 }
 
 function translateToMovement(keyCode) {
-    if (simulator.current.length === 0) {
-      simulator.robot.updatePosition();
+    if (sim.current.length === 0) {
+      sim.robot.updatePosition();
     }
     var k;
-    for (k of simulator.current) {
+    for (k of sim.current) {
         if (keyCode === 87) { // w
-            simulator.gamepad.joystick_left_y = 1;
+            sim.gamepad.joystick_left_y = 1;
         } else if (keyCode === 65) { // a
-            simulator.gamepad.joystick_left_x = 1;
+            sim.gamepad.joystick_left_x = 1;
         } else if (keyCode === 83) { // s
-            simulator.gamepad.joystick_left_y = -1;
+            sim.gamepad.joystick_left_y = -1;
         } else if (keyCode === 68) { // d
-            simulator.gamepad.joystick_left_x = -1;
+            sim.gamepad.joystick_left_x = -1;
         } else if (keyCode === 38) { // up
-            simulator.gamepad.joystick_right_y = 1;
+            sim.gamepad.joystick_right_y = 1;
         } else if (keyCode === 40) { // down
-            simulator.gamepad.joystick_right_y = -1;
+            sim.gamepad.joystick_right_y = -1;
         } else if (keyCode === 37) { // left
-            simulator.gamepad.joystick_right_x = -1;
+            sim.gamepad.joystick_right_x = -1;
         } else if (keyCode === 39) { // right
-            simulator.gamepad.joystick_right_x = 1;
+            sim.gamepad.joystick_right_x = 1;
         }
     }
-    simulator.robot.updatePosition();
+    sim.robot.updatePosition();
 }
 
 //#######################################
@@ -482,7 +489,7 @@ class Simulator{
         /* Execute one cycle of the robot.
         */
         func();
-        simulator.robot.updatePosition();
+        sim.robot.updatePosition();
     }
 
     consistentLoop(period, func){
@@ -509,9 +516,10 @@ class Simulator{
         TODO: Run teleop_setup once before looping teleop_main */
 
         this.robot = new RobotClass();
+          console.log(this.robot)
         this.loadStudentCode();
         this.isRunning = true;
-        mod
+        mode = "teleop"
 
         console.log("Simulate Teleop");
         this.consistentLoop(this.robot.tickRate, this.teleop_main);
