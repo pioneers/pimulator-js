@@ -96,7 +96,6 @@ class RobotClass {
     sleep(duration) {
         /* Autonomous code pauses execution for <duration> seconds
         */
-        // await new Promise(resolve => setTimeout(resolve, duration*1000));
         let ms = duration*1000;
         let start = new Date().getTime();
         let cur = start;
@@ -174,41 +173,12 @@ class GamepadClass{
       40  //down
     ]
 
-    /*INVALIDCOMBINATIONS = [
-        {keyboard.KeyCode(char='w'), keyboard.KeyCode(char='s')},
-        {keyboard.KeyCode(char='a'), keyboard.KeyCode(char='d')},
-        {keyboard.Key.up, keyboard.Key.down},
-        {keyboard.Key.left, keyboard.Key.right}
-    ];
-    COMBINATIONS1 = [
-        keyboard.KeyCode(char='w'),
-        keyboard.KeyCode(char='d'),
-        keyboard.KeyCode(char='a'),
-        keyboard.KeyCode(char='s')
-    ];
-    COMBINATIONS2 = [
-        keyboard.Key.up,
-        keyboard.Key.left,
-        keyboard.Key.right,
-        keyboard.Key.down
-    ]*/
-
     constructor(setNum) {
         this.setNum = setNum;
         this.joystick_left_x = 0;
         this.joystick_left_y = 0;
         this.joystick_right_x = 0;
         this.joystick_right_y = 0;
-
-        /*
-        # this.t0 = time.time()
-        # this.joystick_left_x = this.sets[setNum][0]
-        # this.joystick_left_y =  this.sets[setNum][1]
-        # this.joystick_right_x =  this.sets[setNum][2]
-        # this.joystick_right_y =  this.sets[setNum][3]
-        # this.durations = this.sets[setNum][4]         #lst of instr duration
-        # this.i = 0                                        #index of insturction
-        */
     }
 
     get_value(device) {
@@ -303,9 +273,6 @@ function up(key){
 function onPress(keyCode) {
     /* Handling the events associated with pressing a key. Keyboard inputs are inputted as
        KEYCODE. */
-       // assumes this.current is a pseudo-set (underlying implementation is an array)
-       // assumes INVALIDCOMBINATIONS is an array of arrays (sorted)
-    // keyCode = keyCode.toLowerCase(); //FIXME: code this -> convert to lowercase if keyCode is a letter, else return arg
 
     if (keyCode === 87) { // w
         simulator.gamepad.joystick_left_y = 1;
@@ -324,38 +291,9 @@ function onPress(keyCode) {
     } else if (keyCode === 39) { // right
         simulator.gamepad.joystick_right_x = 1;
     }
-
-    // if (simulator.current.length === 0) {
-    //     if ((simulator.gamepad.COMBINATIONS1.includes(keyCode)) || (simulator.gamepad.COMBINATIONS2.includes(keyCode))) {
-    //         simulator.current.push(keyCode);
-    //         translateToMovement(keyCode);
-    //     }
-    // } else if (simulator.current.length >= 1) {
-    //     if (simulator.current.includes(keyCode)) {
-    //       return null;
-    //     }
-    //     let elem = simulator.current.pop();
-    //     simulator.current.push(elem);
-    //     if (keyCode < elem) {
-    //       var tuple = [keyCode, elem];
-    //     } else {
-    //       var tuple = [elem, keyCode];
-    //     }
-    //     if (!simulator.gamepad.INVALID_COMBINATIONS.includes(tuple)) {
-    //         simulator.current.push(keyCode);
-    //         translateToMovement(keyCode);
-    //     }
-    // }
-    // return null;
 }
 
 function onRelease(keyCode) {
-    // try {
-    //   simulator.current.filter(k => k === keyCode);
-    // }
-    // catch(err) {
-    //   return null;
-    // }
     if (keyCode === 87) { // w
         simulator.gamepad.joystick_left_y = 0;
     } else if (keyCode === 65) { // a
@@ -412,7 +350,6 @@ class Simulator{
         this.robot = null;
         this.mode = "idle";
         this.initGamepad();
-        // this.loadStudentCode()
         this.current = [];
     }
 
@@ -430,11 +367,7 @@ class Simulator{
         Load the student code to the current Simulator instance
         */
 
-        // Load student code
-        // content = getCookie("code");
-
         //# Store the local environment into dictionary
-        // env = {}
         //# Ensure the global Robot reflects the same robot Simulator is using
         env['Robot'] = this.robot
         env['Gamepad'] = this.gamepad

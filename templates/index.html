@@ -36,14 +36,6 @@
     <button type="button" onclick="start(auto=0)">Teleop simulation</button>
     <button type="button" onclick="start(auto=1)">Autonomous Simulation </button>
     <button type="button" onclick="stop()">stop simulation</button>
-
-    <!-- File input code -->
-    <!-- <input type="file" id="input" accept="py">
-    <p id="warning"></p>
-    <p id="contents">   </p> -->
-
-    <!-- Import and initialize Pyodide -->
-    <!-- <script src="https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js"></script> -->
         
     <div style="margin-top:20px">
     <!-- Create a simple CodeMirror instance -->
@@ -94,7 +86,6 @@
     </script>
     </div>
 
-    <script src="{{ url_for('static', filename='js/pimulator.js') }}"></script>
     <script src="{{ url_for('static', filename='js/base.js') }}"></script>
 
     <!-- Optional JavaScript -->

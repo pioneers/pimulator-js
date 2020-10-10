@@ -39,6 +39,7 @@ function update(state) {
     */
     // console.log("StateX")
     // console.log(state.x)
+    var scaleFactor = 2;
     document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
     var robotRect = document.querySelector("rect")
     // console.log("SVG")
@@ -66,11 +67,6 @@ function start(auto=0) {
         else if (auto === 1) {
             worker.postMessage({start:true, mode:"auto"})
         }
-        // We utilize a daemon thread to such that the thread exits even if we
-        // do not exit gracefully from __main__
-        // robotWorker = new Worker("{{ url_for('static', filename='js/pimulator.js') }}");
-        // robotWorker = threading.Thread(group=None, target=pimulator.main, args=(stateQueue,auto,stop),
-        //                                name="robot thread", daemon=True)
         console.log("robot started");
     }
 };
