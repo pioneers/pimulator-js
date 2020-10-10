@@ -1,7 +1,7 @@
 var mode = "idle";
 var worker = new Worker("static/js/robot.js");
 
-// Handle messages from 
+// Handle messages from worker
 function onmessage(e) {
     if (e.data.robot !== undefined) {
         update(e.data.robot);
