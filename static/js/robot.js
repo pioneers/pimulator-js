@@ -1,36 +1,8 @@
 importScripts("https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js");
 
-var content = "";
+var code = "";
 var env = {};
 languagePluginLoader.then(() => function () {});
-
-var code = null;
-var mode = null;
-var sim = null;
-this.onmessage = function(e) {
-    if (e.data.start === true && code !== null && e.data.keypress === undefined){
-        console.log("Successfully Sending Messages")
-        var simulator = new Simulator();
-        sim = simulator
-        if (e.data.mode === "auto") sim.simulateAuto();
-        else sim.simulateTeleop();
-    }
-    else if (e.data.code !== undefined){
-        code = e.data.code;
-        console.log("Upload Succesful")
-    }
-    if (mode === "teleop" && e.data.keypress === true){
-        if (e.data.up === true){
-            up(e.data.keyCode);
-        }
-        else if (e.data.up === false){
-            down(e.data.keyCode);
-        }
-    }
-    if(e.data.start === true && code === null){
-        console.log("Please submit code first");
-    }
-}
 
 const SCREENHEIGHT = 48
 const SCREENWIDTH = 48
@@ -93,12 +65,14 @@ class RobotClass {
         this.rtheta = (this.Wr * 5 + this.rtheta) % 360;
 
         let newState = {
-            x:this.X,
-            y:this.Y,
-            dir:this.dir
+            X: this.X,
+            Y: this.Y,
+            dir: this.dir
         };
 
-        postMessage({robot:{X:sim.robot.X,Y:sim.robot.Y,dir:sim.robot.dir}})
+        postMessage({
+            robot: newState
+        })
     }
 
     set_value(device, param, speed) {
@@ -334,21 +308,21 @@ function onPress(keyCode) {
     // keyCode = keyCode.toLowerCase(); //FIXME: code this -> convert to lowercase if keyCode is a letter, else return arg
 
     if (keyCode === 87) { // w
-        sim.gamepad.joystick_left_y = 1;
+        simulator.gamepad.joystick_left_y = 1;
     } else if (keyCode === 65) { // a
-        sim.gamepad.joystick_left_x = -1;
+        simulator.gamepad.joystick_left_x = -1;
     } else if (keyCode === 83) { // s
-        sim.gamepad.joystick_left_y = -1;
+        simulator.gamepad.joystick_left_y = -1;
     } else if (keyCode === 68) { // d
-        sim.gamepad.joystick_left_x = 1;
+        simulator.gamepad.joystick_left_x = 1;
     } else if (keyCode === 38) { // up
-        sim.gamepad.joystick_right_y = 1;
+        simulator.gamepad.joystick_right_y = 1;
     } else if (keyCode === 40) { // down
-        sim.gamepad.joystick_right_y = -1;
+        simulator.gamepad.joystick_right_y = -1;
     } else if (keyCode === 37) { // left
-        sim.gamepad.joystick_right_x = -1;
+        simulator.gamepad.joystick_right_x = -1;
     } else if (keyCode === 39) { // right
-        sim.gamepad.joystick_right_x = 1;
+        simulator.gamepad.joystick_right_x = 1;
     }
 
     // if (simulator.current.length === 0) {
@@ -383,49 +357,49 @@ function onRelease(keyCode) {
     //   return null;
     // }
     if (keyCode === 87) { // w
-        sim.gamepad.joystick_left_y = 0;
+        simulator.gamepad.joystick_left_y = 0;
     } else if (keyCode === 65) { // a
-        sim.gamepad.joystick_left_x = 0;
+        simulator.gamepad.joystick_left_x = 0;
     } else if (keyCode === 83) { // s
-        sim.gamepad.joystick_left_y = 0;
+        simulator.gamepad.joystick_left_y = 0;
     } else if (keyCode === 68) { // d
-        sim.gamepad.joystick_left_x = 0;
+        simulator.gamepad.joystick_left_x = 0;
     } else if (keyCode === 38) { // up
-        sim.gamepad.joystick_right_y = 0;
+        simulator.gamepad.joystick_right_y = 0;
     } else if (keyCode === 40) { // down
-        sim.gamepad.joystick_right_y = 0;
+        simulator.gamepad.joystick_right_y = 0;
     } else if (keyCode === 37) { // left
-        sim.gamepad.joystick_right_x = 0;
+        simulator.gamepad.joystick_right_x = 0;
     } else if (keyCode === 39) { // right
-        sim.gamepad.joystick_right_x = 0;
+        simulator.gamepad.joystick_right_x = 0;
     }
 }
 
 function translateToMovement(keyCode) {
-    if (sim.current.length === 0) {
-      sim.robot.updatePosition();
+    if (simulator.current.length === 0) {
+      simulator.robot.updatePosition();
     }
     var k;
-    for (k of sim.current) {
+    for (k of simulator.current) {
         if (keyCode === 87) { // w
-            sim.gamepad.joystick_left_y = 1;
+            simulator.gamepad.joystick_left_y = 1;
         } else if (keyCode === 65) { // a
-            sim.gamepad.joystick_left_x = 1;
+            simulator.gamepad.joystick_left_x = 1;
         } else if (keyCode === 83) { // s
-            sim.gamepad.joystick_left_y = -1;
+            simulator.gamepad.joystick_left_y = -1;
         } else if (keyCode === 68) { // d
-            sim.gamepad.joystick_left_x = -1;
+            simulator.gamepad.joystick_left_x = -1;
         } else if (keyCode === 38) { // up
-            sim.gamepad.joystick_right_y = 1;
+            simulator.gamepad.joystick_right_y = 1;
         } else if (keyCode === 40) { // down
-            sim.gamepad.joystick_right_y = -1;
+            simulator.gamepad.joystick_right_y = -1;
         } else if (keyCode === 37) { // left
-            sim.gamepad.joystick_right_x = -1;
+            simulator.gamepad.joystick_right_x = -1;
         } else if (keyCode === 39) { // right
-            sim.gamepad.joystick_right_x = 1;
+            simulator.gamepad.joystick_right_x = 1;
         }
     }
-    sim.robot.updatePosition();
+    simulator.robot.updatePosition();
 }
 
 //#######################################
@@ -436,10 +410,10 @@ class Simulator{
         Initialize new Simulator
         */
         this.robot = null;
+        this.mode = "idle";
         this.initGamepad();
         // this.loadStudentCode()
         this.current = [];
-        this.isRunning = false;
     }
 
     initGamepad(){
@@ -453,12 +427,11 @@ class Simulator{
 
     loadStudentCode(studentCodeFileName="student_code_file.py"){
         /*
-        Load the student code from the file
+        Load the student code to the current Simulator instance
         */
 
         // Load student code
         // content = getCookie("code");
-        content = code;
 
         //# Store the local environment into dictionary
         // env = {}
@@ -467,9 +440,9 @@ class Simulator{
         env['Gamepad'] = this.gamepad
 
         pyodide.runPython(`
-            from js import content, env
+            from js import code, env
             env = dict(env)
-            exec(content, env)
+            exec(code, env)
         `);
 
         env = pyodide.pyimport("env");
@@ -488,7 +461,7 @@ class Simulator{
         /* Execute one cycle of the robot.
         */
         func();
-        sim.robot.updatePosition();
+        simulator.robot.updatePosition();
     }
 
     consistentLoop(period, func){
@@ -501,12 +474,13 @@ class Simulator{
     }
 
     stop() {
-        if (this.isRunning == true) {
-            this.isRunning = false
+        if (this.mode !== "idle") {
+            this.mode = "idle"
             clearInterval(this.interval);
-            document.removeEventListener('keydown', down);
-            document.removeEventListener('keyup', up);
         }
+        postMessage({
+            mode: this.mode
+        })
     }
 
     simulateTeleop(){
@@ -515,28 +489,55 @@ class Simulator{
         TODO: Run teleop_setup once before looping teleop_main */
 
         this.robot = new RobotClass();
-          console.log(this.robot)
         this.loadStudentCode();
-        this.isRunning = true;
-        mode = "teleop"
-
-        console.log("Simulate Teleop");
+        this.mode = "teleop"
         this.consistentLoop(this.robot.tickRate, this.teleop_main);
+        postMessage({
+            mode: this.mode
+        })
     }
 
     simulateAuto() {
         this.robot = new RobotClass();
         this.loadStudentCode();
-        this.isRunning = true;
-        mode = "auto"
-        // auto_thread = threading.Thread(group=null, target=this.autonomous_setup,
-        //                                 name="autonomous code thread", daemon=True)
-        // auto_thread.start()
+        this.mode = "auto"
         this.autonomous_setup()
-        this.consistentLoop(this.robot.tickRate, function(){
-            env = pyodide.pyimport("env");
-            this.robot = env["Robot"];
-        }.bind(this));
-        setTimeout(function() { this.stop(); }, 30*1000);
+        setTimeout(function() { this.stop(); }.bind(this), 30*1000);
+        postMessage({
+            mode: this.mode
+        })
+    }
+}
+
+var simulator = new Simulator();
+
+this.onmessage = function(e) {
+    // Code upload
+    if (e.data.code !== undefined){
+        code = e.data.code;
+        console.log("Code upload succesful")
+    }
+
+    // Start simulation
+    if (e.data.start === true) {
+        if (code === ""){
+            console.log("Please upload code first");
+        }
+        else {
+            if (typeof pyodide != "undefined" && typeof pyodide.version != "undefined") {
+                if (e.data.mode === "auto") simulator.simulateAuto();
+                else if (e.data.mode === "teleop") simulator.simulateTeleop();
+            }
+        }
+    }
+
+    // Handle keypresses in teleop
+    if (simulator.mode === "teleop" && e.data.keypress === true){
+        if (e.data.up === true){
+            up(e.data.keyCode);
+        }
+        else if (e.data.up === false){
+            down(e.data.keyCode);
+        }
     }
 }

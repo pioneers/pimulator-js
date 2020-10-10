@@ -1,31 +1,35 @@
-var running = false;
-var savedCode = null
+var mode = "idle";
 var worker = new Worker("static/js/robot.js");
-worker.postMessage({start:false})
-worker.onmessage = function(e) {
-    running = e.data.robot.isRunning
-    update(e.data.robot)
+
+// Handle messages from 
+function onmessage(e) {
+    if (e.data.robot !== undefined) {
+        update(e.data.robot);
+    }
+    if (e.data.mode !== undefined) {
+        mode = e.data.mode;
+    }
 }
+worker.onmessage = onmessage;
+
+// In teleop mode, send keypresses to the worker
 function down(e){
-    worker.postMessage({keypress: true, keyCode: e.keyCode, up: false});
+    if (mode === "teleop") {
+        worker.postMessage({keypress: true, keyCode: e.keyCode, up: false});
+    }
 }
 function up(e){
-    worker.postMessage({keypress: true, keyCode: e.keyCode, up: true});
+    if (mode === "teleop") {
+        worker.postMessage({keypress: true, keyCode: e.keyCode, up: true});
+    }
 }
 document.addEventListener('keydown', down);
 document.addEventListener('keyup', up);
-var simulator = new Simulator();
 
+// "Upload Code" button sends code to the worker
 function uploadCode() {
-    if (typeof pyodide != "undefined" && typeof pyodide.version != "undefined") {
-        code = cm.getValue();
-        savedCode = code;
-        worker.postMessage({code:code, start:false})
-        // alert("Code uploaded");
-    }
-    else {
-        alert("Simulator has not finished loading. Try again in a moment.")
-    }
+    code = cm.getValue();
+    worker.postMessage({code:code});
 };
 
 function update(state) {
@@ -52,7 +56,7 @@ function start(auto=0) {
     Start the robot thread
     Return if started robot thread
     */
-    if (running) {
+    if (mode !== "idle") {
         return;
     }
     else {
@@ -75,14 +79,10 @@ function stop() {
     /*
     Stop the robot thread
     */
-    update({X:144,Y:144,dir:0})
-    worker.terminate()
-    worker = new Worker("/static/js/robot.js")
-    worker.postMessage({start:false})
-    worker.postMessage({code:savedCode, start:false})
-    worker.onmessage = function(e) {
-        running = e.data.robot.isRunning
-        update(e.data.robot)
-    }
-    running = false
+    worker.terminate();
+    worker = new Worker("/static/js/robot.js");
+    worker.onmessage = onmessage;
+    worker.postMessage({code:code});
+    mode = "idle";
+    update({X:144,Y:144,dir:0});
 };
