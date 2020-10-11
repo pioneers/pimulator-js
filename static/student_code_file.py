@@ -25,8 +25,8 @@ def teleop_main():
         left_y = Gamepad.get_value("joystick_left_y")
         turningSpeed = turningSpeed * abs(turningSpeed)
         left_y = left_y * abs(left_y)
-        Robot.set_value("left_motor", "duty_cycle", max(min(-(left_y - turningSpeed), 1.0), -1.0))
-        Robot.set_value("right_motor", "duty_cycle", max(min(left_y + turningSpeed, 1.0), -1.0))
+        Robot.set_value("left_motor", "duty_cycle", max(min(-(left_y + turningSpeed), 1.0), -1.0))
+        Robot.set_value("right_motor", "duty_cycle", max(min(left_y - turningSpeed, 1.0), -1.0))
 
 def autonomous_actions():
     print("Action 1")
