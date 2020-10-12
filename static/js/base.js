@@ -1,13 +1,35 @@
-var simulator = new Simulator();
+var mode = "idle";
+var worker = new Worker("static/js/robot.js");
 
+// Handle messages from worker
+function onmessage(e) {
+    if (e.data.robot !== undefined) {
+        update(e.data.robot);
+    }
+    if (e.data.mode !== undefined) {
+        mode = e.data.mode;
+    }
+}
+worker.onmessage = onmessage;
+
+// In teleop mode, send keypresses to the worker
+function down(e){
+    if (mode === "teleop") {
+        worker.postMessage({keypress: true, keyCode: e.keyCode, up: false});
+    }
+}
+function up(e){
+    if (mode === "teleop") {
+        worker.postMessage({keypress: true, keyCode: e.keyCode, up: true});
+    }
+}
+document.addEventListener('keydown', down);
+document.addEventListener('keyup', up);
+
+// "Upload Code" button sends code to the worker
 function uploadCode() {
-    if (typeof pyodide != "undefined" && typeof pyodide.version != "undefined") {
-        code = cm.getValue();
-        // alert("Code uploaded");
-    }
-    else {
-        alert("Simulator has not finished loading. Try again in a moment.")
-    }
+    code = cm.getValue();
+    worker.postMessage({code:code});
 };
 
 function update(state) {
@@ -17,13 +39,14 @@ function update(state) {
     */
     // console.log("StateX")
     // console.log(state.x)
-    document.getElementById("demo").innerHTML = state.x.toFixed(2) + ", " + state.y.toFixed(2)
+    var scaleFactor = 2;
+    document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
     var robotRect = document.querySelector("rect")
     // console.log("SVG")
     // console.log(robotRect)
-    robotRect.setAttributeNS(null, "x", state.x)
-    robotRect.setAttributeNS(null, "y", state.y)
-    var rotateStr = "rotate(" + state.dir + " " + (state.x + 15*scaleFactor) + " " + (state.y + 20*scaleFactor) + ")"
+    robotRect.setAttributeNS(null, "x", state.X)
+    robotRect.setAttributeNS(null, "y", state.Y)
+    var rotateStr = "rotate(" + state.dir + " " + (state.X + 15*scaleFactor) + " " + (state.Y + 20*scaleFactor) + ")"
     // console.log(rotateStr)
     robotRect.setAttribute("transform", rotateStr)
     // console.log("Adjusted")
@@ -34,21 +57,16 @@ function start(auto=0) {
     Start the robot thread
     Return if started robot thread
     */
-    if (simulator.isRunning == true) {
+    if (mode !== "idle") {
         return;
     }
     else {
         if (auto === 0) {
-            simulator.simulateTeleop();
+            worker.postMessage({start:true, mode:"teleop"})
         }
         else if (auto === 1) {
-            simulator.simulateAuto();
+            worker.postMessage({start:true, mode:"auto"})
         }
-        // We utilize a daemon thread to such that the thread exits even if we
-        // do not exit gracefully from __main__
-        // robotWorker = new Worker("{{ url_for('static', filename='js/pimulator.js') }}");
-        // robotWorker = threading.Thread(group=None, target=pimulator.main, args=(stateQueue,auto,stop),
-        //                                name="robot thread", daemon=True)
         console.log("robot started");
     }
 };
@@ -57,6 +75,10 @@ function stop() {
     /*
     Stop the robot thread
     */
-    simulator.stop();
-    update({x:144, y:144, dir:0});
+    worker.terminate();
+    worker = new Worker("/static/js/robot.js");
+    worker.onmessage = onmessage;
+    worker.postMessage({code:code});
+    mode = "idle";
+    update({X:144,Y:144,dir:0});
 };
