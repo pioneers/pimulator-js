@@ -50,6 +50,7 @@ function update(state) {
     // console.log(rotateStr)
     robotRect.setAttribute("transform", rotateStr)
     // console.log("Adjusted")
+    setUpCanvas();
 };
 
 function start(auto=0) {
@@ -70,6 +71,19 @@ function start(auto=0) {
         console.log("robot started");
     }
 };
+
+function setUpCanvas() {
+  canvas = document.getElementById('fieldCanvas')
+  ctx = canvas.getContext('2d')
+
+  // outlined square X: 50, Y: 35, width/height 50
+  ctx.beginPath()
+  ctx.strokeRect(50, 35, 50, 50)
+
+  // filled square X: 125, Y: 35, width/height 50
+  ctx.beginPath()
+  ctx.fillRect(125, 35, 50, 50)
+}
 
 function stop() {
     /*
