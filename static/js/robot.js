@@ -35,7 +35,7 @@ class RobotClass {
     }
 
     updatePosition() {
-        /* Updates position of the  Robot using differential drive equations
+        /* Updates position of the Robot using differential drive equations
         Derived with reference to:
         https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf*/
         let lv = this.Wl * this.wRadius;
@@ -473,4 +473,19 @@ this.onmessage = function(e) {
             down(e.data.keyCode);
         }
     }
+}
+
+function FieldObj() {
+    if (!(this instanceof FieldObj)) {
+        return new FieldObj;
+    }
+    this.color;
+    this.width;
+    this.height;
+
+
+}
+
+class wall extends FieldObj {
+
 }
