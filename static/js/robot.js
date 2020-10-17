@@ -458,7 +458,6 @@ this.onmessage = function(e) {
         }
         else {
             if (typeof pyodide != "undefined" && typeof pyodide.version != "undefined") {
-                if (e.data.restart === true) simulator.stop();
                 if (e.data.mode === "auto") simulator.simulateAuto();
                 else if (e.data.mode === "teleop") simulator.simulateTeleop();
             }
