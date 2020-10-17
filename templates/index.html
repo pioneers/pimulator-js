@@ -17,8 +17,8 @@
     <h1>PiE Robotics Simulator</h1>
 
     <svg width="400" height="400" version="1.1" xmlns="http://www.w3.org/2000/svg" style="border:1px solid black">
-      <rect x="140"
-            y="140"
+      <rect x="144"
+            y="144"
             width="60"
             height="80"
             rx="6"
@@ -36,19 +36,6 @@
     <button type="button" onclick="start(auto=0)">Teleop simulation</button>
     <button type="button" onclick="start(auto=1)">Autonomous Simulation </button>
     <button type="button" onclick="stop()">stop simulation</button>
-
-    <!-- File input code -->
-    <!-- <input type="file" id="input" accept="py">
-    <p id="warning"></p>
-    <p id="contents">   </p> -->
-
-    <!-- Import and initialize Pyodide -->
-    <script src="https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js"></script>
-    <script>
-      var content = "";
-      var env = {};
-      languagePluginLoader.then(() => function () {});
-    </script>
         
     <div style="margin-top:20px">
     <!-- Create a simple CodeMirror instance -->
@@ -82,7 +69,7 @@
         lineNumbers: true,
         indentUnit: 4
       });
-      cm.setSize(width="60%", height="1000px");
+      cm.setSize(width="100%", height="1000px");
 
       // var code = getCookie("code");
       var code = "";
@@ -99,7 +86,6 @@
     </script>
     </div>
 
-    <script src="{{ url_for('static', filename='js/pimulator.js') }}"></script>
     <script src="{{ url_for('static', filename='js/base.js') }}"></script>
 
     <!-- Optional JavaScript -->
