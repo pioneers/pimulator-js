@@ -1,5 +1,6 @@
 var mode = "idle";
 var worker = new Worker("static/js/robot.js");
+var timer;
 
 // Handle messages from worker
 function onmessage(e) {
@@ -65,7 +66,32 @@ function start(auto=0) {
             worker.postMessage({start:true, mode:"teleop"})
         }
         else if (auto === 1) {
-            worker.postMessage({start:true, mode:"auto"})
+            worker.onmessage = onmessage;
+            worker.postMessage({code:code});
+            update({X:144,Y:144,dir:0});
+            clearInterval(timer);
+
+            worker.postMessage({start:true, mode:"auto", restart:true})
+            var startTime = new Date().getTime();
+            document.getElementById("timer").innerHTML = "Time Left: 30s";
+            // Tasks for Oct 17:
+                // MAKE NEW BRANCH - done
+                // Time Elapsed -> Countdown Timer - done
+                // Stop timer if simulation is forced to stop (Stop Simulation is clicked)
+                    // Need access to setInterval
+                //
+            timer = setInterval(function() {
+                let currTime = new Date().getTime();
+                let timeElapsed = Math.floor((currTime - startTime) / 1000);
+                let timeLeft = 30 - timeElapsed;
+
+                document.getElementById("timer").innerHTML = "Time Left: " + timeLeft + "s";
+
+                if (timeLeft < 0) {
+                    clearInterval(timer);
+                    document.getElementById("timer").innerHTML = "Autonomous Mode has finished.";
+                }
+            }, 1000);
         }
         console.log("robot started");
     }
@@ -81,4 +107,5 @@ function stop() {
     worker.postMessage({code:code});
     mode = "idle";
     update({X:144,Y:144,dir:0});
+    clearInterval(timer);
 };
