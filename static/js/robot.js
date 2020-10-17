@@ -448,7 +448,6 @@ this.onmessage = function(e) {
     // Code upload
     if (e.data.code !== undefined){
         code = e.data.code;
-        console.log("Code upload succesful")
     }
 
     // Start simulation
@@ -457,10 +456,16 @@ this.onmessage = function(e) {
             console.log("Please upload code first");
         }
         else {
-            if (typeof pyodide != "undefined" && typeof pyodide.version != "undefined") {
-                if (e.data.mode === "auto") simulator.simulateAuto();
-                else if (e.data.mode === "teleop") simulator.simulateTeleop();
+            let simulate = function () {
+                if (typeof pyodide != "undefined" && typeof pyodide.version != "undefined") {
+                    if (e.data.mode === "auto") simulator.simulateAuto();
+                    else if (e.data.mode === "teleop") simulator.simulateTeleop();
+                }
+                else {
+                    setTimeout(simulate, 500);
+                }
             }
+            simulate();
         }
     }
 
