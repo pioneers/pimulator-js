@@ -1,4 +1,4 @@
-var mode = "idle";
+var mode = "idle"; // or auto or teleop
 var worker = new Worker("static/js/robot.js");
 var timer;
 
@@ -56,13 +56,12 @@ function start(auto=0) {
         return;
     }
     else {
+        console.log("Mode", mode)
+        console.log("Starting a simulation")
         if (auto === 0) {
             worker.postMessage({start:true, mode:"teleop"})
         }
         else if (auto === 1) {
-            worker.onmessage = onmessage;
-            worker.postMessage({code:code});
-            update({X:144,Y:144,dir:0});
             clearInterval(timer);
 
             worker.postMessage({start:true, mode:"auto", restart:true})
