@@ -440,7 +440,7 @@ class Simulator{
         });
         this.robot = new RobotClass();
         this.loadStudentCode();
-        
+
         this.timeout = setTimeout(function() { this.stop(); }.bind(this), 30*1000);
         this.robot.simStartTime = new Date().getTime();
         setTimeout(this.autonomous_setup, 0);
