@@ -4,9 +4,11 @@ var code = "";
 var env = {};
 languagePluginLoader.then(() => function () {});
 
-const SCREENHEIGHT = 48
-const SCREENWIDTH = 48
-var scaleFactor = 2
+const SCREENHEIGHT = 48;
+const SCREENWIDTH = 48;
+var scaleFactor = 2;
+
+var obstacles = Array();
 
 class RobotClass {
     /*The MODEL for this simulator. Stores robot data and handles position
@@ -351,6 +353,7 @@ class Simulator{
         this.mode = "idle";
         this.initGamepad();
         this.current = [];
+        this.wallsSetUp = false;
     }
 
     initGamepad(){
@@ -445,34 +448,51 @@ class Simulator{
 var simulator = new Simulator();
 
 this.onmessage = function(e) {
-    // Code upload
-    if (e.data.code !== undefined){
-        code = e.data.code;
-        console.log("Code upload succesful")
+
+    if (e.data.initObj === true) {
+      // wall setup case
+      simulator.wallsSetUp = true;
+      let walls = e.data.walls;
+      let calls = walls.count;
+      let counter = 0;
+      while (counter < calls) {
+        let w = new Wall(walls.arr[counter][0], walls.arr[counter][1], walls.arr[counter][2], walls.arr[counter][3]);
+        obstacles.push(w);
+        counter = counter + 1;
+      }
+    }
+    else {
+      // Code upload
+      if (e.data.code !== undefined){
+          code = e.data.code;
+          console.log("Code upload succesful")
+      }
+
+      // Start simulation
+
+      if (e.data.start === true && simulator.wallsSetUp === true) {
+          if (code === ""){
+              console.log("Please upload code first");
+          }
+          else {
+              if (typeof pyodide != "undefined" && typeof pyodide.version != "undefined") {
+                  if (e.data.mode === "auto") simulator.simulateAuto();
+                  else if (e.data.mode === "teleop") simulator.simulateTeleop();
+              }
+          }
+      }
+
+      // Handle keypresses in teleop
+      if (simulator.mode === "teleop" && e.data.keypress === true){
+          if (e.data.up === true){
+              up(e.data.keyCode);
+          }
+          else if (e.data.up === false){
+              down(e.data.keyCode);
+          }
+      }
     }
 
-    // Start simulation
-    if (e.data.start === true) {
-        if (code === ""){
-            console.log("Please upload code first");
-        }
-        else {
-            if (typeof pyodide != "undefined" && typeof pyodide.version != "undefined") {
-                if (e.data.mode === "auto") simulator.simulateAuto();
-                else if (e.data.mode === "teleop") simulator.simulateTeleop();
-            }
-        }
-    }
-
-    // Handle keypresses in teleop
-    if (simulator.mode === "teleop" && e.data.keypress === true){
-        if (e.data.up === true){
-            up(e.data.keyCode);
-        }
-        else if (e.data.up === false){
-            down(e.data.keyCode);
-        }
-    }
 }
 
 function FieldObj() {
@@ -480,12 +500,25 @@ function FieldObj() {
         return new FieldObj;
     }
     this.color;
-    this.width;
-    this.height;
+    this.x
+    this.y
+    this.w;
+    this.h;
 
 
 }
 
-class wall extends FieldObj {
+class Wall extends FieldObj {
+
+    constructor(x, y, w, h) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+
+        //ctx.beginPath()
+        //ctx.strokeRect(this.x, this.y, this.w, this.h)
+        obstacles.push(this);
+    }
 
 }

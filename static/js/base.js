@@ -1,5 +1,9 @@
+//import Wall from "./robot.js";
+
 var mode = "idle";
 var worker = new Worker("static/js/robot.js");
+
+setUpCanvas();
 
 // Handle messages from worker
 function onmessage(e) {
@@ -57,8 +61,6 @@ function start(auto=0) {
     Start the robot thread
     Return if started robot thread
     */
-   setUpCanvas();
-
     if (mode !== "idle") {
         return;
     }
@@ -76,14 +78,29 @@ function start(auto=0) {
 function setUpCanvas() {
   canvas = document.getElementById('fieldCanvas')
   ctx = canvas.getContext('2d')
+  setUpWalls(ctx);
+
 
   // outlined square X: 50, Y: 35, width/height 50
-  ctx.beginPath()
-  ctx.strokeRect(50, 35, 50, 50)
+  //ctx.beginPath()
+  //ctx.strokeRect(50, 35, 50, 50)
 
   // filled square X: 125, Y: 35, width/height 50
-  ctx.beginPath()
-  ctx.fillRect(125, 35, 50, 50)
+  //ctx.beginPath()
+  //ctx.fillRect(125, 35, 50, 50)
+}
+
+function setUpWalls(ctx) {
+    let wallNum = 4; //change this if you want
+    let arr = new Array([0, 0, 400, 1], [0, 0, 1, 400], [399, 0, 1, 400], [0, 399, 400, 1]);
+    worker.postMessage({initObj: true, walls: {count: wallNum, arr: arr}});
+    let i = 0;
+    
+    while (i < arr.length) {
+        ctx.beginPath();
+        ctx.strokeRect(arr[i][0], arr[i][1], arr[i][2], arr[i][3]);
+        i+=1;
+    } 
 }
 
 function stop() {
