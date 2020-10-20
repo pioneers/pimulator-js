@@ -1,8 +1,7 @@
-language: python
-python:
-        - "3.6.4"
-cache: pip
+language: node_js
+node_js:
+        - lts/*
 install:
-        - pip install -r requirements.txt
+        - npm install eslint
 script:
-        - python tests.py
+        - ./node_modules/.bin/eslint static/js/*.js
