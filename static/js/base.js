@@ -59,8 +59,6 @@ function start(auto=0) {
         return;
     }
     else {
-        console.log("Mode", mode)
-        console.log("Starting a simulation")
         if (auto === 0) {
             worker.postMessage({start:true, mode:"teleop"})
         }
