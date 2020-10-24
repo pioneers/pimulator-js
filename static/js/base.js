@@ -67,13 +67,12 @@ function start(auto=0) {
         else if (auto === 1) {
             clearInterval(timer);
 
-            worker.postMessage({start:true, mode:"auto", restart:true})
+            worker.postMessage({start:true, mode:"auto"})
         }
     }
 };
 
 function runAutoTimer() {
-    console.log("Starting the autonomous timer!")
     var startTime = new Date().getTime();
     document.getElementById("timer").innerHTML = "Time Left: 30s";
 
