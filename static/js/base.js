@@ -37,12 +37,15 @@ function update(state) {
     Update the state (position and direction) of the robot.
     Example of state: {x:72, y:72, dir:0}
     */
-    var scaleFactor = 2;
+    var scaleFactor = 3;
+    let x = state.X * scaleFactor;
+    let y = state.Y * scaleFactor;
+    let dir = state.dir;
     document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
     var robotRect = document.querySelector("rect")
-    robotRect.setAttributeNS(null, "x", state.X)
-    robotRect.setAttributeNS(null, "y", state.Y)
-    var rotateStr = "rotate(" + state.dir + " " + (state.X + 15*scaleFactor) + " " + (state.Y + 20*scaleFactor) + ")"
+    robotRect.setAttributeNS(null, "x", x)
+    robotRect.setAttributeNS(null, "y", y)
+    var rotateStr = "rotate(" + dir + " " + (x + 30) + " " + (y + 40) + ")"
     robotRect.setAttribute("transform", rotateStr)
 };
 
