@@ -82,3 +82,12 @@ function stop() {
     mode = "idle";
     update({X:144,Y:144,dir:0});
 };
+
+console.stdlog = console.log.bind(console);
+console.logs = [];
+console.log = function(){
+    console.logs.push(Array.from(arguments));
+    console.stdlog.apply(console, arguments);
+};
+
+document.getElementById("consoleLog").innerHTML = console.logs;
