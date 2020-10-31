@@ -1,5 +1,6 @@
-var mode = "idle";
+var mode = "idle"; // or auto or teleop
 var worker = new Worker("static/js/robot.js");
+var timer;
 
 // Handle messages from worker
 function onmessage(e) {
@@ -8,6 +9,9 @@ function onmessage(e) {
     }
     if (e.data.mode !== undefined) {
         mode = e.data.mode;
+        if (mode === "auto") {
+            runAutoTimer();
+        }
     }
 }
 worker.onmessage = onmessage;
@@ -37,19 +41,13 @@ function update(state) {
     Update the state (position and direction) of the robot.
     Example of state: {x:72, y:72, dir:0}
     */
-    // console.log("StateX")
-    // console.log(state.x)
     var scaleFactor = 2;
     document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
     var robotRect = document.querySelector("rect")
-    // console.log("SVG")
-    // console.log(robotRect)
     robotRect.setAttributeNS(null, "x", state.X)
     robotRect.setAttributeNS(null, "y", state.Y)
     var rotateStr = "rotate(" + state.dir + " " + (state.X + 15*scaleFactor) + " " + (state.Y + 20*scaleFactor) + ")"
-    // console.log(rotateStr)
     robotRect.setAttribute("transform", rotateStr)
-    // console.log("Adjusted")
 };
 
 function start(auto=0) {
@@ -65,11 +63,30 @@ function start(auto=0) {
             worker.postMessage({start:true, mode:"teleop"})
         }
         else if (auto === 1) {
+            clearInterval(timer);
+
             worker.postMessage({start:true, mode:"auto"})
         }
-        console.log("robot started");
     }
 };
+
+function runAutoTimer() {
+    var startTime = new Date().getTime();
+    document.getElementById("timer").innerHTML = "Time Left: 30s";
+
+    timer = setInterval(function() {
+        let currTime = new Date().getTime();
+        let timeElapsed = Math.floor((currTime - startTime) / 1000);
+        let timeLeft = 30 - timeElapsed;
+
+        document.getElementById("timer").innerHTML = "Time Left: " + timeLeft + "s";
+
+        if (timeLeft < 0) {
+            clearInterval(timer);
+            document.getElementById("timer").innerHTML = "Autonomous Mode has finished.";
+        }
+    }, 1000);
+}
 
 function stop() {
     /*
@@ -81,6 +98,7 @@ function stop() {
     worker.postMessage({code:code});
     mode = "idle";
     update({X:144,Y:144,dir:0});
+    clearInterval(timer);
 };
 
 console.stdlog = console.log.bind(console);

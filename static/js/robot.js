@@ -105,6 +105,9 @@ class RobotClass {
         let numUpdates = 1;
         while (cur < start + ms) {
             cur = new Date().getTime();
+            if (cur > this.simStartTime + 30*1000) {
+                return;
+            }
             if (cur - tick >= this.tickRate) {
                 this.updatePosition();
                 tick = tick + this.tickRate;
@@ -431,14 +434,16 @@ class Simulator{
     }
 
     simulateAuto() {
-        this.robot = new RobotClass();
-        this.loadStudentCode();
-        this.mode = "auto"
-        this.autonomous_setup()
-        setTimeout(function() { this.stop(); }.bind(this), 30*1000);
+        this.mode = "auto";
         postMessage({
             mode: this.mode
-        })
+        });
+        this.robot = new RobotClass();
+        this.loadStudentCode();
+
+        this.timeout = setTimeout(function() { this.stop(); }.bind(this), 30*1000);
+        this.robot.simStartTime = new Date().getTime();
+        setTimeout(this.autonomous_setup, 0);
     }
 }
 
@@ -457,10 +462,16 @@ this.onmessage = function(e) {
             console.log("Please upload code first");
         }
         else {
-            if (typeof pyodide != "undefined" && typeof pyodide.version != "undefined") {
-                if (e.data.mode === "auto") simulator.simulateAuto();
-                else if (e.data.mode === "teleop") simulator.simulateTeleop();
+            let simulate = function () {
+                if (typeof pyodide != "undefined" && typeof pyodide.version != "undefined") {
+                    if (e.data.mode === "auto") simulator.simulateAuto();
+                    else if (e.data.mode === "teleop") simulator.simulateTeleop();
+                }
+                else {
+                    setTimeout(simulate, 500);
+                }
             }
+            simulate();
         }
     }
 
