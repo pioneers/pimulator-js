@@ -101,6 +101,6 @@ function stop() {
     worker.onmessage = onmessage;
     worker.postMessage({code:code});
     mode = "idle";
-    update({X:144,Y:144,dir:0});
+    update({X:70,Y:70,dir:0}); // in inches
     clearInterval(timer);
 };
