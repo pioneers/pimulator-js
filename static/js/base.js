@@ -34,18 +34,18 @@ function uploadCode() {
 
 function update(state) {
     /*
-    Update the state (position and direction) of the robot.
+    Update the state (position and direction) of the robot. Position is in inches, not pixels.
     Example of state: {x:72, y:72, dir:0}
     */
-    var scaleFactor = 3;
-    let x = state.X * scaleFactor;
-    let y = state.Y * scaleFactor;
-    let dir = state.dir;
+    const scaleFactor = 3;
+    const scaledX = state.X * scaleFactor;
+    const scaledY = state.Y * scaleFactor;
+    const dir = state.dir;
     document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
-    var robotRect = document.querySelector("rect")
-    robotRect.setAttributeNS(null, "x", x)
-    robotRect.setAttributeNS(null, "y", y)
-    var rotateStr = "rotate(" + dir + " " + (x + 30) + " " + (y + 40) + ")"
+    const robotRect = document.querySelector("rect")
+    robotRect.setAttributeNS(null, "x", scaledX)
+    robotRect.setAttributeNS(null, "y", scaledY)
+    const rotateStr = `rotate(${dir} ${scaledX + 30} ${scaledY + 40})`
     robotRect.setAttribute("transform", rotateStr)
 };
 
@@ -76,5 +76,5 @@ function stop() {
     worker.onmessage = onmessage;
     worker.postMessage({code:code});
     mode = "idle";
-    update({X:144,Y:144,dir:0});
+    update({X:70,Y:70,dir:0}); // in inches
 };
