@@ -354,6 +354,7 @@ class Simulator{
         this.mode = "idle";
         this.initGamepad();
         this.current = [];
+        this.tapelines = [];
     }
 
     initGamepad(){
@@ -463,7 +464,7 @@ this.onmessage = function(e) {
         }
         else {
             let simulate = function () {
-                if (typeof pyodide != "undefined" && typeof pyodide.version != "undefined") {
+                if (typeof pyodide !== "undefined" && typeof pyodide.version !== "undefined") {
                     if (e.data.mode === "auto") simulator.simulateAuto();
                     else if (e.data.mode === "teleop") simulator.simulateTeleop();
                 }
@@ -484,4 +485,44 @@ this.onmessage = function(e) {
             down(e.data.keyCode);
         }
     }
+}
+class Sensor{
+   constructor(robot, x, y){
+     this.robot = robot;
+     this.x = x;
+     this.y = y;
+   }
+   get_val(){
+     tapeLines = this.robot.tapeLines
+     let total = 0
+     // https://www.geeksforgeeks.org/program-for-point-of-intersection-of-two-lines/
+     for (tapeLine of tapeLines){
+       m = tapeLine.slope
+       // TODO: Add edge case for slope = 0, infinity
+       m1 = -1/slope
+       // make equations of the form: y - mx = c
+       c = tapeLine.y_int
+       c1 = this.y-m1*this.x
+       determinant = -m + m1
+       x = (c - c1)/determinant
+       y = (-m*c1 + m1*c)/determinant
+       distX = Math.abs(this.x-x)
+       distY = Math.abs(this.y-y)
+       distSquared = (distX*distX)+(distY*distY)
+       total += 1/distSquared
+     }
+     return Math.min(1,total)
+   }
+}
+class TapeLine{
+  constructor(x1, y1, x2, y2, width){
+    this.startX = x1
+    this.startY = y1
+    this.endX = x2
+    this.endY = y2
+    this.width = width
+    this.slope = (y1-y2) / (x1-x2)
+    this.y_int = y1 - this.slope*x1
+    // TODO: Add edge cases for lines with slope 0 or infinity
+  }
 }
