@@ -20,8 +20,8 @@ class RobotClass {
     startY = 70.0
 
     constructor(queue=null) {
-      this.X = startX;           // X position of the robot
-      this.Y = startY;           // Y position of the robot
+      this.X = this.startX;           // X position of the robot
+      this.Y = this.startY;           // Y position of the robot
       this.Wl = 0.0;           // angular velocity of l wheel, radians/s
       this.Wr = 0.0;           // angular velocity of r wheel, radians/s
       this.ltheta = 0.0;       // angular position of l wheel, degrees
@@ -33,6 +33,8 @@ class RobotClass {
 
       // Ensure we don't hit sync errors when updating our values
       this.queue = queue;
+      this.sensors = []
+      this.sensors.push(Sensor(this, this.X+20, this.Y+15))
     }
 
     updatePosition() {

@@ -38,7 +38,7 @@ function uploadCode() {
 
 function update(state) {
     /*
-    Update the state (position and direction) of the robot. 
+    Update the state (position and direction) of the robot.
     Input position is in inches. scaleFactor convers inches -> pixels.
     Example of state: {x:72, y:72, dir:0}
     */
