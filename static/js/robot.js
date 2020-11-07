@@ -107,6 +107,7 @@ class RobotClass {
           if (inter) {
             break;
           }
+          console.log(i);
         }
 
         /*
@@ -193,7 +194,7 @@ class RobotClass {
 
     intersectOne(objX1, objY1, objX2, objY2) {
 
-      console.log("Ox1", objX1, "oy1", objY1, "objx2", objX2, "objY2", objY2);
+      //console.log("Ox1", objX1, "oy1", objY1, "objx2", objX2, "objY2", objY2);
       var A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
       var A2 = 0 != (this.topL[0] - this.topR[0]) ? (this.topL[1] - this.topR[1]) / (this.topL[0] - this.topR[0]) : 500000;
       var b1 = objY1 - A1 * objX1;
@@ -203,6 +204,8 @@ class RobotClass {
           Xa < Math.min(Math.max(objX1, objX2), Math.max(this.topL[0], this.topR[0]))) {
             return true;
       }
+
+      //console.log("1", Xa);
 
       A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
       A2 = 0 != (this.botR[0] - this.topR[0]) ? (this.botR[1] - this.topR[1]) / (this.botR[0] - this.topR[0]) : 500000;
@@ -214,6 +217,8 @@ class RobotClass {
             return true;
       }
 
+      //console.log("2", Xa);
+
       A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
       A2 = 0 != (this.botR[0] - this.botL[0]) ? (this.botR[1] - this.botL[1]) / (this.botR[0] - this.botL[0]) : 500000;
       b1 = objY1 - A1 * objX1;
@@ -224,6 +229,8 @@ class RobotClass {
             return true;
       }
 
+      //console.log("3", Xa);
+
       A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
       A2 = 0 != (this.topL[0] - this.botL[0]) ? (this.topL[1] - this.botL[1]) / (this.topL[0] - this.botL[0]) : 500000;
       b1 = objY1 - A1 * objX1;
@@ -233,6 +240,7 @@ class RobotClass {
           Xa < Math.min(Math.max(objX1, objX2), Math.max(this.topL[0], this.botL[0]))) {
             return true;
       }
+      //console.log("4", Xa);
 
       return false;
 
