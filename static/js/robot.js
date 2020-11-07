@@ -8,26 +8,54 @@ const SCREENHEIGHT = 48;
 const SCREENWIDTH = 48;
 var scaleFactor = 2;
 
-var obstacles = Array();
+obstacles = Array();
 
 class RobotClass {
     /*The MODEL for this simulator. Stores robot data and handles position
        calculations & Runtime API calls """*/
     tickRate = 50;          // in ms
-    width = 12 * scaleFactor;                  // width of robot , inches
+    width = 40 * scaleFactor;                  // width of robot , inches
+    height = 30 * scaleFactor;
     wRadius = 2  * scaleFactor;                // radius of a wheel, inches
-    MaxX = 143 * scaleFactor;                 // maximum X value, inches, field is 12'x12'
-    MaxY = 143 * scaleFactor;                 // maximum Y value, inches, field is 12'x12'
-    neg = -1;                    // negate left motor calculation
+    MaxX = 200 * scaleFactor;                 // maximum X value, inches, field is 12'x12'
+    MaxY = 200 * scaleFactor;                 // maximum Y value, inches, field is 12'x12'
+    neg = -1;
+    oldTopL = Array(2);                             // negate left motor calculation
+    topL = Array(2);
+    oldTopR = Array(2);
+    topR = Array(2);
+    oldBotL = Array(2);
+    botL = Array(2);
+    oldBotR = Array(2);
+    botR = Array(2);
+
 
     constructor(queue=null) {
       this.X = 72.0 * scaleFactor;           // X position of the robot
       this.Y = 72.0 * scaleFactor;           // Y position of the robot
-      this.Wl = 0.0;           // angular velocity of l wheel, radians/s
+      this.Wl = 0.0;           // angular velocity of l wheel, radians/upds
       this.Wr = 0.0;           // angular velocity of r wheel, radians/s
       this.ltheta = 0.0;       // angular position of l wheel, degrees
       this.rtheta = 0.0;       // angular position of r wheel, degrees
       this.dir = 0.0;          // Direction of the robot facing, degrees
+
+      //corners are relative to the robot facing up
+
+      //coordinates for top right corner of robot
+      this.topR[0] = this.X - this.height/2;
+      this.topR[1] = this.Y - this.width/2;
+
+      //coordinates for top left corner of robot
+      this.topL[0] = this.X - this.height/2;
+      this.topL[1] = this.Y + this.width/2;
+
+      //coordinates for bottom right corner
+      this.botR[0] = this.X + this.height/2;
+      this.botR[1] = this.Y - this.width/2;
+
+      //coordinates for bottom left corner
+      this.botL[0] = this.X + this.height/2;
+      this.botL[1] = this.Y + this.width/2;
 
       // All asychronous functions currently running
       this.runningCoroutines = new Set();
@@ -40,17 +68,20 @@ class RobotClass {
         /* Updates position of the Robot using differential drive equations
         Derived with reference to:
         https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf*/
+        let dummyCt = 0;
+
         let lv = this.Wl * this.wRadius;
         let rv = this.Wr * this.wRadius * this.neg;
         let radian = Math.PI*this.dir/180;
         let dx;
         let dy;
+        let ogDir = this.dir;
         if (lv == rv) {
             let distance = rv * this.tickRate/1000;
             dx = distance * Math.cos(radian)
             dy = distance * Math.sin(radian)
             //let finalDir = null
-          }
+        }
         else {
             let rt = this.width/2 * (lv+rv)/(rv-lv);
             let wt = (rv-lv)/this.width;
@@ -59,22 +90,177 @@ class RobotClass {
             let j = Math.sin(theta) * rt;
             dx = i * Math.sin(radian) + j * Math.cos(radian);
             dy = i * Math.cos(radian) + j * Math.sin(radian);
-            this.dir= (this.dir + theta*180/Math.PI) % 360;
-          }
+            this.dir = (this.dir + theta*180/Math.PI) % 360;
+        }
+        var ogX = this.X;
+        var ogY = this.Y;
         this.X = Math.max(Math.min(this.X + dx, this.MaxX), 0);
         this.Y = Math.max(Math.min(this.Y + dy, this.MaxY), 0);
         this.ltheta = (this.Wl * 5 + this.ltheta) % 360;
         this.rtheta = (this.Wr * 5 + this.rtheta) % 360;
 
-        let newState = {
-            X: this.X,
-            Y: this.Y,
-            dir: this.dir
-        };
+        this.updateCorners(this.X - ogX, this.Y - ogY, ogDir, dummyCt);
 
-        postMessage({
+        //Check if the given move results in a collision with any field objects
+        for (var i=0; i < obstacles.length; i++) {
+          var inter = this.intersectOne(obstacles[i].x, obstacles[i].y, obstacles[i].w, obstacles[i].h); //inter is false if no collision, and true otherwise
+          if (inter) {
+            break;
+          }
+        }
+
+        /*
+        this.updateCorners(ogX - this.X, ogY - this.Y, -1 * ogDir + 2 * this.dir);
+        this.X = ogX;
+        this.Y = ogY;
+        this.dir = ogDir;
+        */
+
+        //Check to ensure there was no collision
+
+        if (!inter) {
+          let newState = {
+              X: this.X,
+              Y: this.Y,
+              dir: this.dir
+          };
+
+          postMessage({
             robot: newState
-        })
+          })
+
+        } else {
+          this.updateCorners(ogX - this.X, ogY - this.Y, -1 * ogDir + 2 * this.dir, dummyCt);
+          this.X = ogX;
+          this.Y = ogY;
+          this.dir = ogDir;
+        }
+
+        dummyCt+=1;
+    }
+
+    updateCorners(dX, dY, ogDir, dc) {
+
+      var dDir = this.dir - ogDir;
+
+      //top right corner
+      this.topR[0] += dX;
+      this.topR[1] += dY;
+      this.topR[0] -= this.X;
+      this.topR[1] -= this.Y;
+      this.topR[0] = Math.cos(dDir)*this.topR[0] - Math.sin(dDir)*this.topR[1];
+      this.topR[1] = Math.sin(dDir)*this.topR[0] + Math.cos(dDir)*this.topR[1];
+      this.topR[0] += this.X;
+      this.topR[1] += this.Y;
+
+
+      //coordinates for top left corner of robot
+      this.topL[0] += dX;
+      this.topL[1] += dY;
+      this.topL[0] -= this.X;
+      this.topL[1] -= this.Y;
+      this.topL[0] = Math.cos(dDir)*this.topL[0] - Math.sin(dDir)*this.topL[1];
+      this.topL[1] = Math.sin(dDir)*this.topL[0] + Math.cos(dDir)*this.topL[1];
+      this.topL[0] += this.X;
+      this.topL[1] += this.Y;
+
+      //coordinates for bottom right corner
+      this.botR[0] += dX;
+      this.botR[1] += dY;
+      this.botR[0] -= this.X;
+      this.botR[1] -= this.Y;
+      this.botR[0] = Math.cos(dDir)*this.botR[0] - Math.sin(dDir)*this.botR[1];
+      this.botR[1] = Math.sin(dDir)*this.botR[0] + Math.cos(dDir)*this.botR[1];
+      this.botR[0] += this.X;
+      this.botR[1] += this.Y;
+
+      //coordinates for bottom left corner
+      this.botL[0] += dX;
+      this.botL[1] += dY;
+      this.botL[0] -= this.X;
+      this.botL[1] -= this.Y;
+      this.botL[0] = Math.cos(dDir)*this.botL[0] - Math.sin(dDir)*this.botL[1];
+      this.botL[1] = Math.sin(dDir)*this.botL[0] + Math.cos(dDir)*this.botL[1];
+      this.botL[0] += this.X;
+      this.botL[1] += this.Y;
+
+      if (dc % 300 == 0) {
+        console.log(this.topR[0], this.topR[1], "|", this.topL[0], this.topL[1], "|", this.botR[0], this.botR[1], "|", this.botL[0], this.botL[1]);
+      }
+    }
+
+    intersectOne(objX1, objY1, objX2, objY2) {
+
+      var slope = (objY2 - objY1) / (objX2-objX1);
+      var point3under = false;
+      var point4under = false;
+      var x3diff = this.topL[0] - objX1;
+      var y3should = x3diff * slope;
+      if (this.topL[1] < y3should) {
+        point3under = true;
+      }
+      var x4diff = this.topR[0] - objX1;
+      var y4should = x4diff * slope;
+      if (this.topR[1] < y4should) {
+        point4under = true;
+      }
+      if (point3under != point4under) {
+        return true;
+      }
+
+      var slope = (objY2 - objY1) / (objX2-objX1);
+      var point3under = false;
+      var point4under = false;
+      var x3diff = this.topR[0] - objX1;
+      var y3should = x3diff * slope;
+      if (this.topR[1] < y3should) {
+        point3under = true;
+      }
+      var x4diff = this.botR[0] - objX1;
+      var y4should = x4diff * slope;
+      if (this.botR[1] < y4should) {
+        point4under = true;
+      }
+      if (point3under != point4under) {
+        return true;
+      }
+
+      var slope = (objY2 - objY1) / (objX2-objX1);
+      var point3under = false;
+      var point4under = false;
+      var x3diff = this.botR[0] - objX1;
+      var y3should = x3diff * slope;
+      if (this.botR[1] < y3should) {
+        point3under = true;
+      }
+      var x4diff = this.botL[0] - objX1;
+      var y4should = x4diff * slope;
+      if (this.botL[1] < y4should) {
+        point4under = true;
+      }
+      if (point3under != point4under) {
+        return true;
+      }
+
+      var slope = (objY2 - objY1) / (objX2-objX1);
+      var point3under = false;
+      var point4under = false;
+      var x3diff = this.botL[0] - objX1;
+      var y3should = x3diff * slope;
+      if (this.botL[1] < y3should) {
+        point3under = true;
+      }
+      var x4diff = this.topL[0] - objX1;
+      var y4should = x4diff * slope;
+      if (this.topL[1] < y4should) {
+        point4under = true;
+      }
+      if (point3under != point4under) {
+        return true;
+      }
+
+      return false;
+
     }
 
     set_value(device, param, speed) {
@@ -139,6 +325,9 @@ class RobotClass {
         }
         return this.runningCoroutines.has(fn)
     }
+
+
+
 }
 
 class GamepadClass{
@@ -457,7 +646,8 @@ this.onmessage = function(e) {
       let counter = 0;
       while (counter < calls) {
         let w = new Wall(walls.arr[counter][0], walls.arr[counter][1], walls.arr[counter][2], walls.arr[counter][3]);
-        obstacles.push(w);
+
+        //obstacles.push(w);
         counter = counter + 1;
       }
     }
@@ -500,10 +690,10 @@ function FieldObj() {
         return new FieldObj;
     }
     this.color;
-    this.x
-    this.y
-    this.w;
-    this.h;
+    this.x=0;
+    this.y=0;
+    this.w=0;
+    this.h=0;
 
 
 }
@@ -511,6 +701,7 @@ function FieldObj() {
 class Wall extends FieldObj {
 
     constructor(x, y, w, h) {
+        super();
         this.x = x;
         this.y = y;
         this.w = w;
@@ -520,5 +711,6 @@ class Wall extends FieldObj {
         //ctx.strokeRect(this.x, this.y, this.w, this.h)
         obstacles.push(this);
     }
-
 }
+
+//module.exports = Wall;

@@ -2,6 +2,7 @@
 
 var mode = "idle";
 var worker = new Worker("static/js/robot.js");
+//const Wall = require('./robot.js');
 
 setUpCanvas();
 
@@ -92,15 +93,15 @@ function setUpCanvas() {
 
 function setUpWalls(ctx) {
     let wallNum = 4; //change this if you want
-    let arr = new Array([0, 0, 400, 1], [0, 0, 1, 400], [399, 0, 1, 400], [0, 399, 400, 1]);
+    let arr = new Array([0, 0, 400, 5], [0, 0, 5, 400], [395, 0, 5, 400], [0, 395, 400, 5]);
     worker.postMessage({initObj: true, walls: {count: wallNum, arr: arr}});
     let i = 0;
-    
+
     while (i < arr.length) {
         ctx.beginPath();
-        ctx.strokeRect(arr[i][0], arr[i][1], arr[i][2], arr[i][3]);
+        ctx.fillRect(arr[i][0], arr[i][1], arr[i][2], arr[i][3]);
         i+=1;
-    } 
+    }
 }
 
 function stop() {
