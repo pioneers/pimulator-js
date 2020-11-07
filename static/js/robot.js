@@ -19,14 +19,10 @@ class RobotClass {
     wRadius = 2  * scaleFactor;                // radius of a wheel, inches
     MaxX = 200 * scaleFactor;                 // maximum X value, inches, field is 12'x12'
     MaxY = 200 * scaleFactor;                 // maximum Y value, inches, field is 12'x12'
-    neg = -1;
-    oldTopL = Array(2);                             // negate left motor calculation
+    neg = -1;                                 // negate left motor calculation
     topL = Array(2);
-    oldTopR = Array(2);
     topR = Array(2);
-    oldBotL = Array(2);
     botL = Array(2);
-    oldBotR = Array(2);
     botR = Array(2);
 
 
@@ -102,8 +98,12 @@ class RobotClass {
         this.updateCorners(this.X - ogX, this.Y - ogY, ogDir, dummyCt);
 
         //Check if the given move results in a collision with any field objects
+        var inter = false;
         for (var i=0; i < obstacles.length; i++) {
-          var inter = this.intersectOne(obstacles[i].x, obstacles[i].y, obstacles[i].w, obstacles[i].h); //inter is false if no collision, and true otherwise
+          inter = this.intersectOne(obstacles[i].x, obstacles[i].y, obstacles[i].x + obstacles[i].w, obstacles[i].y);
+          inter = this.intersectOne(obstacles[i].x + obstacles[i].w, obstacles[i].y, obstacles[i].x + obstacles[i].w, obstacles[i].y + obstacles[i].h);
+          inter = this.intersectOne(obstacles[i].x + obstacles[i].w, obstacles[i].y + obstacles[i].h, obstacles[i].x, obstacles[i].y + obstacles[i].h);
+          inter = this.intersectOne(obstacles[i].x, obstacles[i].y + obstacles[i].h, obstacles[i].x, obstacles[i].y);
           if (inter) {
             break;
           }
@@ -141,7 +141,9 @@ class RobotClass {
 
     updateCorners(dX, dY, ogDir, dc) {
 
-      var dDir = this.dir - ogDir;
+      var dDirDeg = -1 * (this.dir - ogDir);
+      var dDir = dDirDeg * Math.PI / 180;
+      console.log("MCOS: ", Math.sin(dDir), '\n');
 
       //top right corner
       this.topR[0] += dX;
@@ -184,79 +186,52 @@ class RobotClass {
       this.botL[0] += this.X;
       this.botL[1] += this.Y;
 
-      if (dc % 300 == 0) {
-        console.log(this.topR[0], this.topR[1], "|", this.topL[0], this.topL[1], "|", this.botR[0], this.botR[1], "|", this.botL[0], this.botL[1]);
+      if (dc % 100000000 == 0) {
+        console.log(this.topR[0], this.topR[1], "|", this.topL[0], this.topL[1], "|", this.botR[0], this.botR[1], "|", this.botL[0], this.botL[1], '\n');
       }
     }
 
     intersectOne(objX1, objY1, objX2, objY2) {
 
-      var slope = (objY2 - objY1) / (objX2-objX1);
-      var point3under = false;
-      var point4under = false;
-      var x3diff = this.topL[0] - objX1;
-      var y3should = x3diff * slope;
-      if (this.topL[1] < y3should) {
-        point3under = true;
-      }
-      var x4diff = this.topR[0] - objX1;
-      var y4should = x4diff * slope;
-      if (this.topR[1] < y4should) {
-        point4under = true;
-      }
-      if (point3under != point4under) {
-        return true;
+      console.log("Ox1", objX1, "oy1", objY1, "objx2", objX2, "objY2", objY2);
+      var A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
+      var A2 = 0 != (this.topL[0] - this.topR[0]) ? (this.topL[1] - this.topR[1]) / (this.topL[0] - this.topR[0]) : 500000;
+      var b1 = objY1 - A1 * objX1;
+      var b2 = this.topL[1] - A2 * this.topL[0];
+      var Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
+      if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.topL[0], this.topR[0])) &&
+          Xa < Math.min(Math.max(objX1, objX2), Math.max(this.topL[0], this.topR[0]))) {
+            return true;
       }
 
-      var slope = (objY2 - objY1) / (objX2-objX1);
-      var point3under = false;
-      var point4under = false;
-      var x3diff = this.topR[0] - objX1;
-      var y3should = x3diff * slope;
-      if (this.topR[1] < y3should) {
-        point3under = true;
-      }
-      var x4diff = this.botR[0] - objX1;
-      var y4should = x4diff * slope;
-      if (this.botR[1] < y4should) {
-        point4under = true;
-      }
-      if (point3under != point4under) {
-        return true;
+      A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
+      A2 = 0 != (this.botR[0] - this.topR[0]) ? (this.botR[1] - this.topR[1]) / (this.botR[0] - this.topR[0]) : 500000;
+      b1 = objY1 - A1 * objX1;
+      b2 = this.botR[1] - A2 * this.botR[0];
+      Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
+      if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.botR[0], this.topR[0])) &&
+          Xa < Math.min(Math.max(objX1, objX2), Math.max(this.botR[0], this.topR[0]))) {
+            return true;
       }
 
-      var slope = (objY2 - objY1) / (objX2-objX1);
-      var point3under = false;
-      var point4under = false;
-      var x3diff = this.botR[0] - objX1;
-      var y3should = x3diff * slope;
-      if (this.botR[1] < y3should) {
-        point3under = true;
-      }
-      var x4diff = this.botL[0] - objX1;
-      var y4should = x4diff * slope;
-      if (this.botL[1] < y4should) {
-        point4under = true;
-      }
-      if (point3under != point4under) {
-        return true;
+      A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
+      A2 = 0 != (this.botR[0] - this.botL[0]) ? (this.botR[1] - this.botL[1]) / (this.botR[0] - this.botL[0]) : 500000;
+      b1 = objY1 - A1 * objX1;
+      b2 = this.botR[1] - A2 * this.botR[0];
+      Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
+      if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.botR[0], this.botL[0])) &&
+          Xa < Math.min(Math.max(objX1, objX2), Math.max(this.botR[0], this.botL[0]))) {
+            return true;
       }
 
-      var slope = (objY2 - objY1) / (objX2-objX1);
-      var point3under = false;
-      var point4under = false;
-      var x3diff = this.botL[0] - objX1;
-      var y3should = x3diff * slope;
-      if (this.botL[1] < y3should) {
-        point3under = true;
-      }
-      var x4diff = this.topL[0] - objX1;
-      var y4should = x4diff * slope;
-      if (this.topL[1] < y4should) {
-        point4under = true;
-      }
-      if (point3under != point4under) {
-        return true;
+      A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
+      A2 = 0 != (this.topL[0] - this.botL[0]) ? (this.topL[1] - this.botL[1]) / (this.topL[0] - this.botL[0]) : 500000;
+      b1 = objY1 - A1 * objX1;
+      b2 = this.topL[1] - A2 * this.topL[0];
+      Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
+      if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.topL[0], this.botL[0])) &&
+          Xa < Math.min(Math.max(objX1, objX2), Math.max(this.topL[0], this.botL[0]))) {
+            return true;
       }
 
       return false;
