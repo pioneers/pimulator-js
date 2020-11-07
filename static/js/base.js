@@ -44,14 +44,18 @@ function update(state) {
     */
     // console.log("StateX")
     // console.log(state.x)
+
+    var offsetX = state.X - 30;
+    var offsetY = state.Y - 40;
+
     var scaleFactor = 2;
-    document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
+    document.getElementById("demo").innerHTML = offsetX.toFixed(2) + ", " + offsetY.toFixed(2)
     var robotRect = document.querySelector("rect")
     // console.log("SVG")
     // console.log(robotRect)
-    robotRect.setAttributeNS(null, "x", state.X)
-    robotRect.setAttributeNS(null, "y", state.Y)
-    var rotateStr = "rotate(" + state.dir + " " + (state.X + 15*scaleFactor) + " " + (state.Y + 20*scaleFactor) + ")"
+    robotRect.setAttributeNS(null, "x", offsetX)
+    robotRect.setAttributeNS(null, "y", offsetY)
+    var rotateStr = "rotate(" + state.dir + " " + (offsetX + 15*scaleFactor) + " " + (offsetY + 20*scaleFactor) + ")"
     // console.log(rotateStr)
     robotRect.setAttribute("transform", rotateStr)
     // console.log("Adjusted")
@@ -93,7 +97,7 @@ function setUpCanvas() {
 
 function setUpWalls(ctx) {
     let wallNum = 4; //change this if you want
-    let arr = new Array([0, 0, 400, 5], [0, 0, 5, 400], [395, 0, 5, 400], [0, 395, 400, 5]);
+    let arr = new Array([0, 0, 400, 5], [0, 0, 5, 400], [395, 0, 5, 400], [0, 395, 400, 5], [50, 50, 50, 50]);
     worker.postMessage({initObj: true, walls: {count: wallNum, arr: arr}});
     let i = 0;
 

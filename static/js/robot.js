@@ -27,8 +27,8 @@ class RobotClass {
 
 
     constructor(queue=null) {
-      this.X = 72.0 * scaleFactor;           // X position of the robot
-      this.Y = 72.0 * scaleFactor;           // Y position of the robot
+      this.X = 72.0 * scaleFactor - 30;           // X position of the robot
+      this.Y = 72.0 * scaleFactor - 40;           // Y position of the robot
       this.Wl = 0.0;           // angular velocity of l wheel, radians/upds
       this.Wr = 0.0;           // angular velocity of r wheel, radians/s
       this.ltheta = 0.0;       // angular position of l wheel, degrees
@@ -100,6 +100,7 @@ class RobotClass {
         //Check if the given move results in a collision with any field objects
         var inter = false;
         for (var i=0; i < obstacles.length; i++) {
+          console.log(this.intersectOne(144,144,100,144));
           inter = this.intersectOne(obstacles[i].x, obstacles[i].y, obstacles[i].x + obstacles[i].w, obstacles[i].y);
           inter = this.intersectOne(obstacles[i].x + obstacles[i].w, obstacles[i].y, obstacles[i].x + obstacles[i].w, obstacles[i].y + obstacles[i].h);
           inter = this.intersectOne(obstacles[i].x + obstacles[i].w, obstacles[i].y + obstacles[i].h, obstacles[i].x, obstacles[i].y + obstacles[i].h);
@@ -107,7 +108,6 @@ class RobotClass {
           if (inter) {
             break;
           }
-          console.log(i);
         }
 
         /*
@@ -144,7 +144,7 @@ class RobotClass {
 
       var dDirDeg = -1 * (this.dir - ogDir);
       var dDir = dDirDeg * Math.PI / 180;
-      console.log("MCOS: ", Math.sin(dDir), '\n');
+      //console.log("MCOS: ", Math.sin(dDir), '\n');
 
       //top right corner
       this.topR[0] += dX;
@@ -188,7 +188,7 @@ class RobotClass {
       this.botL[1] += this.Y;
 
       if (dc % 100000000 == 0) {
-        console.log(this.topR[0], this.topR[1], "|", this.topL[0], this.topL[1], "|", this.botR[0], this.botR[1], "|", this.botL[0], this.botL[1], '\n');
+        //console.log(this.topR[0], this.topR[1], "|", this.topL[0], this.topL[1], "|", this.botR[0], this.botR[1], "|", this.botL[0], this.botL[1], '\n');
       }
     }
 
@@ -202,10 +202,11 @@ class RobotClass {
       var Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
       if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.topL[0], this.topR[0])) &&
           Xa < Math.min(Math.max(objX1, objX2), Math.max(this.topL[0], this.topR[0]))) {
+            console.log("Yeehaw");
             return true;
       }
 
-      //console.log("1", Xa);
+      console.log("Xa #1:", Xa);
 
       A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
       A2 = 0 != (this.botR[0] - this.topR[0]) ? (this.botR[1] - this.topR[1]) / (this.botR[0] - this.topR[0]) : 500000;
@@ -214,10 +215,11 @@ class RobotClass {
       Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
       if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.botR[0], this.topR[0])) &&
           Xa < Math.min(Math.max(objX1, objX2), Math.max(this.botR[0], this.topR[0]))) {
+            console.log("Yeehaw");
             return true;
       }
 
-      //console.log("2", Xa);
+      console.log("Xa #2:", Xa);
 
       A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
       A2 = 0 != (this.botR[0] - this.botL[0]) ? (this.botR[1] - this.botL[1]) / (this.botR[0] - this.botL[0]) : 500000;
@@ -226,10 +228,11 @@ class RobotClass {
       Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
       if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.botR[0], this.botL[0])) &&
           Xa < Math.min(Math.max(objX1, objX2), Math.max(this.botR[0], this.botL[0]))) {
+            console.log("Yeehaw");
             return true;
       }
 
-      //console.log("3", Xa);
+      console.log("Xa #3:", Xa);
 
       A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
       A2 = 0 != (this.topL[0] - this.botL[0]) ? (this.topL[1] - this.botL[1]) / (this.topL[0] - this.botL[0]) : 500000;
@@ -238,9 +241,10 @@ class RobotClass {
       Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
       if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.topL[0], this.botL[0])) &&
           Xa < Math.min(Math.max(objX1, objX2), Math.max(this.topL[0], this.botL[0]))) {
+            console.log("Yeehaw");
             return true;
       }
-      //console.log("4", Xa);
+      console.log("Xa #4:", Xa);
 
       return false;
 
