@@ -19,7 +19,7 @@ class RobotClass {
     startX = 70.0               // starting X position of the center of the robot
     startY = 70.0               // starting Y position of the center of the robot
 
-    constructor(queue=null) {
+    constructor() {
       this.X = this.startX;     // current X position of the center of the robot
       this.Y = this.startY;     // current Y position of the center of the robot
       this.Wl = 0.0;            // angular velocity of l wheel, radians/s
@@ -30,9 +30,6 @@ class RobotClass {
 
       // All asychronous functions currently running
       this.runningCoroutines = new Set();
-
-      // Ensure we don't hit sync errors when updating our values
-      this.queue = queue;
     }
 
     updatePosition() {
