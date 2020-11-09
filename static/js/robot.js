@@ -33,8 +33,7 @@ class RobotClass {
 
       // Ensure we don't hit sync errors when updating our values
       this.queue = queue;
-      this.sensors = []
-      this.sensors.push(Sensor(this, this.X+20, this.Y+15))
+      this.sensor = Sensor(this)
     }
 
     updatePosition() {
@@ -72,7 +71,7 @@ class RobotClass {
             Y: this.Y,
             dir: this.dir
         };
-
+        this.sensor.get_val()
         postMessage({
             robot: newState
         })
@@ -490,31 +489,38 @@ this.onmessage = function(e) {
     }
 }
 class Sensor{
-   constructor(robot, x, y){
+   constructor(robot){
      this.robot = robot;
-     this.x = x;
-     this.y = y;
    }
    get_val(){
-     tapeLines = this.robot.tapeLines
-     let total = 0
-     // https://www.geeksforgeeks.org/program-for-point-of-intersection-of-two-lines/
-     for (tapeLine of tapeLines){
-       m = tapeLine.slope
-       // TODO: Add edge case for slope = 0, infinity
-       m1 = -1/slope
-       // make equations of the form: y - mx = c
-       c = tapeLine.y_int
-       c1 = this.y-m1*this.x
-       determinant = -m + m1
-       x = (c - c1)/determinant
-       y = (-m*c1 + m1*c)/determinant
-       distX = Math.abs(this.x-x)
-       distY = Math.abs(this.y-y)
-       distSquared = (distX*distX)+(distY*distY)
-       total += 1/distSquared
+     var sensorsX = [robot.x, robot.x + Math.sin(robot.dir), robot.x - Math.sin(robot.dir)]
+     var sensorsY = [robot.y, robot.y + Math.cos(robot.dir), robot.y - Math.cos(robot.dir)]
+
+     var tapeLines = this.robot.tapeLines
+     let total = []
+     let i = 0
+     for (;i<3;i++){
+       sensor_x = sensorsX[i]
+       sensor_y = sensorsY[i]
+       // https://www.geeksforgeeks.org/program-for-point-of-intersection-of-two-lines/
+       for (tapeLine of tapeLines){
+         m = tapeLine.slope
+         // TODO: Add edge case for slope = 0, infinity
+         m1 = -1/slope
+         // make equations of the form: y - mx = c
+         c = tapeLine.y_int
+         c1 = sensor_y-m1*sensor_x
+         determinant = -m + m1
+         x = (c - c1)/determinant
+         y = (-m*c1 + m1*c)/determinant
+         distX = Math.abs(sensor_x-x)
+         distY = Math.abs(sensor_y-y)
+         distSquared = (distX*distX)+(distY*distY)
+         total.push(Math.min(1,1/distSquared))
+
+       }
      }
-     return Math.min(1,total)
+     return total
    }
 }
 class TapeLine{
