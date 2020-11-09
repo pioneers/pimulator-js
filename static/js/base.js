@@ -38,13 +38,13 @@ function uploadCode() {
 
 function update(state) {
     /*
-    Update the state (position and direction) of the robot. 
+    Update the state (position and direction) of the center of the robot. 
     Input position is in inches. scaleFactor convers inches -> pixels.
     Example of state: {x:72, y:72, dir:0}
     */
     const scaleFactor = 3;
-    const scaledX = state.X * scaleFactor;
-    const scaledY = state.Y * scaleFactor;
+    const scaledX = state.X * scaleFactor - 30;
+    const scaledY = state.Y * scaleFactor - 40;
     const dir = state.dir;
     document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
     const robotRect = document.querySelector("rect")
