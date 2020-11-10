@@ -33,7 +33,9 @@ class RobotClass {
 
       // Ensure we don't hit sync errors when updating our values
       this.queue = queue;
-      this.sensor = Sensor(this)
+      this.sensor = new Sensor(this);
+      this.tapeLines = [];
+      this.tapeLines.push(new TapeLine(40, 40, 80, 80, 10));
     }
 
     updatePosition() {
@@ -493,33 +495,34 @@ class Sensor{
      this.robot = robot;
    }
    get_val(){
-     var sensorsX = [robot.x, robot.x + Math.sin(robot.dir), robot.x - Math.sin(robot.dir)]
-     var sensorsY = [robot.y, robot.y + Math.cos(robot.dir), robot.y - Math.cos(robot.dir)]
+     var sensorsX = [this.robot.x, this.robot.x + Math.sin(this.robot.dir), this.robot.x - Math.sin(this.robot.dir)]
+     var sensorsY = [this.robot.y, this.robot.y + Math.cos(this.robot.dir), this.robot.y - Math.cos(this.robot.dir)]
 
      var tapeLines = this.robot.tapeLines
      let total = []
      let i = 0
      for (;i<3;i++){
-       sensor_x = sensorsX[i]
-       sensor_y = sensorsY[i]
+       let sensor_x = sensorsX[i]
+       let sensor_y = sensorsY[i]
        // https://www.geeksforgeeks.org/program-for-point-of-intersection-of-two-lines/
-       for (tapeLine of tapeLines){
-         m = tapeLine.slope
+       for (const tapeLine of tapeLines){
+         let m = tapeLine.slope
          // TODO: Add edge case for slope = 0, infinity
-         m1 = -1/slope
+         let m1 = -1/m
          // make equations of the form: y - mx = c
-         c = tapeLine.y_int
-         c1 = sensor_y-m1*sensor_x
-         determinant = -m + m1
-         x = (c - c1)/determinant
-         y = (-m*c1 + m1*c)/determinant
-         distX = Math.abs(sensor_x-x)
-         distY = Math.abs(sensor_y-y)
-         distSquared = (distX*distX)+(distY*distY)
+         let c = tapeLine.y_int
+         let c1 = sensor_y-m1*sensor_x
+         let determinant = -m + m1
+         let x = (c - c1)/determinant
+         let y = (-m*c1 + m1*c)/determinant
+         let distX = Math.abs(sensor_x-x)
+         let distY = Math.abs(sensor_y-y)
+         let distSquared = (distX*distX)+(distY*distY)
          total.push(Math.min(1,1/distSquared))
 
        }
      }
+     console.log(total)
      return total
    }
 }
