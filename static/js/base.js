@@ -1,8 +1,6 @@
-//import Wall from "./robot.js";
-
-var mode = "idle";
+var mode = "idle"; // or auto or teleop
 var worker = new Worker("static/js/robot.js");
-//const Wall = require('./robot.js');
+var timer;
 
 setUpCanvas();
 
@@ -13,6 +11,9 @@ function onmessage(e) {
     }
     if (e.data.mode !== undefined) {
         mode = e.data.mode;
+        if (mode === "auto") {
+            runAutoTimer();
+        }
     }
 }
 worker.onmessage = onmessage;
@@ -40,25 +41,19 @@ function uploadCode() {
 function update(state) {
     /*
     Update the state (position and direction) of the robot.
+    Input position is in inches. scaleFactor convers inches -> pixels.
     Example of state: {x:72, y:72, dir:0}
     */
-    // console.log("StateX")
-    // console.log(state.x)
-
-    var offsetX = state.X - 30;
-    var offsetY = state.Y - 40;
-
-    var scaleFactor = 2;
-    document.getElementById("demo").innerHTML = offsetX.toFixed(2) + ", " + offsetY.toFixed(2)
-    var robotRect = document.querySelector("rect")
-    // console.log("SVG")
-    // console.log(robotRect)
-    robotRect.setAttributeNS(null, "x", offsetX)
-    robotRect.setAttributeNS(null, "y", offsetY)
-    var rotateStr = "rotate(" + state.dir + " " + (offsetX + 15*scaleFactor) + " " + (offsetY + 20*scaleFactor) + ")"
-    // console.log(rotateStr)
+    const scaleFactor = 3;
+    const scaledX = state.X * scaleFactor - 30;
+    const scaledY = state.Y * scaleFactor - 40;
+    const dir = state.dir;
+    document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
+    const robotRect = document.querySelector("rect")
+    robotRect.setAttributeNS(null, "x", scaledX)
+    robotRect.setAttributeNS(null, "y", scaledY)
+    const rotateStr = `rotate(${dir} ${scaledX + 30} ${scaledY + 40})`
     robotRect.setAttribute("transform", rotateStr)
-    // console.log("Adjusted")
 };
 
 function start(auto=0) {
@@ -74,11 +69,30 @@ function start(auto=0) {
             worker.postMessage({start:true, mode:"teleop"})
         }
         else if (auto === 1) {
+            clearInterval(timer);
+
             worker.postMessage({start:true, mode:"auto"})
         }
-        console.log("robot started");
     }
 };
+
+function runAutoTimer() {
+    var startTime = new Date().getTime();
+    document.getElementById("timer").innerHTML = "Time Left: 30s";
+
+    timer = setInterval(function() {
+        let currTime = new Date().getTime();
+        let timeElapsed = Math.floor((currTime - startTime) / 1000);
+        let timeLeft = 30 - timeElapsed;
+
+        document.getElementById("timer").innerHTML = "Time Left: " + timeLeft + "s";
+
+        if (timeLeft < 0) {
+            clearInterval(timer);
+            document.getElementById("timer").innerHTML = "Autonomous Mode has finished.";
+        }
+    }, 1000);
+}
 
 function setUpCanvas() {
   canvas = document.getElementById('fieldCanvas')
@@ -117,5 +131,6 @@ function stop() {
     worker.onmessage = onmessage;
     worker.postMessage({code:code});
     mode = "idle";
-    update({X:144,Y:144,dir:0});
+    update({X:70,Y:70,dir:0}); // in inches
+    clearInterval(timer);
 };
