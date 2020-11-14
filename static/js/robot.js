@@ -6,32 +6,30 @@ languagePluginLoader.then(() => function () {});
 
 const SCREENHEIGHT = 48
 const SCREENWIDTH = 48
-var scaleFactor = 2
 
 class RobotClass {
     /*The MODEL for this simulator. Stores robot data and handles position
        calculations & Runtime API calls """*/
-    tickRate = 50;          // in ms
-    width = 12 * scaleFactor;                  // width of robot , inches
-    wRadius = 2  * scaleFactor;                // radius of a wheel, inches
-    MaxX = 143 * scaleFactor;                 // maximum X value, inches, field is 12'x12'
-    MaxY = 143 * scaleFactor;                 // maximum Y value, inches, field is 12'x12'
-    neg = -1;                    // negate left motor calculation
+    tickRate = 50;              // in ms
+    width = 20;                 // width of robot , inches
+    wRadius = 2;                // radius of a wheel, inches
+    MaxX = 144;                 // maximum X value, inches, field is 12'x12'
+    MaxY = 144;                 // maximum Y value, inches, field is 12'x12'
+    neg = -1;                   // negate left motor calculation
+    startX = 70.0               // starting X position of the center of the robot
+    startY = 70.0               // starting Y position of the center of the robot
 
-    constructor(queue=null) {
-      this.X = 72.0 * scaleFactor;           // X position of the robot
-      this.Y = 72.0 * scaleFactor;           // Y position of the robot
-      this.Wl = 0.0;           // angular velocity of l wheel, radians/s
-      this.Wr = 0.0;           // angular velocity of r wheel, radians/s
-      this.ltheta = 0.0;       // angular position of l wheel, degrees
-      this.rtheta = 0.0;       // angular position of r wheel, degrees
-      this.dir = 0.0;          // Direction of the robot facing, degrees
+    constructor() {
+      this.X = this.startX;     // current X position of the center of the robot
+      this.Y = this.startY;     // current Y position of the center of the robot
+      this.Wl = 0.0;            // angular velocity of l wheel, radians/s
+      this.Wr = 0.0;            // angular velocity of r wheel, radians/s
+      this.ltheta = 0.0;        // angular position of l wheel, degrees
+      this.rtheta = 0.0;        // angular position of r wheel, degrees
+      this.dir = 0.0;           // Direction of the robot facing, degrees
 
       // All asychronous functions currently running
       this.runningCoroutines = new Set();
-
-      // Ensure we don't hit sync errors when updating our values
-      this.queue = queue;
     }
 
     updatePosition() {
@@ -117,7 +115,7 @@ class RobotClass {
     }
 
     printState() {
-        console.log('x = ${this.X.toFixed(2)}, y = ${this.Y.toFixed(2)}, theta = ${this.dir.toFixed(2)}');
+        console.log(`x = ${this.X.toFixed(2)}, y = ${this.Y.toFixed(2)}, theta = ${this.dir.toFixed(2)}`);
     }
 
     run(fn) {
