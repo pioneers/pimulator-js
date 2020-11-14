@@ -6,26 +6,53 @@ languagePluginLoader.then(() => function () {});
 
 const SCREENHEIGHT = 48
 const SCREENWIDTH = 48
-var scaleFactor = 2
+dc = 0;
+obstacles = Array();
 
 class RobotClass {
     /*The MODEL for this simulator. Stores robot data and handles position
        calculations & Runtime API calls """*/
     tickRate = 50;          // in ms
-    width = 12 * scaleFactor;                  // width of robot , inches
-    wRadius = 2  * scaleFactor;                // radius of a wheel, inches
-    MaxX = 143 * scaleFactor;                 // maximum X value, inches, field is 12'x12'
-    MaxY = 143 * scaleFactor;                 // maximum Y value, inches, field is 12'x12'
+    width = 20;                  // width of robot , inches
+    height = 15;
+    wRadius = 2;                // radius of a wheel, inches
+    MaxX = 144;                 // maximum X value, inches, field is 12'x12'
+    MaxY = 144;                 // maximum Y value, inches, field is 12'x12'
     neg = -1;                    // negate left motor calculation
+    startX = 70.0;
+    startY = 70.0;
+    topL = Array(2);
+    topR = Array(2);
+    botL = Array(2);
+    botR = Array(2);
 
     constructor(queue=null) {
-      this.X = 72.0 * scaleFactor;           // X position of the robot
-      this.Y = 72.0 * scaleFactor;           // Y position of the robot
+      this.X = this.startX;           // X position of the robot
+      this.Y = this.startY;           // Y position of the robot
       this.Wl = 0.0;           // angular velocity of l wheel, radians/s
       this.Wr = 0.0;           // angular velocity of r wheel, radians/s
       this.ltheta = 0.0;       // angular position of l wheel, degrees
       this.rtheta = 0.0;       // angular position of r wheel, degrees
       this.dir = 0.0;          // Direction of the robot facing, degrees
+
+
+      //corners are relative to the robot facing up
+
+      //coordinates for top right corner of robot
+      this.topR[0] = this.X - this.height/2;
+      this.topR[1] = this.Y - this.width/2;
+
+      //coordinates for top left corner of robot
+      this.topL[0] = this.X - this.height/2;
+      this.topL[1] = this.Y + this.width/2;
+
+      //coordinates for bottom right corner
+      this.botR[0] = this.X + this.height/2;
+      this.botR[1] = this.Y - this.width/2;
+
+      //coordinates for bottom left corner
+      this.botL[0] = this.X + this.height/2;
+      this.botL[1] = this.Y + this.width/2;
 
       // All asychronous functions currently running
       this.runningCoroutines = new Set();
@@ -34,8 +61,84 @@ class RobotClass {
       this.queue = queue;
     }
 
+    intersectOne(objX1, objY1, objX2, objY2) {
+
+      //console.log("Ox1", objX1, "oy1", objY1, "objx2", objX2, "objY2", objY2);
+      var A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
+      var A2 = 0 != (this.topL[0] - this.topR[0]) ? (this.topL[1] - this.topR[1]) / (this.topL[0] - this.topR[0]) : 500000;
+      var b1 = objY1 - A1 * objX1;
+      var b2 = this.topL[1] - A2 * this.topL[0];
+      var Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
+      if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.topL[0], this.topR[0])) &&
+          Xa < Math.min(Math.max(objX1, objX2), Math.max(this.topL[0], this.topR[0]))) {
+            console.log("Yeehaw");
+            return true;
+      }
+
+      //console.log("Xa #1:", Xa);
+
+      A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
+      A2 = 0 != (this.botR[0] - this.topR[0]) ? (this.botR[1] - this.topR[1]) / (this.botR[0] - this.topR[0]) : 500000;
+      b1 = objY1 - A1 * objX1;
+      b2 = this.botR[1] - A2 * this.botR[0];
+      Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
+      if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.botR[0], this.topR[0])) &&
+          Xa < Math.min(Math.max(objX1, objX2), Math.max(this.botR[0], this.topR[0]))) {
+            console.log("Yeehaw");
+            return true;
+      }
+
+      //console.log("Xa #2:", Xa);
+
+      A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
+      A2 = 0 != (this.botR[0] - this.botL[0]) ? (this.botR[1] - this.botL[1]) / (this.botR[0] - this.botL[0]) : 500000;
+      b1 = objY1 - A1 * objX1;
+      b2 = this.botR[1] - A2 * this.botR[0];
+      Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
+      if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.botR[0], this.botL[0])) &&
+          Xa < Math.min(Math.max(objX1, objX2), Math.max(this.botR[0], this.botL[0]))) {
+            console.log("Yeehaw");
+            return true;
+      }
+
+      //console.log("Xa #3:", Xa);
+
+      A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
+      A2 = 0 != (this.topL[0] - this.botL[0]) ? (this.topL[1] - this.botL[1]) / (this.topL[0] - this.botL[0]) : 500000;
+      b1 = objY1 - A1 * objX1;
+      b2 = this.topL[1] - A2 * this.topL[0];
+      Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
+      if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.topL[0], this.botL[0])) &&
+          Xa < Math.min(Math.max(objX1, objX2), Math.max(this.topL[0], this.botL[0]))) {
+            console.log("Yeehaw");
+            return true;
+      }
+      //console.log("Xa #4:", Xa);
+
+      return false;
+
+    }
+
+    set_value(device, param, speed) {
+        /* Runtime API method for updating L/R motor speed. Takes only L/R
+           Motor as device name and speed bounded by [-1,1]. */
+        if (speed > 1.0 || speed < -1.0){
+            throw new Error("Speed cannot be great than 1.0 or less than -1.0.");
+        }
+        if (param !== "duty_cycle") {
+            throw new Error('"duty_cycle" is the only currently supported parameter');
+        }
+        if (device === "left_motor") {
+            this.Wl = speed * 9;
+        } else if (device === "right_motor") {
+            this.Wr = speed * 9;
+        } else {
+            throw new Error("Cannot find device name: " + device);
+        }
+    }
+
     updatePosition() {
-        /* Updates position of the Robot using differential drive equations
+        /* Updates position of the  Robot using differential drive equations
         Derived with reference to:
         https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf*/
         let lv = this.Wl * this.wRadius;
@@ -43,6 +146,7 @@ class RobotClass {
         let radian = Math.PI*this.dir/180;
         let dx;
         let dy;
+        let ogDir = this.dir;
         if (lv == rv) {
             let distance = rv * this.tickRate/1000;
             dx = distance * Math.cos(radian)
@@ -59,20 +163,120 @@ class RobotClass {
             dy = i * Math.cos(radian) + j * Math.sin(radian);
             this.dir= (this.dir + theta*180/Math.PI) % 360;
           }
-        this.X = Math.max(Math.min(this.X + dx, this.MaxX), 0);
-        this.Y = Math.max(Math.min(this.Y + dy, this.MaxY), 0);
-        this.ltheta = (this.Wl * 5 + this.ltheta) % 360;
-        this.rtheta = (this.Wr * 5 + this.rtheta) % 360;
+          var ogX = this.X;
+          var ogY = this.Y;
+          this.X = Math.max(Math.min(this.X + dx, this.MaxX), 0);
+          this.Y = Math.max(Math.min(this.Y + dy, this.MaxY), 0);
+          this.ltheta = (this.Wl * 5 + this.ltheta) % 360;
+          this.rtheta = (this.Wr * 5 + this.rtheta) % 360;
 
-        let newState = {
-            X: this.X,
-            Y: this.Y,
-            dir: this.dir
-        };
+          this.updateCorners(this.X - ogX, this.Y - ogY, ogDir);
 
-        postMessage({
-            robot: newState
-        })
+          if (dc % 100) {
+            console.log("topRight:", this.topR[0], this.topR[1], "\n");
+            console.log("topLeft:", this.topL[0], this.topL[1], "\n");
+            console.log("botRight:", this.botR[0], this.botR[1], "\n");
+            console.log("botLeft:", this.botL[0], this.botL[1], "\n");
+            dc++;
+          }
+          else {
+            dc++;
+          }
+          //Check if the given move results in a collision with any field objects
+          var inter = false;
+          for (var i=0; i < obstacles.length; i++) {
+            console.log(this.intersectOne(144,144,100,144));
+            inter = this.intersectOne(obstacles[i].x, obstacles[i].y, obstacles[i].x + obstacles[i].w, obstacles[i].y);
+            inter = this.intersectOne(obstacles[i].x + obstacles[i].w, obstacles[i].y, obstacles[i].x + obstacles[i].w, obstacles[i].y + obstacles[i].h);
+            inter = this.intersectOne(obstacles[i].x + obstacles[i].w, obstacles[i].y + obstacles[i].h, obstacles[i].x, obstacles[i].y + obstacles[i].h);
+            inter = this.intersectOne(obstacles[i].x, obstacles[i].y + obstacles[i].h, obstacles[i].x, obstacles[i].y);
+            if (inter) {
+              break;
+            }
+          }
+
+          /*
+          this.updateCorners(ogX - this.X, ogY - this.Y, -1 * ogDir + 2 * this.dir);
+          this.X = ogX;
+          this.Y = ogY;
+          this.dir = ogDir;
+          */
+
+          //Check to ensure there was no collision
+
+          if (!inter) {
+            let newState = {
+                X: this.X,
+                Y: this.Y,
+                dir: this.dir
+            };
+
+            postMessage({
+              robot: newState
+            })
+
+          } else {
+            this.updateCorners(ogX - this.X, ogY - this.Y, -1 * ogDir + 2 * this.dir);
+            this.X = ogX;
+            this.Y = ogY;
+            this.dir = ogDir;
+          }
+
+    }
+
+    updateCorners(dX, dY, ogDir) {
+
+      var dDirDeg = -1 * (this.dir - ogDir);
+      var dDir = dDirDeg * Math.PI / 180;
+      //console.log("MCOS: ", Math.sin(dDir), '\n');
+
+      //top right corner
+      this.topR[0] += dX;
+      this.topR[1] += dY;
+
+
+      this.topR[0] -= this.X;
+      this.topR[1] -= this.Y;
+
+
+      this.topR[0] = Math.cos(dDir)*this.topR[0] - Math.sin(dDir)*this.topR[1];
+      this.topR[1] = Math.sin(dDir)*this.topR[0] + Math.cos(dDir)*this.topR[1];
+
+
+      this.topR[0] += this.X;
+      this.topR[1] += this.Y;
+
+
+
+      //coordinates for top left corner of robot
+      this.topL[0] += dX;
+      this.topL[1] += dY;
+      this.topL[0] -= this.X;
+      this.topL[1] -= this.Y;
+      this.topL[0] = Math.cos(dDir)*this.topL[0] - Math.sin(dDir)*this.topL[1];
+      this.topL[1] = Math.sin(dDir)*this.topL[0] + Math.cos(dDir)*this.topL[1];
+      this.topL[0] += this.X;
+      this.topL[1] += this.Y;
+
+      //coordinates for bottom right corner
+      this.botR[0] += dX;
+      this.botR[1] += dY;
+      this.botR[0] -= this.X;
+      this.botR[1] -= this.Y;
+      this.botR[0] = Math.cos(dDir)*this.botR[0] - Math.sin(dDir)*this.botR[1];
+      this.botR[1] = Math.sin(dDir)*this.botR[0] + Math.cos(dDir)*this.botR[1];
+      this.botR[0] += this.X;
+      this.botR[1] += this.Y;
+
+      //coordinates for bottom left corner
+      this.botL[0] += dX;
+      this.botL[1] += dY;
+      this.botL[0] -= this.X;
+      this.botL[1] -= this.Y;
+      this.botL[0] = Math.cos(dDir)*this.botL[0] - Math.sin(dDir)*this.botL[1];
+      this.botL[1] = Math.sin(dDir)*this.botL[0] + Math.cos(dDir)*this.botL[1];
+      this.botL[0] += this.X;
+      this.botL[1] += this.Y;
     }
 
     set_value(device, param, speed) {
@@ -105,6 +309,9 @@ class RobotClass {
         let numUpdates = 1;
         while (cur < start + ms) {
             cur = new Date().getTime();
+            if (cur > this.simStartTime + 30*1000) {
+                return;
+            }
             if (cur - tick >= this.tickRate) {
                 this.updatePosition();
                 tick = tick + this.tickRate;
@@ -114,7 +321,7 @@ class RobotClass {
     }
 
     printState() {
-        console.log('x = ${this.X.toFixed(2)}, y = ${this.Y.toFixed(2)}, theta = ${this.dir.toFixed(2)}');
+        console.log(`x = ${this.X.toFixed(2)}, y = ${this.Y.toFixed(2)}, theta = ${this.dir.toFixed(2)}`);
     }
 
     run(fn) {
@@ -279,7 +486,7 @@ function onPress(keyCode) {
     } else if (keyCode === 65) { // a
         simulator.gamepad.joystick_left_x = -1;
     } else if (keyCode === 83) { // s
-        simulator.gamepad.joystick_left_y = -1;
+        simulator.gamepad.joysticstk_left_y = -1;
     } else if (keyCode === 68) { // d
         simulator.gamepad.joystick_left_x = 1;
     } else if (keyCode === 38) { // up
@@ -431,14 +638,16 @@ class Simulator{
     }
 
     simulateAuto() {
-        this.robot = new RobotClass();
-        this.loadStudentCode();
-        this.mode = "auto"
-        this.autonomous_setup()
-        setTimeout(function() { this.stop(); }.bind(this), 30*1000);
+        this.mode = "auto";
         postMessage({
             mode: this.mode
-        })
+        });
+        this.robot = new RobotClass();
+        this.loadStudentCode();
+
+        this.timeout = setTimeout(function() { this.stop(); }.bind(this), 30*1000);
+        this.robot.simStartTime = new Date().getTime();
+        setTimeout(this.autonomous_setup, 0);
     }
 }
 
@@ -457,10 +666,16 @@ this.onmessage = function(e) {
             console.log("Please upload code first");
         }
         else {
-            if (typeof pyodide != "undefined" && typeof pyodide.version != "undefined") {
-                if (e.data.mode === "auto") simulator.simulateAuto();
-                else if (e.data.mode === "teleop") simulator.simulateTeleop();
+            let simulate = function () {
+                if (typeof pyodide != "undefined" && typeof pyodide.version != "undefined") {
+                    if (e.data.mode === "auto") simulator.simulateAuto();
+                    else if (e.data.mode === "teleop") simulator.simulateTeleop();
+                }
+                else {
+                    setTimeout(simulate, 500);
+                }
             }
+            simulate();
         }
     }
 
@@ -480,12 +695,25 @@ function FieldObj() {
         return new FieldObj;
     }
     this.color;
-    this.width;
-    this.height;
+    this.x=0;
+    this.y=0;
+    this.w=0;
+    this.h=0;
 
 
 }
 
-class wall extends FieldObj {
+class Wall extends FieldObj {
 
+    constructor(x, y, w, h) {
+        super();
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+
+        //ctx.beginPath()
+        //ctx.strokeRect(this.x, this.y, this.w, this.h)
+        obstacles.push(this);
+    }
 }

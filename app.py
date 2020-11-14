@@ -1,7 +1,4 @@
-import datetime
-import time
-from base64 import b64decode
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template
 app = Flask(__name__)
 
 @app.route('/')

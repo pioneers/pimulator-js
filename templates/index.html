@@ -15,9 +15,16 @@
 
   <body>
     <h1>PiE Robotics Simulator</h1>
+<<<<<<< HEAD
     <div style = 'position: relative;'>
       <canvas id="fieldCanvas" width="400" height="400"></canvas>
       <svg width="400" height="400" version="1.1" xmlns="http://www.w3.org/2000/svg" style="position: absolute; left: 0px; top: 0px; border:1px solid black">
+=======
+
+    <div style = 'position: relative;'>
+      <canvas id="fieldCanvas" width="400" height="400"></canvas>
+      <svg width="432" height="432" version="1.1" xmlns="http://www.w3.org/2000/svg" style="position: absolute; left: 0px; top: 0px; border:1px solid white; fill-opacity:0;">
+>>>>>>> 28fc28e96bdbdcfc6849c1563b0acad23e0bf7ce
         <rect x="144"
             y="144"
             width="60"
@@ -30,12 +37,17 @@
             stroke-width="2"/>
       </svg>
     </div>
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 28fc28e96bdbdcfc6849c1563b0acad23e0bf7ce
 
     <div id="demo">
       x and y coordinates updated here
     </div>
+
+    <h4 id="timer"; style="color:blue">Autonomous Timer: </h4>
 
     <button type="button" onclick="start(auto=0)">Teleop simulation</button>
     <button type="button" onclick="start(auto=1)">Autonomous Simulation </button>
@@ -73,7 +85,7 @@
         lineNumbers: true,
         indentUnit: 4
       });
-      cm.setSize(width="60%", height="1000px");
+      cm.setSize(width="100%", height="1000px");
 
       // var code = getCookie("code");
       var code = "";
