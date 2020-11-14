@@ -1,6 +1,7 @@
 var mode = "idle"; // or auto or teleop
 var worker = new Worker("static/js/robot.js");
 var timer;
+var inputMode = "keyboard";
 
 // Handle messages from worker
 function onmessage(e) {
@@ -16,15 +17,30 @@ function onmessage(e) {
 }
 worker.onmessage = onmessage;
 
+// Switch input mode between 'keyboard' and 'gamepad'
+function switchInput() {
+    if (inputMode === "keyboard") {
+        inputMode = "gamepad";
+        document.getElementById("inputMode").innerHTML = "Input: Gamepad";
+    } else if (inputMode == "gamepad") {
+        inputMode = "keyboard";
+        document.getElementById("inputMode").innerHTML = "Input: Keyboard";
+    }
+}
+
 // In teleop mode, send keypresses to the worker
 function down(e){
     if (mode === "teleop") {
-        worker.postMessage({keypress: true, keyCode: e.keyCode, up: false});
+        if (inputMode === "keyboard") {
+            worker.postMessage({keypress: true, keyCode: e.keyCode, up: false});
+        }
     }
 }
 function up(e){
     if (mode === "teleop") {
-        worker.postMessage({keypress: true, keyCode: e.keyCode, up: true});
+        if (inputMode === "keyboard") {
+            worker.postMessage({keypress: true, keyCode: e.keyCode, up: true});
+        }
     }
 }
 document.addEventListener('keydown', down);
@@ -87,6 +103,14 @@ function runAutoTimer() {
         }
     }, 1000);
 }
+
+//GAMEPAD:
+/**
+ * Create a global setInterval that is initialized when teleop starts and the mode is gamepad
+ * setInterval is cleared upon call to stop()
+ * setInterval every 10ms
+ * if gamepad axes < 0.2 -> postMessage to stop movement
+ */
 
 function stop() {
     /*
