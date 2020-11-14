@@ -7,6 +7,8 @@ languagePluginLoader.then(() => function () {});
 const SCREENHEIGHT = 48
 const SCREENWIDTH = 48
 dc = 0;
+count1 = 0;
+count2 = 0;
 obstacles = Array();
 
 class RobotClass {
@@ -61,9 +63,168 @@ class RobotClass {
       this.queue = queue;
     }
 
-    intersectOne(objX1, objY1, objX2, objY2) {
+    intersectRobotRef(obj) {
+      // coordinates of the k_i vectors
+      var k1x = obj.botL[0] - this.botL[0]; //x of the vector from botL of robot to botL of obstacle
+      var k1y = obj.botL[1] - this.botL[1]; //figure it out from here...
+      var k2x = obj.topL[0] - this.botL[0];
+      var k2y = obj.topL[1] - this.botL[1];
+      var k3x = obj.topR[0] - this.botL[0];
+      var k3y = obj.topR[1] - this.botL[1];
+      var k4x = obj.botR[0] - this.botL[0];
+      var k4y = obj.botR[1] - this.botL[1];
 
-      //console.log("Ox1", objX1, "oy1", objY1, "objx2", objX2, "objY2", objY2);
+      // vector from botL to botR of robot
+      var ref1x = this.botR[0] - this.botL[0];
+      var ref1y = this.botR[1] - this.botL[1];
+
+      // vector from botL to topL of robot
+      var ref2x = this.topL[0] - this.botL[0];
+      var ref2y = this.topL[1] - this.botL[1];
+
+      // make the ref1 vector into a unit vector
+      var ref1mag = Math.sqrt(ref1x * ref1x + ref1y * ref1y);
+      var ref1x = ref1x / ref1mag;
+      var ref1y = ref1y / ref1mag;
+
+      // make the ref2 vector into a unit vector
+      var ref2mag = Math.sqrt(ref2x * ref2x + ref2y * ref2y);
+      var ref2x = ref2x / ref2mag;
+      var ref2y = ref2y / ref2mag;
+
+      var k1ref1ProjLen = k1x * ref1x + k1y * ref1y;
+      var k2ref1ProjLen = k2x * ref1x + k2y * ref1y;
+      var k3ref1ProjLen = k3x * ref1x + k3y * ref1y;
+      var k4ref1ProjLen = k4x * ref1x + k4y * ref1y;
+
+      var ref1inter = true;
+
+      if (this.findMax(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) > ref1mag) {
+        if (this.findMin(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) > ref1mag) {
+          ref1inter = false;
+        }
+      } else if (this.findMax(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) < 0) {
+        if (this.findMin(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) < 0) {
+          ref1inter = false;
+        }
+      }
+
+      var k1ref2ProjLen = k1x * ref2x + k1y * ref2y;
+      var k2ref2ProjLen = k2x * ref2x + k2y * ref2y;
+      var k3ref2ProjLen = k3x * ref2x + k3y * ref2y;
+      var k4ref2ProjLen = k4x * ref2x + k4y * ref2y;
+
+      var ref2inter = true;
+
+      if (this.findMax(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) > ref2mag) {
+        if (this.findMin(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) > ref2mag) {
+          ref2inter = false;
+        }
+      } else if (this.findMax(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) < 0) {
+        if (this.findMin(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) < 0) {
+          ref2inter = false;
+        }
+      }
+
+      return ref1inter && ref2inter;
+    }
+
+    intersectObjRef(obj) {
+      // coordinates of the k_i vectors
+      var k1x = this.botL[0] - obj.botL[0]; //x of the vector from botL of obj to botL of robot
+      var k1y = this.botL[1] - obj.botL[1]; //figure it out from here...
+      var k2x = this.topL[0] - obj.botL[0];
+      var k2y = this.topL[1] - obj.botL[1];
+      var k3x = this.topR[0] - obj.botL[0];
+      var k3y = this.topR[1] - obj.botL[1];
+      var k4x = this.botR[0] - obj.botL[0];
+      var k4y = this.botR[1] - obj.botL[1];
+
+      // vector from botL to botR of obj
+      var ref1x = obj.botR[0] - obj.botL[0];
+      var ref1y = obj.botR[1] - obj.botL[1];
+
+      // vector from botL to topL of obj
+      var ref2x = obj.topL[0] - obj.botL[0];
+      var ref2y = obj.topL[1] - obj.botL[1];
+
+      // make the ref1 vector into a unit vector
+      var ref1mag = Math.sqrt(ref1x * ref1x + ref1y * ref1y);
+      var ref1x = ref1x / ref1mag;
+      var ref1y = ref1y / ref1mag;
+
+      // make the ref2 vector into a unit vector
+      var ref2mag = Math.sqrt(ref2x * ref2x + ref2y * ref2y);
+      var ref2x = ref2x / ref2mag;
+      var ref2y = ref2y / ref2mag;
+
+      var k1ref1ProjLen = k1x * ref1x + k1y * ref1y;
+      var k2ref1ProjLen = k2x * ref1x + k2y * ref1y;
+      var k3ref1ProjLen = k3x * ref1x + k3y * ref1y;
+      var k4ref1ProjLen = k4x * ref1x + k4y * ref1y;
+
+      var ref1inter = true;
+
+      if (this.findMax(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) > ref1mag) {
+        if (this.findMin(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) > ref1mag) {
+          ref1inter = false;
+        }
+      } else if (this.findMax(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) < 0) {
+        if (this.findMin(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) < 0) {
+          ref1inter = false;
+        }
+      }
+
+      var k1ref2ProjLen = k1x * ref2x + k1y * ref2y;
+      var k2ref2ProjLen = k2x * ref2x + k2y * ref2y;
+      var k3ref2ProjLen = k3x * ref2x + k3y * ref2y;
+      var k4ref2ProjLen = k4x * ref2x + k4y * ref2y;
+
+      var ref2inter = true;
+
+      if (this.findMax(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) > ref2mag) {
+        if (this.findMin(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) > ref2mag) {
+          return false;
+        }
+      } else if (this.findMax(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) < 0) {
+        if (this.findMin(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) < 0) {
+          return false;
+        }
+      }
+
+      return ref1inter && ref2inter;
+    }
+
+    intersectOne(obj) {
+      return this.intersectRobotRef(obj) && this.intersectObjRef(obj);
+    }
+
+    findMax(k1, k2, k3, k4) {
+      var max = k1;
+      if (k2 > max) {
+        max = k2;
+      } else if (k3 > max) {
+        max = k3;
+      } else if (k4 > max) {
+        max = k4;
+      }
+      return max;
+    }
+
+    findMin(k1, k2, k3, k4) {
+      var min = k1;
+      if (k2 < min) {
+        min = k2;
+      } else if (k3 < min) {
+        min = k3;
+      } else if (k4 < min) {
+        min = k4;
+      }
+      return min;
+    }
+
+    intersectOneOld(objX1, objY1, objX2, objY2) {
+
       var A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
       var A2 = 0 != (this.topL[0] - this.topR[0]) ? (this.topL[1] - this.topR[1]) / (this.topL[0] - this.topR[0]) : 500000;
       var b1 = objY1 - A1 * objX1;
@@ -71,11 +232,8 @@ class RobotClass {
       var Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
       if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.topL[0], this.topR[0])) &&
           Xa < Math.min(Math.max(objX1, objX2), Math.max(this.topL[0], this.topR[0]))) {
-            console.log("Yeehaw");
             return true;
       }
-
-      //console.log("Xa #1:", Xa);
 
       A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
       A2 = 0 != (this.botR[0] - this.topR[0]) ? (this.botR[1] - this.topR[1]) / (this.botR[0] - this.topR[0]) : 500000;
@@ -84,11 +242,8 @@ class RobotClass {
       Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
       if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.botR[0], this.topR[0])) &&
           Xa < Math.min(Math.max(objX1, objX2), Math.max(this.botR[0], this.topR[0]))) {
-            console.log("Yeehaw");
             return true;
       }
-
-      //console.log("Xa #2:", Xa);
 
       A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
       A2 = 0 != (this.botR[0] - this.botL[0]) ? (this.botR[1] - this.botL[1]) / (this.botR[0] - this.botL[0]) : 500000;
@@ -97,11 +252,8 @@ class RobotClass {
       Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
       if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.botR[0], this.botL[0])) &&
           Xa < Math.min(Math.max(objX1, objX2), Math.max(this.botR[0], this.botL[0]))) {
-            console.log("Yeehaw");
             return true;
       }
-
-      //console.log("Xa #3:", Xa);
 
       A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
       A2 = 0 != (this.topL[0] - this.botL[0]) ? (this.topL[1] - this.botL[1]) / (this.topL[0] - this.botL[0]) : 500000;
@@ -110,13 +262,10 @@ class RobotClass {
       Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
       if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.topL[0], this.botL[0])) &&
           Xa < Math.min(Math.max(objX1, objX2), Math.max(this.topL[0], this.botL[0]))) {
-            console.log("Yeehaw");
             return true;
       }
-      //console.log("Xa #4:", Xa);
 
       return false;
-
     }
 
     set_value(device, param, speed) {
@@ -138,6 +287,8 @@ class RobotClass {
     }
 
     updatePosition() {
+        count1++;
+        console.log(count1, " ");
         /* Updates position of the  Robot using differential drive equations
         Derived with reference to:
         https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf*/
@@ -173,10 +324,7 @@ class RobotClass {
           this.updateCorners(this.X - ogX, this.Y - ogY, ogDir);
 
           if (dc % 100) {
-            console.log("topRight:", this.topR[0], this.topR[1], "\n");
-            console.log("topLeft:", this.topL[0], this.topL[1], "\n");
-            console.log("botRight:", this.botR[0], this.botR[1], "\n");
-            console.log("botLeft:", this.botL[0], this.botL[1], "\n");
+            //debug print statements here
             dc++;
           }
           else {
@@ -185,13 +333,13 @@ class RobotClass {
           //Check if the given move results in a collision with any field objects
           var inter = false;
           for (var i=0; i < obstacles.length; i++) {
-            console.log(this.intersectOne(144,144,100,144));
-            inter = this.intersectOne(obstacles[i].x, obstacles[i].y, obstacles[i].x + obstacles[i].w, obstacles[i].y);
-            inter = this.intersectOne(obstacles[i].x + obstacles[i].w, obstacles[i].y, obstacles[i].x + obstacles[i].w, obstacles[i].y + obstacles[i].h);
-            inter = this.intersectOne(obstacles[i].x + obstacles[i].w, obstacles[i].y + obstacles[i].h, obstacles[i].x, obstacles[i].y + obstacles[i].h);
-            inter = this.intersectOne(obstacles[i].x, obstacles[i].y + obstacles[i].h, obstacles[i].x, obstacles[i].y);
+            inter = this.intersectOne(obstacles[i]);
             if (inter) {
+              console.log("crash! \n");
               break;
+            }
+            if (i == 3) {
+              console.log("pass");
             }
           }
 
@@ -203,7 +351,8 @@ class RobotClass {
           */
 
           //Check to ensure there was no collision
-
+          count2++;
+          console.log(count2, "\n");
           if (!inter) {
             let newState = {
                 X: this.X,
@@ -228,21 +377,14 @@ class RobotClass {
 
       var dDirDeg = -1 * (this.dir - ogDir);
       var dDir = dDirDeg * Math.PI / 180;
-      //console.log("MCOS: ", Math.sin(dDir), '\n');
 
       //top right corner
       this.topR[0] += dX;
       this.topR[1] += dY;
-
-
       this.topR[0] -= this.X;
       this.topR[1] -= this.Y;
-
-
-      this.topR[0] = Math.cos(dDir)*this.topR[0] - Math.sin(dDir)*this.topR[1];
-      this.topR[1] = Math.sin(dDir)*this.topR[0] + Math.cos(dDir)*this.topR[1];
-
-
+      this.topR[0] = Math.cos(dDir)*this.topR[0] + Math.sin(dDir)*this.topR[1];
+      this.topR[1] = -1 * Math.sin(dDir)*this.topR[0] + Math.cos(dDir)*this.topR[1];
       this.topR[0] += this.X;
       this.topR[1] += this.Y;
 
@@ -253,8 +395,8 @@ class RobotClass {
       this.topL[1] += dY;
       this.topL[0] -= this.X;
       this.topL[1] -= this.Y;
-      this.topL[0] = Math.cos(dDir)*this.topL[0] - Math.sin(dDir)*this.topL[1];
-      this.topL[1] = Math.sin(dDir)*this.topL[0] + Math.cos(dDir)*this.topL[1];
+      this.topL[0] = Math.cos(dDir)*this.topL[0] + Math.sin(dDir)*this.topL[1];
+      this.topL[1] = -1 * Math.sin(dDir)*this.topL[0] + Math.cos(dDir)*this.topL[1];
       this.topL[0] += this.X;
       this.topL[1] += this.Y;
 
@@ -263,8 +405,8 @@ class RobotClass {
       this.botR[1] += dY;
       this.botR[0] -= this.X;
       this.botR[1] -= this.Y;
-      this.botR[0] = Math.cos(dDir)*this.botR[0] - Math.sin(dDir)*this.botR[1];
-      this.botR[1] = Math.sin(dDir)*this.botR[0] + Math.cos(dDir)*this.botR[1];
+      this.botR[0] = Math.cos(dDir)*this.botR[0] + Math.sin(dDir)*this.botR[1];
+      this.botR[1] = -1 * Math.sin(dDir)*this.botR[0] + Math.cos(dDir)*this.botR[1];
       this.botR[0] += this.X;
       this.botR[1] += this.Y;
 
@@ -273,8 +415,8 @@ class RobotClass {
       this.botL[1] += dY;
       this.botL[0] -= this.X;
       this.botL[1] -= this.Y;
-      this.botL[0] = Math.cos(dDir)*this.botL[0] - Math.sin(dDir)*this.botL[1];
-      this.botL[1] = Math.sin(dDir)*this.botL[0] + Math.cos(dDir)*this.botL[1];
+      this.botL[0] = Math.cos(dDir)*this.botL[0] + Math.sin(dDir)*this.botL[1];
+      this.botL[1] = -1 * Math.sin(dDir)*this.botL[0] + Math.cos(dDir)*this.botL[1];
       this.botL[0] += this.X;
       this.botL[1] += this.Y;
     }
@@ -660,6 +802,13 @@ this.onmessage = function(e) {
         console.log("Code upload succesful")
     }
 
+    //make fieldObj
+    if (e.data.initObj === true) {
+        for (var i = 0; i < e.data.walls.count; i++) {
+            new Wall(e.data.walls.arr[i][0], e.data.walls.arr[i][1], e.data.walls.arr[i][2], e.data.walls.arr[i][3]);
+        }
+    }
+
     // Start simulation
     if (e.data.start === true) {
         if (code === ""){
@@ -705,13 +854,25 @@ function FieldObj() {
 
 class Wall extends FieldObj {
 
+    topL = Array(2);
+    topR = Array(2);
+    botL = Array(2);
+    botR = Array(2);
+
     constructor(x, y, w, h) {
         super();
-        this.x = x;
-        this.y = y;
-        this.w = w;
-        this.h = h;
-
+        this.x = (132/400) * x; //change 132 value it is speculative
+        this.y = (132/400) * y;
+        this.w = (132/400) * w;
+        this.h = (132/400) * h;
+        this.topL[0] = x;
+        this.topL[1] = y;
+        this.topR[0] = x + w;
+        this.topR[1] = y;
+        this.botL[0] = x;
+        this.botL[1] = y + h;
+        this.botR[0] = x + w;
+        this.botR[1] = y + h;
         //ctx.beginPath()
         //ctx.strokeRect(this.x, this.y, this.w, this.h)
         obstacles.push(this);

@@ -54,11 +54,6 @@ function update(state) {
     robotRect.setAttributeNS(null, "y", scaledY)
     const rotateStr = `rotate(${dir} ${scaledX + 30} ${scaledY + 40})`
     robotRect.setAttribute("transform", rotateStr)
-<<<<<<< HEAD
-    // console.log("Adjusted")
-    setUpCanvas();
-=======
->>>>>>> 28fc28e96bdbdcfc6849c1563b0acad23e0bf7ce
 };
 
 function start(auto=0) {
@@ -81,19 +76,6 @@ function start(auto=0) {
     }
 };
 
-<<<<<<< HEAD
-function setUpCanvas() {
-  canvas = document.getElementById('fieldCanvas')
-  ctx = canvas.getContext('2d')
-
-  // outlined square X: 50, Y: 35, width/height 50
-  ctx.beginPath()
-  ctx.strokeRect(50, 35, 50, 50)
-
-  // filled square X: 125, Y: 35, width/height 50
-  ctx.beginPath()
-  ctx.fillRect(125, 35, 50, 50)
-=======
 function runAutoTimer() {
     var startTime = new Date().getTime();
     document.getElementById("timer").innerHTML = "Time Left: 30s";
@@ -129,16 +111,14 @@ function setUpCanvas() {
 
 function setUpWalls(ctx) {
     let wallNum = 4; //change this if you want
-    let arr = new Array([0, 0, 400, 5], [0, 0, 5, 400], [395, 0, 5, 400], [0, 395, 400, 5], [50, 50, 50, 50]);
+    let arr = new Array([0, 0, 400, 5], [0, 0, 5, 400], [395, 0, 5, 400], [0, 395, 400, 5]);
     worker.postMessage({initObj: true, walls: {count: wallNum, arr: arr}});
     let i = 0;
-
     while (i < arr.length) {
         ctx.beginPath();
         ctx.fillRect(arr[i][0], arr[i][1], arr[i][2], arr[i][3]);
         i+=1;
     }
->>>>>>> 28fc28e96bdbdcfc6849c1563b0acad23e0bf7ce
 }
 
 function stop() {
