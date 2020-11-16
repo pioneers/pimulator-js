@@ -628,7 +628,7 @@ function onPress(keyCode) {
     } else if (keyCode === 65) { // a
         simulator.gamepad.joystick_left_x = -1;
     } else if (keyCode === 83) { // s
-        simulator.gamepad.joysticstk_left_y = -1;
+        simulator.gamepad.joystick_left_y = -1;
     } else if (keyCode === 68) { // d
         simulator.gamepad.joystick_left_x = 1;
     } else if (keyCode === 38) { // up
