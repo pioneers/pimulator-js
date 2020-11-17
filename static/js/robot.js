@@ -495,8 +495,8 @@ class Sensor{
      this.robot = robot;
    }
    get_val(){
-     var sensorsX = [this.robot.x, this.robot.x + Math.sin(this.robot.dir), this.robot.x - Math.sin(this.robot.dir)]
-     var sensorsY = [this.robot.y, this.robot.y + Math.cos(this.robot.dir), this.robot.y - Math.cos(this.robot.dir)]
+     var sensorsX = [this.robot.X, this.robot.X + 5*Math.sin(this.robot.dir), this.robot.X - 5*Math.sin(this.robot.dir)]
+     var sensorsY = [this.robot.Y, this.robot.Y + 5*Math.cos(this.robot.dir), this.robot.Y - 5*Math.cos(this.robot.dir)]
 
      var tapeLines = this.robot.tapeLines
      let total = []
@@ -515,10 +515,21 @@ class Sensor{
          let determinant = -m + m1
          let x = (c - c1)/determinant
          let y = (-m*c1 + m1*c)/determinant
-         let distX = Math.abs(sensor_x-x)
-         let distY = Math.abs(sensor_y-y)
-         let distSquared = (distX*distX)+(distY*distY)
-         total.push(Math.min(1,1/distSquared))
+
+         // check if intersectioin point is inside the tapeLine
+         if ((sensor_x < tapeLine.startX && sensor_x < tapeLine.endX) || (sensor_x > tapeLine.startX && sensor_x > tapeLine.endX)){
+           let startDistX = Math.abs(sensor_x-tapeLine.startX)
+           let startDistY = Math.abs(sensor_y-tapeLine.startY)
+           let endDistX = Math.abs(sensor_x-tapeLine.endX)
+           let endDistY = Math.abs(sensor_y-tapeLine.startY)
+           let distSquared = Math.min((startDistX*startDistX+startDistY*startDistY),(endDistX*endDistX+endDistY*endDistY))
+           total.push(Math.min(1,3/distSquared))
+         } else {
+           let distX = Math.abs(sensor_x-x)
+           let distY = Math.abs(sensor_y-y)
+           let distSquared = (distX*distX)+(distY*distY)
+           total.push(Math.min(1,3/distSquared))
+         }
 
        }
      }
