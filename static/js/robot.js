@@ -495,9 +495,8 @@ class Sensor{
      this.robot = robot;
    }
    get_val(){
-     var sensorsX = [this.robot.x, this.robot.x + Math.sin(this.robot.dir), this.robot.x - Math.sin(this.robot.dir)]
-     var sensorsY = [this.robot.y, this.robot.y + Math.cos(this.robot.dir), this.robot.y - Math.cos(this.robot.dir)]
-
+     var sensorsX = [this.robot.X, this.robot.X + 5*Math.sin(this.robot.dir), this.robot.X - 5*Math.sin(this.robot.dir)]
+     var sensorsY = [this.robot.Y, this.robot.Y + 5*Math.cos(this.robot.dir), this.robot.Y - 5*Math.cos(this.robot.dir)]
      var tapeLines = this.robot.tapeLines
      let total = []
      let i = 0
@@ -508,18 +507,33 @@ class Sensor{
        for (const tapeLine of tapeLines){
          let m = tapeLine.slope
          // TODO: Add edge case for slope = 0, infinity
-         let m1 = -1/m
-         // make equations of the form: y - mx = c
-         let c = tapeLine.y_int
-         let c1 = sensor_y-m1*sensor_x
-         let determinant = -m + m1
-         let x = (c - c1)/determinant
-         let y = (-m*c1 + m1*c)/determinant
-         let distX = Math.abs(sensor_x-x)
-         let distY = Math.abs(sensor_y-y)
-         let distSquared = (distX*distX)+(distY*distY)
-         total.push(Math.min(1,1/distSquared))
+         if (m === "horizontal") {
+           if (tapeLine.startX <= sensor_x && sensor_x <= tapeLine.endX) {
+             let distY = Math.abs(sensor_y-y)
+             let distSquared = (distY*distY)
+           } else {
+             if (tapeLine.)
+           }
+         } else if (m === "vertical") {
+           if (tapeLine.startY <= sensor_y && sensor_y <= tapeLine.endY) {
+             let distX = Math.abs(sensor_x-x)
+             let distSquared = (distX*distX)
+           } else {
 
+           }
+         } else {
+           let m1 = -1/m
+           // make equations of the form: y - mx = c
+           let c = tapeLine.y_int
+           let c1 = sensor_y-m1*sensor_x
+           let determinant = -m + m1
+           let x = (c - c1)/determinant
+           let y = (-m*c1 + m1*c)/determinant
+           let distX = Math.abs(sensor_x-x)
+           let distY = Math.abs(sensor_y-y)
+           let distSquared = (distX*distX)+(distY*distY)
+         }
+           total.push(Math.min(1,10/distSquared))
        }
      }
      console.log(total)
@@ -533,8 +547,14 @@ class TapeLine{
     this.endX = x2
     this.endY = y2
     this.width = width
-    this.slope = (y1-y2) / (x1-x2)
-    this.y_int = y1 - this.slope*x1
+    if (startX === endX) {
+      this.slope = "vertical"
+    } else if (startY === endY) {
+      this.slope = "horizontal"
+    } else {
+      this.slope = (y1-y2) / (x1-x2);
+      this.y_int = y1 - this.slope*x1
+    }
     // TODO: Add edge cases for lines with slope 0 or infinity
   }
 }
