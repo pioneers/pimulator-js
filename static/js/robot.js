@@ -497,6 +497,10 @@ class Sensor{
    get_val(){
      var sensorsX = [this.robot.X, this.robot.X + 5*Math.sin(this.robot.dir), this.robot.X - 5*Math.sin(this.robot.dir)]
      var sensorsY = [this.robot.Y, this.robot.Y + 5*Math.cos(this.robot.dir), this.robot.Y - 5*Math.cos(this.robot.dir)]
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0ce7ce3b89890de8b31b486b15ef1a620021a916
      var tapeLines = this.robot.tapeLines
      let total = []
      let i = 0
@@ -507,6 +511,7 @@ class Sensor{
        for (const tapeLine of tapeLines){
          let m = tapeLine.slope
          // TODO: Add edge case for slope = 0, infinity
+<<<<<<< HEAD
          if (m === "horizontal") {
            if (tapeLine.startX <= sensor_x && sensor_x <= tapeLine.endX) {
              let distY = Math.abs(sensor_y-y)
@@ -534,6 +539,31 @@ class Sensor{
            let distSquared = (distX*distX)+(distY*distY)
          }
            total.push(Math.min(1,10/distSquared))
+=======
+         let m1 = -1/m
+         // make equations of the form: y - mx = c
+         let c = tapeLine.y_int
+         let c1 = sensor_y-m1*sensor_x
+         let determinant = -m + m1
+         let x = (c - c1)/determinant
+         let y = (-m*c1 + m1*c)/determinant
+
+         // check if intersectioin point is inside the tapeLine
+         if ((sensor_x < tapeLine.startX && sensor_x < tapeLine.endX) || (sensor_x > tapeLine.startX && sensor_x > tapeLine.endX)){
+           let startDistX = Math.abs(sensor_x-tapeLine.startX)
+           let startDistY = Math.abs(sensor_y-tapeLine.startY)
+           let endDistX = Math.abs(sensor_x-tapeLine.endX)
+           let endDistY = Math.abs(sensor_y-tapeLine.startY)
+           let distSquared = Math.min((startDistX*startDistX+startDistY*startDistY),(endDistX*endDistX+endDistY*endDistY))
+           total.push(Math.min(1,3/distSquared))
+         } else {
+           let distX = Math.abs(sensor_x-x)
+           let distY = Math.abs(sensor_y-y)
+           let distSquared = (distX*distX)+(distY*distY)
+           total.push(Math.min(1,3/distSquared))
+         }
+
+>>>>>>> 0ce7ce3b89890de8b31b486b15ef1a620021a916
        }
      }
      console.log(total)
