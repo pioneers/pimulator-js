@@ -68,7 +68,6 @@ function start(auto=0) {
         }
         else if (auto === 1) {
             clearInterval(timer);
-
             worker.postMessage({start:true, mode:"auto"})
         }
     }
@@ -78,6 +77,7 @@ function runAutoTimer() {
     var startTime = new Date().getTime();
     document.getElementById("timer").innerHTML = "Time Left: 30s";
 
+    clearInterval(timer);
     timer = setInterval(function() {
         let currTime = new Date().getTime();
         let timeElapsed = Math.floor((currTime - startTime) / 1000);
