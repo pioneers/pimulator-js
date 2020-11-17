@@ -68,7 +68,7 @@ function start(auto=0) {
         }
         else if (auto === 1) {
             clearInterval(timer);
-            
+
             worker.postMessage({start:true, mode:"auto"})
         }
     }
