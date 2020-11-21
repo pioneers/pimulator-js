@@ -495,6 +495,7 @@ class Sensor{
      this.robot = robot;
    }
    get_val(){
+     console.log(this.robot.dir)
      var sensorsX = [this.robot.X, this.robot.X + 5*Math.sin(this.robot.dir), this.robot.X - 5*Math.sin(this.robot.dir)]
      var sensorsY = [this.robot.Y, this.robot.Y + 5*Math.cos(this.robot.dir), this.robot.Y - 5*Math.cos(this.robot.dir)]
 
@@ -505,6 +506,7 @@ class Sensor{
        let sensor_x = sensorsX[i]
        let sensor_y = sensorsY[i]
        // https://www.geeksforgeeks.org/program-for-point-of-intersection-of-two-lines/
+       let totalLine = 0
        for (const tapeLine of tapeLines){
          let m = tapeLine.slope
          // TODO: Add edge case for slope = 0, infinity
@@ -528,9 +530,9 @@ class Sensor{
            let distX = Math.abs(sensor_x-x)
            let distY = Math.abs(sensor_y-y)
            let distSquared = (distX*distX)+(distY*distY)
-           total.push(Math.min(1,3/distSquared))
+           totalLine += Math.min(1,3/distSquared)
          }
-
+         total.push(totalLine)
        }
      }
      console.log(total)
