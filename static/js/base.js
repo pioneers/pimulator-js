@@ -117,9 +117,9 @@ function setUpWalls(ctx) {
     while (i < arr.length) {
         ctx.beginPath();
         ctx.fillRect(
-            arr[i][0]*scaleFactor, 
-            arr[i][1]*scaleFactor, 
-            arr[i][2]*scaleFactor, 
+            arr[i][0]*scaleFactor,
+            arr[i][1]*scaleFactor,
+            arr[i][2]*scaleFactor,
             arr[i][3]*scaleFactor
         );
         i+=1;
