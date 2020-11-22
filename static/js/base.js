@@ -78,6 +78,7 @@ function runAutoTimer() {
     var startTime = new Date().getTime();
     document.getElementById("timer").innerHTML = "Time Left: 30s";
 
+    clearInterval(timer);
     timer = setInterval(function() {
         let currTime = new Date().getTime();
         let timeElapsed = Math.floor((currTime - startTime) / 1000);
