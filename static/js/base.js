@@ -2,6 +2,8 @@ var mode = "idle"; // or auto or teleop
 var worker = new Worker("static/js/robot.js");
 var timer;
 var inputMode = "keyboard";
+//var gamepadInterval;
+//var gamepad;
 
 // Handle messages from worker
 function onmessage(e) {
@@ -28,18 +30,18 @@ function switchInput() {
     }
 }
 
-// In teleop mode, send keypresses to the worker
+// In teleop mode, send keyModees to the worker
 function down(e){
     if (mode === "teleop") {
         if (inputMode === "keyboard") {
-            worker.postMessage({keypress: true, keyCode: e.keyCode, up: false});
+            worker.postMessage({keyMode: inputMode, keyCode: e.keyCode, up: false});
         }
     }
 }
 function up(e){
     if (mode === "teleop") {
         if (inputMode === "keyboard") {
-            worker.postMessage({keypress: true, keyCode: e.keyCode, up: true});
+            worker.postMessage({keyMode: inputMode, keyCode: e.keyCode, up: true});
         }
     }
 }
@@ -54,7 +56,7 @@ function uploadCode() {
 
 function update(state) {
     /*
-    Update the state (position and direction) of the center of the robot. 
+    Update the state (position and direction) of the center of the robot.
     Input position is in inches. scaleFactor convers inches -> pixels.
     Example of state: {x:72, y:72, dir:0}
     */
@@ -79,12 +81,13 @@ function start(auto=0) {
         return;
     }
     else {
+        clearInterval(timer);
+        //clearInterval(gamepadInterval);
         if (auto === 0) {
             worker.postMessage({start:true, mode:"teleop"})
+            //setTeleopLoop();
         }
         else if (auto === 1) {
-            clearInterval(timer);
-
             worker.postMessage({start:true, mode:"auto"})
         }
     }
@@ -115,6 +118,35 @@ function runAutoTimer() {
  * setInterval every 10ms
  * if gamepad axes < 0.2 -> postMessage to stop movement
  */
+ /*
+function setTeleopLoop() {
+    gamepadInterval = setInterval(checkJoysticks, 500);
+}
+
+function checkJoysticks() {
+    console.log("checking gamepad axes");
+    if (atCenter(gamepad.axes, 0)) { // L: left_right is zero
+        worker.postMessage({keyMode: true, keyCode: 68, up: true});
+        worker.postMessage({keyMode: true, keyCode: 65, up: true});
+    }
+    if (atCenter(gamepad.axes, 1)) { // L: up+down is zero
+        worker.postMessage({keyMode: true, keyCode: 83, up: true});
+        worker.postMessage({keyMode: true, keyCode: 87, up: true});
+    }
+    if (atCenter(gamepad.axes, 2)) { // R: left_right is zero
+        worker.postMessage({keyMode: true, keyCode: 39, up: true});
+        worker.postMessage({keyMode: true, keyCode: 37, up: true});
+    }
+    if (atCenter(gamepad.axes, 3)) { // R: up+down is zero
+        worker.postMessage({keyMode: true, keyCode: 40, up: true});
+        worker.postMessage({keyMode: true, keyCode: 38, up: true});
+    }
+}
+
+function atCenter(axes, axis) {
+    return axes[axis] > -0.1 && axes[axis] < 0.1;
+}
+*/
 
 function stop() {
     /*
@@ -127,4 +159,5 @@ function stop() {
     mode = "idle";
     update({X:70,Y:70,dir:0}); // in inches
     clearInterval(timer);
+    //clearInterval(gamepadInterval);
 };

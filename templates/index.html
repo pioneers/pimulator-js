@@ -11,8 +11,6 @@
 
     <!-- Disables scrolling with arrow keys and spacebar -->
     <script src="{{ url_for('static', filename='js/disable_scrolling.js') }}"></script>
-
-    <script src="{{ url_for('static', filename='js/joypad.min.js') }}"></script>
   </head>
 
   <body>
@@ -47,9 +45,7 @@
     <script src="{{ url_for('static', filename='js/codemirror.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/codemirror.css') }}">
     <script src="{{ url_for('static', filename='js/python.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/joypad.min.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-
     <button type="button" onclick="uploadCode()">Upload code</button>
 
     <script>
@@ -93,26 +89,28 @@
     </script>
     </div>
 
+    <script src="{{ url_for('static', filename='js/joypad.js') }}"></script>
+
     <div style="position:absolute; top:80px; right:0px">
         <div class="info">
             <h2 id="heading"></h2>
             <p id="message"></p>
-            <p id="button_0">A: </p>
-            <p id="button_1">B: </p>
-            <p id="button_2">X: </p>
-            <p id="button_3">Y: </p>
-            <p id="button_4">LB: </p>
-            <p id="button_5">RB: </p>
-            <p id="button_6">LT: </p>
-            <p id="button_7">RT: </p>
-            <p id="button_8">Select: </p>
-            <p id="button_9">Start: </p>
-            <p id="button_10">LS: </p>
-            <p id="button_11">RS: </p>
-            <p id="button_12">U: </p>
-            <p id="button_13">D: </p>
-            <p id="button_14">L: </p>
-            <p id="button_15">R: </p>
+            <p id="button_0">button_a: </p>
+            <p id="button_1">button_b: </p>
+            <p id="button_2">button_x: </p>
+            <p id="button_3">button_y: </p>
+            <p id="button_4">l_bumper: </p>
+            <p id="button_5">r_bumper: </p>
+            <p id="button_6">l_trigger: </p>
+            <p id="button_7">r_trigger: </p>
+            <p id="button_8">button_back: </p>
+            <p id="button_9">button_start: </p>
+            <p id="button_10">l_stick: </p>
+            <p id="button_11">r_stick: </p>
+            <p id="button_12">dpad_up: </p>
+            <p id="button_13">dpad_down: </p>
+            <p id="button_14">dpad_left: </p>
+            <p id="button_15">dpad_right: </p>
             <p id="axis_0">LH: </p>
             <p id="axis_1">LV: </p>
             <p id="axis_2">RH: </p>
@@ -121,22 +119,22 @@
 
         <script>
         let padMap = {
-            button_0: "A",
-            button_1: "B",
-            button_2: "X",
-            button_3: "Y",
-            button_4: "LB",
-            button_5: "RB",
-            button_6: "LT",
-            button_7: "RT",
-            button_8: "Select",
-            button_9: "Start",
-            button_10: "LS",
-            button_11: "RS",
-            button_12: "U",
-            button_13: "D",
-            button_14: "L",
-            button_15: "R",
+            button_0: "button_a",
+            button_1: "button_b",
+            button_2: "button_x",
+            button_3: "button_y",
+            button_4: "l_bumper",
+            button_5: "r_bumper",
+            button_6: "l_trigger",
+            button_7: "r_trigger",
+            button_8: "button_back",
+            button_9: "button_start",
+            button_10: "l_stick",
+            button_11: "r_stick",
+            button_12: "dpad_up",
+            button_13: "dpad_down",
+            button_14: "dpad_left",
+            button_15: "dpad_right",
             axis_0: "LH",
             axis_1: "LV",
             axis_2: "RH",
@@ -157,7 +155,7 @@
 
         function clearPadVals() {
             for (let key in padMap) {
-                document.getElementById(key).innerHTML = padMap[key] + ": ";
+                document.getElementById(key).innerText = padMap[key] + ": ";
             }
         }
 
@@ -178,52 +176,58 @@
             console.log(e.detail);
             const buttonName = e.detail.buttonName;
             clearPadVals();
-            document.getElementById(buttonName).innerHTML = padMap[buttonName] + ": 1";
+            document.getElementById(buttonName).innerText = padMap[buttonName] + ": 1";
         });
         joypad.on('axis_move', e => {
             console.log(e.detail);
             const axisName = "axis_" + e.detail.axis;
             clearPadVals();
-            document.getElementById(axisName).innerHTML = padMap[axisName] + ": " + e.detail.axisMovementValue;
+            document.getElementById(axisName).innerText = padMap[axisName] + ": " + e.detail.axisMovementValue;
             if (mode === "teleop") {
                 if (inputMode === "gamepad") {
+                    if (e.detail.axisMovementValue > 0.7) {
+                        worker.postMessage({keyMode: inputMode, isButton: false, axis: e.detail.axis, value: e.detail.axisMovementValue, up: false}); //Left Joystick Right
+                    } else if (e.detail.axisMovementValue < -0.7) {
+                        worker.postMessage({keyMode: inputMode, isButton: false, axis: e.detail.axis, value: e.detail.axisMovementValue, up: false}); //Left Joystick Left
+                    } else {
+                        worker.postMessage({keyMode: inputMode, isButton: false, axis: e.detail.axis, value: 0, up: true});
+                    }
+
+                    /* Original Code for sending Joystick Movements as Keypresses
                     if (axisName == "axis_0") {
                         if (e.detail.axisMovementValue > 0.7) {
-                            worker.postMessage({keypress: true, keyCode: 68, up: false}); //Left Joystick Right
+                            worker.postMessage({keyMode: inputMode, keyCode: 68, up: false}); //Left Joystick Right
                         } else if (e.detail.axisMovementValue < -0.7) {
-                            worker.postMessage({keypress: true, keyCode: 65, up: false}); //Left Joystick Left
+                            worker.postMessage({keyMode: inputMode, keyCode: 65, up: false}); //Left Joystick Left
                         } else {
-                            worker.postMessage({keypress: true, keyCode: 68, up: true});
-                            worker.postMessage({keypress: true, keyCode: 65, up: true});
+                            worker.postMessage({keyMode: inputMode, keyCode: 68, up: true});
                         }
                     } else if (axisName == "axis_1") {
                         if (e.detail.axisMovementValue > 0.7) {
-                            worker.postMessage({keypress: true, keyCode: 83, up: false}); //Left Joystick Down
+                            worker.postMessage({keyMode: inputMode, keyCode: 83, up: false}); //Left Joystick Down
                         } else if (e.detail.axisMovementValue < -0.7) {
-                            worker.postMessage({keypress: true, keyCode: 87, up: false}); //Left Joystick Up
+                            worker.postMessage({keyMode: inputMode, keyCode: 87, up: false}); //Left Joystick Up
                         } else {
-                            worker.postMessage({keypress: true, keyCode: 83, up: true});
-                            worker.postMessage({keypress: true, keyCode: 87, up: true});
+                            worker.postMessage({keyMode: inputMode, keyCode: 83, up: true});
                         }
                     } else if (axisName == "axis_2") {
                         if (e.detail.axisMovementValue > 0.7) {
-                            worker.postMessage({keypress: true, keyCode: 39, up: false}); //Right Joystick Right
+                            worker.postMessage({keyMode: inputMode, keyCode: 39, up: false}); //Right Joystick Right
                         } else if (e.detail.axisMovementValue < -0.7) {
-                            worker.postMessage({keypress: true, keyCode: 37, up: false}); //Right Joystick Left
+                            worker.postMessage({keyMode: inputMode, keyCode: 37, up: false}); //Right Joystick Left
                         } else {
-                            worker.postMessage({keypress: true, keyCode: 39, up: true});
-                            worker.postMessage({keypress: true, keyCode: 37, up: true});
+                            worker.postMessage({keyMode: inputMpde, keyCode: 39, up: true});
                         }
                     } else if (axisName == "axis_3") {
                         if (e.detail.axisMovementValue > 0.7) {
-                            worker.postMessage({keypress: true, keyCode: 40, up: false}); //Left Joystick Down
+                            worker.postMessage({keyMode: inputMode, keyCode: 40, up: false}); //Left Joystick Down
                         } else if (e.detail.axisMovementValue < -0.7) {
-                            worker.postMessage({keypress: true, keyCode: 38, up: false}); //Left Joystick Up
+                            worker.postMessage({keyMode: inputMode, keyCode: 38, up: false}); //Left Joystick Up
                         } else {
-                            worker.postMessage({keypress: true, keyCode: 40, up: true});
-                            worker.postMessage({keypress: true, keyCode: 38, up: true});
+                            worker.postMessage({keyMode: inputMode, keyCode: 40, up: true});
                         }
                     }
+                    */
                 }
             }
         });
