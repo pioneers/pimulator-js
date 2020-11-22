@@ -397,6 +397,37 @@ function translateToMovement(keyCode) {
 }
 
 /*********************** GAMEPAD INPUT GAMEPAD FUNCTIONS ***********************/
+
+/**
+ * A mapping from the button names of the controller to the button names
+ * in the PiE Robot API.
+ */
+let padMap = {
+    button_0: "button_a",
+    button_1: "button_b",
+    button_2: "button_x",
+    button_3: "button_y",
+    button_4: "l_bumper",
+    button_5: "r_bumper",
+    button_6: "l_trigger",
+    button_7: "r_trigger",
+    button_8: "button_back",
+    button_9: "button_start",
+    button_10: "l_stick",
+    button_11: "r_stick",
+    button_12: "dpad_up",
+    button_13: "dpad_down",
+    button_14: "dpad_left",
+    button_15: "dpad_right",
+    axis_0: "LH",
+    axis_1: "LV",
+    axis_2: "RH",
+    axis_3: "RV",
+}
+
+/**
+ * Helper up/down game button press methods
+ */
 function downGamepad(button){
     onPressGamepad(button);
 }
@@ -404,107 +435,118 @@ function upGamepad(button){
     onReleaseGamepad(button);
 }
 
+/**
+ * Sets a button in the robot API to a pressed state i.e. true
+ */
 function onPressGamepad(button) {
-    if (button === "button_a") {
+    if (padMap[button] === "button_a") {
         simulator.gamepad.button_a = true;
-    } else if (button === "button_b") {
+    } else if (padMap[button] === "button_b") {
         simulator.gamepad.button_b = true;
-    } else if (button === "button_x") {
+    } else if (padMap[button] === "button_x") {
         simulator.gamepad.button_x = true;
-    } else if (button === "button_y") {
+    } else if (padMap[button] === "button_y") {
         simulator.gamepad.button_y = true;
-    } else if (button === "l_bumper") {
+    } else if (padMap[button] === "l_bumper") {
         simulator.gamepad.l_bumper = true;
-    } else if (button === "r_bumper") {
+    } else if (padMap[button] === "r_bumper") {
         simulator.gamepad.r_bumper = true;
-    } else if (button === "l_trigger") {
+    } else if (padMap[button] === "l_trigger") {
         simulator.gamepad.l_trigger = true;
-    } else if (button === "r_trigger") {
+    } else if (padMap[button] === "r_trigger") {
         simulator.gamepad.r_trigger = true;
-    } else if (button === "button_back") {
+    } else if (padMap[button] === "button_back") {
         simulator.gamepad.button_back = true;
-    } else if (button === "button_start") {
+    } else if (padMap[button] === "button_start") {
         simulator.gamepad.button_start = true;
-    } else if (button === "l_stick") {
+    } else if (padMap[button] === "l_stick") {
         simulator.gamepad.l_stick = true;
-    } else if (button === "r_stick") {
+    } else if (padMap[button] === "r_stick") {
         simulator.gamepad.r_stick = true;
-    } else if (button === "dpad_up") {
+    } else if (padMap[button] === "dpad_up") {
         simulator.gamepad.dpad_up = true;
-    } else if (button === "dpad_down") {
+    } else if (padMap[button] === "dpad_down") {
         simulator.gamepad.dpad_down = true;
-    } else if (button === "dpad_left") {
+    } else if (padMap[button] === "dpad_left") {
         simulator.gamepad.dpad_left = true;
-    } else if (button === "dpad_right") {
+    } else if (padMap[button] === "dpad_right") {
         simulator.gamepad.dpad_right = true;
     }
 }
 
+/**
+ * Sets a button in the robot API to a released state i.e. false
+ */
 function onReleaseGamepad(button) {
-    if (button === "button_a") {
+    if (padMap[button] === "button_a") {
         simulator.gamepad.button_a = false;
-    } else if (button === "button_b") {
+    } else if (padMap[button] === "button_b") {
         simulator.gamepad.button_b = false;
-    } else if (button === "button_x") {
+    } else if (padMap[button] === "button_x") {
         simulator.gamepad.button_x = false;
-    } else if (button === "button_y") {
+    } else if (padMap[button] === "button_y") {
         simulator.gamepad.button_y = false;
-    } else if (button === "l_bumper") {
+    } else if (padMap[button] === "l_bumper") {
         simulator.gamepad.l_bumper = false;
-    } else if (button === "r_bumper") {
+    } else if (padMap[button] === "r_bumper") {
         simulator.gamepad.r_bumper = false;
-    } else if (button === "l_trigger") {
+    } else if (padMap[button] === "l_trigger") {
         simulator.gamepad.l_trigger = false;
-    } else if (button === "r_trigger") {
+    } else if (padMap[button] === "r_trigger") {
         simulator.gamepad.r_trigger = false;
-    } else if (button === "button_back") {
+    } else if (padMap[button] === "button_back") {
         simulator.gamepad.button_back = false;
-    } else if (button === "button_start") {
+    } else if (padMap[button] === "button_start") {
         simulator.gamepad.button_start = false;
-    } else if (button === "l_stick") {
+    } else if (padMap[button] === "l_stick") {
         simulator.gamepad.l_stick = false;
-    } else if (button === "r_stick") {
+    } else if (padMap[button] === "r_stick") {
         simulator.gamepad.r_stick = false;
-    } else if (button === "dpad_up") {
+    } else if (padMap[button] === "dpad_up") {
         simulator.gamepad.dpad_up = false;
-    } else if (button === "dpad_down") {
+    } else if (padMap[button] === "dpad_down") {
         simulator.gamepad.dpad_down = false;
-    } else if (button === "dpad_left") {
+    } else if (padMap[button] === "dpad_left") {
         simulator.gamepad.dpad_left = false;
-    } else if (button === "dpad_right") {
+    } else if (padMap[button] === "dpad_right") {
         simulator.gamepad.dpad_right = false;
     }
 }
 
+/**
+ * Sets the value of the axis according to joystick movement
+ */
 function moveGamepad(axis, value) {
-    console.log("joystick register: " + axis + " with value " + value);
     if (axis === 0) { // left joystick horizontal axis
         if (value > 0) { // joystick position right
-            simulator.gamepad.joystick_left_x = 1;
+            simulator.gamepad.joystick_left_x = value; //1
         } else if (value < 0) { // joystick position left
-            simulator.gamepad.joystick_left_x = -1;
+            simulator.gamepad.joystick_left_x = value; //-1
         }
     } else if (axis === 1) { // left joystick vertical axis
         if (value > 0) { // joystick position down ***
-            simulator.gamepad.joystick_left_y = -1;
+            simulator.gamepad.joystick_left_y = -1 * value; //-1
         } else if (value < 0) { // joystick position up ***
-            simulator.gamepad.joystick_left_y = 1;
+            simulator.gamepad.joystick_left_y = -1 * value; //1
         }
     } else if (axis === 2) { // right joystick horizontal axis
         if (value > 0) { // joystick position right
-            simulator.gamepad.joystick_right_x = 1;
+            simulator.gamepad.joystick_right_x = value; //1
         } else if (value < 0) { // joystick position left
-            simulator.gamepad.joystick_right_x = -1;
+            simulator.gamepad.joystick_right_x = value; //-1
         }
     } else if (axis === 3) { // right joystick vertical axis
         if (value > 0) { // joystick position down ***
-            simulator.gamepad.joystick_right_y = -1;
+            simulator.gamepad.joystick_right_y = -1 * value; //-1
         } else if (value < 0) { // joystick position up ***
-            simulator.gamepad.joystick_right_y = 1;
+            simulator.gamepad.joystick_right_y = -1 * value; //1
         }
     }
 }
 
+/**
+ * Resets the value of the axis back to the center
+ */
 function stopGamepad(axis) {
     if (axis === 0) { // left joystick horizontal axis
         simulator.gamepad.joystick_left_x = 0;

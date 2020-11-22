@@ -2,8 +2,6 @@ var mode = "idle"; // or auto or teleop
 var worker = new Worker("static/js/robot.js");
 var timer;
 var inputMode = "keyboard";
-//var gamepadInterval;
-//var gamepad;
 
 // Handle messages from worker
 function onmessage(e) {
@@ -23,14 +21,14 @@ worker.onmessage = onmessage;
 function switchInput() {
     if (inputMode === "keyboard") {
         inputMode = "gamepad";
-        document.getElementById("inputMode").innerHTML = "Input: Gamepad";
+        document.getElementById("inputMode").innerText = "Input: Gamepad";
     } else if (inputMode == "gamepad") {
         inputMode = "keyboard";
-        document.getElementById("inputMode").innerHTML = "Input: Keyboard";
+        document.getElementById("inputMode").innerText = "Input: Keyboard";
     }
 }
 
-// In teleop mode, send keyModees to the worker
+// In teleop mode, if the input is set to the keyboard, send keyCodes to the worker
 function down(e){
     if (mode === "teleop") {
         if (inputMode === "keyboard") {
@@ -82,10 +80,8 @@ function start(auto=0) {
     }
     else {
         clearInterval(timer);
-        //clearInterval(gamepadInterval);
         if (auto === 0) {
             worker.postMessage({start:true, mode:"teleop"})
-            //setTeleopLoop();
         }
         else if (auto === 1) {
             worker.postMessage({start:true, mode:"auto"})
@@ -95,58 +91,21 @@ function start(auto=0) {
 
 function runAutoTimer() {
     var startTime = new Date().getTime();
-    document.getElementById("timer").innerHTML = "Time Left: 30s";
+    document.getElementById("timer").innerText = "Time Left: 30s";
 
     timer = setInterval(function() {
         let currTime = new Date().getTime();
         let timeElapsed = Math.floor((currTime - startTime) / 1000);
         let timeLeft = 30 - timeElapsed;
 
-        document.getElementById("timer").innerHTML = "Time Left: " + timeLeft + "s";
+        document.getElementById("timer").innerText = "Time Left: " + timeLeft + "s";
 
         if (timeLeft < 0) {
             clearInterval(timer);
-            document.getElementById("timer").innerHTML = "Autonomous Mode has finished.";
+            document.getElementById("timer").innerText = "Autonomous Mode has finished.";
         }
     }, 1000);
 }
-
-//GAMEPAD:
-/**
- * Create a global setInterval that is initialized when teleop starts and the mode is gamepad
- * setInterval is cleared upon call to stop()
- * setInterval every 10ms
- * if gamepad axes < 0.2 -> postMessage to stop movement
- */
- /*
-function setTeleopLoop() {
-    gamepadInterval = setInterval(checkJoysticks, 500);
-}
-
-function checkJoysticks() {
-    console.log("checking gamepad axes");
-    if (atCenter(gamepad.axes, 0)) { // L: left_right is zero
-        worker.postMessage({keyMode: true, keyCode: 68, up: true});
-        worker.postMessage({keyMode: true, keyCode: 65, up: true});
-    }
-    if (atCenter(gamepad.axes, 1)) { // L: up+down is zero
-        worker.postMessage({keyMode: true, keyCode: 83, up: true});
-        worker.postMessage({keyMode: true, keyCode: 87, up: true});
-    }
-    if (atCenter(gamepad.axes, 2)) { // R: left_right is zero
-        worker.postMessage({keyMode: true, keyCode: 39, up: true});
-        worker.postMessage({keyMode: true, keyCode: 37, up: true});
-    }
-    if (atCenter(gamepad.axes, 3)) { // R: up+down is zero
-        worker.postMessage({keyMode: true, keyCode: 40, up: true});
-        worker.postMessage({keyMode: true, keyCode: 38, up: true});
-    }
-}
-
-function atCenter(axes, axis) {
-    return axes[axis] > -0.1 && axes[axis] < 0.1;
-}
-*/
 
 function stop() {
     /*

@@ -177,6 +177,15 @@
             const buttonName = e.detail.buttonName;
             clearPadVals();
             document.getElementById(buttonName).innerText = padMap[buttonName] + ": 1";
+            if (mode === "teleop") {
+                if (inputMode === "gamepad") {
+                    if (e.detail.pressed) {
+                        worker.postMessage({keyMode: inputMode, isButton: true, button: buttonName, up: false});
+                    } else {
+                        worker.postMessage({keyMode: inputMode, isButton: true, button: buttonName, up: true});
+                    }
+                }
+            }
         });
         joypad.on('axis_move', e => {
             console.log(e.detail);
@@ -192,42 +201,6 @@
                     } else {
                         worker.postMessage({keyMode: inputMode, isButton: false, axis: e.detail.axis, value: 0, up: true});
                     }
-
-                    /* Original Code for sending Joystick Movements as Keypresses
-                    if (axisName == "axis_0") {
-                        if (e.detail.axisMovementValue > 0.7) {
-                            worker.postMessage({keyMode: inputMode, keyCode: 68, up: false}); //Left Joystick Right
-                        } else if (e.detail.axisMovementValue < -0.7) {
-                            worker.postMessage({keyMode: inputMode, keyCode: 65, up: false}); //Left Joystick Left
-                        } else {
-                            worker.postMessage({keyMode: inputMode, keyCode: 68, up: true});
-                        }
-                    } else if (axisName == "axis_1") {
-                        if (e.detail.axisMovementValue > 0.7) {
-                            worker.postMessage({keyMode: inputMode, keyCode: 83, up: false}); //Left Joystick Down
-                        } else if (e.detail.axisMovementValue < -0.7) {
-                            worker.postMessage({keyMode: inputMode, keyCode: 87, up: false}); //Left Joystick Up
-                        } else {
-                            worker.postMessage({keyMode: inputMode, keyCode: 83, up: true});
-                        }
-                    } else if (axisName == "axis_2") {
-                        if (e.detail.axisMovementValue > 0.7) {
-                            worker.postMessage({keyMode: inputMode, keyCode: 39, up: false}); //Right Joystick Right
-                        } else if (e.detail.axisMovementValue < -0.7) {
-                            worker.postMessage({keyMode: inputMode, keyCode: 37, up: false}); //Right Joystick Left
-                        } else {
-                            worker.postMessage({keyMode: inputMpde, keyCode: 39, up: true});
-                        }
-                    } else if (axisName == "axis_3") {
-                        if (e.detail.axisMovementValue > 0.7) {
-                            worker.postMessage({keyMode: inputMode, keyCode: 40, up: false}); //Left Joystick Down
-                        } else if (e.detail.axisMovementValue < -0.7) {
-                            worker.postMessage({keyMode: inputMode, keyCode: 38, up: false}); //Left Joystick Up
-                        } else {
-                            worker.postMessage({keyMode: inputMode, keyCode: 40, up: true});
-                        }
-                    }
-                    */
                 }
             }
         });
