@@ -4,8 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- Bootstrap CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
 
     <title>PiE Robotics Simulator</title>
 
@@ -14,108 +17,143 @@
   </head>
 
   <body>
-    <h1>PiE Robotics Simulator</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <h1>PiE Robotics Simulator</h1>
 
-    <svg width="432" height="432" version="1.1" xmlns="http://www.w3.org/2000/svg" style="border:1px solid black">
-      <rect x="144"
-            y="144"
-            width="60"
-            height="80"
-            rx="6"
-            ry="6"
-            stroke="navy"
-            fill="transparent"
-            transform="rotate(0)"
-            stroke-width="2"/>
-    </svg>
+                <svg width="432" height="432" version="1.1" xmlns="http://www.w3.org/2000/svg" style="border:1px solid black">
+                  <rect x="144"
+                        y="144"
+                        width="60"
+                        height="80"
+                        rx="6"
+                        ry="6"
+                        stroke="navy"
+                        fill="transparent"
+                        transform="rotate(0)"
+                        stroke-width="2"/>
+                </svg>
 
-    <div id="demo">
-      x and y coordinates updated here
-    </div>
+                <div class="row">
+                    <div class="col">
+                        <div id="demo">
+                          x and y coordinates updated here
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <p id="timer"; style="color:blue">Autonomous Timer: </p>
+                    </div>
+                </div>
 
-    <h4 id="timer"; style="color:blue">Autonomous Timer: </h4>
 
-    <button type="button" onclick="start(auto=0)">Teleop simulation</button>
-    <button type="button" onclick="start(auto=1)">Autonomous Simulation </button>
-    <button type="button" onclick="stop()">stop simulation</button>
-    <button type="button" id="inputMode" onclick="switchInput()">Input: Keyboard</button>
+            </div>
+            <div class="col-6 align-self-center">
+                <div class="row justify-content-md-center m-2">
+                    <div class="btn-group" role="group" aria-label="simulations">
+                      <button type="button" class="btn btn-primary" onclick="start(auto=1)">Autonomous Simulation</button>
+                      <button type="button" class="btn btn-primary" onclick="start(auto=0)">Teleop Simulation</button>
+                      <button type="button" class="btn btn-danger" onclick="stop()">Stop Simulation</button>
+                    </div>
+                </div>
+                <div class="row justify-content-md-center m-2">
+                    <button type="button" class="btn btn-info" id="inputMode" onclick="switchInput()">Input: Keyboard</button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-8">
+                <div class="container" id="cmblock">
+                    <!-- Create a simple CodeMirror instance -->
+                    <script src="{{ url_for('static', filename='js/codemirror.js') }}"></script>
+                    <link rel="stylesheet" href="{{ url_for('static', filename='css/codemirror.css') }}">
+                    <script src="{{ url_for('static', filename='js/python.js') }}"></script>
+                    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+                    <button type="button" class="btn btn-success" onclick="uploadCode()">Upload Code</button>
 
-    <div style="margin-top:20px">
-    <!-- Create a simple CodeMirror instance -->
-    <script src="{{ url_for('static', filename='js/codemirror.js') }}"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/codemirror.css') }}">
-    <script src="{{ url_for('static', filename='js/python.js') }}"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <button type="button" onclick="uploadCode()">Upload code</button>
+                    <script>
+                      function setCookie(name, value) {
+                          document.cookie = name + "=" + (value || "");
+                      }
+                      function getCookie(name) {
+                          let nameEQ = name + "=";
+                          let ca = document.cookie.split(';');
+                          for(let i=0; i < ca.length; i++) {
+                              let c = ca[i];
+                              while (c.charAt(0)==' ') c = c.substring(1,c.length);
+                              if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+                          }
+                          return null;
+                      }
+                      function eraseCookie(name) {
+                          document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                      }
 
-    <script>
-      function setCookie(name, value) {
-          document.cookie = name + "=" + (value || "");
-      }
-      function getCookie(name) {
-          let nameEQ = name + "=";
-          let ca = document.cookie.split(';');
-          for(let i=0; i < ca.length; i++) {
-              let c = ca[i];
-              while (c.charAt(0)==' ') c = c.substring(1,c.length);
-              if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-          }
-          return null;
-      }
-      function eraseCookie(name) {
-          document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-      }
+                      var cm = CodeMirror(document.getElementById("cmblock"), { //place the codemirror inside the div container
+                        value: "",
+                        mode:  "python",
+                        lineNumbers: true,
+                        indentUnit: 4
+                      });
+                      cm.setSize(width="100%", height="1000px");
 
-      var cm = CodeMirror(document.body, {
-        value: "",
-        mode:  "python",
-        lineNumbers: true,
-        indentUnit: 4
-      });
-      cm.setSize(width="100%", height="1000px");
-
-      // var code = getCookie("code");
-      var code = "";
-      if (code == "" || code === null) {
-        var xhr=new XMLHttpRequest();
-        xhr.open("GET","{{ url_for('static', filename='student_code_file.py') }}");
-        xhr.onload = () => {
-          code = xhr.responseText;
-          // setCookie("code", code)
-          cm.setValue(code);
-        }
-        xhr.send();
-      }
-    </script>
+                      // var code = getCookie("code");
+                      var code = "";
+                      if (code == "" || code === null) {
+                        var xhr=new XMLHttpRequest();
+                        xhr.open("GET","{{ url_for('static', filename='student_code_file.py') }}");
+                        xhr.onload = () => {
+                          code = xhr.responseText;
+                          // setCookie("code", code)
+                          cm.setValue(code);
+                        }
+                        xhr.send();
+                      }
+                    </script>
+                </div>
+            </div>
+            <div class="col-4">
+                <script>
+                    function dropdown() {
+                        $('#info').collapse('toggle');
+                    }
+                </script>
+                <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#info" aria-expanded="false" aria-controls="info">
+                    Gamepad Readings
+                </button>
+                <div  id="info"class="collapse">
+                    <div class="container">
+                        <h2 id="heading"></h2>
+                        <p id="message"></p>
+                        <p id="button_0">button_a: </p>
+                        <p id="button_1">button_b: </p>
+                        <p id="button_2">button_x: </p>
+                        <p id="button_3">button_y: </p>
+                        <p id="button_4">l_bumper: </p>
+                        <p id="button_5">r_bumper: </p>
+                        <p id="button_6">l_trigger: </p>
+                        <p id="button_7">r_trigger: </p>
+                        <p id="button_8">button_back: </p>
+                        <p id="button_9">button_start: </p>
+                        <p id="button_10">l_stick: </p>
+                        <p id="button_11">r_stick: </p>
+                        <p id="button_12">dpad_up: </p>
+                        <p id="button_13">dpad_down: </p>
+                        <p id="button_14">dpad_left: </p>
+                        <p id="button_15">dpad_right: </p>
+                        <p id="axis_0">LH: </p>
+                        <p id="axis_1">LV: </p>
+                        <p id="axis_2">RH: </p>
+                        <p id="axis_3">RV: </p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/joypad.js') }}"></script>
-
-    <div style="position:absolute; top:80px; right:0px">
-        <div class="info">
-            <h2 id="heading"></h2>
-            <p id="message"></p>
-            <p id="button_0">button_a: </p>
-            <p id="button_1">button_b: </p>
-            <p id="button_2">button_x: </p>
-            <p id="button_3">button_y: </p>
-            <p id="button_4">l_bumper: </p>
-            <p id="button_5">r_bumper: </p>
-            <p id="button_6">l_trigger: </p>
-            <p id="button_7">r_trigger: </p>
-            <p id="button_8">button_back: </p>
-            <p id="button_9">button_start: </p>
-            <p id="button_10">l_stick: </p>
-            <p id="button_11">r_stick: </p>
-            <p id="button_12">dpad_up: </p>
-            <p id="button_13">dpad_down: </p>
-            <p id="button_14">dpad_left: </p>
-            <p id="button_15">dpad_right: </p>
-            <p id="axis_0">LH: </p>
-            <p id="axis_1">LV: </p>
-            <p id="axis_2">RH: </p>
-            <p id="axis_3">RV: </p>
-        </div>
 
         <script>
         let padMap = {
@@ -209,12 +247,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/base.js') }}"></script>
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
   </body>
 </html>
