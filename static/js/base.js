@@ -13,6 +13,11 @@ function onmessage(e) {
             runAutoTimer();
         }
     }
+
+    if (e.data.log !== undefined) {
+        let text = e.data.log;
+        log(text);
+    }
 }
 worker.onmessage = onmessage;
 
@@ -105,3 +110,18 @@ function stop() {
     update({X:70,Y:70,dir:0}); // in inches
     clearInterval(timer);
 };
+
+function clearConsole(){
+    document.getElementById("consoleLog").innerText = ""
+}
+clearConsole()
+
+function log(text) {
+    const array = ['pyodide.py', '<eval>'];
+    for (string of array){
+        if(text.includes(string)){
+            return
+        }
+    }
+    logged = document.getElementById("consoleLog").innerText += text + "\n";
+}

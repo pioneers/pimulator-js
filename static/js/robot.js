@@ -1,3 +1,26 @@
+var console=(function(oldCons){
+    return {
+        log: function(text){
+            oldCons.log(text);
+            postMessage({
+                log: text
+            })
+        },
+        info: function (text) {
+            oldCons.info(text);
+            // code
+        },
+        warn: function (text) {
+            oldCons.warn(text);
+            // code
+        },
+        error: function (text) {
+            oldCons.error(text);
+            // code
+        }
+    };
+}(console));
+
 importScripts("https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js");
 
 var code = "";
@@ -451,7 +474,7 @@ this.onmessage = function(e) {
     // Code upload
     if (e.data.code !== undefined){
         code = e.data.code;
-        console.log("Code upload succesful")
+        console.log("Code upload successful")
     }
 
     // Start simulation
