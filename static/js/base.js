@@ -13,6 +13,11 @@ function onmessage(e) {
             runAutoTimer();
         }
     }
+
+    if (e.data.log !== undefined) {
+        let text = e.data.log;
+        log(text);
+    }
 }
 worker.onmessage = onmessage;
 
@@ -101,11 +106,15 @@ function stop() {
     clearInterval(timer);
 };
 
-console.stdlog = console.log.bind(console);
-console.logs = [];
-console.log = function(){
-    console.logs.push(Array.from(arguments));
-    console.stdlog.apply(console, arguments);
-};
+function clearConsole(){
+  document.getElementById("consoleLog").innerText = ""
+}
+clearConsole()
 
-document.getElementById("consoleLog").innerHTML = console.logs;
+function log(text) {
+  if(!text.includes('pyodide.py')){
+    if(!text.includes('<eval>')){
+  logged = document.getElementById("consoleLog").innerText += text + "\n";
+    }
+  }
+}
