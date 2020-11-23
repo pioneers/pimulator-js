@@ -107,14 +107,16 @@ function stop() {
 };
 
 function clearConsole(){
-  document.getElementById("consoleLog").innerText = ""
+    document.getElementById("consoleLog").innerText = ""
 }
 clearConsole()
 
 function log(text) {
-  if(!text.includes('pyodide.py')){
-    if(!text.includes('<eval>')){
-  logged = document.getElementById("consoleLog").innerText += text + "\n";
+    const array = ['pyodide.py', '<eval>'];
+    for (string of array){
+        if(text.includes(string)){
+            return
+        }
     }
-  }
+    logged = document.getElementById("consoleLog").innerText += text + "\n";
 }
