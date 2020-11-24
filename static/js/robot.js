@@ -35,7 +35,9 @@ class RobotClass {
       this.queue = queue;
       this.sensor = new Sensor(this);
       this.tapeLines = [];
-      this.tapeLines.push(new TapeLine(40, 40, 80, 80, 10));
+      this.tapeLines.push(new TapeLine(27, 27, 115, 115));
+      // this.tapeLines.push(new TapeLine(115, 27, 115, 115));
+      // this.tapeLines.push(new TapeLine(27, 27, 115, 27))
     }
 
     updatePosition() {
@@ -495,11 +497,12 @@ class Sensor{
      this.robot = robot;
    }
    get_val(){
-     var sensorsX = [this.robot.X, this.robot.X + 5*Math.sin(this.robot.dir), this.robot.X - 5*Math.sin(this.robot.dir)]
-     var sensorsY = [this.robot.Y, this.robot.Y + 5*Math.cos(this.robot.dir), this.robot.Y - 5*Math.cos(this.robot.dir)]
+     var sensorsX = [this.robot.X - 5*Math.sin(this.robot.dir/180*Math.PI), this.robot.X, this.robot.X + 5*Math.sin(this.robot.dir/180*Math.PI)]
+     var sensorsY = [this.robot.Y - 5*Math.cos(this.robot.dir/180*Math.PI), this.robot.Y, this.robot.Y + 5*Math.cos(this.robot.dir/180*Math.PI)]
 
      var tapeLines = this.robot.tapeLines
      let total = []
+     let totalLine = 0
      let i = 0
      for (;i<3;i++){
        let sensor_x = sensorsX[i]
@@ -507,82 +510,68 @@ class Sensor{
        // https://www.geeksforgeeks.org/program-for-point-of-intersection-of-two-lines/
        for (const tapeLine of tapeLines){
          let m = tapeLine.slope
-         // TODO: Add edge case for slope = 0, infinity
          if (m === "horizontal") {
            let distY = Math.abs(sensor_y-tapeLine.startY)
            if (tapeLine.startX <= sensor_x && sensor_x <= tapeLine.endX) {
              let distSquared = (distY*distY)
+             totalLine += Math.min(1,3/distSquared)
            } else {
-             if (tapeLine.startX >= sensor_x) {
-               let distX = Math.abs(tapeLine.startX-sensor_x)
-             } else {
-               let distX = Math.abs(tapeLine.endX-sensor_x)
-             }
+             let distX = Math.min(Math.abs(tapeLine.startX-sensor_x), Math.abs(tapeLine.endX-sensor_x))
              let distSquared = (distY*distY) + (distX*distX)
-           }
+             totalLine += Math.min(1,3/distSquared)
+             }
          } else if (m === "vertical") {
            let distX = Math.abs(sensor_x-tapeLine.startX)
            if (tapeLine.startY <= sensor_y && sensor_y <= tapeLine.endY) {
              let distSquared = (distX*distX)
+             totalLine += Math.min(1,3/distSquared)
            } else {
-             if (tapeLine.startY >= sensor_y) {
-               let distY = Math.abs(tapeLine.startY-sensor_y)
-             } else {
-               let distY = Math.abs(tapeLine.endY-sensor_y)
-             }
+             let distY = Math.min(Math.abs(tapeLine.startY-sensor_y), Math.abs(tapeLine.endY-sensor_y))
              let distSquared = (distY*distY) + (distX*distX)
-           }
-         } else {
-           if ((sensor_x < tapeLine.startX && sensor_x < tapeLine.endX) || (sensor_x > tapeLine.startX && sensor_x > tapeLine.endX)){
-             let startDistX = Math.abs(sensor_x-tapeLine.startX)
-             let startDistY = Math.abs(sensor_y-tapeLine.startY)
-             let endDistX = Math.abs(sensor_x-tapeLine.endX)
-             let endDistY = Math.abs(sensor_y-tapeLine.startY)
-             let distSquared = Math.min((startDistX*startDistX+startDistY*startDistY),(endDistX*endDistX+endDistY*endDistY))
-             total.push(Math.min(1,3/distSquared))
+             totalLine += Math.min(1,3/distSquared)
+             }
            } else {
+           // check if intersection point is inside the tapeLine
+             if ((sensor_x < tapeLine.startX && sensor_x < tapeLine.endX) || (sensor_x > tapeLine.startX && sensor_x > tapeLine.endX)){
+               let startDistX = Math.abs(sensor_x-tapeLine.startX)
+               let startDistY = Math.abs(sensor_y-tapeLine.startY)
+               let endDistX = Math.abs(sensor_x-tapeLine.endX)
+               let endDistY = Math.abs(sensor_y-tapeLine.startY)
+               let distSquared = Math.min((startDistX*startDistX+startDistY*startDistY),(endDistX*endDistX+endDistY*endDistY))
+               totalLine += Math.min(1,3/distSquared)
+           } else {
+             let m1 = -1/m
+             let c = tapeLine.y_int
+             let c1 = sensor_y-m1*sensor_x
+             let determinant = -m + m1
+             let x = (c - c1)/determinant
+             let y = (-m*c1 + m1*c)/determinant
              let distX = Math.abs(sensor_x-x)
              let distY = Math.abs(sensor_y-y)
              let distSquared = (distX*distX)+(distY*distY)
-             total.push(Math.min(1,3/distSquared))
+             totalLine += Math.min(1,3/distSquared)
            }
-           let m1 = -1/m
-           // make equations of the form: y - mx = c
-           let c = tapeLine.y_int
-           let c1 = sensor_y-m1*sensor_x
-           let determinant = -m + m1
-           let x = (c - c1)/determinant
-           let y = (-m*c1 + m1*c)/determinant
-           let distX = Math.abs(sensor_x-x)
-           let distY = Math.abs(sensor_y-y)
-           let distSquared = (distX*distX)+(distY*distY)
          }
-           total.push(Math.min(1,10/distSquared))
-
-         // check if intersectioin point is inside the tapeLine
-
-
        }
+       total.push(Math.min(totalLine, 1))
      }
      console.log(total)
      return total
    }
 }
 class TapeLine{
-  constructor(x1, y1, x2, y2, width){
+  constructor(x1, y1, x2, y2){
     this.startX = x1
     this.startY = y1
     this.endX = x2
     this.endY = y2
-    this.width = width
-    if (startX === endX) {
+    if (this.startX === this.endX) {
       this.slope = "vertical"
-    } else if (startY === endY) {
+    } else if (this.startY === this.endY) {
       this.slope = "horizontal"
     } else {
       this.slope = (y1-y2) / (x1-x2);
       this.y_int = y1 - this.slope*x1
     }
-    // TODO: Add edge cases for lines with slope 0 or infinity
   }
 }

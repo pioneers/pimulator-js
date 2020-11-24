@@ -47,10 +47,20 @@ function update(state) {
     const scaledY = state.Y * scaleFactor;
     const dir = state.dir;
     document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
+    const sensorPoints = document.querySelectorAll("circle")
+    console.log(dir)
+    const centerX = scaledX + 30
+    const centerY = scaledY + 40
+    sensorPoints[0].setAttributeNS(null, "cx", centerX)
+    sensorPoints[0].setAttributeNS(null, "cy", centerY)
+    sensorPoints[1].setAttributeNS(null, "cy", centerY+(15*Math.sin(dir/180*Math.PI)))
+    sensorPoints[1].setAttributeNS(null, "cx", centerX+(15*Math.cos(dir/180*Math.PI)))
+    sensorPoints[2].setAttributeNS(null, "cy", centerY-(15*Math.sin(dir/180*Math.PI)))
+    sensorPoints[2].setAttributeNS(null, "cx", centerX-(15*Math.cos(dir/180*Math.PI)))
     const robotRect = document.querySelector("rect")
     robotRect.setAttributeNS(null, "x", scaledX)
     robotRect.setAttributeNS(null, "y", scaledY)
-    const rotateStr = `rotate(${dir} ${scaledX + 30} ${scaledY + 40})`
+    const rotateStr = `rotate(${dir} ${centerX} ${centerY})`
     robotRect.setAttribute("transform", rotateStr)
 };
 
