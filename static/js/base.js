@@ -48,7 +48,6 @@ function update(state) {
     const dir = state.dir;
     document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
     const sensorPoints = document.querySelectorAll("circle")
-    console.log(dir)
     const centerX = scaledX + 30
     const centerY = scaledY + 40
     sensorPoints[0].setAttributeNS(null, "cx", centerX)
