@@ -497,8 +497,8 @@ class Sensor{
      this.robot = robot;
    }
    get_val(){
-     var sensorsX = [this.robot.X - 5*Math.sin(this.robot.dir/180*Math.PI), this.robot.X, this.robot.X + 5*Math.sin(this.robot.dir/180*Math.PI)]
-     var sensorsY = [this.robot.Y - 5*Math.cos(this.robot.dir/180*Math.PI), this.robot.Y, this.robot.Y + 5*Math.cos(this.robot.dir/180*Math.PI)]
+     var sensorsY = [this.robot.Y - 5*Math.sin(this.robot.dir/180*Math.PI), this.robot.Y, this.robot.Y + 5*Math.sin(this.robot.dir/180*Math.PI)]
+     var sensorsX = [this.robot.X - 5*Math.cos(this.robot.dir/180*Math.PI), this.robot.X, this.robot.X + 5*Math.cos(this.robot.dir/180*Math.PI)]
 
      var tapeLines = this.robot.tapeLines
      let total = []
@@ -508,6 +508,7 @@ class Sensor{
        let sensor_x = sensorsX[i]
        let sensor_y = sensorsY[i]
        // https://www.geeksforgeeks.org/program-for-point-of-intersection-of-two-lines/
+       let totalLine = 0
        for (const tapeLine of tapeLines){
          let m = tapeLine.slope
          if (m === "horizontal") {
