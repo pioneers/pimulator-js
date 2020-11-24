@@ -139,4 +139,5 @@ function log(text) {
         }
     }
     logged = document.getElementById("consoleLog").innerText += text + "\n";
+    document.getElementById('consoleLog').scrollTop = document.getElementById('consoleLog').scrollHeight;
 }
