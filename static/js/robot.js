@@ -1,5 +1,4 @@
-importScripts('./GamepadClass.js');
-
+/* Rebind console messages. */
 var console=(function(oldCons){
     return {
         log: function(text){
@@ -24,6 +23,7 @@ var console=(function(oldCons){
 }(console));
 
 importScripts("https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js");
+importScripts('./GamepadClass.js');
 
 var code = "";
 var env = {};
