@@ -19,7 +19,7 @@ class RobotClass {
     startX = 70.0
     startY = 70.0
 
-    constructor(queue=null) {
+    constructor(autonomous_main=null) {
       this.X = this.startX;           // X position of the robot
       this.Y = this.startY;           // Y position of the robot
       this.Wl = 0.0;           // angular velocity of l wheel, radians/s
@@ -32,10 +32,14 @@ class RobotClass {
       this.runningCoroutines = new Set();
 
       // Ensure we don't hit sync errors when updating our values
-      this.queue = queue;
+      this.leftSensor = 0;
+      this.centerSensor = 0;
+      this.rightSensor = 0;
+      this.autonomous_main = autonomous_main
       this.sensor = new Sensor(this);
       this.tapeLines = [];
       this.tapeLines.push(new TapeLine(27, 27, 115, 115));
+      console.log(this.autonomous_main)
       // this.tapeLines.push(new TapeLine(115, 27, 115, 115));
       // this.tapeLines.push(new TapeLine(27, 27, 115, 27))
     }
@@ -75,6 +79,7 @@ class RobotClass {
             Y: this.Y,
             dir: this.dir
         };
+        console.log(newState)
         this.sensor.get_val()
         postMessage({
             robot: newState
@@ -98,7 +103,18 @@ class RobotClass {
             throw new Error("Cannot find device name: " + device);
         }
     }
-
+    get_value(device, param) {
+      if (device === "4752729234491832779312"){
+        if (param === "left"){
+          return this.leftSensor
+        } else if (param === "center") {
+          return this.centerSensor
+        } else if (param === "right"){
+          return this.rightSensor
+        }
+      }
+      throw new Error("Device was not found" + device)
+    }
     sleep(duration) {
         /* Autonomous code pauses execution for <duration> seconds
         */
@@ -116,6 +132,7 @@ class RobotClass {
             }
             if (cur - tick >= this.tickRate) {
                 this.updatePosition();
+                this.autonomous_main();
                 tick = tick + this.tickRate;
                 numUpdates++;
             }
@@ -395,7 +412,7 @@ class Simulator{
         this.autonomous_main = env['autonomous_main']
         this.teleop_setup = env['teleop_setup']
         this.teleop_main = env['teleop_main']
-
+        console.log(env['autonomous_main'])
         // ensure_is_function("teleop_setup", this.teleop_setup)
         // ensure_is_function("teleop_main", this.teleop_main)
     }
@@ -447,7 +464,7 @@ class Simulator{
         });
         this.robot = new RobotClass();
         this.loadStudentCode();
-
+        this.robot.autonomous_main= this.autonomous_main
         this.timeout = setTimeout(function() { this.stop(); }.bind(this), 30*1000);
         this.robot.simStartTime = new Date().getTime();
         setTimeout(this.autonomous_setup, 0);
@@ -497,8 +514,8 @@ class Sensor{
      this.robot = robot;
    }
    get_val(){
-     var sensorsY = [this.robot.Y - 5*Math.sin(this.robot.dir/180*Math.PI), this.robot.Y, this.robot.Y + 5*Math.sin(this.robot.dir/180*Math.PI)]
-     var sensorsX = [this.robot.X - 5*Math.cos(this.robot.dir/180*Math.PI), this.robot.X, this.robot.X + 5*Math.cos(this.robot.dir/180*Math.PI)]
+     var sensorsY = [this.robot.Y - 5*Math.cos(-this.robot.dir/180*Math.PI), this.robot.Y, this.robot.Y + 5*Math.cos(-this.robot.dir/180*Math.PI)]
+     var sensorsX = [this.robot.X - 5*Math.sin(-this.robot.dir/180*Math.PI), this.robot.X, this.robot.X + 5*Math.sin(-this.robot.dir/180*Math.PI)]
 
      var tapeLines = this.robot.tapeLines
      let total = []
@@ -557,6 +574,9 @@ class Sensor{
        total.push(Math.min(totalLine, 1))
      }
      console.log(total)
+     this.robot.leftSensor = total[0]
+     this.robot.centerSensor = total[1]
+     this.robot.rightSensor = total[2]
      return total
    }
 }
