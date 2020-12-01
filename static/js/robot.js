@@ -149,17 +149,17 @@ class RobotClass {
         independently of the main loop of code.
         */
         if (!(typeof fn === "function")) {
-            throw new Error("First argument to Robot.isRunning must be a function");
+            throw new Error("First argument to Robot.run must be a function");
         }
         this.runningCoroutines.add(fn)
         fn()
    }
-    isRunning(fn) {
+    is_running(fn) {
         /* Returns True if the given `fn` is already running as a coroutine.
         See: Robot.run
         TODO: Fully implement */
         if (!(typeof fn === "function")) {
-            throw new Error("First argument to Robot.isRunning must be a function");
+            throw new Error("First argument to Robot.is_running must be a function");
         }
         return this.runningCoroutines.has(fn)
     }
