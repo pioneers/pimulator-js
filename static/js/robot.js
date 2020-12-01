@@ -1,5 +1,4 @@
-importScripts('./GamepadClass.js');
-
+/* Rebind console messages. */
 var console=(function(oldCons){
     return {
         log: function(text){
@@ -24,6 +23,7 @@ var console=(function(oldCons){
 }(console));
 
 importScripts("https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js");
+importScripts('./GamepadClass.js');
 
 var code = "";
 var env = {};
@@ -149,17 +149,17 @@ class RobotClass {
         independently of the main loop of code.
         */
         if (!(typeof fn === "function")) {
-            throw new Error("First argument to Robot.isRunning must be a function");
+            throw new Error("First argument to Robot.run must be a function");
         }
         this.runningCoroutines.add(fn)
         fn()
    }
-    isRunning(fn) {
+    is_running(fn) {
         /* Returns True if the given `fn` is already running as a coroutine.
         See: Robot.run
         TODO: Fully implement */
         if (!(typeof fn === "function")) {
-            throw new Error("First argument to Robot.isRunning must be a function");
+            throw new Error("First argument to Robot.is_running must be a function");
         }
         return this.runningCoroutines.has(fn)
     }
