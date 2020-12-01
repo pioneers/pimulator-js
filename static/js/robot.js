@@ -1,4 +1,4 @@
-importScripts('./gamepadClass.js');
+importScripts('./GamepadClass.js');
 
 var console=(function(oldCons){
     return {
@@ -287,7 +287,7 @@ function translateToMovement(keyCode) {
  * A mapping from the button names of the controller to the button names
  * in the PiE Robot API.
  */
-let padMap = {
+const padMap = {
     button_0: "button_a",
     button_1: "button_b",
     button_2: "button_x",
