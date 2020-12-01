@@ -52,9 +52,9 @@ function update(state) {
     const scaledY = centerY - 40
     sensorPoints[0].setAttributeNS(null, "cx", centerX)
     sensorPoints[0].setAttributeNS(null, "cy", centerY)
-    sensorPoints[1].setAttributeNS(null, "cy", centerY+(-15*Math.cos(dir/180*Math.PI)))
+    sensorPoints[1].setAttributeNS(null, "cy", centerY+(15*Math.cos(dir/180*Math.PI)))
     sensorPoints[1].setAttributeNS(null, "cx", centerX+(-15*Math.sin(dir/180*Math.PI)))
-    sensorPoints[2].setAttributeNS(null, "cy", centerY-(-15*Math.cos(dir/180*Math.PI)))
+    sensorPoints[2].setAttributeNS(null, "cy", centerY-(15*Math.cos(dir/180*Math.PI)))
     sensorPoints[2].setAttributeNS(null, "cx", centerX-(-15*Math.sin(dir/180*Math.PI)))
     const robotRect = document.querySelector("rect")
     robotRect.setAttributeNS(null, "x", scaledX)
