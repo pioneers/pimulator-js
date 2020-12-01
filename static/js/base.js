@@ -1,6 +1,7 @@
 var mode = "idle"; // or auto or teleop
 var worker = new Worker("static/js/robot.js");
 var timer;
+var inputMode = "keyboard";
 
 // Handle messages from worker
 function onmessage(e) {
@@ -21,15 +22,30 @@ function onmessage(e) {
 }
 worker.onmessage = onmessage;
 
-// In teleop mode, send keypresses to the worker
+// Switch input mode between 'keyboard' and 'gamepad'
+function switchInput() {
+    if (inputMode === "keyboard") {
+        inputMode = "gamepad";
+        document.getElementById("inputMode").innerText = "Input: Gamepad";
+    } else if (inputMode == "gamepad") {
+        inputMode = "keyboard";
+        document.getElementById("inputMode").innerText = "Input: Keyboard";
+    }
+}
+
+// In teleop mode, if the input is set to the keyboard, send keyCodes to the worker
 function down(e){
     if (mode === "teleop") {
-        worker.postMessage({keypress: true, keyCode: e.keyCode, up: false});
+        if (inputMode === "keyboard") {
+            worker.postMessage({keyMode: inputMode, keyCode: e.keyCode, up: false});
+        }
     }
 }
 function up(e){
     if (mode === "teleop") {
-        worker.postMessage({keypress: true, keyCode: e.keyCode, up: true});
+        if (inputMode === "keyboard") {
+            worker.postMessage({keyMode: inputMode, keyCode: e.keyCode, up: true});
+        }
     }
 }
 document.addEventListener('keydown', down);
@@ -43,7 +59,7 @@ function uploadCode() {
 
 function update(state) {
     /*
-    Update the state (position and direction) of the center of the robot. 
+    Update the state (position and direction) of the center of the robot.
     Input position is in inches. scaleFactor convers inches -> pixels.
     Example of state: {x:72, y:72, dir:0}
     */
@@ -68,12 +84,11 @@ function start(auto=0) {
         return;
     }
     else {
+        clearInterval(timer);
         if (auto === 0) {
             worker.postMessage({start:true, mode:"teleop"})
         }
         else if (auto === 1) {
-            clearInterval(timer);
-
             worker.postMessage({start:true, mode:"auto"})
         }
     }
@@ -81,7 +96,7 @@ function start(auto=0) {
 
 function runAutoTimer() {
     var startTime = new Date().getTime();
-    document.getElementById("timer").innerHTML = "Time Left: 30s";
+    document.getElementById("timer").innerText = "Time Left: 30s";
 
     clearInterval(timer);
     timer = setInterval(function() {
@@ -89,11 +104,11 @@ function runAutoTimer() {
         let timeElapsed = Math.floor((currTime - startTime) / 1000);
         let timeLeft = 30 - timeElapsed;
 
-        document.getElementById("timer").innerHTML = "Time Left: " + timeLeft + "s";
+        document.getElementById("timer").innerText = "Time Left: " + timeLeft + "s";
 
         if (timeLeft < 0) {
             clearInterval(timer);
-            document.getElementById("timer").innerHTML = "Autonomous Mode has finished.";
+            document.getElementById("timer").innerText = "Autonomous Mode has finished.";
         }
     }, 1000);
 }
@@ -123,5 +138,7 @@ function log(text) {
             return
         }
     }
-    logged = document.getElementById("consoleLog").innerText += text + "\n";
+    let consoleLog = document.getElementById("consoleLog")
+    logged = consoleLog.innerText += text + "\n";
+    consoleLog.scrollTop = consoleLog.scrollHeight;
 }
