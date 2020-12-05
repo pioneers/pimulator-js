@@ -1,4 +1,4 @@
-# Begin with the Python 3.4 image
+# Begin with the latest nginx image
 FROM nginx:latest
 
 MAINTAINER Charles Hong <charleshong@pioneers.berkeley.edu>
