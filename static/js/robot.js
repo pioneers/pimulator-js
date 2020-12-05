@@ -79,7 +79,6 @@ class RobotClass {
             Y: this.Y,
             dir: this.dir
         };
-        console.log(newState)
         this.sensor.get_val()
         postMessage({
             robot: newState
