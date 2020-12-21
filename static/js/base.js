@@ -69,8 +69,8 @@ function update(state) {
     const dir = state.dir;
     document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
     const sensorPoints = document.querySelectorAll("circle")
-    const scaledX = centerX - 30
-    const scaledY = centerY - 40
+    const topLeftCornerX = centerX - 30
+    const topLeftCornerY = centerY - 40
     sensorPoints[0].setAttributeNS(null, "cx", centerX)
     sensorPoints[0].setAttributeNS(null, "cy", centerY)
     sensorPoints[1].setAttributeNS(null, "cy", centerY+(15*Math.cos(dir/180*Math.PI)))
@@ -78,8 +78,8 @@ function update(state) {
     sensorPoints[2].setAttributeNS(null, "cy", centerY-(15*Math.cos(dir/180*Math.PI)))
     sensorPoints[2].setAttributeNS(null, "cx", centerX-(-15*Math.sin(dir/180*Math.PI)))
     const robotRect = document.querySelector("rect")
-    robotRect.setAttributeNS(null, "x", scaledX)
-    robotRect.setAttributeNS(null, "y", scaledY)
+    robotRect.setAttributeNS(null, "x", topLeftCornerX)
+    robotRect.setAttributeNS(null, "y", topLeftCornerY)
     const rotateStr = `rotate(${dir} ${centerX} ${centerY})`
     robotRect.setAttribute("transform", rotateStr)
 };

@@ -32,6 +32,92 @@ languagePluginLoader.then(() => function () {});
 const SCREENHEIGHT = 48
 const SCREENWIDTH = 48
 
+class Sensor{
+   constructor(robot) {
+     this.robot = robot;
+   }
+   get_val(){
+     var sensorsY = [this.robot.Y - 5*Math.cos(this.robot.dir/180*Math.PI), this.robot.Y, this.robot.Y + 5*Math.cos(this.robot.dir/180*Math.PI)]
+     var sensorsX = [this.robot.X - 5*Math.sin(-this.robot.dir/180*Math.PI), this.robot.X, this.robot.X + 5*Math.sin(-this.robot.dir/180*Math.PI)]
+
+     var tapeLines = this.robot.simulator.tapeLines
+     let total = []
+     let totalLine = 0
+     let i = 0
+     for (;i<3;i++){
+       let sensor_x = sensorsX[i]
+       let sensor_y = sensorsY[i]
+       // https://www.geeksforgeeks.org/program-for-point-of-intersection-of-two-lines/
+       let totalLine = 0
+       for (const tapeLine of tapeLines){
+         let m = tapeLine.slope
+         if (m === "horizontal") {
+           let distY = Math.abs(sensor_y-tapeLine.startY)
+           if (tapeLine.startX <= sensor_x && sensor_x <= tapeLine.endX) {
+             let distSquared = (distY*distY)
+             totalLine += Math.min(1,3/distSquared)
+           } else {
+             let distX = Math.min(Math.abs(tapeLine.startX-sensor_x), Math.abs(tapeLine.endX-sensor_x))
+             let distSquared = (distY*distY) + (distX*distX)
+             totalLine += Math.min(1,3/distSquared)
+             }
+         } else if (m === "vertical") {
+           let distX = Math.abs(sensor_x-tapeLine.startX)
+           if (tapeLine.startY <= sensor_y && sensor_y <= tapeLine.endY) {
+             let distSquared = (distX*distX)
+             totalLine += Math.min(1,3/distSquared)
+           } else {
+             let distY = Math.min(Math.abs(tapeLine.startY-sensor_y), Math.abs(tapeLine.endY-sensor_y))
+             let distSquared = (distY*distY) + (distX*distX)
+             totalLine += Math.min(1,3/distSquared)
+             }
+           } else {
+           // check if intersection point is inside the tapeLine
+             if ((sensor_x < tapeLine.startX && sensor_x < tapeLine.endX) || (sensor_x > tapeLine.startX && sensor_x > tapeLine.endX)){
+               let startDistX = Math.abs(sensor_x-tapeLine.startX)
+               let startDistY = Math.abs(sensor_y-tapeLine.startY)
+               let endDistX = Math.abs(sensor_x-tapeLine.endX)
+               let endDistY = Math.abs(sensor_y-tapeLine.startY)
+               let distSquared = Math.min((startDistX*startDistX+startDistY*startDistY),(endDistX*endDistX+endDistY*endDistY))
+               totalLine += Math.min(1,3/distSquared)
+           } else {
+             let m1 = -1/m
+             let c = tapeLine.y_int
+             let c1 = sensor_y-m1*sensor_x
+             let determinant = -m + m1
+             let x = (c - c1)/determinant
+             let y = (-m*c1 + m1*c)/determinant
+             let distX = Math.abs(sensor_x-x)
+             let distY = Math.abs(sensor_y-y)
+             let distSquared = (distX*distX)+(distY*distY)
+             totalLine += Math.min(1,3/distSquared)
+           }
+         }
+       }
+       total.push(Math.min(totalLine, 1))
+     }
+     this.robot.leftSensor = total[0]
+     this.robot.centerSensor = total[1]
+     this.robot.rightSensor = total[2]
+     return total
+   }
+}
+class TapeLine{
+  constructor(x1, y1, x2, y2) {
+    this.startX = x1
+    this.startY = y1
+    this.endX = x2
+    this.endY = y2
+    if (this.startX === this.endX) {
+      this.slope = "vertical"
+    } else if (this.startY === this.endY) {
+      this.slope = "horizontal"
+    } else {
+      this.slope = (y1-y2) / (x1-x2);
+      this.y_int = y1 - this.slope*x1
+    }
+  }
+}
 class RobotClass {
     /*The MODEL for this simulator. Stores robot data and handles position
        calculations & Runtime API calls """*/
@@ -44,9 +130,9 @@ class RobotClass {
     startX = 70.0
     startY = 70.0
 
-    constructor(autonomous_main=null) {
-      this.X = this.startX;           // X position of the robot
-      this.Y = this.startY;           // Y position of the robot
+    constructor(simulator) {
+      this.X = this.startX;     // current X position of the center of the robot
+      this.Y = this.startY;     // current Y position of the center of the robot
       this.Wl = 0.0;           // angular velocity of l wheel, radians/s
       this.Wr = 0.0;           // angular velocity of r wheel, radians/s
       this.ltheta = 0.0;       // angular position of l wheel, degrees
@@ -60,10 +146,9 @@ class RobotClass {
       this.leftSensor = 0;
       this.centerSensor = 0;
       this.rightSensor = 0;
-      this.autonomous_main = autonomous_main
+      this.simulator = simulator
       this.sensor = new Sensor(this);
-      this.tapeLines = [];
-      this.tapeLines.push(new TapeLine(27, 27, 115, 115));
+
       // this.tapeLines.push(new TapeLine(115, 27, 115, 115));
       // this.tapeLines.push(new TapeLine(27, 27, 115, 27))
     }
@@ -127,6 +212,7 @@ class RobotClass {
         }
     }
     get_value(device, param) {
+
       if (device === "4752729234491832779312"){
         if (param === "left"){
           return this.leftSensor
@@ -187,47 +273,6 @@ class RobotClass {
         return this.runningCoroutines.has(fn)
     }
 }
-
-/*
-function isFunction(functionToCheck) {
- return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
-}
-TIMEOUT_VALUE = .1 // seconds
-function timeout_handler(signum, frame){
-    throw new Error("Student code timed out");
-  }
-function ensure_is_function(tag, val)
-    {if (!isFunction(val)) throw new Error("${tag} is not a function";}
-function ensure_not_overridden(module, name){
-    if hasAttribute(module, name) raise new Error("Student code overrides ${name}, which is part of the API")}
-function _ensure_strict_semantics(fn){
-    */ /* (Internal): provides additional error checking for the PiE API */ /*
-    if (!inspect.iscoroutinefunction(fn)){
-        throw new Error("Internal runtime error: _ensure_strict_semantics can only be applied to `async def` functions")}
-    function wrapped_fn(*args, **kwargs){
-        //# Ensure that this function is called directly out of the event loop,
-        //# and not out of the `setup` and `loop` functions.
-        stack = inspect.stack()
-        try{
-            for (frame of stack) {
-                if (os.path.basename(frame.filename) == "base_events.py" && frame.function == "_run_once"){
-                    //# We've hit the event loop, so everything is good
-                    break}
-                elif (os.path.basename(frame.filename) == "pimulator.py" and frame.function == 'simulate'){
-                    //# We've hit the runtime before hitting the event loop, which
-                    //# is bad
-                    raise Exception("Call to `{}` must be inside an `async def` function called using `Robot.run`".format(fn.__name__))
-                  }
-                }
-              }
-        finally{
-            del stack}
-        return fn(*args, **kwargs)
-      }
-    return wrapped_fn
-}
-*/
-
 
 /*********************** KEYBOARD INPUT GAMEPAD FUNCTIONS ***********************/
 
@@ -468,7 +513,8 @@ class Simulator{
         this.mode = "idle";
         this.initGamepad();
         this.current = [];
-        this.tapelines = [];
+        this.tapeLines = [];
+        this.tapeLines.push(new TapeLine(27, 27, 115, 115));
     }
 
     initGamepad(){
@@ -503,7 +549,6 @@ class Simulator{
         this.autonomous_main = env['autonomous_main']
         this.teleop_setup = env['teleop_setup']
         this.teleop_main = env['teleop_main']
-        console.log(env['autonomous_main'])
         // ensure_is_function("teleop_setup", this.teleop_setup)
         // ensure_is_function("teleop_main", this.teleop_main)
     }
@@ -539,7 +584,7 @@ class Simulator{
         Run setup_fn once before continuously looping loop_fn
         TODO: Run teleop_setup once before looping teleop_main */
 
-        this.robot = new RobotClass();
+        this.robot = new RobotClass(this);
         this.loadStudentCode();
         this.mode = "teleop"
         this.consistentLoop(this.robot.tickRate, this.teleop_main);
@@ -553,9 +598,9 @@ class Simulator{
         postMessage({
             mode: this.mode
         });
-        this.robot = new RobotClass();
+        this.robot = new RobotClass(this);
         this.loadStudentCode();
-        this.robot.autonomous_main= this.autonomous_main
+        this.robot.autonomous_main = this.autonomous_main
         this.timeout = setTimeout(function() { this.stop(); }.bind(this), 30*1000);
         this.robot.simStartTime = new Date().getTime();
         setTimeout(this.autonomous_setup, 0);
@@ -617,91 +662,4 @@ this.onmessage = function(e) {
             }
         }
     }
-}
-class Sensor{
-   constructor(robot){
-     this.robot = robot;
-   }
-   get_val(){
-     var sensorsY = [this.robot.Y - 5*Math.cos(this.robot.dir/180*Math.PI), this.robot.Y, this.robot.Y + 5*Math.cos(this.robot.dir/180*Math.PI)]
-     var sensorsX = [this.robot.X - 5*Math.sin(-this.robot.dir/180*Math.PI), this.robot.X, this.robot.X + 5*Math.sin(-this.robot.dir/180*Math.PI)]
-
-     var tapeLines = this.robot.tapeLines
-     let total = []
-     let totalLine = 0
-     let i = 0
-     for (;i<3;i++){
-       let sensor_x = sensorsX[i]
-       let sensor_y = sensorsY[i]
-       // https://www.geeksforgeeks.org/program-for-point-of-intersection-of-two-lines/
-       let totalLine = 0
-       for (const tapeLine of tapeLines){
-         let m = tapeLine.slope
-         if (m === "horizontal") {
-           let distY = Math.abs(sensor_y-tapeLine.startY)
-           if (tapeLine.startX <= sensor_x && sensor_x <= tapeLine.endX) {
-             let distSquared = (distY*distY)
-             totalLine += Math.min(1,3/distSquared)
-           } else {
-             let distX = Math.min(Math.abs(tapeLine.startX-sensor_x), Math.abs(tapeLine.endX-sensor_x))
-             let distSquared = (distY*distY) + (distX*distX)
-             totalLine += Math.min(1,3/distSquared)
-             }
-         } else if (m === "vertical") {
-           let distX = Math.abs(sensor_x-tapeLine.startX)
-           if (tapeLine.startY <= sensor_y && sensor_y <= tapeLine.endY) {
-             let distSquared = (distX*distX)
-             totalLine += Math.min(1,3/distSquared)
-           } else {
-             let distY = Math.min(Math.abs(tapeLine.startY-sensor_y), Math.abs(tapeLine.endY-sensor_y))
-             let distSquared = (distY*distY) + (distX*distX)
-             totalLine += Math.min(1,3/distSquared)
-             }
-           } else {
-           // check if intersection point is inside the tapeLine
-             if ((sensor_x < tapeLine.startX && sensor_x < tapeLine.endX) || (sensor_x > tapeLine.startX && sensor_x > tapeLine.endX)){
-               let startDistX = Math.abs(sensor_x-tapeLine.startX)
-               let startDistY = Math.abs(sensor_y-tapeLine.startY)
-               let endDistX = Math.abs(sensor_x-tapeLine.endX)
-               let endDistY = Math.abs(sensor_y-tapeLine.startY)
-               let distSquared = Math.min((startDistX*startDistX+startDistY*startDistY),(endDistX*endDistX+endDistY*endDistY))
-               totalLine += Math.min(1,3/distSquared)
-           } else {
-             let m1 = -1/m
-             let c = tapeLine.y_int
-             let c1 = sensor_y-m1*sensor_x
-             let determinant = -m + m1
-             let x = (c - c1)/determinant
-             let y = (-m*c1 + m1*c)/determinant
-             let distX = Math.abs(sensor_x-x)
-             let distY = Math.abs(sensor_y-y)
-             let distSquared = (distX*distX)+(distY*distY)
-             totalLine += Math.min(1,3/distSquared)
-           }
-         }
-       }
-       total.push(Math.min(totalLine, 1))
-     }
-     console.log(total)
-     this.robot.leftSensor = total[0]
-     this.robot.centerSensor = total[1]
-     this.robot.rightSensor = total[2]
-     return total
-   }
-}
-class TapeLine{
-  constructor(x1, y1, x2, y2){
-    this.startX = x1
-    this.startY = y1
-    this.endX = x2
-    this.endY = y2
-    if (this.startX === this.endX) {
-      this.slope = "vertical"
-    } else if (this.startY === this.endY) {
-      this.slope = "horizontal"
-    } else {
-      this.slope = (y1-y2) / (x1-x2);
-      this.y_int = y1 - this.slope*x1
-    }
-  }
 }
