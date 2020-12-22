@@ -13,7 +13,7 @@
     <title>PiE Robotics Simulator</title>
 
     <!-- Disables scrolling with arrow keys and spacebar -->
-    <script src="{{ url_for('static', filename='js/disable_scrolling.js') }}"></script>
+    <script src="/static/js/disable_scrolling.js"></script>
   </head>
 
   <body>
@@ -142,10 +142,9 @@
                     <div class="tab-content" id="view-tab-content">
                         <div class="tab-pane fade show active" id="code-mirror" role="tabpanel" aria-labelledby="home-tab">
                             <!-- Create a simple CodeMirror instance -->
-                            <script src="{{ url_for('static', filename='js/codemirror.js') }}"></script>
-                            <link rel="stylesheet" href="{{ url_for('static', filename='css/codemirror.css') }}">
-                            <script src="{{ url_for('static', filename='js/python.js') }}"></script>
-                            <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+                            <script src="/static/js/codemirror.js"></script>
+                            <link rel="stylesheet" href="/static/css/codemirror.css">
+                            <script src="/static/js/python.js"></script>
 
                             <div class="container" id="cmblock" style="padding-left:0px;padding-right:0px">
                                 <script>
@@ -178,7 +177,7 @@
                                   var code = "";
                                   if (code == "" || code === null) {
                                     var xhr=new XMLHttpRequest();
-                                    xhr.open("GET","{{ url_for('static', filename='student_code_file.py') }}");
+                                    xhr.open("GET","/static/student_code_file.py");
                                     xhr.onload = () => {
                                       code = xhr.responseText;
                                       // setCookie("code", code)
@@ -228,9 +227,9 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/joypad.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/gamepad.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/base.js') }}"></script>
+    <script src="/static/js/joypad.js"></script>
+    <script src="/static/js/gamepad.js"></script>
+    <script src="/static/js/base.js"></script>
 
   </body>
 </html>
