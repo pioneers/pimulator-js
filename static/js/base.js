@@ -6,7 +6,7 @@ var inputMode = "keyboard";
 // Handle messages from worker
 function onmessage(e) {
     if (e.data.robot !== undefined) {
-        update(e.data.robot); 
+        update(e.data.robot);
     }
     if (e.data.sensors !== undefined) {
         updateSensors(e.data.sensors);
@@ -88,9 +88,9 @@ function update(state) {
 };
 
 function updateSensors(sensorValues) {
-    document.getElementById("left-sensor").innerText = "Left Sensor: " + e.data.sensors.leftSensor.toFixed(2);
-    document.getElementById("center-sensor").innerText = "Center Sensor: " + e.data.sensors.centerSensor.toFixed(2);
-    document.getElementById("right-sensor").innerText = "Right Sensor: " + e.data.sensors.rightSensor.toFixed(2);
+    document.getElementById("left-sensor").innerText = "Left Sensor: " + sensorValues.leftSensor.toFixed(3);
+    document.getElementById("center-sensor").innerText = "Center Sensor: " + sensorValues.centerSensor.toFixed(3);
+    document.getElementById("right-sensor").innerText = "Right Sensor: " + sensorValues.rightSensor.toFixed(3);
 }
 
 function start(auto=0) {
