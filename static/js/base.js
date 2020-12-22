@@ -6,7 +6,10 @@ var inputMode = "keyboard";
 // Handle messages from worker
 function onmessage(e) {
     if (e.data.robot !== undefined) {
-        update(e.data.robot);
+        update(e.data.robot); 
+    }
+    if (e.data.sensors !== undefined) {
+        updateSensors(e.data.sensors);
     }
     if (e.data.mode !== undefined) {
         mode = e.data.mode;
@@ -26,10 +29,10 @@ worker.onmessage = onmessage;
 function switchInput() {
     if (inputMode === "keyboard") {
         inputMode = "gamepad";
-        document.getElementById("inputMode").innerText = "Input: Gamepad";
+        document.getElementById("input-mode").innerText = "Input: Gamepad";
     } else if (inputMode == "gamepad") {
         inputMode = "keyboard";
-        document.getElementById("inputMode").innerText = "Input: Keyboard";
+        document.getElementById("input-mode").innerText = "Input: Keyboard";
     }
 }
 
@@ -84,6 +87,12 @@ function update(state) {
     robotRect.setAttribute("transform", rotateStr)
 };
 
+function updateSensors(sensorValues) {
+    document.getElementById("left-sensor").innerText = "Left Sensor: " + e.data.sensors.leftSensor.toFixed(2);
+    document.getElementById("center-sensor").innerText = "Center Sensor: " + e.data.sensors.centerSensor.toFixed(2);
+    document.getElementById("right-sensor").innerText = "Right Sensor: " + e.data.sensors.rightSensor.toFixed(2);
+}
+
 function start(auto=0) {
     /*
     Start the robot thread
@@ -136,7 +145,7 @@ function stop() {
 };
 
 function clearConsole(){
-    document.getElementById("consoleLog").innerText = ""
+    document.getElementById("console").innerText = ""
 }
 clearConsole()
 
@@ -147,7 +156,7 @@ function log(text) {
             return
         }
     }
-    let consoleLog = document.getElementById("consoleLog")
+    let consoleLog = document.getElementById("console")
     logged = consoleLog.innerText += text + "\n";
     consoleLog.scrollTop = consoleLog.scrollHeight;
 }

@@ -105,9 +105,9 @@ class RobotClass {
         };
 
         this.sensor.get_val()
-        let sensorValues {
-            leftSensor: this.leftSensor
-            centerSensor: this.centerSensor
+        let sensorValues = {
+            leftSensor: this.leftSensor,
+            centerSensor: this.centerSensor,
             rightSensor: this.rightSensor
         };
 

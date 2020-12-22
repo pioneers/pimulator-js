@@ -101,7 +101,7 @@
                         <div class="card-header">
                             <ul class="nav nav-tabs card-header-tabs" id="set-tabs">
                                 <li class="nav-item">
-                                    <a href="#consoleLog" class="nav-link active" id="code-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Console</a>
+                                    <a href="#console" class="nav-link active" id="code-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Console</a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="#settings" class="nav-link" id="gamepad-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Settings</a>
@@ -110,9 +110,9 @@
                         </div>
                         <div class="card-body" style="padding:0.1rem">
                             <div class="tab-content" id="view-tab-content">
-                                <pre class="tab-pane fade show active" id="consoleLog" role="tabpanel" aria-labelledby="console-tab" style="overflow:scroll;height:497px;margin-bottom:0px;padding-left:0.5rem;padding-top:0.4rem" ></pre>
+                                <pre class="tab-pane fade show active" id="console" role="tabpanel" aria-labelledby="console-tab" style="overflow:scroll;height:497px;margin-bottom:0px;padding-left:0.5rem;padding-top:0.4rem" ></pre>
                                 <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="gamepad-tab">
-                                    <button type="button" class="btn btn-info" id="inputMode" onclick="switchInput()">Input: Keyboard</button>
+                                    <button type="button" class="btn btn-info" id="input-mode" onclick="switchInput()">Input: Keyboard</button>
                                 </div>
                             </div>
                         </div>
@@ -129,6 +129,9 @@
                         </li>
                         <li class="nav-item">
                             <a href="#gamepad-menu" class="nav-link" id="gamepad-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Gamepad</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#sensor-menu" class="nav-link" id="sensor-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Sensors</a>
                         </li>
                     </ul>
                     <div class="p-2">
@@ -210,6 +213,13 @@
                                 <p id="axis_1">LV: </p>
                                 <p id="axis_2">RH: </p>
                                 <p id="axis_3">RV: </p>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="sensor-menu" role="tabpanel" aria-labelledby="sensor-menu">
+                            <div class="container">
+                                <p id="left-sensor">Left Sensor:</p>
+                                <p id="center-sensor">Center Sensor:</p>
+                                <p id="right-sensor">Right Sensor:</p>
                             </div>
                         </div>
                     </div>
