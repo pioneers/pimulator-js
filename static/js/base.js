@@ -8,6 +8,9 @@ function onmessage(e) {
     if (e.data.robot !== undefined) {
         update(e.data.robot);
     }
+    if (e.data.sensors !== undefined) {
+        updateSensors(e.data.sensors);
+    }
     if (e.data.mode !== undefined) {
         mode = e.data.mode;
         if (mode === "auto") {
@@ -26,10 +29,10 @@ worker.onmessage = onmessage;
 function switchInput() {
     if (inputMode === "keyboard") {
         inputMode = "gamepad";
-        document.getElementById("inputMode").innerText = "Input: Gamepad";
+        document.getElementById("input-mode").innerText = "Input: Gamepad";
     } else if (inputMode == "gamepad") {
         inputMode = "keyboard";
-        document.getElementById("inputMode").innerText = "Input: Keyboard";
+        document.getElementById("input-mode").innerText = "Input: Keyboard";
     }
 }
 
@@ -64,16 +67,31 @@ function update(state) {
     Example of state: {x:72, y:72, dir:0}
     */
     const scaleFactor = 3;
-    const scaledX = state.X * scaleFactor - 30;
-    const scaledY = state.Y * scaleFactor - 40;
+    const centerX = state.X * scaleFactor;
+    const centerY = state.Y * scaleFactor;
     const dir = state.dir;
     document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
+    const sensorPoints = document.querySelectorAll("circle")
+    const topLeftCornerX = centerX - 30
+    const topLeftCornerY = centerY - 40
+    sensorPoints[0].setAttributeNS(null, "cx", centerX)
+    sensorPoints[0].setAttributeNS(null, "cy", centerY)
+    sensorPoints[1].setAttributeNS(null, "cy", centerY+(15*Math.cos(dir/180*Math.PI)))
+    sensorPoints[1].setAttributeNS(null, "cx", centerX+(-15*Math.sin(dir/180*Math.PI)))
+    sensorPoints[2].setAttributeNS(null, "cy", centerY-(15*Math.cos(dir/180*Math.PI)))
+    sensorPoints[2].setAttributeNS(null, "cx", centerX-(-15*Math.sin(dir/180*Math.PI)))
     const robotRect = document.querySelector("rect")
-    robotRect.setAttributeNS(null, "x", scaledX)
-    robotRect.setAttributeNS(null, "y", scaledY)
-    const rotateStr = `rotate(${dir} ${scaledX + 30} ${scaledY + 40})`
+    robotRect.setAttributeNS(null, "x", topLeftCornerX)
+    robotRect.setAttributeNS(null, "y", topLeftCornerY)
+    const rotateStr = `rotate(${dir} ${centerX} ${centerY})`
     robotRect.setAttribute("transform", rotateStr)
 };
+
+function updateSensors(sensorValues) {
+    document.getElementById("left-sensor").innerText = "Left Sensor: " + sensorValues.leftSensor.toFixed(3);
+    document.getElementById("center-sensor").innerText = "Center Sensor: " + sensorValues.centerSensor.toFixed(3);
+    document.getElementById("right-sensor").innerText = "Right Sensor: " + sensorValues.rightSensor.toFixed(3);
+}
 
 function start(auto=0) {
     /*
@@ -127,7 +145,7 @@ function stop() {
 };
 
 function clearConsole(){
-    document.getElementById("consoleLog").innerText = ""
+    document.getElementById("console").innerText = ""
 }
 clearConsole()
 
@@ -138,7 +156,7 @@ function log(text) {
             return
         }
     }
-    let consoleLog = document.getElementById("consoleLog")
+    let consoleLog = document.getElementById("console")
     logged = consoleLog.innerText += text + "\n";
     consoleLog.scrollTop = consoleLog.scrollHeight;
 }

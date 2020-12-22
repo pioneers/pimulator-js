@@ -24,6 +24,7 @@ var console=(function(oldCons){
 
 importScripts("https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js");
 importScripts('./GamepadClass.js');
+importScripts('./Sensor.js');
 
 var code = "";
 var env = {};
@@ -40,21 +41,31 @@ class RobotClass {
     wRadius = 2;                // radius of a wheel, inches
     MaxX = 144;                 // maximum X value, inches, field is 12'x12'
     MaxY = 144;                 // maximum Y value, inches, field is 12'x12'
-    neg = -1;                   // negate left motor calculation
-    startX = 70.0               // starting X position of the center of the robot
-    startY = 70.0               // starting Y position of the center of the robot
+    neg = -1;                    // negate left motor calculation
+    startX = 70.0
+    startY = 70.0
 
-    constructor() {
+    constructor(simulator) {
       this.X = this.startX;     // current X position of the center of the robot
       this.Y = this.startY;     // current Y position of the center of the robot
-      this.Wl = 0.0;            // angular velocity of l wheel, radians/s
-      this.Wr = 0.0;            // angular velocity of r wheel, radians/s
-      this.ltheta = 0.0;        // angular position of l wheel, degrees
-      this.rtheta = 0.0;        // angular position of r wheel, degrees
-      this.dir = 0.0;           // Direction of the robot facing, degrees
+      this.Wl = 0.0;           // angular velocity of l wheel, radians/s
+      this.Wr = 0.0;           // angular velocity of r wheel, radians/s
+      this.ltheta = 0.0;       // angular position of l wheel, degrees
+      this.rtheta = 0.0;       // angular position of r wheel, degrees
+      this.dir = 0.0;          // Direction of the robot facing, degrees
 
       // All asychronous functions currently running
       this.runningCoroutines = new Set();
+
+      // Ensure we don't hit sync errors when updating our values
+      this.leftSensor = 0;
+      this.centerSensor = 0;
+      this.rightSensor = 0;
+      this.simulator = simulator
+      this.sensor = new Sensor(this);
+
+      // this.tapeLines.push(new TapeLine(115, 27, 115, 115));
+      // this.tapeLines.push(new TapeLine(27, 27, 115, 27))
     }
 
     updatePosition() {
@@ -93,8 +104,16 @@ class RobotClass {
             dir: this.dir
         };
 
+        this.sensor.get_val()
+        let sensorValues = {
+            leftSensor: this.leftSensor,
+            centerSensor: this.centerSensor,
+            rightSensor: this.rightSensor
+        };
+
         postMessage({
-            robot: newState
+            robot: newState,
+            sensors: sensorValues
         })
     }
 
@@ -115,7 +134,19 @@ class RobotClass {
             throw new Error("Cannot find device name: " + device);
         }
     }
+    get_value(device, param) {
 
+      if (device === "4752729234491832779312"){
+        if (param === "left"){
+          return this.leftSensor
+        } else if (param === "center") {
+          return this.centerSensor
+        } else if (param === "right"){
+          return this.rightSensor
+        }
+      }
+      throw new Error("Device was not found" + device)
+    }
     sleep(duration) {
         /* Autonomous code pauses execution for <duration> seconds
         */
@@ -133,6 +164,7 @@ class RobotClass {
             }
             if (cur - tick >= this.tickRate) {
                 this.updatePosition();
+                this.autonomous_main();
                 tick = tick + this.tickRate;
                 numUpdates++;
             }
@@ -164,47 +196,6 @@ class RobotClass {
         return this.runningCoroutines.has(fn)
     }
 }
-
-/*
-function isFunction(functionToCheck) {
- return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
-}
-TIMEOUT_VALUE = .1 // seconds
-function timeout_handler(signum, frame){
-    throw new Error("Student code timed out");
-  }
-function ensure_is_function(tag, val)
-    {if (!isFunction(val)) throw new Error("${tag} is not a function";}
-function ensure_not_overridden(module, name){
-    if hasAttribute(module, name) raise new Error("Student code overrides ${name}, which is part of the API")}
-function _ensure_strict_semantics(fn){
-    */ /* (Internal): provides additional error checking for the PiE API */ /*
-    if (!inspect.iscoroutinefunction(fn)){
-        throw new Error("Internal runtime error: _ensure_strict_semantics can only be applied to `async def` functions")}
-    function wrapped_fn(*args, **kwargs){
-        //# Ensure that this function is called directly out of the event loop,
-        //# and not out of the `setup` and `loop` functions.
-        stack = inspect.stack()
-        try{
-            for (frame of stack) {
-                if (os.path.basename(frame.filename) == "base_events.py" && frame.function == "_run_once"){
-                    //# We've hit the event loop, so everything is good
-                    break}
-                elif (os.path.basename(frame.filename) == "pimulator.py" and frame.function == 'simulate'){
-                    //# We've hit the runtime before hitting the event loop, which
-                    //# is bad
-                    raise Exception("Call to `{}` must be inside an `async def` function called using `Robot.run`".format(fn.__name__))
-                  }
-                }
-              }
-        finally{
-            del stack}
-        return fn(*args, **kwargs)
-      }
-    return wrapped_fn
-}
-*/
-
 
 /*********************** KEYBOARD INPUT GAMEPAD FUNCTIONS ***********************/
 
@@ -445,6 +436,8 @@ class Simulator{
         this.mode = "idle";
         this.initGamepad();
         this.current = [];
+        this.tapeLines = [];
+        this.tapeLines.push(new TapeLine(27, 27, 115, 115));
     }
 
     initGamepad(){
@@ -479,7 +472,6 @@ class Simulator{
         this.autonomous_main = env['autonomous_main']
         this.teleop_setup = env['teleop_setup']
         this.teleop_main = env['teleop_main']
-
         // ensure_is_function("teleop_setup", this.teleop_setup)
         // ensure_is_function("teleop_main", this.teleop_main)
     }
@@ -515,7 +507,7 @@ class Simulator{
         Run setup_fn once before continuously looping loop_fn
         TODO: Run teleop_setup once before looping teleop_main */
 
-        this.robot = new RobotClass();
+        this.robot = new RobotClass(this);
         this.loadStudentCode();
         this.mode = "teleop"
         this.consistentLoop(this.robot.tickRate, this.teleop_main);
@@ -529,9 +521,9 @@ class Simulator{
         postMessage({
             mode: this.mode
         });
-        this.robot = new RobotClass();
+        this.robot = new RobotClass(this);
         this.loadStudentCode();
-
+        this.robot.autonomous_main = this.autonomous_main
         this.timeout = setTimeout(function() { this.stop(); }.bind(this), 30*1000);
         this.robot.simStartTime = new Date().getTime();
         setTimeout(this.autonomous_setup, 0);
@@ -554,7 +546,7 @@ this.onmessage = function(e) {
         }
         else {
             let simulate = function () {
-                if (typeof pyodide != "undefined" && typeof pyodide.version != "undefined") {
+                if (typeof pyodide !== "undefined" && typeof pyodide.version !== "undefined") {
                     if (e.data.mode === "auto") simulator.simulateAuto();
                     else if (e.data.mode === "teleop") simulator.simulateTeleop();
                 }
