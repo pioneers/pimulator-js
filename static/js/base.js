@@ -1,6 +1,7 @@
 var mode = "idle"; // or auto or teleop
 var worker = new Worker("static/js/robot.js");
 var timer;
+const scaleFactor = 3;
 
 setUpCanvas();
 
@@ -44,7 +45,6 @@ function update(state) {
     Input position is in inches. scaleFactor convers inches -> pixels.
     Example of state: {x:72, y:72, dir:0}
     */
-    const scaleFactor = 3;
     const scaledX = state.X * scaleFactor - 30;
     const scaledY = state.Y * scaleFactor - 40;
     const dir = state.dir;
@@ -111,12 +111,17 @@ function setUpCanvas() {
 
 function setUpWalls(ctx) {
     let wallNum = 4; //change this if you want
-    let arr = new Array([0, 0, 400, 5], [0, 0, 5, 400], [395, 0, 5, 400], [0, 395, 400, 5]);
+    let arr = new Array([0, 0, 144, 2], [0, 0, 2, 144], [142, 0, 2, 144], [0, 142, 144, 2]);
     worker.postMessage({initObj: true, walls: {count: wallNum, arr: arr}});
     let i = 0;
     while (i < arr.length) {
         ctx.beginPath();
-        ctx.fillRect(arr[i][0], arr[i][1], arr[i][2], arr[i][3]);
+        ctx.fillRect(
+            arr[i][0]*scaleFactor,
+            arr[i][1]*scaleFactor,
+            arr[i][2]*scaleFactor,
+            arr[i][3]*scaleFactor
+        );
         i+=1;
     }
 }

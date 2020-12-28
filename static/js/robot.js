@@ -15,8 +15,8 @@ class RobotClass {
     /*The MODEL for this simulator. Stores robot data and handles position
        calculations & Runtime API calls """*/
     tickRate = 50;          // in ms
-    width = 20;                  // width of robot , inches
-    height = 15;
+    width = 26.7;                  // width of robot , inches
+    height = 20;
     wRadius = 2;                // radius of a wheel, inches
     MaxX = 144;                 // maximum X value, inches, field is 12'x12'
     MaxY = 144;                 // maximum Y value, inches, field is 12'x12'
@@ -99,12 +99,12 @@ class RobotClass {
 
       var ref1inter = true;
 
-      if (this.findMax(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) > ref1mag) {
-        if (this.findMin(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) > ref1mag) {
+      if (this.findMax(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) >= ref1mag) {
+        if (this.findMin(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) >= ref1mag) {
           ref1inter = false;
         }
-      } else if (this.findMax(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) < 0) {
-        if (this.findMin(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) < 0) {
+      } else if (this.findMax(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) <= 0) {
+        if (this.findMin(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) <= 0) {
           ref1inter = false;
         }
       }
@@ -116,12 +116,12 @@ class RobotClass {
 
       var ref2inter = true;
 
-      if (this.findMax(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) > ref2mag) {
-        if (this.findMin(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) > ref2mag) {
+      if (this.findMax(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) >= ref2mag) {
+        if (this.findMin(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) >= ref2mag) {
           ref2inter = false;
         }
-      } else if (this.findMax(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) < 0) {
-        if (this.findMin(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) < 0) {
+      } else if (this.findMax(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) <= 0) {
+        if (this.findMin(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) <= 0) {
           ref2inter = false;
         }
       }
@@ -203,9 +203,11 @@ class RobotClass {
       var max = k1;
       if (k2 > max) {
         max = k2;
-      } else if (k3 > max) {
+      }
+      if (k3 > max) {
         max = k3;
-      } else if (k4 > max) {
+      }
+      if (k4 > max) {
         max = k4;
       }
       return max;
@@ -215,9 +217,11 @@ class RobotClass {
       var min = k1;
       if (k2 < min) {
         min = k2;
-      } else if (k3 < min) {
+      }
+      if (k3 < min) {
         min = k3;
-      } else if (k4 < min) {
+      }
+      if (k4 < min) {
         min = k4;
       }
       return min;
@@ -287,6 +291,8 @@ class RobotClass {
     }
 
     updatePosition() {
+        //count1++;
+        //console.log(count1, " ");
         /* Updates position of the  Robot using differential drive equations
         Derived with reference to:
         https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf*/
@@ -310,10 +316,13 @@ class RobotClass {
             let j = Math.sin(theta) * rt;
             dx = i * Math.sin(radian) + j * Math.cos(radian);
             dy = i * Math.cos(radian) + j * Math.sin(radian);
-            this.dir= (this.dir + theta*180/Math.PI) % 360;
+            this.dir = (this.dir + theta*180/Math.PI) % 360;
           }
-          var ogX = this.X;
-          var ogY = this.Y;
+          const ogX = this.X;
+          const ogY = this.Y;
+          const ogltheta = this.ltheta;
+          const ogrtheta = this.rtheta;
+
           this.X = Math.max(Math.min(this.X + dx, this.MaxX), 0);
           this.Y = Math.max(Math.min(this.Y + dy, this.MaxY), 0);
           this.ltheta = (this.Wl * 5 + this.ltheta) % 360;
@@ -321,13 +330,7 @@ class RobotClass {
 
           this.updateCorners(this.X - ogX, this.Y - ogY, ogDir);
 
-          if (dc % 100) {
-            //debug print statements here
-            dc++;
-          }
-          else {
-            dc++;
-          }
+
           //Check if the given move results in a collision with any field objects
           var inter = false;
           for (var i=0; i < obstacles.length; i++) {
@@ -336,19 +339,25 @@ class RobotClass {
               console.log("crash! \n");
               break;
             }
-            if (i == 3) {
-              console.log("pass");
-            }
           }
 
           /*
-          this.updateCorners(ogX - this.X, ogY - this.Y, -1 * ogDir + 2 * this.dir);
-          this.X = ogX;
-          this.Y = ogY;
-          this.dir = ogDir;
+          let mxX = this.findMax(this.topR[0], this.topL[0], this.botR[0], this.botL[0]);
+          let miX = this.findMin(this.topR[0], this.topL[0], this.botR[0], this.botL[0]);
+
+          let mxY = this.findMax(this.topR[1], this.topL[1], this.botR[1], this.botL[1]);
+          let miY = this.findMin(this.topR[1], this.topL[1], this.botR[1], this.botL[1]);
+
+          if (mxX > this.maxX || miX < 0) {
+            inter = true;
+          } else if (mxY > this.maxY || miY < 0) {
+            inter = true;
+          }
           */
 
           //Check to ensure there was no collision
+          //count2++;
+          //console.log(count2, "\n");
           if (!inter) {
             let newState = {
                 X: this.X,
@@ -365,15 +374,51 @@ class RobotClass {
             this.X = ogX;
             this.Y = ogY;
             this.dir = ogDir;
+            this.ltheta = ogltheta;
+            this.rtheta = ogrtheta;
           }
+          /*
+          if (dc % 100 == 0) {
+            //debug print statements here
+
+            console.log("TL: ",this.topL[0], this.topL[1],
+            "\n TR: ", this.topR[0], this.topR[1],
+            "\n BL: ", this.botL[0], this.botL[1],
+            "\n BR: ", this.botR[0], this.botR[1]);
+          }
+
+          dc++;
+          */
 
     }
 
     updateCorners(dX, dY, ogDir) {
 
-      var dDirDeg = -1 * (this.dir - ogDir);
-      var dDir = dDirDeg * Math.PI / 180;
+      //var dDirDeg = -1 * (this.dir - ogDir);
+      let dDir = this.dir * Math.PI / 180;
+      //let dDir = dDirDeg * Math.PI / 180;
+      let sin = Math.sin(dDir);
+      let cos = Math.cos(dDir);
 
+
+      //top right corner
+      this.topR[0] = this.X - (this.height/2) * cos + (this.width/2) * sin;
+      this.topR[1] = this.Y - (this.height/2) * sin - (this.width/2) * cos;
+
+      //top left corner
+      this.topL[0] = this.X - (this.height/2) * cos - (this.width/2) * sin;
+      this.topL[1] = this.Y - (this.height/2) * sin + (this.width/2) * cos;
+
+      //bottom left corner
+      this.botL[0] = this.X + (this.height/2) * cos - (this.width/2) * sin
+      this.botL[1] = this.Y + (this.height/2) * sin + (this.width/2) * cos;
+
+      //bottom right corner
+      this.botR[0] = this.X + (this.height/2) * cos + (this.width/2) * sin;
+      this.botR[1] = this.Y + (this.height/2) * sin - (this.width/2) * cos;
+
+
+      /*
       //top right corner
       this.topR[0] += dX;
       this.topR[1] += dY;
@@ -383,8 +428,6 @@ class RobotClass {
       this.topR[1] = -1 * Math.sin(dDir)*this.topR[0] + Math.cos(dDir)*this.topR[1];
       this.topR[0] += this.X;
       this.topR[1] += this.Y;
-
-
 
       //coordinates for top left corner of robot
       this.topL[0] += dX;
@@ -415,6 +458,7 @@ class RobotClass {
       this.botL[1] = -1 * Math.sin(dDir)*this.botL[0] + Math.cos(dDir)*this.botL[1];
       this.botL[0] += this.X;
       this.botL[1] += this.Y;
+      */
     }
 
     set_value(device, param, speed) {
@@ -624,7 +668,7 @@ function onPress(keyCode) {
     } else if (keyCode === 65) { // a
         simulator.gamepad.joystick_left_x = -1;
     } else if (keyCode === 83) { // s
-        simulator.gamepad.joysticstk_left_y = -1;
+        simulator.gamepad.joystick_left_y = -1;
     } else if (keyCode === 68) { // d
         simulator.gamepad.joystick_left_x = 1;
     } else if (keyCode === 38) { // up
