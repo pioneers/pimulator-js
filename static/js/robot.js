@@ -287,8 +287,6 @@ class RobotClass {
     }
 
     updatePosition() {
-        count1++;
-        console.log(count1, " ");
         /* Updates position of the  Robot using differential drive equations
         Derived with reference to:
         https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf*/
@@ -351,8 +349,6 @@ class RobotClass {
           */
 
           //Check to ensure there was no collision
-          count2++;
-          console.log(count2, "\n");
           if (!inter) {
             let newState = {
                 X: this.X,
