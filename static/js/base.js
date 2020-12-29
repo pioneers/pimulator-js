@@ -83,17 +83,17 @@ function update(state) {
     const robotRect = document.querySelector("rect")
     robotRect.setAttributeNS(null, "x", topLeftCornerX)
     robotRect.setAttributeNS(null, "y", topLeftCornerY)
-    const rotateStr = `rotate(${dir} ${centerX} ${centerY})`
+    const rotateStr = `rotate(${state.  dir} ${centerX} ${centerY})`
     robotRect.setAttribute("transform", rotateStr)
     const triangle = document.querySelector("polygon")
     let dirRotate = (state.dir+90)/180*Math.PI
-    let topTriangleX = centerX - 12*Math.cos(dirRotate)
-    let topTriangleY = centerY + 12*Math.cos(dirRotate)
-    let baseTriangleX = .25*topTriangleX + .75 * centerX
-    let baseTriangleY = .25*topTriangleY + .75 *centerY
+    let topTriangleX = centerX - 18*Math.sin(dirRotate)
+    let topTriangleY = centerY + 18*Math.cos(dirRotate)
+    let baseTriangleX = .5*topTriangleX + .5 * centerX
+    let baseTriangleY = .5*topTriangleY + .5 *centerY
     let sideDist = 9/Math.sqrt(3)
     console.log(topTriangleX,topTriangleY)
-    const triangleStr = `${topTriangleX},${topTriangleY} ${baseTriangleX-sideDist*Math.sin(dir)},${baseTriangleY+sideDist*Math.sin(dir)} ${baseTriangleX+sideDist*Math.sin(dir)},${baseTriangleY-sideDist*Math.sin(dir)}`;
+    const triangleStr = `${topTriangleX},${topTriangleY} ${baseTriangleX-sideDist*Math.sin(dir)},${baseTriangleY+sideDist*Math.cos(dir)} ${baseTriangleX+sideDist*Math.sin(dir)},${baseTriangleY-sideDist*Math.cos(dir)}`;
     console.log(triangleStr)
     triangle.setAttributeNS(null, "points",triangleStr);
 
