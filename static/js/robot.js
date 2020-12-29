@@ -96,41 +96,41 @@ class RobotClass {
       // this.tapeLines.push(new TapeLine(27, 27, 115, 27))
     }
 
-    intersectRobotRef(obj) {
+    intersectRobotRef(obj, corners) {
       // coordinates of the k_i vectors
-      var k1x = obj.botL[0] - this.botL[0]; //x of the vector from botL of robot to botL of obstacle
-      var k1y = obj.botL[1] - this.botL[1]; //figure it out from here...
-      var k2x = obj.topL[0] - this.botL[0];
-      var k2y = obj.topL[1] - this.botL[1];
-      var k3x = obj.topR[0] - this.botL[0];
-      var k3y = obj.topR[1] - this.botL[1];
-      var k4x = obj.botR[0] - this.botL[0];
-      var k4y = obj.botR[1] - this.botL[1];
+      let k1x = obj.botL[0] - corners.botL[0]; //x of the vector from botL of robot to botL of obstacle
+      let k1y = obj.botL[1] - corners.botL[1]; //figure it out from here...
+      let k2x = obj.topL[0] - corners.botL[0];
+      let k2y = obj.topL[1] - corners.botL[1];
+      let k3x = obj.topR[0] - corners.botL[0];
+      let k3y = obj.topR[1] - corners.botL[1];
+      let k4x = obj.botR[0] - corners.botL[0];
+      let k4y = obj.botR[1] - corners.botL[1];
 
       // vector from botL to botR of robot
-      var ref1x = this.botR[0] - this.botL[0];
-      var ref1y = this.botR[1] - this.botL[1];
+      let ref1x = corners.botR[0] - corners.botL[0];
+      let ref1y = corners.botR[1] - corners.botL[1];
 
       // vector from botL to topL of robot
-      var ref2x = this.topL[0] - this.botL[0];
-      var ref2y = this.topL[1] - this.botL[1];
+      let ref2x = corners.topL[0] - corners.botL[0];
+      let ref2y = corners.topL[1] - corners.botL[1];
 
       // make the ref1 vector into a unit vector
-      var ref1mag = Math.sqrt(ref1x * ref1x + ref1y * ref1y);
-      var ref1x = ref1x / ref1mag;
-      var ref1y = ref1y / ref1mag;
+      let ref1mag = Math.sqrt(ref1x * ref1x + ref1y * ref1y);
+      ref1x = ref1x / ref1mag;
+      ref1y = ref1y / ref1mag;
 
       // make the ref2 vector into a unit vector
-      var ref2mag = Math.sqrt(ref2x * ref2x + ref2y * ref2y);
-      var ref2x = ref2x / ref2mag;
-      var ref2y = ref2y / ref2mag;
+      let ref2mag = Math.sqrt(ref2x * ref2x + ref2y * ref2y);
+      ref2x = ref2x / ref2mag;
+      ref2y = ref2y / ref2mag;
 
-      var k1ref1ProjLen = k1x * ref1x + k1y * ref1y;
-      var k2ref1ProjLen = k2x * ref1x + k2y * ref1y;
-      var k3ref1ProjLen = k3x * ref1x + k3y * ref1y;
-      var k4ref1ProjLen = k4x * ref1x + k4y * ref1y;
+      let k1ref1ProjLen = k1x * ref1x + k1y * ref1y;
+      let k2ref1ProjLen = k2x * ref1x + k2y * ref1y;
+      let k3ref1ProjLen = k3x * ref1x + k3y * ref1y;
+      let k4ref1ProjLen = k4x * ref1x + k4y * ref1y;
 
-      var ref1inter = true;
+      let ref1inter = true;
 
       if (this.findMax(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) >= ref1mag) {
         if (this.findMin(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) >= ref1mag) {
@@ -142,12 +142,12 @@ class RobotClass {
         }
       }
 
-      var k1ref2ProjLen = k1x * ref2x + k1y * ref2y;
-      var k2ref2ProjLen = k2x * ref2x + k2y * ref2y;
-      var k3ref2ProjLen = k3x * ref2x + k3y * ref2y;
-      var k4ref2ProjLen = k4x * ref2x + k4y * ref2y;
+      let k1ref2ProjLen = k1x * ref2x + k1y * ref2y;
+      let k2ref2ProjLen = k2x * ref2x + k2y * ref2y;
+      let k3ref2ProjLen = k3x * ref2x + k3y * ref2y;
+      let k4ref2ProjLen = k4x * ref2x + k4y * ref2y;
 
-      var ref2inter = true;
+      let ref2inter = true;
 
       if (this.findMax(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) >= ref2mag) {
         if (this.findMin(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) >= ref2mag) {
@@ -162,41 +162,41 @@ class RobotClass {
       return ref1inter && ref2inter;
     }
 
-    intersectObjRef(obj) {
+    intersectObjRef(obj, corners) {
       // coordinates of the k_i vectors
-      var k1x = this.botL[0] - obj.botL[0]; //x of the vector from botL of obj to botL of robot
-      var k1y = this.botL[1] - obj.botL[1]; //figure it out from here...
-      var k2x = this.topL[0] - obj.botL[0];
-      var k2y = this.topL[1] - obj.botL[1];
-      var k3x = this.topR[0] - obj.botL[0];
-      var k3y = this.topR[1] - obj.botL[1];
-      var k4x = this.botR[0] - obj.botL[0];
-      var k4y = this.botR[1] - obj.botL[1];
+      let k1x = corners.botL[0] - obj.botL[0]; //x of the vector from botL of obj to botL of robot
+      let k1y = corners.botL[1] - obj.botL[1]; //figure it out from here...
+      let k2x = corners.topL[0] - obj.botL[0];
+      let k2y = corners.topL[1] - obj.botL[1];
+      let k3x = corners.topR[0] - obj.botL[0];
+      let k3y = corners.topR[1] - obj.botL[1];
+      let k4x = corners.botR[0] - obj.botL[0];
+      let k4y = corners.botR[1] - obj.botL[1];
 
       // vector from botL to botR of obj
-      var ref1x = obj.botR[0] - obj.botL[0];
-      var ref1y = obj.botR[1] - obj.botL[1];
+      let ref1x = obj.botR[0] - obj.botL[0];
+      let ref1y = obj.botR[1] - obj.botL[1];
 
       // vector from botL to topL of obj
-      var ref2x = obj.topL[0] - obj.botL[0];
-      var ref2y = obj.topL[1] - obj.botL[1];
+      let ref2x = obj.topL[0] - obj.botL[0];
+      let ref2y = obj.topL[1] - obj.botL[1];
 
       // make the ref1 vector into a unit vector
-      var ref1mag = Math.sqrt(ref1x * ref1x + ref1y * ref1y);
-      var ref1x = ref1x / ref1mag;
-      var ref1y = ref1y / ref1mag;
+      let ref1mag = Math.sqrt(ref1x * ref1x + ref1y * ref1y);
+      ref1x = ref1x / ref1mag;
+      ref1y = ref1y / ref1mag;
 
       // make the ref2 vector into a unit vector
-      var ref2mag = Math.sqrt(ref2x * ref2x + ref2y * ref2y);
-      var ref2x = ref2x / ref2mag;
-      var ref2y = ref2y / ref2mag;
+      let ref2mag = Math.sqrt(ref2x * ref2x + ref2y * ref2y);
+      ref2x = ref2x / ref2mag;
+      ref2y = ref2y / ref2mag;
 
-      var k1ref1ProjLen = k1x * ref1x + k1y * ref1y;
-      var k2ref1ProjLen = k2x * ref1x + k2y * ref1y;
-      var k3ref1ProjLen = k3x * ref1x + k3y * ref1y;
-      var k4ref1ProjLen = k4x * ref1x + k4y * ref1y;
+      let k1ref1ProjLen = k1x * ref1x + k1y * ref1y;
+      let k2ref1ProjLen = k2x * ref1x + k2y * ref1y;
+      let k3ref1ProjLen = k3x * ref1x + k3y * ref1y;
+      let k4ref1ProjLen = k4x * ref1x + k4y * ref1y;
 
-      var ref1inter = true;
+      let ref1inter = true;
 
       if (this.findMax(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) > ref1mag) {
         if (this.findMin(k1ref1ProjLen, k2ref1ProjLen, k3ref1ProjLen, k4ref1ProjLen) > ref1mag) {
@@ -208,12 +208,12 @@ class RobotClass {
         }
       }
 
-      var k1ref2ProjLen = k1x * ref2x + k1y * ref2y;
-      var k2ref2ProjLen = k2x * ref2x + k2y * ref2y;
-      var k3ref2ProjLen = k3x * ref2x + k3y * ref2y;
-      var k4ref2ProjLen = k4x * ref2x + k4y * ref2y;
+      let k1ref2ProjLen = k1x * ref2x + k1y * ref2y;
+      let k2ref2ProjLen = k2x * ref2x + k2y * ref2y;
+      let k3ref2ProjLen = k3x * ref2x + k3y * ref2y;
+      let k4ref2ProjLen = k4x * ref2x + k4y * ref2y;
 
-      var ref2inter = true;
+      let ref2inter = true;
 
       if (this.findMax(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) > ref2mag) {
         if (this.findMin(k1ref2ProjLen, k2ref2ProjLen, k3ref2ProjLen, k4ref2ProjLen) > ref2mag) {
@@ -228,12 +228,12 @@ class RobotClass {
       return ref1inter && ref2inter;
     }
 
-    intersectOne(obj) {
-      return this.intersectRobotRef(obj) && this.intersectObjRef(obj);
+    intersectOne(obj, corners) {
+      return this.intersectRobotRef(obj, corners) && this.intersectObjRef(obj, corners);
     }
 
     findMax(k1, k2, k3, k4) {
-      var max = k1;
+      let max = k1;
       if (k2 > max) {
         max = k2;
       }
@@ -247,7 +247,7 @@ class RobotClass {
     }
 
     findMin(k1, k2, k3, k4) {
-      var min = k1;
+      let min = k1;
       if (k2 < min) {
         min = k2;
       }
@@ -258,51 +258,6 @@ class RobotClass {
         min = k4;
       }
       return min;
-    }
-
-    intersectOneOld(objX1, objY1, objX2, objY2) {
-
-      var A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
-      var A2 = 0 != (this.topL[0] - this.topR[0]) ? (this.topL[1] - this.topR[1]) / (this.topL[0] - this.topR[0]) : 500000;
-      var b1 = objY1 - A1 * objX1;
-      var b2 = this.topL[1] - A2 * this.topL[0];
-      var Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
-      if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.topL[0], this.topR[0])) &&
-          Xa < Math.min(Math.max(objX1, objX2), Math.max(this.topL[0], this.topR[0]))) {
-            return true;
-      }
-
-      A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
-      A2 = 0 != (this.botR[0] - this.topR[0]) ? (this.botR[1] - this.topR[1]) / (this.botR[0] - this.topR[0]) : 500000;
-      b1 = objY1 - A1 * objX1;
-      b2 = this.botR[1] - A2 * this.botR[0];
-      Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
-      if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.botR[0], this.topR[0])) &&
-          Xa < Math.min(Math.max(objX1, objX2), Math.max(this.botR[0], this.topR[0]))) {
-            return true;
-      }
-
-      A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
-      A2 = 0 != (this.botR[0] - this.botL[0]) ? (this.botR[1] - this.botL[1]) / (this.botR[0] - this.botL[0]) : 500000;
-      b1 = objY1 - A1 * objX1;
-      b2 = this.botR[1] - A2 * this.botR[0];
-      Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
-      if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.botR[0], this.botL[0])) &&
-          Xa < Math.min(Math.max(objX1, objX2), Math.max(this.botR[0], this.botL[0]))) {
-            return true;
-      }
-
-      A1 = 0 != (objX1 - objX2) ? (objY1 - objY2) / (objX1 - objX2) : 500000;
-      A2 = 0 != (this.topL[0] - this.botL[0]) ? (this.topL[1] - this.botL[1]) / (this.topL[0] - this.botL[0]) : 500000;
-      b1 = objY1 - A1 * objX1;
-      b2 = this.topL[1] - A2 * this.topL[0];
-      Xa = 0 != A1 - A2 ? (b2 - b1) / (A1 - A2) : -500000;
-      if (Xa > Math.max(Math.min(objX1, objX2), Math.min(this.topL[0], this.botL[0])) &&
-          Xa < Math.min(Math.max(objX1, objX2), Math.max(this.topL[0], this.botL[0]))) {
-            return true;
-      }
-
-      return false;
     }
 
     set_value(device, param, speed) {
@@ -334,7 +289,7 @@ class RobotClass {
         let radian = Math.PI*this.dir/180;
         let dx;
         let dy;
-        let ogDir = this.dir;
+        let dir = this.dir;
         if (lv == rv) {
             let distance = rv * this.tickRate/1000;
             dx = distance * Math.cos(radian)
@@ -349,159 +304,89 @@ class RobotClass {
             let j = Math.sin(theta) * rt;
             dx = i * Math.sin(radian) + j * Math.cos(radian);
             dy = i * Math.cos(radian) + j * Math.sin(radian);
-            this.dir = (this.dir + theta*180/Math.PI) % 360;
+            dir = (this.dir + theta*180/Math.PI) % 360;
           }
-          const ogX = this.X;
-          const ogY = this.Y;
-          const ogltheta = this.ltheta;
-          const ogrtheta = this.rtheta;
 
-          this.X = Math.max(Math.min(this.X + dx, this.MaxX), 0);
-          this.Y = Math.max(Math.min(this.Y + dy, this.MaxY), 0);
-          this.ltheta = (this.Wl * 5 + this.ltheta) % 360;
-          this.rtheta = (this.Wr * 5 + this.rtheta) % 360;
+          const X = Math.max(Math.min(this.X + dx, this.MaxX), 0);
+          const Y = Math.max(Math.min(this.Y + dy, this.MaxY), 0);
+          const ltheta = (this.Wl * 5 + this.ltheta) % 360;
+          const rtheta = (this.Wr * 5 + this.rtheta) % 360;
 
-          this.updateCorners(this.X - ogX, this.Y - ogY, ogDir);
+          const corners = this.updateCorners(X, Y, dir);
 
 
           //Check if the given move results in a collision with any field objects
-          var inter = false;
-          for (var i=0; i < obstacles.length; i++) {
-            inter = this.intersectOne(obstacles[i]);
+          let inter = false;
+          for (let i=0; i < obstacles.length; i++) {
+            inter = this.intersectOne(obstacles[i], corners);
             if (inter) {
               console.log("crash! \n");
               break;
             }
           }
 
-          /*
-          let mxX = this.findMax(this.topR[0], this.topL[0], this.botR[0], this.botL[0]);
-          let miX = this.findMin(this.topR[0], this.topL[0], this.botR[0], this.botL[0]);
-
-          let mxY = this.findMax(this.topR[1], this.topL[1], this.botR[1], this.botL[1]);
-          let miY = this.findMin(this.topR[1], this.topL[1], this.botR[1], this.botL[1]);
-
-          if (mxX > this.maxX || miX < 0) {
-            inter = true;
-          } else if (mxY > this.maxY || miY < 0) {
-            inter = true;
-          }
-          */
 
           //Check to ensure there was no collision
           //count2++;
           //console.log(count2, "\n");
           if (!inter) {
-            let newState = {
-                X: this.X,
-                Y: this.Y,
-                dir: this.dir
-            };
-
-            this.sensor.get_val()
-            let sensorValues = {
-                leftSensor: this.leftSensor,
-                centerSensor: this.centerSensor,
-                rightSensor: this.rightSensor
-            };
-
-            postMessage({
-                robot: newState,
-                sensors: sensorValues
-            })
-
-          } else {
-            this.updateCorners(ogX - this.X, ogY - this.Y, -1 * ogDir + 2 * this.dir);
-            this.X = ogX;
-            this.Y = ogY;
-            this.dir = ogDir;
-            this.ltheta = ogltheta;
-            this.rtheta = ogrtheta;
+            this.X = X;
+            this.Y = Y;
+            this.ltheta = ltheta;
+            this.rtheta = rtheta;
+            this.dir = dir;
+            this.botL = corners.botL;
+            this.botR = corners.botR;
+            this.topL = corners.topL;
+            this.topR = corners.topR;
           }
 
+          let newState = {
+              X: this.X,
+              Y: this.Y,
+              dir: this.dir
+          };
 
-          /*
-          if (dc % 100 == 0) {
-            //debug print statements here
+          this.sensor.get_val()
+          let sensorValues = {
+              leftSensor: this.leftSensor,
+              centerSensor: this.centerSensor,
+              rightSensor: this.rightSensor
+          };
 
-            console.log("TL: ",this.topL[0], this.topL[1],
-            "\n TR: ", this.topR[0], this.topR[1],
-            "\n BL: ", this.botL[0], this.botL[1],
-            "\n BR: ", this.botR[0], this.botR[1]);
-          }
-
-          dc++;
-          */
+          postMessage({
+              robot: newState,
+              sensors: sensorValues
+          })
 
     }
 
-    updateCorners(dX, dY, ogDir) {
+    updateCorners(newX, newY, dir) {
 
-      //var dDirDeg = -1 * (this.dir - ogDir);
-      let dDir = this.dir * Math.PI / 180;
+      //let dDirDeg = -1 * (this.dir - ogDir);
+      let dDir = dir * Math.PI / 180;
       //let dDir = dDirDeg * Math.PI / 180;
       let sin = Math.sin(dDir);
       let cos = Math.cos(dDir);
 
-
+      let dict = {topR: Array(2), topL: Array(2), botL: Array(2), botR: Array(2)};
       //top right corner
-      this.topR[0] = this.X - (this.height/2) * cos + (this.width/2) * sin;
-      this.topR[1] = this.Y - (this.height/2) * sin - (this.width/2) * cos;
+      dict.topR[0] = newX - (this.height/2) * cos + (this.width/2) * sin;
+      dict.topR[1] = newY - (this.height/2) * sin - (this.width/2) * cos;
 
       //top left corner
-      this.topL[0] = this.X - (this.height/2) * cos - (this.width/2) * sin;
-      this.topL[1] = this.Y - (this.height/2) * sin + (this.width/2) * cos;
+      dict.topL[0] = newX - (this.height/2) * cos - (this.width/2) * sin;
+      dict.topL[1] = newY - (this.height/2) * sin + (this.width/2) * cos;
 
       //bottom left corner
-      this.botL[0] = this.X + (this.height/2) * cos - (this.width/2) * sin
-      this.botL[1] = this.Y + (this.height/2) * sin + (this.width/2) * cos;
+      dict.botL[0] = newX + (this.height/2) * cos - (this.width/2) * sin
+      dict.botL[1] = newY + (this.height/2) * sin + (this.width/2) * cos;
 
       //bottom right corner
-      this.botR[0] = this.X + (this.height/2) * cos + (this.width/2) * sin;
-      this.botR[1] = this.Y + (this.height/2) * sin - (this.width/2) * cos;
+      dict.botR[0] = newX + (this.height/2) * cos + (this.width/2) * sin;
+      dict.botR[1] = newY + (this.height/2) * sin - (this.width/2) * cos;
 
-
-      /*
-      //top right corner
-      this.topR[0] += dX;
-      this.topR[1] += dY;
-      this.topR[0] -= this.X;
-      this.topR[1] -= this.Y;
-      this.topR[0] = Math.cos(dDir)*this.topR[0] + Math.sin(dDir)*this.topR[1];
-      this.topR[1] = -1 * Math.sin(dDir)*this.topR[0] + Math.cos(dDir)*this.topR[1];
-      this.topR[0] += this.X;
-      this.topR[1] += this.Y;
-
-      //coordinates for top left corner of robot
-      this.topL[0] += dX;
-      this.topL[1] += dY;
-      this.topL[0] -= this.X;
-      this.topL[1] -= this.Y;
-      this.topL[0] = Math.cos(dDir)*this.topL[0] + Math.sin(dDir)*this.topL[1];
-      this.topL[1] = -1 * Math.sin(dDir)*this.topL[0] + Math.cos(dDir)*this.topL[1];
-      this.topL[0] += this.X;
-      this.topL[1] += this.Y;
-
-      //coordinates for bottom right corner
-      this.botR[0] += dX;
-      this.botR[1] += dY;
-      this.botR[0] -= this.X;
-      this.botR[1] -= this.Y;
-      this.botR[0] = Math.cos(dDir)*this.botR[0] + Math.sin(dDir)*this.botR[1];
-      this.botR[1] = -1 * Math.sin(dDir)*this.botR[0] + Math.cos(dDir)*this.botR[1];
-      this.botR[0] += this.X;
-      this.botR[1] += this.Y;
-
-      //coordinates for bottom left corner
-      this.botL[0] += dX;
-      this.botL[1] += dY;
-      this.botL[0] -= this.X;
-      this.botL[1] -= this.Y;
-      this.botL[0] = Math.cos(dDir)*this.botL[0] + Math.sin(dDir)*this.botL[1];
-      this.botL[1] = -1 * Math.sin(dDir)*this.botL[0] + Math.cos(dDir)*this.botL[1];
-      this.botL[0] += this.X;
-      this.botL[1] += this.Y;
-      */
+      return dict;
     }
 
     set_value(device, param, speed) {
@@ -636,7 +521,7 @@ function translateToMovement(keyCode) {
     if (simulator.current.length === 0) {
       simulator.robot.updatePosition();
     }
-    var k;
+    let k;
     for (k of simulator.current) {
         if (keyCode === 87) { // w
             simulator.gamepad.joystick_left_y = 1;
