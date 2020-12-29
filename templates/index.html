@@ -4,19 +4,23 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- Bootstrap CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
 
     <title>PiE Robotics Simulator</title>
 
     <!-- Disables scrolling with arrow keys and spacebar -->
-    <script src="{{ url_for('static', filename='js/disable_scrolling.js') }}"></script>
+    <script src="/static/js/disable_scrolling.js"></script>
   </head>
 
   <body>
-    <h1>PiE Robotics Simulator</h1>
+
+    <!-- <h1>PiE Robotics Simulator</h1>
     <div style = 'position: relative;'>
-      <canvas id="fieldCanvas" width="432" height="432"></canvas>
+
       <svg width="432" height="432" version="1.1" xmlns="http://www.w3.org/2000/svg" style="position: absolute; left: 0px; top: 0px; border:1px solid black">
 
         <rect x="144"
@@ -30,75 +34,221 @@
             transform="rotate(0)"
             stroke-width="2"/>
       </svg>
+    </div> -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <span class="navbar-brand mb-0 h1">PiE Robotics Simulator</span>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link" href="https://pioneers.berkeley.edu/software/robot_api" target="_blank">Robot API</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="d-flex flex-fill flex-row bd-highlight mb-3">
+                <div class="bd-highlight mr-3">
+                    <div class="card d-inline-flex border-primary">
+                        <div class="card-header d-flex border-primary">
+                            Simulator
+                        </div>
+                        <div class="card-body text-center border-primary" style="padding:0px">
+                            <div class="d-inline-flex flex-row bd-highlight">
+                                <div class="bd-highlight" style="position: relative;">
+                                  <canvas id="fieldCanvas" width="432" height="432"></canvas>
+                                  <svg width="432" height="432" version="1.1" xmlns="http://www.w3.org/2000/svg" style="position: absolute; left: 0px; top: 0px; border:1px solid black">
+                                    <line x1="81" y1="81" x2="345" y2="345" stroke="green" stroke-width="5" />
+                                    <!-- <line x1="375" y1="121" x2="375" y2="385" stroke="green" stroke-width="5" /> -->
+                                    <!-- <line x1="111" y1="121" x2="375" y2="121" stroke="green" stroke-width="5" /> -->
+                                    <rect x="180"
+                                          y="170"
+                                          width="60"
+                                          height="80"
+                                          rx="6"
+                                          ry="6"
+                                          stroke="navy"
+                                          fill="transparent"
+                                          transform="rotate(0)"
+                                          stroke-width="2"/>
+                                    <circle cx="210" cy="210" r="4" stroke="red" stroke-width="3" fill="red" />
+                                    <circle cx="210" cy="195" r="4" stroke="red" stroke-width="3" fill="red" />
+                                    <circle cx="210" cy="225" r="4" stroke="red" stroke-width="3" fill="red" />
+                                  </svg>
+                                </div>
+                                <div class="d-flex flex-column bd-highlight">
+                                    <div class="bd-highlight">
+                                        <a onclick="start(auto=0)" aria-controls="home" aria-selected="true" class="text-decoration-none h2" data-toggle="tooltip" data-placement="right" title="Start Teleop Simulation" style="cursor:pointer">
+                                            <svg width="1.2em" height="1.2em" viewBox="0 0 16 16" class="bi bi-controller" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                  <path fill-rule="evenodd" d="M11.119 2.693c.904.19 1.75.495 2.235.98.407.408.779 1.05 1.094 1.772.32.733.599 1.591.805 2.466.206.875.34 1.78.364 2.606.024.815-.059 1.602-.328 2.21a1.42 1.42 0 0 1-1.445.83c-.636-.067-1.115-.394-1.513-.773a11.307 11.307 0 0 1-.739-.809c-.126-.147-.25-.291-.368-.422-.728-.804-1.597-1.527-3.224-1.527-1.627 0-2.496.723-3.224 1.527-.119.131-.242.275-.368.422-.243.283-.494.576-.739.81-.398.378-.877.705-1.513.772a1.42 1.42 0 0 1-1.445-.83c-.27-.608-.352-1.395-.329-2.21.024-.826.16-1.73.365-2.606.206-.875.486-1.733.805-2.466.315-.722.687-1.364 1.094-1.772.486-.485 1.331-.79 2.235-.98.932-.196 2.03-.292 3.119-.292 1.089 0 2.187.096 3.119.292zm-6.032.979c-.877.185-1.469.443-1.733.708-.276.276-.587.783-.885 1.465a13.748 13.748 0 0 0-.748 2.295 12.351 12.351 0 0 0-.339 2.406c-.022.755.062 1.368.243 1.776a.42.42 0 0 0 .426.24c.327-.034.61-.199.929-.502.212-.202.4-.423.615-.674.133-.156.276-.323.44-.505C4.861 9.97 5.978 9.026 8 9.026s3.139.943 3.965 1.855c.164.182.307.35.44.505.214.25.403.472.615.674.318.303.601.468.929.503a.42.42 0 0 0 .426-.241c.18-.408.265-1.02.243-1.776a12.354 12.354 0 0 0-.339-2.406 13.753 13.753 0 0 0-.748-2.295c-.298-.682-.61-1.19-.885-1.465-.264-.265-.856-.523-1.733-.708-.85-.179-1.877-.27-2.913-.27-1.036 0-2.063.091-2.913.27z"/>
+                                                  <path d="M11.5 6.026a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm-1 1a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm2 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm-1 1a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm-7-2.5h1v3h-1v-3z"/>
+                                                  <path d="M3.5 6.526h3v1h-3v-1zM3.051 3.26a.5.5 0 0 1 .354-.613l1.932-.518a.5.5 0 0 1 .258.966l-1.932.518a.5.5 0 0 1-.612-.354zm9.976 0a.5.5 0 0 0-.353-.613l-1.932-.518a.5.5 0 1 0-.259.966l1.932.518a.5.5 0 0 0 .612-.354z"/>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                    <div class="bd-highlight">
+                                        <a onclick="start(auto=1)" aria-controls="home" aria-selected="true" class="text-decoration-none h2" data-toggle="tooltip" data-placement="right" title="Start Autonomous Simulation" style="cursor:pointer">
+                                            <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" class="bi bi-play" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" d="M10.804 8L5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"/>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                    <div class="bd-highlight">
+                                        <a onclick="stop()" aria-controls="home" aria-selected="true" class="text-decoration-none text-danger h2" data-toggle="tooltip" data-placement="right" title="Stop Simulation" style="cursor:pointer">
+                                            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x-octagon" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" d="M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353L4.54.146zM5.1 1L1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1H5.1z"/>
+                                                <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer border-primary">
+                            <div id="demo">
+                              x and y coordinates updated here
+                            </div>
+                            <div id="timer">Autonomous Timer: </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bd-highlight flex-fill">
+                    <div class="card border-primary h-100">
+                        <div class="card-header">
+                            <ul class="nav nav-tabs card-header-tabs" id="set-tabs">
+                                <li class="nav-item">
+                                    <a href="#console" class="nav-link active" id="code-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Console</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#settings" class="nav-link" id="gamepad-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Settings</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body" style="padding:0.1rem">
+                            <div class="tab-content" id="view-tab-content">
+                                <pre class="tab-pane fade show active" id="console" role="tabpanel" aria-labelledby="console-tab" style="overflow:scroll;height:497px;margin-bottom:0px;padding-left:0.5rem;padding-top:0.4rem" ></pre>
+                                <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="gamepad-tab">
+                                    <button type="button" class="btn btn-info" id="input-mode" onclick="switchInput()">Input: Keyboard</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="card w-100 border-primary">
+                <div class="card-header d-flex mb-3 align-items-end" style="margin-bottom:0px!important;padding:0px">
+                    <ul class="nav nav-tabs card-header-tabs mr-auto p-2" style="margin:0px;margin-left:29px;padding:0px!important" id="view-tabs">
+                        <li class="nav-item">
+                            <a href="#code-mirror" class="nav-link active" id="code-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Code</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#gamepad-menu" class="nav-link" id="gamepad-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Gamepad</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#sensor-menu" class="nav-link" id="sensor-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Sensors</a>
+                        </li>
+                    </ul>
+                    <div class="p-2">
+                        <button type="button" class="btn btn-success" onclick="uploadCode()">Upload Code</button>
+                    </div>
+                </div>
+                <div class="card-body" style="padding:0px">
+                    <div class="tab-content" id="view-tab-content">
+                        <div class="tab-pane fade show active" id="code-mirror" role="tabpanel" aria-labelledby="home-tab">
+                            <!-- Create a simple CodeMirror instance -->
+                            <script src="/static/js/codemirror.js"></script>
+                            <link rel="stylesheet" href="/static/css/codemirror.css">
+                            <script src="/static/js/python.js"></script>
+
+                            <div class="container" id="cmblock" style="padding-left:0px;padding-right:0px">
+                                <script>
+                                  function setCookie(name, value) {
+                                      document.cookie = name + "=" + (value || "");
+                                  }
+                                  function getCookie(name) {
+                                      let nameEQ = name + "=";
+                                      let ca = document.cookie.split(';');
+                                      for(let i=0; i < ca.length; i++) {
+                                          let c = ca[i];
+                                          while (c.charAt(0)==' ') c = c.substring(1,c.length);
+                                          if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+                                      }
+                                      return null;
+                                  }
+                                  function eraseCookie(name) {
+                                      document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+                                  }
+
+                                  var cm = CodeMirror(document.getElementById("cmblock"), { //place the codemirror inside the div container
+                                    value: "",
+                                    mode:  "python",
+                                    lineNumbers: true,
+                                    indentUnit: 4
+                                  });
+                                  cm.setSize(width="100%", height="1000px");
+
+                                  // var code = getCookie("code");
+                                  var code = "";
+                                  if (code == "" || code === null) {
+                                    var xhr=new XMLHttpRequest();
+                                    xhr.open("GET","/static/student_code_file.py");
+                                    xhr.onload = () => {
+                                      code = xhr.responseText;
+                                      // setCookie("code", code)
+                                      cm.setValue(code);
+                                    }
+                                    xhr.send();
+                                  }
+                                </script>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="gamepad-menu" role="tabpanel" aria-labelledby="gamepad-tab">
+                            <div class="container">
+                                <h2 id="heading"></h2>
+                                <p id="message"></p>
+                                <p id="button_0">button_a: </p>
+                                <p id="button_1">button_b: </p>
+                                <p id="button_2">button_x: </p>
+                                <p id="button_3">button_y: </p>
+                                <p id="button_4">l_bumper: </p>
+                                <p id="button_5">r_bumper: </p>
+                                <p id="button_6">l_trigger: </p>
+                                <p id="button_7">r_trigger: </p>
+                                <p id="button_8">button_back: </p>
+                                <p id="button_9">button_start: </p>
+                                <p id="button_10">l_stick: </p>
+                                <p id="button_11">r_stick: </p>
+                                <p id="button_12">dpad_up: </p>
+                                <p id="button_13">dpad_down: </p>
+                                <p id="button_14">dpad_left: </p>
+                                <p id="button_15">dpad_right: </p>
+                                <p id="axis_0">LH: </p>
+                                <p id="axis_1">LV: </p>
+                                <p id="axis_2">RH: </p>
+                                <p id="axis_3">RV: </p>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="sensor-menu" role="tabpanel" aria-labelledby="sensor-menu">
+                            <div class="container">
+                                <p id="left-sensor">Left Sensor:</p>
+                                <p id="center-sensor">Center Sensor:</p>
+                                <p id="right-sensor">Right Sensor:</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div id="demo">
-      x and y coordinates updated here
-    </div>
-
-    <h4 id="timer"; style="color:blue">Autonomous Timer: </h4>
-
-    <button type="button" onclick="start(auto=0)">Teleop simulation</button>
-    <button type="button" onclick="start(auto=1)">Autonomous Simulation </button>
-    <button type="button" onclick="stop()">stop simulation</button>
-
-    <div style="margin-top:20px">
-    <!-- Create a simple CodeMirror instance -->
-    <script src="{{ url_for('static', filename='js/codemirror.js') }}"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/codemirror.css') }}">
-    <script src="{{ url_for('static', filename='js/python.js') }}"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-
-    <button type="button" onclick="uploadCode()">Upload code</button>
-    <script>
-      function setCookie(name, value) {
-          document.cookie = name + "=" + (value || "");
-      }
-      function getCookie(name) {
-          let nameEQ = name + "=";
-          let ca = document.cookie.split(';');
-          for(let i=0; i < ca.length; i++) {
-              let c = ca[i];
-              while (c.charAt(0)==' ') c = c.substring(1,c.length);
-              if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-          }
-          return null;
-      }
-      function eraseCookie(name) {
-          document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-      }
-
-      var cm = CodeMirror(document.body, {
-        value: "",
-        mode:  "python",
-        lineNumbers: true,
-        indentUnit: 4
-      });
-      cm.setSize(width="100%", height="1000px");
-
-      // var code = getCookie("code");
-      var code = "";
-      if (code == "" || code === null) {
-        var xhr=new XMLHttpRequest();
-        xhr.open("GET","{{ url_for('static', filename='student_code_file.py') }}");
-        xhr.onload = () => {
-          code = xhr.responseText;
-          // setCookie("code", code)
-          cm.setValue(code);
-        }
-        xhr.send();
-      }
-    </script>
-    </div>
-
-    <script src="{{ url_for('static', filename='js/robot.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/base.js') }}"></script>
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="/static/js/joypad.js"></script>
+    <script src="/static/js/gamepad.js"></script>
+    <script src="/static/js/base.js"></script>
 
   </body>
 </html>

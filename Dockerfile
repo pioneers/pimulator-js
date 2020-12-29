@@ -1,19 +1,12 @@
-# Begin with the Python 3.4 image
-FROM python:3.6.4
+# Begin with the latest nginx image
+FROM nginx:latest
 
-MAINTAINER Scott Numamoto <scott.numamoto@pioneers.berkeley.edu>
+MAINTAINER Charles Hong <charleshong@pioneers.berkeley.edu>
 
-# Add the current directory to /code in the image
-ADD requirements.txt /code/requirements.txt
+# Create the expected file structure in the image
+COPY templates/index.html /usr/share/nginx/html/index.html
+COPY static /usr/share/nginx/html/static
 
-# Set the working directory to /code
-WORKDIR /code
-
-# Install the Python dependencies
-RUN pip install -r requirements.txt
-
-# Expose default port
-EXPOSE 5000
-
-# Set the default command
-CMD ["python", "-u", "app.py"]
+# docker build -t webserver .
+# docker run -it --rm -d -p 8080:80 --name web webserver
+# Navigate to localhost:8080
