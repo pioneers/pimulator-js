@@ -22,6 +22,47 @@ var console=(function(oldCons){
     };
 }(console));
 
+var console=(function(oldCons){
+    return {
+        log: function(text){
+            oldCons.log(text);
+            postMessage({
+                log: text
+            })
+        },
+        info: function (text) {
+            oldCons.info(text);
+            // code
+        },
+        warn: function (text) {
+            oldCons.warn(text);
+            // code
+        },
+        error: function (text) {
+            oldCons.error(text);
+            // code
+        }
+    };
+}(console));
+
+var log = console.log;
+
+console.log = function () {
+    var first_parameter = arguments[0];
+    var other_parameters = Array.prototype.slice.call(arguments, 1);
+
+    function formatConsoleDate (date) {
+        var hour = date.getHours();
+        var minutes = date.getMinutes();
+        var seconds = date.getSeconds();
+        var milliseconds = date.getMilliseconds();
+
+        return ((hour < 10) ? '0' + hour: hour) + ':' + ((minutes < 10) ? '0' + minutes: minutes) + ' ';
+    }
+
+    log.apply(console, [formatConsoleDate(new Date()) + first_parameter].concat(other_parameters));
+};
+
 importScripts("https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js");
 importScripts('./GamepadClass.js');
 importScripts('./Sensor.js');
