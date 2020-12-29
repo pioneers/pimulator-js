@@ -13,7 +13,7 @@
     <title>PiE Robotics Simulator</title>
 
     <!-- Disables scrolling with arrow keys and spacebar -->
-    <script src="{{ url_for('static', filename='js/disable_scrolling.js') }}"></script>
+    <script src="/static/js/disable_scrolling.js"></script>
   </head>
 
   <body>
@@ -40,18 +40,24 @@
                         <div class="card-body text-center border-primary" style="padding:0px">
                             <div class="d-inline-flex flex-row bd-highlight">
                                 <div class="bd-highlight">
-                                    <svg width="432" height="432" version="1.1" xmlns="http://www.w3.org/2000/svg" style="border:1px solid black">
-                                      <rect x="144"
-                                            y="144"
-                                            width="60"
-                                            height="80"
-                                            rx="6"
-                                            ry="6"
-                                            stroke="navy"
-                                            fill="transparent"
-                                            transform="rotate(0)"
-                                            stroke-width="2"/>
-                                    </svg>
+                                  <svg width="432" height="432" version="1.1" xmlns="http://www.w3.org/2000/svg" style="border:1px solid black">
+                                    <line x1="81" y1="81" x2="345" y2="345" stroke="green" stroke-width="5" />
+                                    <!-- <line x1="375" y1="121" x2="375" y2="385" stroke="green" stroke-width="5" /> -->
+                                    <!-- <line x1="111" y1="121" x2="375" y2="121" stroke="green" stroke-width="5" /> -->
+                                    <rect x="180"
+                                          y="170"
+                                          width="60"
+                                          height="80"
+                                          rx="6"
+                                          ry="6"
+                                          stroke="navy"
+                                          fill="transparent"
+                                          transform="rotate(0)"
+                                          stroke-width="2"/>
+                                    <circle cx="210" cy="210" r="4" stroke="red" stroke-width="3" fill="red" />
+                                    <circle cx="210" cy="195" r="4" stroke="red" stroke-width="3" fill="red" />
+                                    <circle cx="210" cy="225" r="4" stroke="red" stroke-width="3" fill="red" />
+                                  </svg>
                                 </div>
                                 <div class="d-flex flex-column bd-highlight">
                                     <div class="bd-highlight">
@@ -95,7 +101,7 @@
                         <div class="card-header">
                             <ul class="nav nav-tabs card-header-tabs" id="set-tabs">
                                 <li class="nav-item">
-                                    <a href="#consoleLog" class="nav-link active" id="code-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Console</a>
+                                    <a href="#console" class="nav-link active" id="code-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Console</a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="#settings" class="nav-link" id="gamepad-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Settings</a>
@@ -104,9 +110,9 @@
                         </div>
                         <div class="card-body" style="padding:0.1rem">
                             <div class="tab-content" id="view-tab-content">
-                                <pre class="tab-pane fade show active" id="consoleLog" role="tabpanel" aria-labelledby="console-tab" style="overflow:scroll;height:497px;margin-bottom:0px;padding-left:0.5rem;padding-top:0.4rem" ></pre>
+                                <pre class="tab-pane fade show active" id="console" role="tabpanel" aria-labelledby="console-tab" style="overflow:scroll;height:497px;margin-bottom:0px;padding-left:0.5rem;padding-top:0.4rem" ></pre>
                                 <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="gamepad-tab">
-                                    <button type="button" class="btn btn-info" id="inputMode" onclick="switchInput()">Input: Keyboard</button>
+                                    <button type="button" class="btn btn-info" id="input-mode" onclick="switchInput()">Input: Keyboard</button>
                                 </div>
                             </div>
                         </div>
@@ -124,6 +130,9 @@
                         <li class="nav-item">
                             <a href="#gamepad-menu" class="nav-link" id="gamepad-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Gamepad</a>
                         </li>
+                        <li class="nav-item">
+                            <a href="#sensor-menu" class="nav-link" id="sensor-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Sensors</a>
+                        </li>
                     </ul>
                     <div class="p-2">
                         <button type="button" class="btn btn-success" onclick="uploadCode()">Upload Code</button>
@@ -133,10 +142,9 @@
                     <div class="tab-content" id="view-tab-content">
                         <div class="tab-pane fade show active" id="code-mirror" role="tabpanel" aria-labelledby="home-tab">
                             <!-- Create a simple CodeMirror instance -->
-                            <script src="{{ url_for('static', filename='js/codemirror.js') }}"></script>
-                            <link rel="stylesheet" href="{{ url_for('static', filename='css/codemirror.css') }}">
-                            <script src="{{ url_for('static', filename='js/python.js') }}"></script>
-                            <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+                            <script src="/static/js/codemirror.js"></script>
+                            <link rel="stylesheet" href="/static/css/codemirror.css">
+                            <script src="/static/js/python.js"></script>
 
                             <div class="container" id="cmblock" style="padding-left:0px;padding-right:0px">
                                 <script>
@@ -169,7 +177,7 @@
                                   var code = "";
                                   if (code == "" || code === null) {
                                     var xhr=new XMLHttpRequest();
-                                    xhr.open("GET","{{ url_for('static', filename='student_code_file.py') }}");
+                                    xhr.open("GET","/static/student_code_file.py");
                                     xhr.onload = () => {
                                       code = xhr.responseText;
                                       // setCookie("code", code)
@@ -206,15 +214,22 @@
                                 <p id="axis_3">RV: </p>
                             </div>
                         </div>
+                        <div class="tab-pane fade" id="sensor-menu" role="tabpanel" aria-labelledby="sensor-menu">
+                            <div class="container">
+                                <p id="left-sensor">Left Sensor:</p>
+                                <p id="center-sensor">Center Sensor:</p>
+                                <p id="right-sensor">Right Sensor:</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/joypad.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/gamepad.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/base.js') }}"></script>
+    <script src="/static/js/joypad.js"></script>
+    <script src="/static/js/gamepad.js"></script>
+    <script src="/static/js/base.js"></script>
 
   </body>
 </html>
