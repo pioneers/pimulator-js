@@ -62,9 +62,9 @@ class Sensor{
        }
        total.push(Math.min(totalLine, 1))
      }
-     this.robot.leftSensor = total[0]
+     this.robot.leftSensor = total[2]
      this.robot.centerSensor = total[1]
-     this.robot.rightSensor = total[2]
+     this.robot.rightSensor = total[0]
      return total
    }
 }

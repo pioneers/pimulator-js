@@ -69,22 +69,35 @@ function update(state) {
     const scaleFactor = 3;
     const centerX = state.X * scaleFactor;
     const centerY = state.Y * scaleFactor;
-    const dir = state.dir;
+    const dir = state.dir/180*Math.PI;  // Convert to Radians
     document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
     const sensorPoints = document.querySelectorAll("circle")
     const topLeftCornerX = centerX - 30
     const topLeftCornerY = centerY - 40
     sensorPoints[0].setAttributeNS(null, "cx", centerX)
     sensorPoints[0].setAttributeNS(null, "cy", centerY)
-    sensorPoints[1].setAttributeNS(null, "cy", centerY+(15*Math.cos(dir/180*Math.PI)))
-    sensorPoints[1].setAttributeNS(null, "cx", centerX+(-15*Math.sin(dir/180*Math.PI)))
-    sensorPoints[2].setAttributeNS(null, "cy", centerY-(15*Math.cos(dir/180*Math.PI)))
-    sensorPoints[2].setAttributeNS(null, "cx", centerX-(-15*Math.sin(dir/180*Math.PI)))
+    sensorPoints[1].setAttributeNS(null, "cy", centerY+(15*Math.cos(dir)))
+    sensorPoints[1].setAttributeNS(null, "cx", centerX+(-15*Math.sin(dir)))
+    sensorPoints[2].setAttributeNS(null, "cy", centerY-(15*Math.cos(dir)))
+    sensorPoints[2].setAttributeNS(null, "cx", centerX-(-15*Math.sin(dir)))
     const robotRect = document.querySelector("rect")
     robotRect.setAttributeNS(null, "x", topLeftCornerX)
     robotRect.setAttributeNS(null, "y", topLeftCornerY)
     const rotateStr = `rotate(${dir} ${centerX} ${centerY})`
     robotRect.setAttribute("transform", rotateStr)
+    const triangle = document.querySelector("polygon")
+    let dirRotate = (state.dir+90)/180*Math.PI
+    let topTriangleX = centerX - 12*Math.cos(dirRotate)
+    let topTriangleY = centerY + 12*Math.cos(dirRotate)
+    let baseTriangleX = .25*topTriangleX + .75 * centerX
+    let baseTriangleY = .25*topTriangleY + .75 *centerY
+    let sideDist = 9/Math.sqrt(3)
+    console.log(topTriangleX,topTriangleY)
+    const triangleStr = `${topTriangleX},${topTriangleY} ${baseTriangleX-sideDist*Math.sin(dir)},${baseTriangleY+sideDist*Math.sin(dir)} ${baseTriangleX+sideDist*Math.sin(dir)},${baseTriangleY-sideDist*Math.sin(dir)}`;
+    console.log(triangleStr)
+    triangle.setAttributeNS(null, "points",triangleStr);
+
+
 };
 
 function updateSensors(sensorValues) {
