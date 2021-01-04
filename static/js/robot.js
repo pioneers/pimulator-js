@@ -1,3 +1,4 @@
+
 /* Rebind console messages. */
 var console=(function(oldCons){
     return {
@@ -25,6 +26,7 @@ var console=(function(oldCons){
 importScripts("https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js");
 importScripts('./GamepadClass.js');
 importScripts('./Sensor.js');
+importScripts('./FieldObj.js');
 
 var code = "";
 var env = {};
@@ -320,7 +322,6 @@ class RobotClass {
           for (let i=0; i < obstacles.length; i++) {
             inter = this.intersectOne(obstacles[i], corners);
             if (inter) {
-              console.log("crash! \n");
               break;
             }
           }
@@ -863,45 +864,5 @@ this.onmessage = function(e) {
                 }
             }
         }
-    }
-}
-
-function FieldObj() {
-    if (!(this instanceof FieldObj)) {
-        return new FieldObj;
-    }
-    this.color;
-    this.x=0;
-    this.y=0;
-    this.w=0;
-    this.h=0;
-
-
-}
-
-class Wall extends FieldObj {
-
-    topL = Array(2);
-    topR = Array(2);
-    botL = Array(2);
-    botR = Array(2);
-
-    constructor(x, y, w, h) {
-        super();
-        this.x = (132/400) * x; //change 132 value it is speculative
-        this.y = (132/400) * y;
-        this.w = (132/400) * w;
-        this.h = (132/400) * h;
-        this.topL[0] = x;
-        this.topL[1] = y;
-        this.topR[0] = x + w;
-        this.topR[1] = y;
-        this.botL[0] = x;
-        this.botL[1] = y + h;
-        this.botR[0] = x + w;
-        this.botR[1] = y + h;
-        //ctx.beginPath()
-        //ctx.strokeRect(this.x, this.y, this.w, this.h)
-        obstacles.push(this);
     }
 }
