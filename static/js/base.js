@@ -2,7 +2,7 @@ var mode = "idle"; // or auto or teleop
 var worker = new Worker("static/js/robot.js");
 var timer;
 var inputMode = "keyboard";
-var scaleFactor = 3;
+const scaleFactor = 3;
 
 setUpCanvas();
 
@@ -151,6 +151,7 @@ function setUpCanvas() {
 function setUpWalls(ctx) {
     let wallNum = 4; //change this if you want
     let arr = new Array([0, 0, 144, 2], [0, 0, 2, 144], [142, 0, 2, 144], [0, 142, 144, 2]);
+    //TODO: Read obstacle info from a data file
     worker.postMessage({initObj: true, walls: {count: wallNum, arr: arr}});
     let i = 0;
     while (i < arr.length) {

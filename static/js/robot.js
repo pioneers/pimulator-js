@@ -99,6 +99,10 @@ class RobotClass {
     }
 
     intersectRobotRef(obj, corners) {
+      /* Using the normals of the robot as reference axes,
+      returns true if the projections of the object and the robot intersect
+      via both normals. */
+
       // coordinates of the k_i vectors
       let k1x = obj.botL[0] - corners.botL[0]; //x of the vector from botL of robot to botL of obstacle
       let k1y = obj.botL[1] - corners.botL[1]; //figure it out from here...
@@ -165,6 +169,10 @@ class RobotClass {
     }
 
     intersectObjRef(obj, corners) {
+      /* Using the normals of the object as reference axes,
+      returns true if the projections of the object and the robot intersect
+      via both normals. */
+
       // coordinates of the k_i vectors
       let k1x = corners.botL[0] - obj.botL[0]; //x of the vector from botL of obj to botL of robot
       let k1y = corners.botL[1] - obj.botL[1]; //figure it out from here...
@@ -231,6 +239,10 @@ class RobotClass {
     }
 
     intersectOne(obj, corners) {
+      /* Returns true if object and robot intersect,
+      this means that their projections intersect via all
+      4 normals */
+
       return this.intersectRobotRef(obj, corners) && this.intersectObjRef(obj, corners);
     }
 
@@ -281,8 +293,6 @@ class RobotClass {
     }
 
     updatePosition() {
-        //count1++;
-        //console.log(count1, " ");
         /* Updates position of the  Robot using differential drive equations
         Derived with reference to:
         https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf*/
@@ -363,6 +373,9 @@ class RobotClass {
     }
 
     updateCorners(newX, newY, dir) {
+      /* Returns dictionary of prospective corners of the robot after prompted
+      movement. Changes the actual corners only after verifiying that the
+      robot won't crash */
 
       //let dDirDeg = -1 * (this.dir - ogDir);
       let dDir = dir * Math.PI / 180;
