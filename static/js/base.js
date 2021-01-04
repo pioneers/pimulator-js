@@ -86,12 +86,12 @@ function update(state) {
     const rotateStr = `rotate(${state.  dir} ${centerX} ${centerY})`
     robotRect.setAttribute("transform", rotateStr)
     const triangle = document.querySelector("polygon")
-    let dirRotate = (state.dir+90)/180*Math.PI
-    let topTriangleX = centerX - 18*Math.sin(dirRotate)
-    let topTriangleY = centerY + 18*Math.cos(dirRotate)
-    let baseTriangleX = .5*topTriangleX + .5 * centerX
-    let baseTriangleY = .5*topTriangleY + .5 *centerY
-    let sideDist = 9/Math.sqrt(3)
+    const dirRotate = (state.dir+90)/180*Math.PI
+    const topTriangleX = centerX - 24*Math.sin(dirRotate)
+    const topTriangleY = centerY + 24*Math.cos(dirRotate)
+    const baseTriangleX = 3*topTriangleX/4 +  1* centerX/4
+    const baseTriangleY = 3*topTriangleY/4 + 1*centerY/4
+    const sideDist = 6/Math.sqrt(3)
     console.log(topTriangleX,topTriangleY)
     const triangleStr = `${topTriangleX},${topTriangleY} ${baseTriangleX-sideDist*Math.sin(dir)},${baseTriangleY+sideDist*Math.cos(dir)} ${baseTriangleX+sideDist*Math.sin(dir)},${baseTriangleY-sideDist*Math.cos(dir)}`;
     console.log(triangleStr)
