@@ -100,7 +100,7 @@
 
                 <div class="bd-highlight flex-fill">
                     <div class="card border-primary h-100">
-                        <div class="card-header">
+                        <div class="card-header" style="padding-top:7px">
                             <ul class="nav nav-tabs card-header-tabs" id="set-tabs">
                                 <li class="nav-item">
                                     <a href="#console" class="nav-link active" id="console-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Console</a>
@@ -114,12 +114,15 @@
                             </ul>
                         </div>
                         <div class="card-body" style="padding:0.1rem">
-                            <div class="tab-content" id="view-tab-content">
-                                <pre class="tab-pane fade show active" id="console" role="tabpanel" aria-labelledby="console-tab" style="overflow:scroll;height:497px;margin-bottom:0px;padding-left:0.5rem;padding-top:0.4rem" ></pre>
+                            <div class="tab-content overflow-auto" id="view-tab-content">
+                                <pre class="tab-pane fade show active" id="console" role="tabpanel" aria-labelledby="console-tab" style="overflow:scroll;height:502px;margin-bottom:0px;padding-left:0.5rem;padding-top:0.4rem" ></pre>
                                 <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-                                    <button type="button" class="btn btn-info" id="input-mode" onclick="switchInput()">Input: Keyboard</button>
+                                    <p id="input-mode">Input:
+                                    <button type="button" id="keyboard-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchInput(0)">Keyboard</button>
+                                    <button type="button" id="gamepad-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchInput(1)">Gamepad</button>
+                                    </p>
                                 </div>
-                                <div class="tab-pane fade" id="help" role="tabpanel" aria-labelledby="settings-tab">
+                                <div class="tab-pane fade" id="help" role="tabpanel" aria-labelledby="settings-tab" style="height:502px;margin-bottom:0px">
                                     <div class="accordion" id="help-accordion">
                                         <div class="card">
                                             <div class="card-header" id="help-general-heading">
@@ -127,9 +130,18 @@
                                                     General
                                                 </button>
                                             </div>
-                                            <div id="help-general-body" class="collapse show" aria-labelledby="help-general-heading" data-parent="#help-accordion">
+                                            <div id="help-general-body" class="collapse show" aria-labelledby="help-general-heading">
                                                 <div class="card-body">
-                                                    <p>Once Python has been initialized (when the Console outputs 'Python initialization complete'), the simulator is ready for use. Before you can simulate anything, make sure to upload your code using the 'Upload Code' button. When your code has been uploaded, the console will output 'Code upload successful'. Now everything is ready for simulation! You can start and stop simulations by clicking the buttons to the right of the field.</p>
+                                                    <p>
+                                                        Once Python has been initialized (when the Console outputs 'Python initialization
+                                                        complete'), the simulator is ready for use.
+                                                    </p>
+                                                    <p>
+                                                        You can copy/paste code into 'Code' section or type in your code directly. Be sure to upload your code using the 'Upload Code' button. When your code has been uploaded, the console will output 'Code upload successful'. Now everything is ready for simulation!
+                                                    </p>
+                                                    <p>
+                                                        You can start and stop simulations by clicking the buttons to the right of the field.
+                                                    </p>
                                                     <table class="table">
                                                         <thead>
                                                             <tr>
@@ -176,7 +188,7 @@
                                                     Keyboard
                                                 </button>
                                             </div>
-                                            <div id="help-keyboard-body" class="collapse" aria-labelledby="help-keyboard-heading" data-parent="#help-accordion">
+                                            <div id="help-keyboard-body" class="collapse" aria-labelledby="help-keyboard-heading">
                                                 <div class="card-body">
                                                     <p>
                                                         The simulator's default controls use the keyboard, rather than a game controller.
@@ -229,9 +241,106 @@
                                                     Gamepad
                                                 </button>
                                             </div>
-                                            <div id="help-gamepad-body" class="collapse" aria-labelledby="help-gamepad-heading" data-parent="#help-accordion">
+                                            <div id="help-gamepad-body" class="collapse" aria-labelledby="help-gamepad-heading">
                                                 <div class="card-body">
-                                                    test3
+                                                    <p>
+                                                        Keyboard inputs only support joystick controls. For more functionality, a game
+                                                        controller can be connected to the simulator. To input a game controller, connect it
+                                                        to your computer and click any button. Confirm that the controller has successfully
+                                                        been connected by checking the 'Gamepad' section. <i>The 'Gamepad' section will read inputs
+                                                        directly off of your gamepad, not values from your robot.</i> The following are button mappings between a generic game controller and the Robot API:
+                                                    </p>
+                                                    <img src="https://user-images.githubusercontent.com/580022/45268303-10a03e80-b4ce-11e8-883c-1f586566c040.png" alt="" class="img-thumbnail mb-3">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Game Controller</th>
+                                                                <th scope="col">Robot API</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>A</td>
+                                                                <td>button_a</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>B</td>
+                                                                <td>button_b</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>X</td>
+                                                                <td>button_x</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Y</td>
+                                                                <td>button_y</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>LB</td>
+                                                                <td>l_bumper</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>RB</td>
+                                                                <td>r_bumper</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>LT</td>
+                                                                <td>l_trigger</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>RT</td>
+                                                                <td>r_trigger</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Back</td>
+                                                                <td>button_back</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Start</td>
+                                                                <td>button_start</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>LSB (Pressed)</td>
+                                                                <td>l_stick</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>RSB (Pressed)</td>
+                                                                <td>r_stick</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>D-pad Up</td>
+                                                                <td>dpad_up</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>D-pad Down</td>
+                                                                <td>dpad_down</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>D-pad Left</td>
+                                                                <td>dpad_left</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>D-pad Right</td>
+                                                                <td>dpad_right</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Axis 0 / LSB (Left & Right)</td>
+                                                                <td>joystick_left_x</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Axis 1 / LSB (Up & Down)</td>
+                                                                <td>joystick_left_y</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Axis 2 / RSB (Left & Right)</td>
+                                                                <td>joystick_right_x</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Axis 3 / RSB (Up & Down)</td>
+                                                                <td>joystick_right_y</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
                                                 </div>
                                             </div>
                                         </div>
@@ -331,10 +440,10 @@
                                 <p id="button_13">dpad_down: </p>
                                 <p id="button_14">dpad_left: </p>
                                 <p id="button_15">dpad_right: </p>
-                                <p id="axis_0">LH: </p>
-                                <p id="axis_1">LV: </p>
-                                <p id="axis_2">RH: </p>
-                                <p id="axis_3">RV: </p>
+                                <p id="axis_0">axis_0: </p>
+                                <p id="axis_1">axis_1: </p>
+                                <p id="axis_2">axis_2: </p>
+                                <p id="axis_3">axis_3: </p>
                             </div>
                         </div>
                         <div class="tab-pane fade" id="sensor-menu" role="tabpanel" aria-labelledby="sensor-menu">

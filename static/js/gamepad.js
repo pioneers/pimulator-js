@@ -15,10 +15,10 @@ const padMap = {
     button_13: "dpad_down",
     button_14: "dpad_left",
     button_15: "dpad_right",
-    axis_0: "LH",
-    axis_1: "LV",
-    axis_2: "RH",
-    axis_3: "RV",
+    axis_0: "axis_0",
+    axis_1: "axis_1",
+    axis_2: "axis_2",
+    axis_3: "axis_3",
 }
 
 function resetInfo(e) {

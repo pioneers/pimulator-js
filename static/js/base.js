@@ -26,13 +26,23 @@ function onmessage(e) {
 worker.onmessage = onmessage;
 
 // Switch input mode between 'keyboard' and 'gamepad'
-function switchInput() {
-    if (inputMode === "keyboard") {
-        inputMode = "gamepad";
-        document.getElementById("input-mode").innerText = "Input: Gamepad";
-    } else if (inputMode == "gamepad") {
-        inputMode = "keyboard";
-        document.getElementById("input-mode").innerText = "Input: Keyboard";
+function switchInput(state) {
+    if (state === 1) {
+        if (inputMode === "gamepad") {
+            $("#gamepad-btn").button('toggle');
+        } else {
+            inputMode = "gamepad";
+            //document.getElementById("input-mode").innerText = "Input: Gamepad";
+            $("#keyboard-btn").button('toggle');
+        }
+    } else if (state === 0) {
+        if (inputMode === "keyboard") {
+            $("#keyboard-btn").button('toggle');
+        } else {
+            inputMode = "keyboard";
+            //document.getElementById("input-mode").innerText = "Input: Keyboard";
+            $("#gamepad-btn").button('toggle');
+        }
     }
 }
 
@@ -156,7 +166,7 @@ function log(text) {
             return
         }
     }
-    let consoleLog = document.getElementById("console")
-    logged = consoleLog.innerText += text + "\n";
+    let consoleLog = document.getElementById("console");
+    logged = consoleLog.innerHTML += text + "<br>";
     consoleLog.scrollTop = consoleLog.scrollHeight;
 }
