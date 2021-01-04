@@ -72,20 +72,28 @@ function update(state) {
     const dir = state.dir/180*Math.PI;  // Convert to Radians
     document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
     const sensorPoints = document.querySelectorAll("circle")
-    const topLeftCornerX = centerX - 30
-    const topLeftCornerY = centerY - 40
+
+
+    //set sensors
+
     sensorPoints[0].setAttributeNS(null, "cx", centerX)
     sensorPoints[0].setAttributeNS(null, "cy", centerY)
     sensorPoints[1].setAttributeNS(null, "cy", centerY+(15*Math.cos(dir)))
     sensorPoints[1].setAttributeNS(null, "cx", centerX+(-15*Math.sin(dir)))
     sensorPoints[2].setAttributeNS(null, "cy", centerY-(15*Math.cos(dir)))
     sensorPoints[2].setAttributeNS(null, "cx", centerX-(-15*Math.sin(dir)))
+
+    //set robot coordinates
+    const topLeftCornerX = centerX - 30
+    const topLeftCornerY = centerY - 40
     const robotRect = document.querySelector("rect")
     robotRect.setAttributeNS(null, "x", topLeftCornerX)
     robotRect.setAttributeNS(null, "y", topLeftCornerY)
     const rotateStr = `rotate(${state.  dir} ${centerX} ${centerY})`
     robotRect.setAttribute("transform", rotateStr)
     const triangle = document.querySelector("polygon")
+
+    //set triangle on robot 
     const dirRotate = (state.dir+90)/180*Math.PI
     const topTriangleX = centerX - 24*Math.sin(dirRotate)
     const topTriangleY = centerY + 24*Math.cos(dirRotate)
