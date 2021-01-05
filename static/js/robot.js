@@ -31,8 +31,8 @@ var code = "";
 var env = {};
 languagePluginLoader.then(() => function () {});
 
-const SCREENHEIGHT = 48
-const SCREENWIDTH = 48
+const SCREENHEIGHT = 48;
+const SCREENWIDTH = 48;
 
 class RobotClass {
     /*The MODEL for this simulator. Stores robot data and handles position
@@ -85,7 +85,7 @@ class RobotClass {
         this.leftSensor = 0;
         this.centerSensor = 0;
         this.rightSensor = 0;
-        this.simulator = simulator
+        this.simulator = simulator;
         this.sensor = new Sensor(this);
     }
 
@@ -575,7 +575,7 @@ const padMap = {
     axis_1: "LV",
     axis_2: "RH",
     axis_3: "RV",
-}
+};
 
 /**
  * Sets a button in the robot API to a pressed state i.e. true
@@ -734,12 +734,12 @@ class Simulator{
     }
 
     initGamepad(){
-        const control_types = ['tank', 'arcade', 'other1', 'other2']
-        const GAMEPAD_MODE = "tank"
-        let control_type_index = control_types.indexOf(GAMEPAD_MODE)
+        const control_types = ['tank', 'arcade', 'other1', 'other2'];
+        const GAMEPAD_MODE = "tank";
+        let control_type_index = control_types.indexOf(GAMEPAD_MODE);
         if (control_type_index == -1) {
-            throw new Error("Invalid gamepad mode")}
-        this.gamepad = new GamepadClass(control_type_index)
+            throw new Error("Invalid gamepad mode")};
+        this.gamepad = new GamepadClass(control_type_index);
     }
 
     loadStudentCode(){
@@ -749,8 +749,8 @@ class Simulator{
 
         //# Store the local environment into dictionary
         //# Ensure the global Robot reflects the same robot Simulator is using
-        env['Robot'] = this.robot
-        env['Gamepad'] = this.gamepad
+        env['Robot'] = this.robot;
+        env['Gamepad'] = this.gamepad;
 
         pyodide.runPython(`
             from js import code, env
@@ -761,10 +761,10 @@ class Simulator{
         env = pyodide.pyimport("env");
 
         //# Eventually need to gracefully handle failures here
-        this.autonomous_setup = env['autonomous_setup']
-        this.autonomous_main = env['autonomous_main']
-        this.teleop_setup = env['teleop_setup']
-        this.teleop_main = env['teleop_main']
+        this.autonomous_setup = env['autonomous_setup'];
+        this.autonomous_main = env['autonomous_main'];
+        this.teleop_setup = env['teleop_setup'];
+        this.teleop_main = env['teleop_main'];
         // ensure_is_function("teleop_setup", this.teleop_setup)
         // ensure_is_function("teleop_main", this.teleop_main)
     }
@@ -787,12 +787,12 @@ class Simulator{
 
     stop() {
         if (this.mode !== "idle") {
-            this.mode = "idle"
+            this.mode = "idle";
             clearInterval(this.interval);
         }
         postMessage({
             mode: this.mode
-        })
+        });
     }
 
     simulateTeleop(){
@@ -806,7 +806,7 @@ class Simulator{
         this.consistentLoop(this.robot.tickRate, this.teleop_main);
         postMessage({
             mode: this.mode
-        })
+        });
     }
 
     simulateAuto() {
@@ -816,7 +816,7 @@ class Simulator{
         });
         this.robot = new RobotClass(this);
         this.loadStudentCode();
-        this.robot.autonomous_main = this.autonomous_main
+        this.robot.autonomous_main = this.autonomous_main;
         this.timeout = setTimeout(function() { this.stop(); }.bind(this), 30*1000);
         this.robot.simStartTime = new Date().getTime();
         setTimeout(this.autonomous_setup, 0);
@@ -829,7 +829,7 @@ this.onmessage = function(e) {
     // Code upload
     if (e.data.code !== undefined){
         code = e.data.code;
-        console.log("Code upload successful")
+        console.log("Code upload successful");
     }
 
     // Add field objects to the simulator
