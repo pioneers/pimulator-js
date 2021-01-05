@@ -126,7 +126,7 @@
                                 <pre class="tab-pane fade show active" id="console" role="tabpanel" aria-labelledby="console-tab" style="overflow:scroll;height:502px;margin-bottom:0px;padding-left:0.5rem;padding-top:0.4rem" ></pre>
 
                                 <!-- Settings -->
-                                <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                                <div class="tab-pane fade p-3" id="settings" role="tabpanel" aria-labelledby="settings-tab">
                                     <p id="input-mode">Input:
                                     <button type="button" id="keyboard-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchInput(0)">Keyboard</button>
                                     <button type="button" id="gamepad-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchInput(1)">Gamepad</button>
@@ -356,6 +356,7 @@
                                                             </tr>
                                                         </tbody>
                                                     </table>
+                                                    <p><i>Note: The <b>y-axis</b> values for the Gamepad are opposite to the values for the Robot i.e. Joystick Up will be +1 for the Robot but -1 for the Gamepad.</i></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -465,15 +466,25 @@
                                 <p id="axis_1">axis_1: </p>
                                 <p id="axis_2">axis_2: </p>
                                 <p id="axis_3">axis_3: </p>
+                                <p style="font-size:10px" class="text-sensor font-weight-light text-center"><i>Note: These values are readings from the connected Game Controller and may be different from the Robot Values. For more information on how Game Controller buttons correspond to Robot values, visit the 'Gamepad' section under 'Help.'</i></p>
                             </div>
                         </div>
 
                         <!-- Sensor Readings -->
                         <div class="tab-pane fade" id="sensor-menu" role="tabpanel" aria-labelledby="sensor-menu">
-                            <div class="container">
-                                <p id="left-sensor">Left Sensor:</p>
-                                <p id="center-sensor">Center Sensor:</p>
-                                <p id="right-sensor">Right Sensor:</p>
+                            <div class="container pt-3">
+                                <div class="row">
+                                    <div class="col">
+                                        <p id="left-sensor" class="text-center">Left Sensor: 0.000</p>
+                                    </div>
+                                    <div class="col">
+                                        <p id="center-sensor" class="text-center">Center Sensor: 0.000</p>
+                                    </div>
+                                    <div class="col">
+                                        <p id="right-sensor" class="text-center">Right Sensor: 0.000</p>
+                                    </div>
+                                </div>
+                                <p style="font-size:10px" class="text-sensor font-weight-light text-center"><i>For more information on how to use these sensors, visit the <a href="https://pioneers.berkeley.edu/software/robot_api" target="_blank">Robot API</a></i></p>
                             </div>
                         </div>
                     </div>
