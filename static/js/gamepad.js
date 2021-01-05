@@ -1,3 +1,6 @@
+/*
+ * A map that maps the button name to its name in the Robot API
+ */
 const padMap = {
     button_0: "button_a",
     button_1: "button_b",
@@ -21,11 +24,17 @@ const padMap = {
     axis_3: "axis_3",
 }
 
+/*
+ * Reset the Game Controller information
+ */
 function resetInfo(e) {
     heading.innerText = 'No controller connected!';
     message.innerText = 'Please connect a controller and press any key to start.';
 };
 
+/*
+ * Update the status of a connected Game Controller
+ */
 function updateInfo(e) {
     const { gamepad } = e;
 
@@ -33,25 +42,45 @@ function updateInfo(e) {
     message.innerText = gamepad.id;
 };
 
+/*
+ * Clear all of the gamepad value readings
+ */
 function clearPadVals() {
     for (let key in padMap) {
         document.getElementById(key).innerText = padMap[key] + ": ";
     }
 }
 
+// Reset once before doing anything
 resetInfo();
+
+/*
+ * Defines what happens when a Game Controller is connected to your computer
+ */
 joypad.on('connect', e => {
     console.log("gamepad connected");
     console.log(e);
     return updateInfo(e)
 });
+
+/*
+ * Defines what happens when a Game Controller is disconnected from your computer
+ */
 joypad.on('disconnect', e => {
     console.log(e);
     return resetInfo(e);
 });
+
+/*
+ * Defines the threshold that must be exceeded for an axis to be considered to be 'moved'
+ */
 joypad.set({
     axisMovementThreshold: 0.05
 });
+
+/*
+ * Defines what happens when a Game Controller button is pressed
+ */
 joypad.on('button_press', e => {
     console.log(e.detail);
     const buttonName = e.detail.buttonName;
@@ -67,6 +96,10 @@ joypad.on('button_press', e => {
         }
     }
 });
+
+/*
+ * Defines what happens when a Game Controller axis is moved
+ */
 joypad.on('axis_move', e => {
     console.log(e.detail);
     const axisName = "axis_" + e.detail.axis;

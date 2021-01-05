@@ -17,6 +17,7 @@
   </head>
 
   <body>
+    <!-- Header Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <span class="navbar-brand mb-0 h1">PiE Robotics Simulator</span>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -29,9 +30,13 @@
         </div>
     </nav>
 
+    <!-- Body of Content -->
     <div class="container">
+
+        <!-- Row 1: Field & Simulator Info -->
         <div class="row">
             <div class="d-flex flex-fill flex-row bd-highlight mb-3">
+                <!-- Field -->
                 <div class="bd-highlight mr-3">
                     <div class="card d-inline-flex border-primary">
                         <div class="card-header d-flex border-primary">
@@ -98,9 +103,11 @@
                     </div>
                 </div>
 
+                <!-- Simulator Info -->
                 <div class="bd-highlight flex-fill">
                     <div class="card border-primary h-100">
                         <div class="card-header" style="padding-top:7px">
+                            <!-- Simulator Nav Tabs -->
                             <ul class="nav nav-tabs card-header-tabs" id="set-tabs">
                                 <li class="nav-item">
                                     <a href="#console" class="nav-link active" id="console-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Console</a>
@@ -115,15 +122,21 @@
                         </div>
                         <div class="card-body" style="padding:0.1rem">
                             <div class="tab-content overflow-auto" id="view-tab-content">
+                                <!-- Console -->
                                 <pre class="tab-pane fade show active" id="console" role="tabpanel" aria-labelledby="console-tab" style="overflow:scroll;height:502px;margin-bottom:0px;padding-left:0.5rem;padding-top:0.4rem" ></pre>
+
+                                <!-- Settings -->
                                 <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
                                     <p id="input-mode">Input:
                                     <button type="button" id="keyboard-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchInput(0)">Keyboard</button>
                                     <button type="button" id="gamepad-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchInput(1)">Gamepad</button>
                                     </p>
                                 </div>
+
+                                <!-- Help -->
                                 <div class="tab-pane fade" id="help" role="tabpanel" aria-labelledby="settings-tab" style="height:502px;margin-bottom:0px">
                                     <div class="accordion" id="help-accordion">
+                                        <!-- Help: General -->
                                         <div class="card">
                                             <div class="card-header" id="help-general-heading">
                                                 <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-general-body" aria-expanded="true" aria-controls="help-general-body">
@@ -182,6 +195,7 @@
                                             </div>
                                         </div>
 
+                                        <!-- Help: Keyboard -->
                                         <div class="card">
                                             <div class="card-header" id="help-keyboard-heading">
                                                 <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-keyboard-body" aria-expanded="true" aria-controls="help-keyboard-body">
@@ -235,6 +249,7 @@
                                             </div>
                                         </div>
 
+                                        <!-- Help: Gamepad -->
                                         <div class="card">
                                             <div class="card-header" id="help-gamepad-heading">
                                                 <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-gamepad-body" aria-expanded="true" aria-controls="help-gamepad-body">
@@ -352,9 +367,12 @@
                 </div>
             </div>
         </div>
+
+        <!-- Row 2: Code & I/O -->
         <div class="row">
             <div class="card w-100 border-primary">
                 <div class="card-header d-flex mb-3 align-items-end" style="margin-bottom:0px!important;padding:0px">
+                    <!-- I/O Nav Tabs -->
                     <ul class="nav nav-tabs card-header-tabs mr-auto p-2" style="margin:0px;margin-left:29px;padding:0px!important" id="view-tabs">
                         <li class="nav-item">
                             <a href="#code-mirror" class="nav-link active" id="code-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Code</a>
@@ -372,6 +390,7 @@
                 </div>
                 <div class="card-body" style="padding:0px">
                     <div class="tab-content" id="view-tab-content">
+                        <!-- CodeMirror -->
                         <div class="tab-pane fade show active" id="code-mirror" role="tabpanel" aria-labelledby="home-tab">
                             <!-- Create a simple CodeMirror instance -->
                             <script src="/static/js/codemirror.js"></script>
@@ -420,6 +439,8 @@
                                 </script>
                             </div>
                         </div>
+
+                        <!-- Gamepad Readings -->
                         <div class="tab-pane fade" id="gamepad-menu" role="tabpanel" aria-labelledby="gamepad-tab">
                             <div class="container">
                                 <h2 id="heading"></h2>
@@ -446,6 +467,8 @@
                                 <p id="axis_3">axis_3: </p>
                             </div>
                         </div>
+
+                        <!-- Sensor Readings -->
                         <div class="tab-pane fade" id="sensor-menu" role="tabpanel" aria-labelledby="sensor-menu">
                             <div class="container">
                                 <p id="left-sensor">Left Sensor:</p>
