@@ -77,7 +77,7 @@ document.addEventListener('keyup', up);
 function uploadCode() {
     code = cm.getValue();
     worker.postMessage({code:code});
-};
+}
 
 function update(state) {
     /*
@@ -91,9 +91,7 @@ function update(state) {
     document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
     const sensorPoints = document.querySelectorAll("circle")
 
-
-    //set sensors
-
+    // Set sensors
     sensorPoints[0].setAttributeNS(null, "cx", centerX)
     sensorPoints[0].setAttributeNS(null, "cy", centerY)
     sensorPoints[1].setAttributeNS(null, "cy", centerY+(15*Math.cos(dir)))
@@ -101,7 +99,7 @@ function update(state) {
     sensorPoints[2].setAttributeNS(null, "cy", centerY-(15*Math.cos(dir)))
     sensorPoints[2].setAttributeNS(null, "cx", centerX-(-15*Math.sin(dir)))
 
-    //set robot coordinates
+    // Set robot coordinates
     const topLeftCornerX = centerX - 30
     const topLeftCornerY = centerY - 40
     const robotRect = document.querySelector("rect")
@@ -110,7 +108,7 @@ function update(state) {
     const rotateStr = `rotate(${state.dir} ${centerX} ${centerY})`
     robotRect.setAttribute("transform", rotateStr)
 
-    //set triangle on robot
+    // Set triangle on robot
     const triangle = document.querySelector("polygon")
     const dirRotate = (state.dir+90)/180*Math.PI
     const topTriangleX = centerX - 24*Math.sin(dirRotate)
@@ -122,9 +120,7 @@ function update(state) {
     const trianglePoint3 = `${baseTriangleX+sideDist*Math.sin(dir)},${baseTriangleY-sideDist*Math.cos(dir)}`
     const triangleStr = `${topTriangleX},${topTriangleY} ` + trianglePoint2 + trianglePoint3;
     triangle.setAttributeNS(null, "points",triangleStr);
-
-
-};
+}
 
 function updateSensors(sensorValues) {
     document.getElementById("left-sensor").innerText = "Left Sensor: " + sensorValues.leftSensor.toFixed(3);
@@ -149,7 +145,7 @@ function start(auto=0) {
             worker.postMessage({start:true, mode:"auto"})
         }
     }
-};
+}
 
 function runAutoTimer() {
     var startTime = new Date().getTime();
@@ -181,7 +177,7 @@ function stop() {
     mode = "idle";
     update({X:70,Y:70,dir:0}); // in inches
     clearInterval(timer);
-};
+}
 
 function clearConsole(){
     document.getElementById("console").innerText = ""
