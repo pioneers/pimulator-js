@@ -2,6 +2,7 @@ var mode = "idle"; // or auto or teleop
 var worker = new Worker("static/js/robot.js");
 var timer;
 var inputMode = "keyboard";
+const scaleFactor = 3;
 
 // Handle messages from worker
 function onmessage(e) {
@@ -17,13 +18,31 @@ function onmessage(e) {
             runAutoTimer();
         }
     }
-
     if (e.data.log !== undefined) {
         let text = e.data.log;
         log(text);
     }
+    if (e.data.objs !== undefined) {
+        drawObjs(e.data.objs);
+    }
 }
 worker.onmessage = onmessage;
+
+function drawObjs(objs) {
+    /* Draw objects received from the worker. */
+    const canvas = document.getElementById('fieldCanvas');
+    const ctx = canvas.getContext('2d');
+
+    for (let i = 0; i < objs.length; i++) {
+        ctx.beginPath();
+        ctx.fillRect(
+            objs[i].x*scaleFactor,
+            objs[i].y*scaleFactor,
+            objs[i].w*scaleFactor,
+            objs[i].h*scaleFactor
+        );
+    }
+}
 
 // Switch input mode between 'keyboard' and 'gamepad'
 function switchInput() {
@@ -66,7 +85,6 @@ function update(state) {
     Input position is in inches. scaleFactor convers inches -> pixels.
     Example of state: {x:72, y:72, dir:0}
     */
-    const scaleFactor = 3;
     const centerX = state.X * scaleFactor;
     const centerY = state.Y * scaleFactor;
     const dir = state.dir/180*Math.PI;  // Convert to Radians
