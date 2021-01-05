@@ -307,26 +307,26 @@ class RobotClass {
             dx = i * Math.sin(radian) + j * Math.cos(radian);
             dy = i * Math.cos(radian) + j * Math.sin(radian);
             dir = (this.dir + theta*180/Math.PI) % 360;
-          }
+        }
 
-          // Temporarily define new robot positional values
-          const X = Math.max(Math.min(this.X + dx, this.MaxX), 0);
-          const Y = Math.max(Math.min(this.Y + dy, this.MaxY), 0);
-          const ltheta = (this.Wl * 5 + this.ltheta) % 360;
-          const rtheta = (this.Wr * 5 + this.rtheta) % 360;
-          const corners = this.updateCorners(X, Y, dir);
+        // Temporarily define new robot positional values
+        const X = Math.max(Math.min(this.X + dx, this.MaxX), 0);
+        const Y = Math.max(Math.min(this.Y + dy, this.MaxY), 0);
+        const ltheta = (this.Wl * 5 + this.ltheta) % 360;
+        const rtheta = (this.Wr * 5 + this.rtheta) % 360;
+        const corners = this.updateCorners(X, Y, dir);
 
-          //Check if the given move results in a collision with any field objects
-          let inter = false;
-          for (let i=0; i < simulator.obstacles.length; i++) {
+        //Check if the given move results in a collision with any field objects
+        let inter = false;
+        for (let i=0; i < simulator.obstacles.length; i++) {
             inter = this.intersectOne(simulator.obstacles[i], corners);
             if (inter) {
-              break;
+                break;
             }
-          }
+        }
 
-          // If no collision, update robot positional attributes
-          if (!inter) {
+        // If no collision, update robot positional attributes
+        if (!inter) {
             this.X = X;
             this.Y = Y;
             this.ltheta = ltheta;
@@ -336,27 +336,26 @@ class RobotClass {
             this.botR = corners.botR;
             this.topL = corners.topL;
             this.topR = corners.topR;
-          }
+        }
 
-          // Send position and sensor readings to main thread
-          let newState = {
-              X: this.X,
-              Y: this.Y,
-              dir: this.dir
-          };
+        // Send position and sensor readings to main thread
+        let newState = {
+            X: this.X,
+            Y: this.Y,
+            dir: this.dir
+        };
 
-          this.sensor.get_val()
-          let sensorValues = {
-              leftSensor: this.leftSensor,
-              centerSensor: this.centerSensor,
-              rightSensor: this.rightSensor
-          };
+        this.sensor.get_val()
+        let sensorValues = {
+            leftSensor: this.leftSensor,
+            centerSensor: this.centerSensor,
+            rightSensor: this.rightSensor
+        };
 
-          postMessage({
-              robot: newState,
-              sensors: sensorValues
-          })
-
+        postMessage({
+            robot: newState,
+            sensors: sensorValues
+        })
     }
 
     updateCorners(newX, newY, dir) {
@@ -423,6 +422,7 @@ class RobotClass {
         }
         throw new Error("Device was not found" + device);
     }
+    
     sleep(duration) {
         /* Autonomous code pauses execution for <duration> seconds
         */
