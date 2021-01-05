@@ -3,8 +3,8 @@ var worker = new Worker("static/js/robot.js");
 var timer;
 var inputMode = "keyboard";
 const scaleFactor = 3;
-
-setUpCanvas();
+const canvas = document.getElementById('fieldCanvas');
+const ctx = canvas.getContext('2d');
 
 // Handle messages from worker
 function onmessage(e) {
@@ -27,6 +27,25 @@ function onmessage(e) {
     }
 }
 worker.onmessage = onmessage;
+
+function setUpWalls(ctx) {
+    let wallNum = 4; //change this if you want
+    let arr = new Array([0, 0, 144, 2], [0, 0, 2, 144], [142, 0, 2, 144], [0, 142, 144, 2]);
+    //TODO: Read obstacle info from a data file
+    worker.postMessage({initObj: true, walls: {count: wallNum, arr: arr}});
+    let i = 0;
+    while (i < arr.length) {
+        ctx.beginPath();
+        ctx.fillRect(
+            arr[i][0]*scaleFactor,
+            arr[i][1]*scaleFactor,
+            arr[i][2]*scaleFactor,
+            arr[i][3]*scaleFactor
+        );
+        i+=1;
+    }
+}
+setUpWalls(ctx);
 
 // Switch input mode between 'keyboard' and 'gamepad'
 function switchInput() {
@@ -133,39 +152,6 @@ function runAutoTimer() {
     }, 1000);
 }
 
-function setUpCanvas() {
-  canvas = document.getElementById('fieldCanvas')
-  ctx = canvas.getContext('2d')
-  setUpWalls(ctx);
-
-
-  // outlined square X: 50, Y: 35, width/height 50
-  //ctx.beginPath()
-  //ctx.strokeRect(50, 35, 50, 50)
-
-  // filled square X: 125, Y: 35, width/height 50
-  //ctx.beginPath()
-  //ctx.fillRect(125, 35, 50, 50)
-}
-
-function setUpWalls(ctx) {
-    let wallNum = 4; //change this if you want
-    let arr = new Array([0, 0, 144, 2], [0, 0, 2, 144], [142, 0, 2, 144], [0, 142, 144, 2]);
-    //TODO: Read obstacle info from a data file
-    worker.postMessage({initObj: true, walls: {count: wallNum, arr: arr}});
-    let i = 0;
-    while (i < arr.length) {
-        ctx.beginPath();
-        ctx.fillRect(
-            arr[i][0]*scaleFactor,
-            arr[i][1]*scaleFactor,
-            arr[i][2]*scaleFactor,
-            arr[i][3]*scaleFactor
-        );
-        i+=1;
-    }
-}
-
 function stop() {
     /*
     Stop the robot thread
@@ -177,6 +163,7 @@ function stop() {
     mode = "idle";
     update({X:70,Y:70,dir:0}); // in inches
     clearInterval(timer);
+    setUpWalls(ctx);
 };
 
 function clearConsole(){

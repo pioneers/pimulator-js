@@ -2,13 +2,10 @@ function FieldObj() {
     if (!(this instanceof FieldObj)) {
         return new FieldObj;
     }
-    this.color;
     this.x=0;
     this.y=0;
     this.w=0;
     this.h=0;
-
-
 }
 
 class Wall extends FieldObj {
@@ -32,8 +29,5 @@ class Wall extends FieldObj {
         this.botL[1] = y + h;
         this.botR[0] = x + w;
         this.botR[1] = y + h;
-        //ctx.beginPath()
-        //ctx.strokeRect(this.x, this.y, this.w, this.h)
-        obstacles.push(this);
     }
 }
