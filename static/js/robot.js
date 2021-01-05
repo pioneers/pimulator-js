@@ -715,10 +715,22 @@ class Simulator{
         this.tapeLines = [];
         this.tapeLines.push(new TapeLine(27, 27, 115, 115));
         this.obstacles = [];
+
+        //TODO: Read obstacle info from a data file
+        this.obstacles.push(new Wall(0, 0, 144, 2));
+        this.obstacles.push(new Wall(0, 0, 2, 144));
+        this.obstacles.push(new Wall(142, 0, 2, 144));
+        this.obstacles.push(new Wall(0, 142, 144, 2));
+
+        this.drawObjs();
     }
 
-    addObstacle(obj) {
-        this.obstacles.push(obj);
+    drawObjs() {
+        let objs = [];
+        for (const obstacle of this.obstacles) {
+            objs.push(obstacle);
+        }
+        postMessage({objs: objs});
     }
 
     initGamepad(){
@@ -728,9 +740,9 @@ class Simulator{
         if (control_type_index == -1) {
             throw new Error("Invalid gamepad mode")}
         this.gamepad = new GamepadClass(control_type_index)
-      }
+    }
 
-    loadStudentCode(studentCodeFileName="student_code_file.py"){
+    loadStudentCode(){
         /*
         Load the student code to the current Simulator instance
         */
@@ -822,13 +834,15 @@ this.onmessage = function(e) {
 
     // Add field objects to the simulator
     if (e.data.initObj === true) {
-        for (var i = 0; i < e.data.walls.count; i++) {
-            simulator.addObstacle(
-                new Wall(e.data.walls.arr[i][0], 
-                         e.data.walls.arr[i][1], 
-                         e.data.walls.arr[i][2], 
-                         e.data.walls.arr[i][3])
-            );
+        for (var i = 0; i < e.data.objs.length; i++) {
+            if (e.data.types[i] == "wall") {
+                simulator.addObstacle(
+                    new Wall(e.data.objs[i][0],
+                             e.data.objs[i][1],
+                             e.data.objs[i][2],
+                             e.data.objs[i][3])
+                );
+            }
         }
     }
 

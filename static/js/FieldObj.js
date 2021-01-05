@@ -17,10 +17,10 @@ class Wall extends FieldObj {
 
     constructor(x, y, w, h) {
         super();
-        this.x = (132/400) * x;
-        this.y = (132/400) * y;
-        this.w = (132/400) * w;
-        this.h = (132/400) * h;
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
         this.topL[0] = x;
         this.topL[1] = y;
         this.topR[0] = x + w;

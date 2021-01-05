@@ -3,8 +3,6 @@ var worker = new Worker("static/js/robot.js");
 var timer;
 var inputMode = "keyboard";
 const scaleFactor = 3;
-const canvas = document.getElementById('fieldCanvas');
-const ctx = canvas.getContext('2d');
 
 // Handle messages from worker
 function onmessage(e) {
@@ -20,32 +18,31 @@ function onmessage(e) {
             runAutoTimer();
         }
     }
-
     if (e.data.log !== undefined) {
         let text = e.data.log;
         log(text);
     }
+    if (e.data.objs !== undefined) {
+        drawObjs(e.data.objs);
+    }
 }
 worker.onmessage = onmessage;
 
-function setUpWalls(ctx) {
-    let wallNum = 4; //change this if you want
-    let arr = new Array([0, 0, 144, 2], [0, 0, 2, 144], [142, 0, 2, 144], [0, 142, 144, 2]);
-    //TODO: Read obstacle info from a data file
-    worker.postMessage({initObj: true, walls: {count: wallNum, arr: arr}});
-    let i = 0;
-    while (i < arr.length) {
+function drawObjs(objs) {
+    /* Draw objects received from the worker. */
+    const canvas = document.getElementById('fieldCanvas');
+    const ctx = canvas.getContext('2d');
+
+    for (let i = 0; i < objs.length; i++) {
         ctx.beginPath();
         ctx.fillRect(
-            arr[i][0]*scaleFactor,
-            arr[i][1]*scaleFactor,
-            arr[i][2]*scaleFactor,
-            arr[i][3]*scaleFactor
+            objs[i].x*scaleFactor,
+            objs[i].y*scaleFactor,
+            objs[i].w*scaleFactor,
+            objs[i].h*scaleFactor
         );
-        i+=1;
     }
 }
-setUpWalls(ctx);
 
 // Switch input mode between 'keyboard' and 'gamepad'
 function switchInput() {
@@ -163,7 +160,6 @@ function stop() {
     mode = "idle";
     update({X:70,Y:70,dir:0}); // in inches
     clearInterval(timer);
-    setUpWalls(ctx);
 };
 
 function clearConsole(){
