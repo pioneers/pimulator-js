@@ -25,6 +25,7 @@ var console=(function(oldCons){
 importScripts("https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js");
 importScripts('./GamepadClass.js');
 importScripts('./Sensor.js');
+importScripts('./tapeLines.js');
 
 var code = "";
 var env = {};
@@ -437,8 +438,22 @@ class Simulator{
         this.initGamepad();
         this.current = [];
         this.tapeLines = [];
+        var rawtapeLinesLength = rawtapeLines.length;
+        for (var i = 0; i < rawtapeLines; i++) {
+          let newLine = rawtapeLines[i]
+          this.tapeLines.push(new TapeLine(newLine.x1, newLine.y1, newLine.x2, newLine.y2));
+          // draw objs?
+        }
+
+        this.tapeLines = [];
         this.tapeLines.push(new TapeLine(27, 27, 115, 115));
     }
+    // get yaml file
+    // read tapelines from yaml file as js type (probably dictionary)
+
+    // each line is a dictionary (javascript type somehow read from yaml?) with x1, x2, y1, y2
+    // make each dictionary into an instance of the tapeLine class and add each to this.tapeLines
+
 
     initGamepad(){
         const control_types = ['tank', 'arcade', 'other1', 'other2']
