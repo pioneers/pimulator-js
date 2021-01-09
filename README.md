@@ -35,4 +35,4 @@ Scott has deployed pimulator on Google Cloud, before removing it to not pay mone
 * Authentication to prevent randos from running Python code on our dime
 * Better error messages and feedback
 * Customization of the robot to include sensors and motors, etc.
-        * Visual reflection of this
+    - Visual reflection of this

@@ -2,6 +2,7 @@ var mode = "idle"; // or auto or teleop
 var worker = new Worker("static/js/robot.js");
 var timer;
 var inputMode = "keyboard";
+const scaleFactor = 3;
 
 // Handle messages from worker
 function onmessage(e) {
@@ -17,13 +18,31 @@ function onmessage(e) {
             runAutoTimer();
         }
     }
-
     if (e.data.log !== undefined) {
         let text = e.data.log;
         log(text);
     }
+    if (e.data.objs !== undefined) {
+        drawObjs(e.data.objs);
+    }
 }
 worker.onmessage = onmessage;
+
+function drawObjs(objs) {
+    /* Draw objects received from the worker. */
+    const canvas = document.getElementById('fieldCanvas');
+    const ctx = canvas.getContext('2d');
+
+    for (let i = 0; i < objs.length; i++) {
+        ctx.beginPath();
+        ctx.fillRect(
+            objs[i].x*scaleFactor,
+            objs[i].y*scaleFactor,
+            objs[i].w*scaleFactor,
+            objs[i].h*scaleFactor
+        );
+    }
+}
 
 // Switch input mode between 'keyboard' and 'gamepad'
 function switchInput() {
@@ -58,7 +77,7 @@ document.addEventListener('keyup', up);
 function uploadCode() {
     code = cm.getValue();
     worker.postMessage({code:code});
-};
+}
 
 function update(state) {
     /*
@@ -66,26 +85,42 @@ function update(state) {
     Input position is in inches. scaleFactor convers inches -> pixels.
     Example of state: {x:72, y:72, dir:0}
     */
-    const scaleFactor = 3;
     const centerX = state.X * scaleFactor;
     const centerY = state.Y * scaleFactor;
-    const dir = state.dir;
+    const dir = state.dir/180*Math.PI;  // Convert to Radians
     document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
     const sensorPoints = document.querySelectorAll("circle")
-    const topLeftCornerX = centerX - 30
-    const topLeftCornerY = centerY - 40
+
+    // Set sensors
     sensorPoints[0].setAttributeNS(null, "cx", centerX)
     sensorPoints[0].setAttributeNS(null, "cy", centerY)
-    sensorPoints[1].setAttributeNS(null, "cy", centerY+(15*Math.cos(dir/180*Math.PI)))
-    sensorPoints[1].setAttributeNS(null, "cx", centerX+(-15*Math.sin(dir/180*Math.PI)))
-    sensorPoints[2].setAttributeNS(null, "cy", centerY-(15*Math.cos(dir/180*Math.PI)))
-    sensorPoints[2].setAttributeNS(null, "cx", centerX-(-15*Math.sin(dir/180*Math.PI)))
+    sensorPoints[1].setAttributeNS(null, "cy", centerY+(15*Math.cos(dir)))
+    sensorPoints[1].setAttributeNS(null, "cx", centerX+(-15*Math.sin(dir)))
+    sensorPoints[2].setAttributeNS(null, "cy", centerY-(15*Math.cos(dir)))
+    sensorPoints[2].setAttributeNS(null, "cx", centerX-(-15*Math.sin(dir)))
+
+    // Set robot coordinates
+    const topLeftCornerX = centerX - 30
+    const topLeftCornerY = centerY - 40
     const robotRect = document.querySelector("rect")
     robotRect.setAttributeNS(null, "x", topLeftCornerX)
     robotRect.setAttributeNS(null, "y", topLeftCornerY)
-    const rotateStr = `rotate(${dir} ${centerX} ${centerY})`
+    const rotateStr = `rotate(${state.dir} ${centerX} ${centerY})`
     robotRect.setAttribute("transform", rotateStr)
-};
+
+    // Set triangle on robot
+    const triangle = document.querySelector("polygon")
+    const dirRotate = (state.dir+90)/180*Math.PI
+    const topTriangleX = centerX - 24*Math.sin(dirRotate)
+    const topTriangleY = centerY + 24*Math.cos(dirRotate)
+    const baseTriangleX = 3*topTriangleX/4 +  1* centerX/4
+    const baseTriangleY = 3*topTriangleY/4 + 1*centerY/4
+    const sideDist = 6/Math.sqrt(3)
+    const trianglePoint2 = `${baseTriangleX-sideDist*Math.sin(dir)},${baseTriangleY+sideDist*Math.cos(dir)} `
+    const trianglePoint3 = `${baseTriangleX+sideDist*Math.sin(dir)},${baseTriangleY-sideDist*Math.cos(dir)}`
+    const triangleStr = `${topTriangleX},${topTriangleY} ` + trianglePoint2 + trianglePoint3;
+    triangle.setAttributeNS(null, "points",triangleStr);
+}
 
 function updateSensors(sensorValues) {
     document.getElementById("left-sensor").innerText = "Left Sensor: " + sensorValues.leftSensor.toFixed(3);
@@ -110,7 +145,7 @@ function start(auto=0) {
             worker.postMessage({start:true, mode:"auto"})
         }
     }
-};
+}
 
 function runAutoTimer() {
     var startTime = new Date().getTime();
@@ -142,7 +177,7 @@ function stop() {
     mode = "idle";
     update({X:70,Y:70,dir:0}); // in inches
     clearInterval(timer);
-};
+}
 
 function clearConsole(){
     document.getElementById("console").innerText = ""
