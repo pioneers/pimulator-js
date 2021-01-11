@@ -25,11 +25,8 @@ var console=(function(oldCons){
 importScripts("https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js");
 importScripts('./GamepadClass.js');
 importScripts('./Sensor.js');
-<<<<<<< HEAD
 importScripts('./tapeLines.js');
-=======
 importScripts('./FieldObj.js');
->>>>>>> 5faf14a863703103b267f1a81e3e0f1cc2ee51a0
 
 var code = "";
 var env = {};
@@ -394,7 +391,7 @@ class RobotClass {
     set_value(device, param, speed) {
         /* Runtime API method for updating L/R motor speed. Takes only L/R
            Motor as device name and speed bounded by [-1,1]. */
-        
+
         if (speed > 1.0 || speed < -1.0){
             throw new Error("Speed cannot be great than 1.0 or less than -1.0.");
         }
@@ -411,7 +408,7 @@ class RobotClass {
     }
 
     get_value(device, param) {
-        /* Runtime API method for getting sensor values. 
+        /* Runtime API method for getting sensor values.
            Currently supports reading left, center and right line followers
            in a range of [0,1]. */
 
@@ -426,7 +423,7 @@ class RobotClass {
         }
         throw new Error("Device was not found" + device);
     }
-    
+
     sleep(duration) {
         /* Autonomous code pauses execution for <duration> seconds
         */
@@ -717,32 +714,26 @@ class Simulator{
         this.initGamepad();
         this.current = [];
         this.tapeLines = [];
-        var rawtapeLinesLength = rawtapeLines.length;
-        for (var i = 0; i < rawtapeLines; i++) {
-          let newLine = rawtapeLines[i]
-          this.tapeLines.push(new TapeLine(newLine.x1, newLine.y1, newLine.x2, newLine.y2));
-          // draw objs?
-        }
-
-        this.tapeLines = [];
-        this.tapeLines.push(new TapeLine(27, 27, 115, 115));
         this.obstacles = [];
-
-        //TODO: Read obstacle info from a data file
-        this.obstacles.push(new Wall(0, 0, 144, 2));
-        this.obstacles.push(new Wall(0, 0, 2, 144));
-        this.obstacles.push(new Wall(142, 0, 2, 144));
-        this.obstacles.push(new Wall(0, 142, 144, 2));
+        var tapeLinesLength = objects.tapeLinesData.length;
+        for (let i = 0; i < tapeLinesLength; i++) {
+          let newLine = objects.tapeLinesData[i];
+          this.tapeLines.push(new TapeLine(newLine.x1, newLine.y1, newLine.x2, newLine.y2, newLine.color));
+        }
+        var obstaclesLength = objects.wallsData.length;
+        for (let i = 0; i < obstaclesLength; i++) {
+          let newWall = objects.wallsData[i];
+          this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, newWall.color));
+        }
 
         this.drawObjs();
     }
 
     drawObjs() {
-        let objs = [];
-        for (const obstacle of this.obstacles) {
-            objs.push(obstacle);
-        }
-        postMessage({objs: objs});
+        postMessage({objs: this.obstacles, type: "obstacle"});
+        postMessage({objs: this.tapeLines, type: "tapeLine"});
+        //console.log(this.tapeLines[0].color + " pomme " + this.tapeLines[0].x1);
+        //console.log(this.tapeLines[1].color);
     }
     // get yaml file
     // read tapelines from yaml file as js type (probably dictionary)
