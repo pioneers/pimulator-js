@@ -147,7 +147,7 @@ function updateSensors(sensorValues) {
     document.getElementById("right-sensor").innerText = "Right Sensor: " + sensorValues.rightSensor.toFixed(3);
 }
 
-function start(auto=0) {
+function start(auto=false) {
     /*
     Start the robot thread
     Return if started robot thread
@@ -157,10 +157,10 @@ function start(auto=0) {
     }
     else {
         clearInterval(timer);
-        if (auto === 0) {
+        if (auto === false) {
             worker.postMessage({start:true, mode:"teleop"})
         }
-        else if (auto === 1) {
+        else if (auto === true) {
             worker.postMessage({start:true, mode:"auto"})
         }
     }
