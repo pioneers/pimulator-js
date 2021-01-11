@@ -732,15 +732,7 @@ class Simulator{
     drawObjs() {
         postMessage({objs: this.obstacles, type: "obstacle"});
         postMessage({objs: this.tapeLines, type: "tapeLine"});
-        //console.log(this.tapeLines[0].color + " pomme " + this.tapeLines[0].x1);
-        //console.log(this.tapeLines[1].color);
     }
-    // get yaml file
-    // read tapelines from yaml file as js type (probably dictionary)
-
-    // each line is a dictionary (javascript type somehow read from yaml?) with x1, x2, y1, y2
-    // make each dictionary into an instance of the tapeLine class and add each to this.tapeLines
-
 
     initGamepad(){
         const control_types = ['tank', 'arcade', 'other1', 'other2'];
