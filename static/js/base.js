@@ -33,34 +33,33 @@ function drawObjs(objs, type) {
     const canvas = document.getElementById('fieldCanvas');
     const ctx = canvas.getContext('2d');
     if (type === "obstacle") {
-      const canvas = document.getElementById('fieldCanvas');
-      const ctx = canvas.getContext('2d');
-      for (let i = 0; i < objs.length; i++) {
-          ctx.beginPath();
-          ctx.fillStyle = objs[i].color;
-          ctx.fillRect(
-              objs[i].x*scaleFactor,
-              objs[i].y*scaleFactor,
-              objs[i].w*scaleFactor,
-              objs[i].h*scaleFactor
-          );
-      }
-    } else {
-      const canvas = document.getElementById('fieldCanvas');
-      const ctx = canvas.getContext('2d');
-      ctx.lineWidth = 7;
-      for (let i = 0; i < objs.length; i++) {
-          ctx.beginPath();
-          ctx.strokeStyle = objs[i].color;
-          ctx.moveTo(objs[i].startX*scaleFactor, objs[i].startY*scaleFactor)
-          ctx.lineTo(
-              objs[i].endX*scaleFactor,
-              objs[i].endY*scaleFactor,
-          );
-          ctx.stroke();
-      }
+        const canvas = document.getElementById('fieldCanvas');
+        const ctx = canvas.getContext('2d');
+        for (let i = 0; i < objs.length; i++) {
+            ctx.beginPath();
+            ctx.fillStyle = objs[i].color;
+            ctx.fillRect(
+                objs[i].x*scaleFactor,
+                objs[i].y*scaleFactor,
+                objs[i].w*scaleFactor,
+                objs[i].h*scaleFactor
+            );
+        }
+    } else if (type === "tapeLine") {
+        const canvas = document.getElementById('fieldCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.lineWidth = 5;
+        for (let i = 0; i < objs.length; i++) {
+            ctx.beginPath();
+            ctx.strokeStyle = objs[i].color;
+            ctx.moveTo(objs[i].startX*scaleFactor, objs[i].startY*scaleFactor)
+            ctx.lineTo(
+                objs[i].endX*scaleFactor,
+                objs[i].endY*scaleFactor,
+            );
+            ctx.stroke();
+        }
     }
-
 }
 
 // Switch input mode between 'keyboard' and 'gamepad'
