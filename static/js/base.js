@@ -33,8 +33,6 @@ function drawObjs(objs, type) {
     const canvas = document.getElementById('fieldCanvas');
     const ctx = canvas.getContext('2d');
     if (type === "obstacle") {
-        const canvas = document.getElementById('fieldCanvas');
-        const ctx = canvas.getContext('2d');
         for (let i = 0; i < objs.length; i++) {
             ctx.beginPath();
             ctx.fillStyle = objs[i].color;
@@ -46,8 +44,6 @@ function drawObjs(objs, type) {
             );
         }
     } else if (type === "tapeLine") {
-        const canvas = document.getElementById('fieldCanvas');
-        const ctx = canvas.getContext('2d');
         ctx.lineWidth = 5;
         for (let i = 0; i < objs.length; i++) {
             ctx.beginPath();
