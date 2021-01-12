@@ -25,7 +25,7 @@ var console=(function(oldCons){
 importScripts("https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js");
 importScripts('./GamepadClass.js');
 importScripts('./Sensor.js');
-importScripts('./tapeLines.js');
+importScripts('./objects.js');
 importScripts('./FieldObj.js');
 
 var code = "";
