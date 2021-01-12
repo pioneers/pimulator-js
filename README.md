@@ -26,7 +26,7 @@ To easily deploy, develop, and run the application, pimulator is packaged in ima
 
 ## Deployment
 
-Pimulator is publicly available at https://pimulator.pierobotics.org/.
+Pimulator is publicly available at [pimulator.pierobotics.org](https://pimulator.pierobotics.org/).
 
 ## Future Development
 
