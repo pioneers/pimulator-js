@@ -715,12 +715,12 @@ class Simulator{
         this.current = [];
         this.tapeLines = [];
         this.obstacles = [];
-        var tapeLinesLength = objects.tapeLinesData.length;
+        const tapeLinesLength = objects.tapeLinesData.length;
         for (let i = 0; i < tapeLinesLength; i++) {
           let newLine = objects.tapeLinesData[i];
           this.tapeLines.push(new TapeLine(newLine.x1, newLine.y1, newLine.x2, newLine.y2, newLine.color));
         }
-        var obstaclesLength = objects.wallsData.length;
+        const obstaclesLength = objects.wallsData.length;
         for (let i = 0; i < obstaclesLength; i++) {
           let newWall = objects.wallsData[i];
           this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, newWall.color));
