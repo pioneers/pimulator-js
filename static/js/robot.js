@@ -82,11 +82,9 @@ class RobotClass {
         this.runningCoroutines = new Set();
 
         // Ensure we don't hit sync errors when updating our values
-        this.leftSensor = 0;
-        this.centerSensor = 0;
-        this.rightSensor = 0;
         this.simulator = simulator;
         this.sensor = new Sensor(this);
+        this.limitSwitch = new LimitSwitch(this);
     }
 
     intersectRobotRef(obj, corners) {
@@ -329,9 +327,9 @@ class RobotClass {
 
         this.sensor.get_val()
         let sensorValues = {
-            leftSensor: this.leftSensor,
-            centerSensor: this.centerSensor,
-            rightSensor: this.rightSensor
+            leftSensor: this.sensor.left,
+            centerSensor: this.sensor.center,
+            rightSensor: this.sensor.right
         };
 
         postMessage({
@@ -372,7 +370,7 @@ class RobotClass {
     set_value(device, param, speed) {
         /* Runtime API method for updating L/R motor speed. Takes only L/R
            Motor as device name and speed bounded by [-1,1]. */
-        
+
         if (speed > 1.0 || speed < -1.0){
             throw new Error("Speed cannot be great than 1.0 or less than -1.0.");
         }
@@ -389,22 +387,28 @@ class RobotClass {
     }
 
     get_value(device, param) {
-        /* Runtime API method for getting sensor values. 
+        /* Runtime API method for getting sensor values.
            Currently supports reading left, center and right line followers
            in a range of [0,1]. */
+        if (device === "limit_switch") {
+          if (param === "switch0") {
 
+          } else if (param === "switch1") {
+
+          }
+        }
         if (device === "line_follower") {
             if (param === "left"){
-                return this.leftSensor;
+                return this.sensor.left;
             } else if (param === "center") {
-                return this.centerSensor;
+                return this.sensor.center;
             } else if (param === "right") {
-                return this.rightSensor;
+                return this.sensor.right;
             }
         }
         throw new Error("Device was not found" + device);
     }
-    
+
     sleep(duration) {
         /* Autonomous code pauses execution for <duration> seconds
         */

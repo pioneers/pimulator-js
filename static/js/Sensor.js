@@ -1,7 +1,11 @@
 class Sensor{
    constructor(robot) {
      this.robot = robot;
+     this.left = 0;
+     this.center = 0;
+     this.right = 0;
    }
+
    get_val(){
      var sensorsY = [this.robot.Y - 5*Math.cos(this.robot.dir/180*Math.PI), this.robot.Y, this.robot.Y + 5*Math.cos(this.robot.dir/180*Math.PI)]
      var sensorsX = [this.robot.X - 5*Math.sin(-this.robot.dir/180*Math.PI), this.robot.X, this.robot.X + 5*Math.sin(-this.robot.dir/180*Math.PI)]
@@ -62,10 +66,9 @@ class Sensor{
        }
        total.push(Math.min(totalLine, 1))
      }
-     this.robot.leftSensor = total[2]
-     this.robot.centerSensor = total[1]
-     this.robot.rightSensor = total[0]
-     return total
+     this.left = total[2]
+     this.center = total[1]
+     this.right = total[0]
    }
 }
 class TapeLine{
@@ -83,4 +86,14 @@ class TapeLine{
       this.y_int = y1 - this.slope*x1
     }
   }
+}
+
+class LimitSwitch{
+  constructor(robot) {
+    this.robot = robot;
+    this.switch0 = false;
+    this.switch1 = false;
+  }
+  
+
 }
