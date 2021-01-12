@@ -265,24 +265,6 @@ class RobotClass {
         return min;
     }
 
-    set_value(device, param, speed) {
-        /* Runtime API method for updating L/R motor speed. Takes only L/R
-           Motor as device name and speed bounded by [-1,1]. */
-        if (speed > 1.0 || speed < -1.0){
-            throw new Error("Speed cannot be great than 1.0 or less than -1.0.");
-        }
-        if (param !== "duty_cycle") {
-            throw new Error('"duty_cycle" is the only currently supported parameter');
-        }
-        if (device === "left_motor") {
-            this.Wl = speed * 9;
-        } else if (device === "right_motor") {
-            this.Wr = speed * 9;
-        } else {
-            throw new Error("Cannot find device name: " + device);
-        }
-    }
-
     updatePosition() {
         /* Updates position of the  Robot using differential drive equations
         Derived with reference to:
@@ -411,12 +393,12 @@ class RobotClass {
            Currently supports reading left, center and right line followers
            in a range of [0,1]. */
 
-        if (device === "4752729234491832779312"){
+        if (device === "line_follower") {
             if (param === "left"){
                 return this.leftSensor;
             } else if (param === "center") {
                 return this.centerSensor;
-            } else if (param === "right"){
+            } else if (param === "right") {
                 return this.rightSensor;
             }
         }
