@@ -84,8 +84,7 @@ joypad.set({
 joypad.on('button_press', e => {
     console.log(e.detail);
     const buttonName = e.detail.buttonName;
-    clearPadVals();
-    document.getElementById(buttonName).innerText = padMap[buttonName] + ": 1";
+    //clearPadVals();
     if (mode === "teleop") {
         if (inputMode === "gamepad") {
             if (e.detail.pressed) {
@@ -95,6 +94,11 @@ joypad.on('button_press', e => {
             }
         }
     }
+    if (e.detail.pressed) {
+        document.getElementById(buttonName).innerText = padMap[buttonName] + ": 1";
+    } else {
+        document.getElementById(buttonName).innerText = padMap[buttonName] + ": 0";
+    }
 });
 
 /*
@@ -103,7 +107,7 @@ joypad.on('button_press', e => {
 joypad.on('axis_move', e => {
     console.log(e.detail);
     const axisName = "axis_" + e.detail.axis;
-    clearPadVals();
+    //clearPadVals();
     document.getElementById(axisName).innerText = padMap[axisName] + ": " + e.detail.axisMovementValue;
     if (mode === "teleop") {
         if (inputMode === "gamepad") {
