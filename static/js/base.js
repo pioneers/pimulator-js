@@ -80,7 +80,7 @@ function update(state) {
     const centerX = state.X * scaleFactor;
     const centerY = state.Y * scaleFactor;
     const dir = state.dir;
-    document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
+    document.getElementById("demo").innerHTML = "x: " + state.X.toFixed(2) + ", y: " + state.Y.toFixed(2)
     const sensorPoints = document.querySelectorAll("circle")
     const topLeftCornerX = centerX - 30
     const topLeftCornerY = centerY - 40
@@ -114,11 +114,16 @@ function start(auto=0) {
     else {
         clearInterval(timer);
         if (auto === 0) {
+            $("#teleop-btn").removeClass("btn-outline-primary").addClass("btn-primary")
             worker.postMessage({start:true, mode:"teleop"})
         }
         else if (auto === 1) {
+            $("#autonomous-btn").removeClass("btn-outline-primary").addClass("btn-primary")
             worker.postMessage({start:true, mode:"auto"})
         }
+        document.getElementById("stop-btn").disabled = false;
+        document.getElementById("teleop-btn").disabled = true;
+        document.getElementById("autonomous-btn").disabled = true;
     }
 };
 
@@ -152,6 +157,15 @@ function stop() {
     mode = "idle";
     update({X:70,Y:70,dir:0}); // in inches
     clearInterval(timer);
+    document.getElementById("stop-btn").disabled = true;
+    document.getElementById("teleop-btn").disabled = false;
+    document.getElementById("autonomous-btn").disabled = false;
+    if (document.getElementById("teleop-btn").classList.contains("btn-primary")) {
+        $("#teleop-btn").removeClass("btn-primary").addClass("btn-outline-primary")
+    }
+    if (document.getElementById("autonomous-btn").classList.contains("btn-primary")) {
+        $("#autonomous-btn").removeClass("btn-primary").addClass("btn-outline-primary")
+    }
 };
 
 function clearConsole(){
