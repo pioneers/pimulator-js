@@ -811,20 +811,6 @@ this.onmessage = function(e) {
         console.log("Code upload successful");
     }
 
-    // Add field objects to the simulator
-    if (e.data.initObj === true) {
-        for (var i = 0; i < e.data.objs.length; i++) {
-            if (e.data.types[i] == "wall") {
-                simulator.addObstacle(
-                    new Wall(e.data.objs[i][0],
-                             e.data.objs[i][1],
-                             e.data.objs[i][2],
-                             e.data.objs[i][3])
-                );
-            }
-        }
-    }
-
     // Start simulation
     if (e.data.start === true) {
         if (code === ""){
