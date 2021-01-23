@@ -3,6 +3,7 @@ var worker = new Worker("static/js/robot.js");
 var timer;
 var inputMode = "keyboard";
 var codeUploaded = false;
+const scaleFactor = 3;
 
 // Handle messages from worker
 function onmessage(e) {
@@ -18,13 +19,45 @@ function onmessage(e) {
             runAutoTimer();
         }
     }
-
     if (e.data.log !== undefined) {
         let text = e.data.log;
         log(text);
     }
+    if (e.data.objs !== undefined) {
+        drawObjs(e.data.objs);
+    }
 }
 worker.onmessage = onmessage;
+
+function drawObjs(objs, type) {
+    /* Draw objects received from the worker. */
+    const canvas = document.getElementById('fieldCanvas');
+    const ctx = canvas.getContext('2d');
+    if (type === "obstacle") {
+        for (let i = 0; i < objs.length; i++) {
+            ctx.beginPath();
+            ctx.fillStyle = objs[i].color;
+            ctx.fillRect(
+                objs[i].x*scaleFactor,
+                objs[i].y*scaleFactor,
+                objs[i].w*scaleFactor,
+                objs[i].h*scaleFactor
+            );
+        }
+    } else if (type === "tapeLine") {
+        ctx.lineWidth = 5;
+        for (let i = 0; i < objs.length; i++) {
+            ctx.beginPath();
+            ctx.strokeStyle = objs[i].color;
+            ctx.moveTo(objs[i].startX*scaleFactor, objs[i].startY*scaleFactor)
+            ctx.lineTo(
+                objs[i].endX*scaleFactor,
+                objs[i].endY*scaleFactor,
+            );
+            ctx.stroke();
+        }
+    }
+}
 
 // Switch input mode between 'keyboard' and 'gamepad'
 function switchInput(state) {
@@ -78,26 +111,42 @@ function update(state) {
     Input position is in inches. scaleFactor convers inches -> pixels.
     Example of state: {x:72, y:72, dir:0}
     */
-    const scaleFactor = 3;
     const centerX = state.X * scaleFactor;
     const centerY = state.Y * scaleFactor;
-    const dir = state.dir;
-    document.getElementById("demo").innerHTML = "x: " + state.X.toFixed(2) + ", y: " + state.Y.toFixed(2)
+    const dir = state.dir/180*Math.PI;  // Convert to Radians
+    document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
     const sensorPoints = document.querySelectorAll("circle")
-    const topLeftCornerX = centerX - 30
-    const topLeftCornerY = centerY - 40
+
+    // Set sensors
     sensorPoints[0].setAttributeNS(null, "cx", centerX)
     sensorPoints[0].setAttributeNS(null, "cy", centerY)
-    sensorPoints[1].setAttributeNS(null, "cy", centerY+(15*Math.cos(dir/180*Math.PI)))
-    sensorPoints[1].setAttributeNS(null, "cx", centerX+(-15*Math.sin(dir/180*Math.PI)))
-    sensorPoints[2].setAttributeNS(null, "cy", centerY-(15*Math.cos(dir/180*Math.PI)))
-    sensorPoints[2].setAttributeNS(null, "cx", centerX-(-15*Math.sin(dir/180*Math.PI)))
+    sensorPoints[1].setAttributeNS(null, "cy", centerY+(15*Math.cos(dir)))
+    sensorPoints[1].setAttributeNS(null, "cx", centerX+(-15*Math.sin(dir)))
+    sensorPoints[2].setAttributeNS(null, "cy", centerY-(15*Math.cos(dir)))
+    sensorPoints[2].setAttributeNS(null, "cx", centerX-(-15*Math.sin(dir)))
+
+    // Set robot coordinates
+    const topLeftCornerX = centerX - 30
+    const topLeftCornerY = centerY - 40
     const robotRect = document.querySelector("rect")
     robotRect.setAttributeNS(null, "x", topLeftCornerX)
     robotRect.setAttributeNS(null, "y", topLeftCornerY)
-    const rotateStr = `rotate(${dir} ${centerX} ${centerY})`
+    const rotateStr = `rotate(${state.dir} ${centerX} ${centerY})`
     robotRect.setAttribute("transform", rotateStr)
-};
+
+    // Set triangle on robot
+    const triangle = document.querySelector("polygon")
+    const dirRotate = (state.dir+90)/180*Math.PI
+    const topTriangleX = centerX - 24*Math.sin(dirRotate)
+    const topTriangleY = centerY + 24*Math.cos(dirRotate)
+    const baseTriangleX = 3*topTriangleX/4 +  1* centerX/4
+    const baseTriangleY = 3*topTriangleY/4 + 1*centerY/4
+    const sideDist = 6/Math.sqrt(3)
+    const trianglePoint2 = `${baseTriangleX-sideDist*Math.sin(dir)},${baseTriangleY+sideDist*Math.cos(dir)} `
+    const trianglePoint3 = `${baseTriangleX+sideDist*Math.sin(dir)},${baseTriangleY-sideDist*Math.cos(dir)}`
+    const triangleStr = `${topTriangleX},${topTriangleY} ` + trianglePoint2 + trianglePoint3;
+    triangle.setAttributeNS(null, "points",triangleStr);
+}
 
 function updateSensors(sensorValues) {
     document.getElementById("left-sensor").innerText = "Left Sensor: " + sensorValues.leftSensor.toFixed(3);
@@ -105,7 +154,7 @@ function updateSensors(sensorValues) {
     document.getElementById("right-sensor").innerText = "Right Sensor: " + sensorValues.rightSensor.toFixed(3);
 }
 
-function start(auto=0) {
+function start(auto=false) {
     /*
     Start the robot thread
     Return if started robot thread
@@ -116,10 +165,10 @@ function start(auto=0) {
     else {
         clearInterval(timer);
         if (codeUploaded) {
-            if (auto === 0) {
+            if (auto === false) {
                 $("#teleop-btn").removeClass("btn-outline-primary").addClass("btn-primary")
                 worker.postMessage({start:true, mode:"teleop"})
-            } else if (auto === 1) {
+            } else if (auto === true) {
                 $("#autonomous-btn").removeClass("btn-outline-primary").addClass("btn-primary")
                 worker.postMessage({start:true, mode:"auto"})
             }
@@ -127,10 +176,10 @@ function start(auto=0) {
             document.getElementById("teleop-btn").disabled = true;
             document.getElementById("autonomous-btn").disabled = true;
         } else {
-            if (auto === 0) {
+            if (auto === false) {
                 $("#teleop-btn").button('toggle')
                 worker.postMessage({start:true, mode:"teleop"})
-            } else if (auto === 1) {
+            } else if (auto === true) {
                 $("#autonomous-btn").button('toggle')
                 worker.postMessage({start:true, mode:"auto"})
             }
