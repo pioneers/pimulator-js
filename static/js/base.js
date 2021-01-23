@@ -2,6 +2,7 @@ var mode = "idle"; // or auto or teleop
 var worker = new Worker("static/js/robot.js");
 var timer;
 var inputMode = "keyboard";
+var codeUploaded = false;
 
 // Handle messages from worker
 function onmessage(e) {
@@ -68,6 +69,7 @@ document.addEventListener('keyup', up);
 function uploadCode() {
     code = cm.getValue();
     worker.postMessage({code:code});
+    codeUploaded = true;
 };
 
 function update(state) {
@@ -113,17 +115,26 @@ function start(auto=0) {
     }
     else {
         clearInterval(timer);
-        if (auto === 0) {
-            $("#teleop-btn").removeClass("btn-outline-primary").addClass("btn-primary")
-            worker.postMessage({start:true, mode:"teleop"})
+        if (codeUploaded) {
+            if (auto === 0) {
+                $("#teleop-btn").removeClass("btn-outline-primary").addClass("btn-primary")
+                worker.postMessage({start:true, mode:"teleop"})
+            } else if (auto === 1) {
+                $("#autonomous-btn").removeClass("btn-outline-primary").addClass("btn-primary")
+                worker.postMessage({start:true, mode:"auto"})
+            }
+            document.getElementById("stop-btn").disabled = false;
+            document.getElementById("teleop-btn").disabled = true;
+            document.getElementById("autonomous-btn").disabled = true;
+        } else {
+            if (auto === 0) {
+                $("#teleop-btn").button('toggle')
+                worker.postMessage({start:true, mode:"teleop"})
+            } else if (auto === 1) {
+                $("#autonomous-btn").button('toggle')
+                worker.postMessage({start:true, mode:"auto"})
+            }
         }
-        else if (auto === 1) {
-            $("#autonomous-btn").removeClass("btn-outline-primary").addClass("btn-primary")
-            worker.postMessage({start:true, mode:"auto"})
-        }
-        document.getElementById("stop-btn").disabled = false;
-        document.getElementById("teleop-btn").disabled = true;
-        document.getElementById("autonomous-btn").disabled = true;
     }
 };
 
@@ -140,7 +151,7 @@ function runAutoTimer() {
         document.getElementById("timer").innerText = "Time Left: " + timeLeft + "s";
 
         if (timeLeft < 0) {
-            clearInterval(timer);
+            autonomousReset()
             document.getElementById("timer").innerText = "Autonomous Mode has finished.";
         }
     }, 1000);
@@ -156,6 +167,14 @@ function stop() {
     worker.postMessage({code:code});
     mode = "idle";
     update({X:70,Y:70,dir:0}); // in inches
+    autonomousReset()
+};
+
+function autonomousReset() {
+    /*
+        Reset UI elements when autonomous naturally runs out (30s).
+        Resets the timer & simulation buttons.
+    */
     clearInterval(timer);
     document.getElementById("stop-btn").disabled = true;
     document.getElementById("teleop-btn").disabled = false;
@@ -166,7 +185,7 @@ function stop() {
     if (document.getElementById("autonomous-btn").classList.contains("btn-primary")) {
         $("#autonomous-btn").removeClass("btn-primary").addClass("btn-outline-primary")
     }
-};
+}
 
 function clearConsole(){
     document.getElementById("console").innerText = ""
