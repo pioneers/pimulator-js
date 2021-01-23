@@ -24,7 +24,7 @@ function onmessage(e) {
         log(text);
     }
     if (e.data.objs !== undefined) {
-        drawObjs(e.data.objs);
+        drawObjs(e.data.objs, e.data.type);
     }
 }
 worker.onmessage = onmessage;
