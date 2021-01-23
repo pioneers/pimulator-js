@@ -424,21 +424,21 @@
                                     indentUnit: 4
                                   });
                                   cm.setSize(width="100%", height="1000px");
-                                  function betterTab(cm) {
-                                    if (cm.somethingSelected()) {
-                                      cm.indentSelection("add");
-                                    } else {
-                                      cm.replaceSelection(cm.getOption("indentWithTabs")? "\t":
+                                  cm.setOption("extraKeys", {
+                                    Tab: function(cm) {
+                                      if (cm.somethingSelected()) {
+                                        cm.indentSelection("add");
+                                      } else {
+                                        cm.replaceSelection(cm.getOption("indentWithTabs")? "\t":
                                         Array(cm.getOption("indentUnit") + 1).join(" "), "end", "+input");
+                                      }
                                     }
-                                  }
-
-                                  cm.fromTextArea(document.getElementById("the-editor"), {
-                                    extraKeys: { Tab: betterTab }
                                   });
                                   // var code = getCookie("code");
                                   var code = localStorage.getItem("code")
-                                  if (code === "" || code === null) {
+                                  console.log(code)
+                                  console.log("TEST")
+                                  if (code == "" || code === null) {
                                     var xhr=new XMLHttpRequest();
                                     xhr.open("GET","/static/student_code_file.py");
                                     xhr.onload = () => {
