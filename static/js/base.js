@@ -172,7 +172,7 @@ function stop() {
 
 function autonomousReset() {
     /*
-        Reset UI elements when autonomous naturally runs out (30s).
+        Reset UI elements when autonomous ends by force (Stop) or naturally (30s).
         Resets the timer & simulation buttons.
     */
     clearInterval(timer);

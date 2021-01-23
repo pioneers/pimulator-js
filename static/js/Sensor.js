@@ -62,18 +62,19 @@ class Sensor{
        }
        total.push(Math.min(totalLine, 1))
      }
-     this.robot.leftSensor = total[0]
+     this.robot.leftSensor = total[2]
      this.robot.centerSensor = total[1]
-     this.robot.rightSensor = total[2]
+     this.robot.rightSensor = total[0]
      return total
    }
 }
 class TapeLine{
-  constructor(x1, y1, x2, y2) {
+  constructor(x1, y1, x2, y2, color = "green") {
     this.startX = x1
     this.startY = y1
     this.endX = x2
     this.endY = y2
+    this.color = color
     if (this.startX === this.endX) {
       this.slope = "vertical"
     } else if (this.startY === this.endY) {
