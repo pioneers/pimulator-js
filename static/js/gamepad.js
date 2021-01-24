@@ -84,7 +84,6 @@ joypad.set({
 joypad.on('button_press', e => {
     console.log(e.detail);
     const buttonName = e.detail.buttonName;
-    //clearPadVals();
     if (mode === "teleop") {
         if (inputMode === "gamepad") {
             if (e.detail.pressed) {
@@ -107,14 +106,17 @@ joypad.on('button_press', e => {
 joypad.on('axis_move', e => {
     console.log(e.detail);
     const axisName = "axis_" + e.detail.axis;
-    //clearPadVals();
-    document.getElementById(axisName).innerText = padMap[axisName] + ": " + e.detail.axisMovementValue;
+    var axisVal;
+    if (e.detail.axis === 1 || e.detail.axis === 3) {
+        axisVal = -1 * e.detail.axisMovementValue;
+    } else { // Horizontal Axis
+        axisVal = e.detail.axisMovementValue;
+    }
+    document.getElementById(axisName).innerText = padMap[axisName] + ": " + axisVal;
     if (mode === "teleop") {
         if (inputMode === "gamepad") {
-            if (e.detail.axisMovementValue > 0.7) {
-                worker.postMessage({keyMode: inputMode, isButton: false, axis: e.detail.axis, value: e.detail.axisMovementValue, up: false}); //Left Joystick Right
-            } else if (e.detail.axisMovementValue < -0.7) {
-                worker.postMessage({keyMode: inputMode, isButton: false, axis: e.detail.axis, value: e.detail.axisMovementValue, up: false}); //Left Joystick Left
+            if (axisVal > 0.7 || axisVal < -0.7) { // Past local threshold
+                worker.postMessage({keyMode: inputMode, isButton: false, axis: e.detail.axis, value: axisVal, up: false});
             } else {
                 worker.postMessage({keyMode: inputMode, isButton: false, axis: e.detail.axis, value: 0, up: true});
             }
