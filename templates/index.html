@@ -254,7 +254,7 @@
                                                         Keyboard inputs only support joystick controls. For more functionality, a game
                                                         controller can be connected to the simulator. To input a game controller, connect it
                                                         to your computer and click any button. Confirm that the controller has successfully
-                                                        been connected by checking the 'Gamepad' section. The following are button mappings 
+                                                        been connected by checking the 'Gamepad' section. The following are button mappings
                                                         between a generic game controller and the Robot API:
                                                     </p>
                                                     <img src="https://user-images.githubusercontent.com/580022/45268303-10a03e80-b4ce-11e8-883c-1f586566c040.png" alt="" class="img-thumbnail mb-3">
@@ -425,6 +425,7 @@
                                      }
                                    }
                                  });
+                                 CodeMirror.keyMap.default["Shift-Tab"] = "indentLess";
                                   // var code = getCookie("code");
                                   var code = localStorage.getItem("code")
                                   if (code == "" || code === null) {
