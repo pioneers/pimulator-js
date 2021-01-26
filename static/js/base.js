@@ -2,6 +2,7 @@ var mode = "idle"; // or auto or teleop
 var worker = new Worker("static/js/robot.js");
 var timer;
 var inputMode = "keyboard";
+var codeUploaded = false;
 const scaleFactor = 3;
 
 // Handle messages from worker
@@ -59,13 +60,23 @@ function drawObjs(objs, type) {
 }
 
 // Switch input mode between 'keyboard' and 'gamepad'
-function switchInput() {
-    if (inputMode === "keyboard") {
-        inputMode = "gamepad";
-        document.getElementById("input-mode").innerText = "Input: Gamepad";
-    } else if (inputMode == "gamepad") {
-        inputMode = "keyboard";
-        document.getElementById("input-mode").innerText = "Input: Keyboard";
+function switchInput(state) {
+    if (state === 1) {
+        if (inputMode === "gamepad") {
+            $("#gamepad-btn").button('toggle');
+        } else {
+            inputMode = "gamepad";
+            //document.getElementById("input-mode").innerText = "Input: Gamepad";
+            $("#keyboard-btn").button('toggle');
+        }
+    } else if (state === 0) {
+        if (inputMode === "keyboard") {
+            $("#keyboard-btn").button('toggle');
+        } else {
+            inputMode = "keyboard";
+            //document.getElementById("input-mode").innerText = "Input: Keyboard";
+            $("#gamepad-btn").button('toggle');
+        }
     }
 }
 
@@ -90,8 +101,10 @@ document.addEventListener('keyup', up);
 // "Upload Code" button sends code to the worker
 function uploadCode() {
     code = cm.getValue();
+    localStorage.setItem("code",code)
     worker.postMessage({code:code});
-}
+    codeUploaded = true;
+};
 
 function update(state) {
     /*
@@ -152,14 +165,28 @@ function start(auto=false) {
     }
     else {
         clearInterval(timer);
-        if (auto === false) {
-            worker.postMessage({start:true, mode:"teleop"})
-        }
-        else if (auto === true) {
-            worker.postMessage({start:true, mode:"auto"})
+        if (codeUploaded) {
+            if (auto === false) {
+                $("#teleop-btn").removeClass("btn-outline-primary").addClass("btn-primary")
+                worker.postMessage({start:true, mode:"teleop"})
+            } else if (auto === true) {
+                $("#autonomous-btn").removeClass("btn-outline-primary").addClass("btn-primary")
+                worker.postMessage({start:true, mode:"auto"})
+            }
+            document.getElementById("stop-btn").disabled = false;
+            document.getElementById("teleop-btn").disabled = true;
+            document.getElementById("autonomous-btn").disabled = true;
+        } else {
+            if (auto === false) {
+                $("#teleop-btn").button('toggle')
+                worker.postMessage({start:true, mode:"teleop"})
+            } else if (auto === true) {
+                $("#autonomous-btn").button('toggle')
+                worker.postMessage({start:true, mode:"auto"})
+            }
         }
     }
-}
+};
 
 function runAutoTimer() {
     var startTime = new Date().getTime();
@@ -174,7 +201,7 @@ function runAutoTimer() {
         document.getElementById("timer").innerText = "Time Left: " + timeLeft + "s";
 
         if (timeLeft < 0) {
-            clearInterval(timer);
+            autonomousReset()
             document.getElementById("timer").innerText = "Autonomous Mode has finished.";
         }
     }, 1000);
@@ -190,7 +217,24 @@ function stop() {
     worker.postMessage({code:code});
     mode = "idle";
     update({X:70,Y:70,dir:0}); // in inches
+    autonomousReset()
+};
+
+function autonomousReset() {
+    /*
+        Reset UI elements when autonomous ends by force (Stop) or naturally (30s).
+        Resets the timer & simulation buttons.
+    */
     clearInterval(timer);
+    document.getElementById("stop-btn").disabled = true;
+    document.getElementById("teleop-btn").disabled = false;
+    document.getElementById("autonomous-btn").disabled = false;
+    if (document.getElementById("teleop-btn").classList.contains("btn-primary")) {
+        $("#teleop-btn").removeClass("btn-primary").addClass("btn-outline-primary")
+    }
+    if (document.getElementById("autonomous-btn").classList.contains("btn-primary")) {
+        $("#autonomous-btn").removeClass("btn-primary").addClass("btn-outline-primary")
+    }
 }
 
 function clearConsole(){
@@ -205,7 +249,7 @@ function log(text) {
             return
         }
     }
-    let consoleLog = document.getElementById("console")
-    logged = consoleLog.innerText += text + "\n";
+    let consoleLog = document.getElementById("console");
+    logged = consoleLog.innerHTML += text + "<br>";
     consoleLog.scrollTop = consoleLog.scrollHeight;
 }

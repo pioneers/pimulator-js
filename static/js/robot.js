@@ -647,29 +647,13 @@ function onReleaseGamepad(button) {
  */
 function moveGamepad(axis, value) {
     if (axis === 0) { // left joystick horizontal axis
-        if (value > 0) { // joystick position right
-            simulator.gamepad.joystick_left_x = value; //1
-        } else if (value < 0) { // joystick position left
-            simulator.gamepad.joystick_left_x = value; //-1
-        }
+        simulator.gamepad.joystick_left_x = value;
     } else if (axis === 1) { // left joystick vertical axis
-        if (value > 0) { // joystick position down ***
-            simulator.gamepad.joystick_left_y = -1 * value; //-1
-        } else if (value < 0) { // joystick position up ***
-            simulator.gamepad.joystick_left_y = -1 * value; //1
-        }
+        simulator.gamepad.joystick_left_y = value;
     } else if (axis === 2) { // right joystick horizontal axis
-        if (value > 0) { // joystick position right
-            simulator.gamepad.joystick_right_x = value; //1
-        } else if (value < 0) { // joystick position left
-            simulator.gamepad.joystick_right_x = value; //-1
-        }
+        simulator.gamepad.joystick_right_x = value;
     } else if (axis === 3) { // right joystick vertical axis
-        if (value > 0) { // joystick position down ***
-            simulator.gamepad.joystick_right_y = -1 * value; //-1
-        } else if (value < 0) { // joystick position up ***
-            simulator.gamepad.joystick_right_y = -1 * value; //1
-        }
+        simulator.gamepad.joystick_right_y = value;
     }
 }
 
