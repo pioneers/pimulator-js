@@ -1,4 +1,4 @@
-class Sensor{
+class LineFollower{
    constructor(robot) {
      this.robot = robot;
      this.left = 0;
@@ -6,7 +6,7 @@ class Sensor{
      this.right = 0;
    }
 
-   get_val(){
+   update(){
      var sensorsY = [this.robot.Y - 5*Math.cos(this.robot.dir/180*Math.PI), this.robot.Y, this.robot.Y + 5*Math.cos(this.robot.dir/180*Math.PI)]
      var sensorsX = [this.robot.X - 5*Math.sin(-this.robot.dir/180*Math.PI), this.robot.X, this.robot.X + 5*Math.sin(-this.robot.dir/180*Math.PI)]
 
@@ -94,6 +94,8 @@ class LimitSwitch{
     this.switch0 = false;
     this.switch1 = false;
   }
-  
 
+  update() {
+
+  }
 }

@@ -83,7 +83,7 @@ class RobotClass {
 
         // Ensure we don't hit sync errors when updating our values
         this.simulator = simulator;
-        this.sensor = new Sensor(this);
+        this.lineFollower = new LineFollower(this);
         this.limitSwitch = new LimitSwitch(this);
     }
 
@@ -325,11 +325,11 @@ class RobotClass {
             dir: this.dir
         };
 
-        this.sensor.get_val()
+        this.lineFollower.update()
         let sensorValues = {
-            leftSensor: this.sensor.left,
-            centerSensor: this.sensor.center,
-            rightSensor: this.sensor.right
+            leftSensor: this.lineFollower.left,
+            centerSensor: this.lineFollower.center,
+            rightSensor: this.lineFollower.right
         };
 
         postMessage({
@@ -399,11 +399,11 @@ class RobotClass {
         }
         if (device === "line_follower") {
             if (param === "left"){
-                return this.sensor.left;
+                return this.lineFollower.left;
             } else if (param === "center") {
-                return this.sensor.center;
+                return this.lineFollower.center;
             } else if (param === "right") {
-                return this.sensor.right;
+                return this.lineFollower.right;
             }
         }
         throw new Error("Device was not found" + device);
