@@ -27,6 +27,7 @@ importScripts('./GamepadClass.js');
 importScripts('./Sensor.js');
 importScripts('./objects.js');
 importScripts('./FieldObj.js');
+importScripts('./keyboard.js');
 
 var code = "";
 var env = {};
@@ -444,7 +445,7 @@ class RobotClass {
         }
         this.runningCoroutines.add(fn)
         fn()
-   }
+    }
     is_running(fn) {
         /* Returns True if the given `fn` is already running as a coroutine.
         See: Robot.run
@@ -464,6 +465,7 @@ class RobotClass {
 function onPress(keyCode) {
     /* Handling the events associated with pressing a key. Keyboard inputs are inputted as
        KEYCODE. */
+    simulator.keyboard.press(Keyboard.keyCodeMatch[keyCode]);
 
     if (keyCode === 87) { // w
         simulator.gamepad.joystick_left_y = 1;
@@ -485,6 +487,8 @@ function onPress(keyCode) {
 }
 
 function onRelease(keyCode) {
+    simulator.keyboard.release(Keyboard.keyCodeMatch[keyCode]);
+
     if (keyCode === 87) { // w
         simulator.gamepad.joystick_left_y = 0;
     } else if (keyCode === 65) { // a
@@ -694,6 +698,7 @@ class Simulator{
         this.robot = null;
         this.mode = "idle";
         this.initGamepad();
+        this.keyboard = new Keyboard();
         this.current = [];
         this.tapeLines = [];
         this.obstacles = [];
@@ -730,6 +735,7 @@ class Simulator{
         //# Ensure the global Robot reflects the same robot Simulator is using
         env['Robot'] = this.robot;
         env['Gamepad'] = this.gamepad;
+        env['Keyboard'] = this.keyboard;
 
         pyodide.runPython(`
             from js import code, env
