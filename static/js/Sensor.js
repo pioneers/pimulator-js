@@ -94,9 +94,31 @@ class LimitSwitch{
     this.robot = robot;
     this.switch0 = false;
     this.switch1 = false;
+    this.leeway = 1;
   }
 
   update() {
+    this.switch0 = false;
+    this.switch1 = false;
+    const switch0X = (this.robot.topL[0] + this.robot.topR[0]) / 2;
+    const switch0Y = (this.robot.topL[1] + this.robot.topR[1]) / 2;
+    const switch1X = (this.robot.botL[0] + this.robot.botR[0]) / 2;
+    const switch1Y = (this.robot.botL[1] + this.robot.botR[1]) / 2;
 
+    for (let obstacle of this.robot.simulator.obstacles) {
+      const minX = obstacle.topL[0] - this.leeway;
+      const minY = obstacle.topL[1] - this.leeway;
+      const maxX = obstacle.botR[0] + this.leeway;
+      const maxY = obstacle.botR[1] + this.leeway;
+      if (switch0X >= minX && switch0X <= maxX && switch0Y >= minY && switch0Y <= maxY) {
+        this.switch0 = true;
+      }
+      if (switch1X >= minX && switch1X <= maxX && switch1Y >= minY && switch1Y <= maxY) {
+        this.switch1 = true;
+      }
+    }
+    console.log(this.switch0);
+    console.log(this.switch1);
   }
+
 }

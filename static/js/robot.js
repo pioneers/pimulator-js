@@ -326,7 +326,8 @@ class RobotClass {
             dir: this.dir
         };
 
-        this.lineFollower.update()
+        this.lineFollower.update();
+        this.limitSwitch.update();
         let sensorValues = {
             leftSensor: this.lineFollower.left,
             centerSensor: this.lineFollower.center,
@@ -392,11 +393,11 @@ class RobotClass {
            Currently supports reading left, center and right line followers
            in a range of [0,1]. */
         if (device === "limit_switch") {
-          if (param === "switch0") {
-
-          } else if (param === "switch1") {
-
-          }
+            if (param === "switch0") {
+                return this.limitSwitch.switch0;
+            } else if (param === "switch1") {
+                return this.limitSwitch.switch1;
+            }
         }
         if (device === "line_follower") {
             if (param === "left"){
