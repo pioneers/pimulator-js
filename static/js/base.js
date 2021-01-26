@@ -101,6 +101,7 @@ document.addEventListener('keyup', up);
 // "Upload Code" button sends code to the worker
 function uploadCode() {
     code = cm.getValue();
+    localStorage.setItem("code",code)
     worker.postMessage({code:code});
     codeUploaded = true;
 };
