@@ -172,9 +172,18 @@
                                     indentUnit: 4
                                   });
                                   cm.setSize(width="100%", height="1000px");
-
+                                  cm.setOption("extraKeys", {
+                                   Tab: function(cm) {
+                                     if (cm.somethingSelected()) {
+                                       cm.indentSelection("add");
+                                     } else {
+                                       cm.replaceSelection(cm.getOption("indentWithTabs")? "\t":
+                                       Array(cm.getOption("indentUnit") + 1).join(" "), "end", "+input");
+                                     }
+                                   }
+                                 });
                                   // var code = getCookie("code");
-                                  var code = "";
+                                  var code = localStorage.getItem("code")
                                   if (code == "" || code === null) {
                                     var xhr=new XMLHttpRequest();
                                     xhr.open("GET","/static/student_code_file.py");
@@ -184,6 +193,9 @@
                                       cm.setValue(code);
                                     }
                                     xhr.send();
+                                  }
+                                  else {
+                                    cm.setValue(code)
                                   }
                                 </script>
                             </div>
