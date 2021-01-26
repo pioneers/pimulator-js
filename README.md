@@ -26,7 +26,7 @@ To easily deploy, develop, and run the application, pimulator is packaged in ima
 
 ## Deployment
 
-Scott has deployed pimulator on Google Cloud, before removing it to not pay money.
+Pimulator is publicly hosted at [pimulator.pierobotics.org](https://pimulator.pierobotics.org/).
 
 ## Future Development
 

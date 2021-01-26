@@ -25,6 +25,7 @@ var console=(function(oldCons){
 importScripts("https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js");
 importScripts('./GamepadClass.js');
 importScripts('./Sensor.js');
+importScripts('./objects.js');
 importScripts('./FieldObj.js');
 
 var code = "";
@@ -646,29 +647,13 @@ function onReleaseGamepad(button) {
  */
 function moveGamepad(axis, value) {
     if (axis === 0) { // left joystick horizontal axis
-        if (value > 0) { // joystick position right
-            simulator.gamepad.joystick_left_x = value; //1
-        } else if (value < 0) { // joystick position left
-            simulator.gamepad.joystick_left_x = value; //-1
-        }
+        simulator.gamepad.joystick_left_x = value;
     } else if (axis === 1) { // left joystick vertical axis
-        if (value > 0) { // joystick position down ***
-            simulator.gamepad.joystick_left_y = -1 * value; //-1
-        } else if (value < 0) { // joystick position up ***
-            simulator.gamepad.joystick_left_y = -1 * value; //1
-        }
+        simulator.gamepad.joystick_left_y = value;
     } else if (axis === 2) { // right joystick horizontal axis
-        if (value > 0) { // joystick position right
-            simulator.gamepad.joystick_right_x = value; //1
-        } else if (value < 0) { // joystick position left
-            simulator.gamepad.joystick_right_x = value; //-1
-        }
+        simulator.gamepad.joystick_right_x = value;
     } else if (axis === 3) { // right joystick vertical axis
-        if (value > 0) { // joystick position down ***
-            simulator.gamepad.joystick_right_y = -1 * value; //-1
-        } else if (value < 0) { // joystick position up ***
-            simulator.gamepad.joystick_right_y = -1 * value; //1
-        }
+        simulator.gamepad.joystick_right_y = value;
     }
 }
 
@@ -699,24 +684,20 @@ class Simulator{
         this.initGamepad();
         this.current = [];
         this.tapeLines = [];
-        this.tapeLines.push(new TapeLine(27, 27, 115, 115));
         this.obstacles = [];
-
-        //TODO: Read obstacle info from a data file
-        this.obstacles.push(new Wall(0, 0, 144, 2));
-        this.obstacles.push(new Wall(0, 0, 2, 144));
-        this.obstacles.push(new Wall(142, 0, 2, 144));
-        this.obstacles.push(new Wall(0, 142, 144, 2));
+        for (let newLine of objects.tapeLinesData) {
+            this.tapeLines.push(new TapeLine(newLine.x1, newLine.y1, newLine.x2, newLine.y2, newLine.color));
+        }
+        for (let newWall of objects.wallsData) {
+            this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, newWall.color));
+        }
 
         this.drawObjs();
     }
 
     drawObjs() {
-        let objs = [];
-        for (const obstacle of this.obstacles) {
-            objs.push(obstacle);
-        }
-        postMessage({objs: objs});
+        postMessage({objs: this.obstacles, type: "obstacle"});
+        postMessage({objs: this.tapeLines, type: "tapeLine"});
     }
 
     initGamepad(){
@@ -816,20 +797,6 @@ this.onmessage = function(e) {
     if (e.data.code !== undefined){
         code = e.data.code;
         console.log("Code upload successful");
-    }
-
-    // Add field objects to the simulator
-    if (e.data.initObj === true) {
-        for (var i = 0; i < e.data.objs.length; i++) {
-            if (e.data.types[i] == "wall") {
-                simulator.addObstacle(
-                    new Wall(e.data.objs[i][0],
-                             e.data.objs[i][1],
-                             e.data.objs[i][2],
-                             e.data.objs[i][3])
-                );
-            }
-        }
     }
 
     // Start simulation

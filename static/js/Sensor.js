@@ -72,11 +72,12 @@ class LineFollower{
    }
 }
 class TapeLine{
-  constructor(x1, y1, x2, y2) {
+  constructor(x1, y1, x2, y2, color = "green") {
     this.startX = x1
     this.startY = y1
     this.endX = x2
     this.endY = y2
+    this.color = color
     if (this.startX === this.endX) {
       this.slope = "vertical"
     } else if (this.startY === this.endY) {
