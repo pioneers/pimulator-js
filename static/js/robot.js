@@ -22,7 +22,7 @@ var console=(function(oldCons){
     };
 }(console));
 
-importScripts("https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js");
+importScripts("https://cdn.jsdelivr.net/pyodide/v0.16.1/full/pyodide.js");
 importScripts('./GamepadClass.js');
 importScripts('./Sensor.js');
 importScripts('./objects.js');
@@ -759,16 +759,16 @@ class Simulator{
 
     simulateTeleop(){
         /* Simulate execution of the robot code.
-        Run setup_fn once before continuously looping loop_fn
-        TODO: Run teleop_setup once before looping teleop_main */
+        Run setup once before continuously looping main. */
 
-        this.robot = new RobotClass(this);
-        this.loadStudentCode();
         this.mode = "teleop"
-        this.consistentLoop(this.robot.tickRate, this.teleop_main);
         postMessage({
             mode: this.mode
         });
+        this.robot = new RobotClass(this);
+        this.loadStudentCode();
+        this.teleop_setup();
+        this.consistentLoop(this.robot.tickRate, this.teleop_main);
     }
 
     simulateAuto() {
@@ -778,7 +778,6 @@ class Simulator{
         });
         this.robot = new RobotClass(this);
         this.loadStudentCode();
-        this.robot.autonomous_main = this.autonomous_main;
         this.timeout = setTimeout(function() { this.stop(); }.bind(this), 30*1000);
         this.robot.simStartTime = new Date().getTime();
         this.autonomous_setup();
