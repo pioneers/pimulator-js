@@ -423,7 +423,6 @@ class RobotClass {
             }
             if (cur - tick >= this.tickRate) {
                 this.updatePosition();
-                this.autonomous_main();
                 tick = tick + this.tickRate;
                 numUpdates++;
             }
@@ -782,7 +781,8 @@ class Simulator{
         this.robot.autonomous_main = this.autonomous_main;
         this.timeout = setTimeout(function() { this.stop(); }.bind(this), 30*1000);
         this.robot.simStartTime = new Date().getTime();
-        setTimeout(this.autonomous_setup, 0);
+        this.autonomous_setup();
+        this.consistentLoop(this.robot.tickRate, this.autonomous_main);
     }
 }
 
