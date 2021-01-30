@@ -333,10 +333,15 @@ class RobotClass {
             centerSensor: this.lineFollower.center,
             rightSensor: this.lineFollower.right
         };
-
+        let switchValues = {
+            frontSwitch: this.limitSwitch.switch0,
+            backSwitch: this.limitSwitch.switch1
+        };
+        
         postMessage({
             robot: newState,
-            sensors: sensorValues
+            sensors: sensorValues,
+            switches: switchValues
         })
     }
 

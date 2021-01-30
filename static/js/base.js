@@ -13,6 +13,9 @@ function onmessage(e) {
     if (e.data.sensors !== undefined) {
         updateSensors(e.data.sensors);
     }
+    if (e.data.switches !== undefined) {
+        updateSwitches(e.data.switches);
+    }
     if (e.data.mode !== undefined) {
         mode = e.data.mode;
         if (mode === "auto") {
@@ -153,6 +156,11 @@ function updateSensors(sensorValues) {
     document.getElementById("left-sensor").innerText = "Left Sensor: " + sensorValues.leftSensor.toFixed(3);
     document.getElementById("center-sensor").innerText = "Center Sensor: " + sensorValues.centerSensor.toFixed(3);
     document.getElementById("right-sensor").innerText = "Right Sensor: " + sensorValues.rightSensor.toFixed(3);
+}
+
+function updateSwitches(switchValues) {
+    document.getElementById("front-switch").innerText = "Front Switch: " + switchValues.frontSwitch; 
+    document.getElementById("back-switch").innerText = "Back Switch: " + switchValues.backSwitch; 
 }
 
 function start(auto=false) {
