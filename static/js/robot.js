@@ -464,7 +464,7 @@ class RobotClass {
 function onPress(keyCode) {
     /* Handling the events associated with pressing a key. Keyboard inputs are inputted as
        KEYCODE. */
-    simulator.keyboard.press(Keyboard.keyCodeMatch[keyCode]);
+    simulator.keyboard.press(keyCode);
 
     if (keyCode === 87) { // w
         simulator.gamepad.joystick_left_y = 1;
@@ -486,7 +486,7 @@ function onPress(keyCode) {
 }
 
 function onRelease(keyCode) {
-    simulator.keyboard.release(Keyboard.keyCodeMatch[keyCode]);
+    simulator.keyboard.release(keyCode);
 
     if (keyCode === 87) { // w
         simulator.gamepad.joystick_left_y = 0;
@@ -685,6 +685,7 @@ class Simulator{
         this.current = [];
         this.tapeLines = [];
         this.obstacles = [];
+        this.gamepad = new GamepadClass();
         for (let newLine of objects.tapeLinesData) {
             this.tapeLines.push(new TapeLine(newLine.x1, newLine.y1, newLine.x2, newLine.y2, newLine.color));
         }
@@ -698,15 +699,6 @@ class Simulator{
     drawObjs() {
         postMessage({objs: this.obstacles, type: "obstacle"});
         postMessage({objs: this.tapeLines, type: "tapeLine"});
-    }
-
-    initGamepad(){
-        const control_types = ['tank', 'arcade', 'other1', 'other2'];
-        const GAMEPAD_MODE = "tank";
-        let control_type_index = control_types.indexOf(GAMEPAD_MODE);
-        if (control_type_index == -1) {
-            throw new Error("Invalid gamepad mode")};
-        this.gamepad = new GamepadClass(control_type_index);
     }
 
     loadStudentCode(){
