@@ -15,6 +15,8 @@
     <!-- Disables scrolling with arrow keys and spacebar -->
     <script src="/static/js/disable_scrolling.js"></script>
     <link rel="icon" href="https://staff.pierobotics.org/wiki/w/images/thumb/0/0a/Sprocket.png/800px-Sprocket.png" width="16" height="16">
+
+
   </head>
 
   <body>
@@ -388,7 +390,12 @@
                             <script src="/static/js/codemirror.js"></script>
                             <link rel="stylesheet" href="/static/css/codemirror.css">
                             <script src="/static/js/python.js"></script>
-
+                            <link rel="stylesheet" href="/static/css/cobalt.css">
+                            <link rel="stylesheet" href="/static/css/monokai.css">
+                            <link rel="stylesheet" href="/static/css/solarized.css">
+                            <link rel="stylesheet" href="/static/css/3024-night.css">
+                            <link rel="stylesheet" href="/static/css/blackboard.css">
+                            <script src="/static/js/sublime.js"></script>
                             <div class="container" id="cmblock" style="padding-left:0px;padding-right:0px">
                                 <script>
                                   function setCookie(name, value) {
@@ -412,7 +419,13 @@
                                     value: "",
                                     mode:  "python",
                                     lineNumbers: true,
-                                    indentUnit: 4
+                                    keyMap: "sublime",
+                                    indentUnit: 4,
+                                    autoCloseBrackets: true,
+                                    matchBrackets: true,
+                                    showCursorWhenSelecting: true,
+                                    theme: "blackboard",
+                                    tabSize: 4
                                   });
                                   cm.setSize(width="100%", height="1000px");
                                   cm.setOption("extraKeys", {
@@ -499,6 +512,11 @@
     <script src="/static/js/joypad.js"></script>
     <script src="/static/js/gamepad.js"></script>
     <script src="/static/js/base.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/gh/fcmam5/nightly.js@v1.0/dist/nightly.min.js"></script>
+    <script>
+      var Nightly = new Nightly();
+      Nightly.darkify();
+   </script>
   </body>
+
 </html>
