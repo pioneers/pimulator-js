@@ -21,7 +21,7 @@ class Keyboard{
         if (key in this.keys){
             return this.keys[key];
         } else {
-            console.log("ERROR: The " + key + " key is not supported.");
+            console.log("The " + key + " key is not supported.");
             return false;
         }
     }
