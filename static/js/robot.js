@@ -681,11 +681,11 @@ class Simulator{
         this.robot = null;
         this.mode = "idle";
         this.initGamepad();
+        this.gamepad = new GamepadClass();
         this.keyboard = new Keyboard();
         this.current = [];
         this.tapeLines = [];
         this.obstacles = [];
-        this.gamepad = new GamepadClass();
         for (let newLine of objects.tapeLinesData) {
             this.tapeLines.push(new TapeLine(newLine.x1, newLine.y1, newLine.x2, newLine.y2, newLine.color));
         }
