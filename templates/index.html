@@ -1,3 +1,4 @@
+{# This is actually a jinja template visit https://jinja.palletsprojects.com/en/2.11.x/intro for more info #}
 <!doctype html>
 <html lang="en">
   <head>
@@ -13,7 +14,7 @@
     <title>PiE Robotics Simulator</title>
 
     <!-- Disables scrolling with arrow keys and spacebar -->
-    <script src="/static/js/disable_scrolling.js"></script>
+    <script src="/static/js/disable_scrolling.js?t={[ git_hash }}"></script>
     <link rel="icon" href="https://staff.pierobotics.org/wiki/w/images/thumb/0/0a/Sprocket.png/800px-Sprocket.png" width="16" height="16">
   </head>
 
@@ -254,7 +255,7 @@
                                                         Keyboard inputs only support joystick controls. For more functionality, a game
                                                         controller can be connected to the simulator. To input a game controller, connect it
                                                         to your computer and click any button. Confirm that the controller has successfully
-                                                        been connected by checking the 'Gamepad' section. The following are button mappings 
+                                                        been connected by checking the 'Gamepad' section. The following are button mappings
                                                         between a generic game controller and the Robot API:
                                                     </p>
                                                     <img src="https://user-images.githubusercontent.com/580022/45268303-10a03e80-b4ce-11e8-883c-1f586566c040.png" alt="" class="img-thumbnail mb-3">
@@ -385,9 +386,9 @@
                         <!-- CodeMirror -->
                         <div class="tab-pane fade show active" id="code-mirror" role="tabpanel" aria-labelledby="home-tab">
                             <!-- Create a simple CodeMirror instance -->
-                            <script src="/static/js/codemirror.js"></script>
-                            <link rel="stylesheet" href="/static/css/codemirror.css">
-                            <script src="/static/js/python.js"></script>
+                            <script src="/static/js/codemirror.js?t={[ git_hash }}"></script>
+                            <link rel="stylesheet" href="/static/css/codemirror.css?t={[ git_hash }}">
+                            <script src="/static/js/python.js?t={[ git_hash }}"></script>
 
                             <div class="container" id="cmblock" style="padding-left:0px;padding-right:0px">
                                 <script>
@@ -425,11 +426,12 @@
                                      }
                                    }
                                  });
+                                 CodeMirror.keyMap.default["Shift-Tab"] = "indentLess";
                                   // var code = getCookie("code");
                                   var code = localStorage.getItem("code")
                                   if (code == "" || code === null) {
                                     var xhr=new XMLHttpRequest();
-                                    xhr.open("GET","/static/student_code_file.py");
+                                    xhr.open("GET","/static/student_code_file.py?t={[ git_hash }}");
                                     xhr.onload = () => {
                                       code = xhr.responseText;
                                       // setCookie("code", code)
@@ -501,9 +503,9 @@
         </div>
     </div>
 
-    <script src="/static/js/joypad.js"></script>
-    <script src="/static/js/gamepad.js"></script>
-    <script src="/static/js/base.js"></script>
+    <script src="/static/js/joypad.js?t={{ git_hash }}"></script>
+    <script src="/static/js/gamepad.js?t={{ git_hash }}"></script>
+    <script src="/static/js/base.js?t={{ git_hash }}"></script>
 
   </body>
 </html>
