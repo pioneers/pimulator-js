@@ -1,5 +1,5 @@
 class Keyboard{
-    keyCodeMatch = {65: 'a', 66: 'b', 67: 'c', 68: 'd', 69: 'e', 70: 'f', 71: 'g', 72: 'h',
+    static keyCodeMatch = {65: 'a', 66: 'b', 67: 'c', 68: 'd', 69: 'e', 70: 'f', 71: 'g', 72: 'h',
                          73: 'i', 74: 'j', 75: 'k', 76: 'l', 77: 'm', 78: 'n', 79: 'o', 80: 'p',
                          81: 'q', 82: 'r', 83: 's', 84: 't', 85: 'u', 86: 'v', 87: 'w', 88: 'x',
                          89: 'y', 90: 'z', 188: ",", 190: ".", 191: "/", 186: ";", 222: "'", 219:"[",
@@ -21,14 +21,14 @@ class Keyboard{
         if (key in this.keys){
             return this.keys[key];
         } else {
-            console.log("The " + key + " key is not supported.");
+            console.log("ERROR: The " + key + " key is not supported.");
             return false;
         }
     }
 
     press(keyCode) {
-        if (keyCode in this.keyCodeMatch) {
-            const key = this.keyCodeMatch[keyCode];
+        if (keyCode in Keyboard.keyCodeMatch) {
+            const key = Keyboard.keyCodeMatch[keyCode];
             if (key in this.keys){
                 this.keys[key] = true;
             }
@@ -36,8 +36,8 @@ class Keyboard{
     }
 
     release(keyCode) {
-        if (keyCode in this.keyCodeMatch) {
-            const key = this.keyCodeMatch[keyCode];
+        if (keyCode in Keyboard.keyCodeMatch) {
+            const key = Keyboard.keyCodeMatch[keyCode];
             if (key in this.keys){
                 this.keys[key] = false;
             }
