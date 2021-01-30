@@ -680,7 +680,6 @@ class Simulator{
         */
         this.robot = null;
         this.mode = "idle";
-        this.initGamepad();
         this.gamepad = new GamepadClass();
         this.keyboard = new Keyboard();
         this.current = [];
