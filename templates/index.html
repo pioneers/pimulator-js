@@ -125,6 +125,34 @@
                                     <button type="button" id="keyboard-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchInput(0)">Keyboard</button>
                                     <button type="button" id="gamepad-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchInput(1)">Gamepad</button>
                                     </p>
+                                    <p id="input-mode">Theme:
+                                    <button type="button" id="default-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="changeTheme(0)">Default</button>
+                                    <button type="button" id="dark-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="changeTheme(1)">Dark Mode</button>
+                                    <button type="button" id="monokai-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="changeTheme(2)">Monokai</button>
+                                    <button type="button" id="cobalt-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="changeTheme(3)">Cobalt</button>
+                                    <button type="button" id="solarized-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="changeTheme(4)">Solarized</button>
+                                    <button type="button" id="yeti-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="changeTheme(5)">Yeti</button>
+                                    <button type="button" id="midnight-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="changeTheme(6)">Midnight</button>
+                                    </p>
+                                    <script>
+                                    function changeTheme(theme) {
+                                      if (theme == 0) {
+                                        cm.setOption("theme",'default');
+                                      } else if (theme == 1){
+                                        cm.setOption("theme",'blackboard');
+                                      } else if (theme == 2){
+                                        cm.setOption("theme",'monokai');
+                                      } else if (theme == 3){
+                                        cm.setOption("theme",'cobalt');
+                                      } else if (theme == 4){
+                                        cm.setOption("theme",'solarized');
+                                      } else if (theme == 5){
+                                        cm.setOption("theme",'yeti');
+                                      } else if (theme == 6){
+                                        cm.setOption("theme",'midnight');
+                                      }
+                                    }
+                                    </script>
                                 </div>
 
                                 <!-- Help -->
@@ -393,8 +421,9 @@
                             <link rel="stylesheet" href="/static/css/cobalt.css">
                             <link rel="stylesheet" href="/static/css/monokai.css">
                             <link rel="stylesheet" href="/static/css/solarized.css">
-                            <link rel="stylesheet" href="/static/css/3024-night.css">
+                            <link rel="stylesheet" href="/static/css/yeti.css">
                             <link rel="stylesheet" href="/static/css/blackboard.css">
+                            <link rel="stylesheet" href="/static/css/midnight.css">
                             <script src="/static/js/sublime.js"></script>
                             <div class="container" id="cmblock" style="padding-left:0px;padding-right:0px">
                                 <script>
@@ -424,7 +453,7 @@
                                     autoCloseBrackets: true,
                                     matchBrackets: true,
                                     showCursorWhenSelecting: true,
-                                    theme: "blackboard",
+                                    theme: "default",
                                     tabSize: 4
                                   });
                                   cm.setSize(width="100%", height="1000px");
@@ -513,10 +542,10 @@
     <script src="/static/js/gamepad.js"></script>
     <script src="/static/js/base.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/fcmam5/nightly.js@v1.0/dist/nightly.min.js"></script>
-    <script>
+    <!-- <script>
       var Nightly = new Nightly();
       Nightly.darkify();
-   </script>
+   </script> -->
   </body>
 
 </html>
