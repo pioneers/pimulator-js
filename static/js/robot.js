@@ -329,8 +329,6 @@ class RobotClass {
 
         this.lineFollower.update();
         this.limitSwitch.update();
-        console.log(this.limitSwitch.switch0);
-        console.log(this.limitSwitch.switch1);
         let sensorValues = {
             leftSensor: this.lineFollower.left,
             centerSensor: this.lineFollower.center,
@@ -340,7 +338,7 @@ class RobotClass {
             frontSwitch: this.limitSwitch.switch0,
             backSwitch: this.limitSwitch.switch1
         };
-        
+
         postMessage({
             robot: newState,
             sensors: sensorValues,
