@@ -94,7 +94,7 @@ class LimitSwitch{
     this.robot = robot;
     this.switch0 = false;
     this.switch1 = false;
-    this.leeway = 1;
+    this.leeway = 1; // in inches
   }
 
   update() {
