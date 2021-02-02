@@ -118,7 +118,7 @@ function update(state) {
     const centerX = state.X * scaleFactor;
     const centerY = state.Y * scaleFactor;
     const dir = state.dir/180*Math.PI;  // Convert to Radians
-    document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
+    document.getElementById("demo").innerHTML = "x: " + state.X.toFixed(2) + ", y: " + state.Y.toFixed(2)
     const sensorPoints = document.querySelectorAll("circle")
 
     // Set sensors
