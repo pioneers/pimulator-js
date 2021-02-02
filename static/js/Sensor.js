@@ -117,8 +117,7 @@ class LimitSwitch{
         this.switch1 = true;
       }
     }
-    console.log(this.switch0);
-    console.log(this.switch1);
+
   }
 
 }
