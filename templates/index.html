@@ -476,16 +476,32 @@
 
                         <!-- Sensor Readings -->
                         <div class="tab-pane fade" id="sensor-menu" role="tabpanel" aria-labelledby="sensor-menu">
-                            <div class="container pt-3">
+                            <div class="container pt-3" style="padding-left: 25%; padding-right:25%">
                                 <div class="row">
                                     <div class="col">
-                                        <p id="left-sensor" class="text-center">Left Sensor: 0.000</p>
+                                        <p class="text-left"> <b> Line Follower: </b> </p>
                                     </div>
                                     <div class="col">
-                                        <p id="center-sensor" class="text-center">Center Sensor: 0.000</p>
+                                        <p id="left-sensor" class="text-left">Left: 0.000</p>
                                     </div>
                                     <div class="col">
-                                        <p id="right-sensor" class="text-center">Right Sensor: 0.000</p>
+                                        <p id="center-sensor" class="text-left">Center: 0.000</p>
+                                    </div>
+                                    <div class="col">
+                                        <p id="right-sensor" class="text-left">Right: 0.000</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <p class="text-left"> <b> Limit Switch: </b> </p>
+                                    </div>
+                                    <div class="col">
+                                        <p id="front-switch" class="text-left">Front: False</p>
+                                    </div>
+                                    <div class="col">
+                                        <p id="back-switch" class="text-left">Back: False</p>
+                                    </div>
+                                    <div class="col">
                                     </div>
                                 </div>
                                 <p style="font-size:10px" class="text-sensor font-weight-light text-center"><i>For more information on how to use these sensors, visit the <a href="https://pioneers.berkeley.edu/software/robot_api" target="_blank">Robot API</a></i></p>
