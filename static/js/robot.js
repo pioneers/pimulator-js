@@ -22,11 +22,12 @@ var console=(function(oldCons){
     };
 }(console));
 
-importScripts("https://pyodide-cdn2.iodide.io/v0.15.0/full/pyodide.js");
+importScripts("https://cdn.jsdelivr.net/pyodide/v0.16.1/full/pyodide.js");
 importScripts('./GamepadClass.js');
 importScripts('./Sensor.js');
 importScripts('./objects.js');
 importScripts('./FieldObj.js');
+importScripts('./keyboard.js');
 
 var code = "";
 var env = {};
@@ -335,10 +336,15 @@ class RobotClass {
             centerSensor: this.lineFollower.center,
             rightSensor: this.lineFollower.right
         };
-
+        let switchValues = {
+            frontSwitch: this.limitSwitch.switch0,
+            backSwitch: this.limitSwitch.switch1
+        };
+        
         postMessage({
             robot: newState,
-            sensors: sensorValues
+            sensors: sensorValues,
+            switches: switchValues
         })
     }
 
@@ -430,7 +436,6 @@ class RobotClass {
             }
             if (cur - tick >= this.tickRate) {
                 this.updatePosition();
-                this.autonomous_main();
                 tick = tick + this.tickRate;
                 numUpdates++;
             }
@@ -451,7 +456,7 @@ class RobotClass {
         }
         this.runningCoroutines.add(fn)
         fn()
-   }
+    }
     is_running(fn) {
         /* Returns True if the given `fn` is already running as a coroutine.
         See: Robot.run
@@ -471,6 +476,7 @@ class RobotClass {
 function onPress(keyCode) {
     /* Handling the events associated with pressing a key. Keyboard inputs are inputted as
        KEYCODE. */
+    simulator.keyboard.press(keyCode);
 
     if (keyCode === 87) { // w
         simulator.gamepad.joystick_left_y = 1;
@@ -492,6 +498,8 @@ function onPress(keyCode) {
 }
 
 function onRelease(keyCode) {
+    simulator.keyboard.release(keyCode);
+
     if (keyCode === 87) { // w
         simulator.gamepad.joystick_left_y = 0;
     } else if (keyCode === 65) { // a
@@ -684,7 +692,8 @@ class Simulator{
         */
         this.robot = null;
         this.mode = "idle";
-        this.initGamepad();
+        this.gamepad = new GamepadClass();
+        this.keyboard = new Keyboard();
         this.current = [];
         this.tapeLines = [];
         this.obstacles = [];
@@ -703,15 +712,6 @@ class Simulator{
         postMessage({objs: this.tapeLines, type: "tapeLine"});
     }
 
-    initGamepad(){
-        const control_types = ['tank', 'arcade', 'other1', 'other2'];
-        const GAMEPAD_MODE = "tank";
-        let control_type_index = control_types.indexOf(GAMEPAD_MODE);
-        if (control_type_index == -1) {
-            throw new Error("Invalid gamepad mode")};
-        this.gamepad = new GamepadClass(control_type_index);
-    }
-
     loadStudentCode(){
         /*
         Load the student code to the current Simulator instance
@@ -721,6 +721,7 @@ class Simulator{
         //# Ensure the global Robot reflects the same robot Simulator is using
         env['Robot'] = this.robot;
         env['Gamepad'] = this.gamepad;
+        env['Keyboard'] = this.keyboard;
 
         pyodide.runPython(`
             from js import code, env
@@ -767,16 +768,16 @@ class Simulator{
 
     simulateTeleop(){
         /* Simulate execution of the robot code.
-        Run setup_fn once before continuously looping loop_fn
-        TODO: Run teleop_setup once before looping teleop_main */
+        Run setup once before continuously looping main. */
 
-        this.robot = new RobotClass(this);
-        this.loadStudentCode();
         this.mode = "teleop"
-        this.consistentLoop(this.robot.tickRate, this.teleop_main);
         postMessage({
             mode: this.mode
         });
+        this.robot = new RobotClass(this);
+        this.loadStudentCode();
+        this.teleop_setup();
+        this.consistentLoop(this.robot.tickRate, this.teleop_main);
     }
 
     simulateAuto() {
@@ -786,10 +787,10 @@ class Simulator{
         });
         this.robot = new RobotClass(this);
         this.loadStudentCode();
-        this.robot.autonomous_main = this.autonomous_main;
         this.timeout = setTimeout(function() { this.stop(); }.bind(this), 30*1000);
         this.robot.simStartTime = new Date().getTime();
-        setTimeout(this.autonomous_setup, 0);
+        this.autonomous_setup();
+        this.consistentLoop(this.robot.tickRate, this.autonomous_main);
     }
 }
 
