@@ -13,8 +13,11 @@
 
     <title>PiE Robotics Simulator</title>
 
+    <!-- Store git_hash -->
+    <script>var gitHash = "{{ git_hash }}";</script>
+
     <!-- Disables scrolling with arrow keys and spacebar -->
-    <script src="/static/js/disable_scrolling.js?t={[ git_hash }}"></script>
+    <script src="/static/js/disable_scrolling.js?t={{ git_hash }}"></script>
     <link rel="icon" href="https://staff.pierobotics.org/wiki/w/images/thumb/0/0a/Sprocket.png/800px-Sprocket.png" width="16" height="16">
   </head>
 
