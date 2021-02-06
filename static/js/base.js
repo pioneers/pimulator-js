@@ -13,6 +13,9 @@ function onmessage(e) {
     if (e.data.sensors !== undefined) {
         updateSensors(e.data.sensors);
     }
+    if (e.data.switches !== undefined) {
+        updateSwitches(e.data.switches);
+    }
     if (e.data.mode !== undefined) {
         mode = e.data.mode;
         if (mode === "auto") {
@@ -115,7 +118,7 @@ function update(state) {
     const centerX = state.X * scaleFactor;
     const centerY = state.Y * scaleFactor;
     const dir = state.dir/180*Math.PI;  // Convert to Radians
-    document.getElementById("demo").innerHTML = state.X.toFixed(2) + ", " + state.Y.toFixed(2)
+    document.getElementById("demo").innerHTML = "x: " + state.X.toFixed(2) + ", y: " + state.Y.toFixed(2)
     const sensorPoints = document.querySelectorAll("circle")
 
     // Set sensors
@@ -150,9 +153,15 @@ function update(state) {
 }
 
 function updateSensors(sensorValues) {
-    document.getElementById("left-sensor").innerText = "Left Sensor: " + sensorValues.leftSensor.toFixed(3);
-    document.getElementById("center-sensor").innerText = "Center Sensor: " + sensorValues.centerSensor.toFixed(3);
-    document.getElementById("right-sensor").innerText = "Right Sensor: " + sensorValues.rightSensor.toFixed(3);
+    document.getElementById("left-sensor").innerText = "Left: " + sensorValues.leftSensor.toFixed(3);
+    document.getElementById("center-sensor").innerText = "Center: " + sensorValues.centerSensor.toFixed(3);
+    document.getElementById("right-sensor").innerText = "Right: " + sensorValues.rightSensor.toFixed(3);
+}
+
+function updateSwitches(switchValues) {
+    let booleans = {true: "True", false: "False"}
+    document.getElementById("front-switch").innerText = "Front: " + booleans[switchValues.frontSwitch];
+    document.getElementById("back-switch").innerText = "Back: " + booleans[switchValues.backSwitch];
 }
 
 function start(auto=false) {

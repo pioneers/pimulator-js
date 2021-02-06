@@ -84,11 +84,9 @@ class RobotClass {
         this.runningCoroutines = new Set();
 
         // Ensure we don't hit sync errors when updating our values
-        this.leftSensor = 0;
-        this.centerSensor = 0;
-        this.rightSensor = 0;
         this.simulator = simulator;
-        this.sensor = new Sensor(this);
+        this.lineFollower = new LineFollower(this);
+        this.limitSwitch = new LimitSwitch(this);
     }
 
     intersectRobotRef(obj, corners) {
@@ -329,16 +327,22 @@ class RobotClass {
             dir: this.dir
         };
 
-        this.sensor.get_val()
+        this.lineFollower.update();
+        this.limitSwitch.update();
         let sensorValues = {
-            leftSensor: this.leftSensor,
-            centerSensor: this.centerSensor,
-            rightSensor: this.rightSensor
+            leftSensor: this.lineFollower.left,
+            centerSensor: this.lineFollower.center,
+            rightSensor: this.lineFollower.right
+        };
+        let switchValues = {
+            frontSwitch: this.limitSwitch.switch0,
+            backSwitch: this.limitSwitch.switch1
         };
 
         postMessage({
             robot: newState,
-            sensors: sensorValues
+            sensors: sensorValues,
+            switches: switchValues
         })
     }
 
@@ -394,14 +398,20 @@ class RobotClass {
         /* Runtime API method for getting sensor values.
            Currently supports reading left, center and right line followers
            in a range of [0,1]. */
-
+        if (device === "limit_switch") {
+            if (param === "switch0") {
+                return this.limitSwitch.switch0;
+            } else if (param === "switch1") {
+                return this.limitSwitch.switch1;
+            }
+        }
         if (device === "line_follower") {
             if (param === "left"){
-                return this.leftSensor;
+                return this.lineFollower.left;
             } else if (param === "center") {
-                return this.centerSensor;
+                return this.lineFollower.center;
             } else if (param === "right") {
-                return this.rightSensor;
+                return this.lineFollower.right;
             }
         }
         throw new Error("Device was not found" + device);

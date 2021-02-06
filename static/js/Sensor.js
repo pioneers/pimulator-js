@@ -1,8 +1,12 @@
-class Sensor{
+class LineFollower{
    constructor(robot) {
      this.robot = robot;
+     this.left = 0;
+     this.center = 0;
+     this.right = 0;
    }
-   get_val(){
+
+   update(){
      var sensorsY = [this.robot.Y - 5*Math.cos(this.robot.dir/180*Math.PI), this.robot.Y, this.robot.Y + 5*Math.cos(this.robot.dir/180*Math.PI)]
      var sensorsX = [this.robot.X - 5*Math.sin(-this.robot.dir/180*Math.PI), this.robot.X, this.robot.X + 5*Math.sin(-this.robot.dir/180*Math.PI)]
 
@@ -62,10 +66,9 @@ class Sensor{
        }
        total.push(Math.min(totalLine, 1))
      }
-     this.robot.leftSensor = total[2]
-     this.robot.centerSensor = total[1]
-     this.robot.rightSensor = total[0]
-     return total
+     this.left = total[2]
+     this.center = total[1]
+     this.right = total[0]
    }
 }
 class TapeLine{
@@ -84,4 +87,37 @@ class TapeLine{
       this.y_int = y1 - this.slope*x1
     }
   }
+}
+
+class LimitSwitch{
+  constructor(robot) {
+    this.robot = robot;
+    this.switch0 = false;
+    this.switch1 = false;
+    this.leeway = 1; // in inches
+  }
+
+  update() {
+    this.switch0 = false;
+    this.switch1 = false;
+    const switch0X = (this.robot.topL[0] + this.robot.topR[0]) / 2;
+    const switch0Y = (this.robot.topL[1] + this.robot.topR[1]) / 2;
+    const switch1X = (this.robot.botL[0] + this.robot.botR[0]) / 2;
+    const switch1Y = (this.robot.botL[1] + this.robot.botR[1]) / 2;
+
+    for (let obstacle of this.robot.simulator.obstacles) {
+      const minX = obstacle.topL[0] - this.leeway;
+      const minY = obstacle.topL[1] - this.leeway;
+      const maxX = obstacle.botR[0] + this.leeway;
+      const maxY = obstacle.botR[1] + this.leeway;
+      if (switch0X >= minX && switch0X <= maxX && switch0Y >= minY && switch0Y <= maxY) {
+        this.switch0 = true;
+      }
+      if (switch1X >= minX && switch1X <= maxX && switch1Y >= minY && switch1Y <= maxY) {
+        this.switch1 = true;
+      }
+    }
+
+  }
+
 }
