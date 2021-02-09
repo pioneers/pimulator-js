@@ -272,18 +272,26 @@ class RobotClass {
         /* Updates position of the  Robot using differential drive equations
         Derived with reference to:
         https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf*/
+
+        // Max speed is 0.628 m/s = 24.72 in/s and max acceleration is 0.55 m/s^2 = 21.65 in/s^2
+        // Refresh rate = 0.05/s
+        // Max speed is 1.236 in/tick and max acceleration is 0.054125 in/tick^2
+
+        // this.Wl and this.Wr are the requested speed for the left and right motors
+        // Compare the current speed of each motor to the requested speed, and accelerate in the correct direction
+
         let lv = this.Wl * this.wRadius;
         let rv = this.Wr * this.wRadius * this.neg;
         let radian = Math.PI*this.dir/180;
         let dx;
         let dy;
         let dir = this.dir;
-        if (lv == rv) {
+        if (lv == rv) { // Both motors going in the same direction
             let distance = rv * this.tickRate/1000;
             dx = distance * Math.cos(radian)
             dy = distance * Math.sin(radian)
         }
-        else {
+        else { // Motors going in different directions
             let rt = this.width/2 * (lv+rv)/(rv-lv);
             let wt = (rv-lv)/this.width;
             let theta = wt * this.tickRate/1000;
