@@ -1,5 +1,6 @@
 var mode = "idle"; // or auto or teleop
-var worker = new Worker("static/js/robot.js");
+var worker = new Worker("static/js/robot.js?t=" + gitHash);
+worker.postMessage({gitHash: gitHash});
 var timer;
 var inputMode = "keyboard";
 var codeUploaded = false;
@@ -221,8 +222,9 @@ function stop() {
     Stop the robot thread
     */
     worker.terminate();
-    worker = new Worker("/static/js/robot.js");
+    worker = new Worker("static/js/robot.js?t=" + gitHash);
     worker.onmessage = onmessage;
+    worker.postMessage({gitHash: gitHash});
     worker.postMessage({code:code});
     mode = "idle";
     update({X:70,Y:70,dir:0}); // in inches

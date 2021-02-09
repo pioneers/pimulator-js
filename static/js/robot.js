@@ -22,12 +22,15 @@ var console=(function(oldCons){
     };
 }(console));
 
+// Query string used when creating the worker, including the ampersand separator
+var queryString = location.search;
+
 importScripts("https://cdn.jsdelivr.net/pyodide/v0.16.1/full/pyodide.js");
-importScripts('./GamepadClass.js');
-importScripts('./Sensor.js');
-importScripts('./objects.js');
-importScripts('./FieldObj.js');
-importScripts('./keyboard.js');
+importScripts("./GamepadClass.js" + queryString);
+importScripts("./Sensor.js" + queryString);
+importScripts("./objects.js" + queryString);
+importScripts("./FieldObj.js" + queryString);
+importScripts("./keyboard.js" + queryString);
 
 var code = "";
 var env = {};
