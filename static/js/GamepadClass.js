@@ -32,8 +32,7 @@ class GamepadClass{
       40  //down
     ]
 
-    constructor(setNum) {
-        this.setNum = setNum;
+    constructor() {
 
         // Joysticks
         this.joystick_left_x = 0;
