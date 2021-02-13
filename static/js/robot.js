@@ -49,6 +49,9 @@ class RobotClass {
     MaxX = 144;                 // maximum X value, inches, field is 12'x12'
     MaxY = 144;                 // maximum Y value, inches, field is 12'x12'
     neg = -1;                    // negate left motor calculation
+    accel = 0.054125
+    vel = 1.265
+    currentVel = 0
     startX = 70.0;
     startY = 70.0;
     topL = Array(2);
@@ -287,9 +290,36 @@ class RobotClass {
         let dy;
         let dir = this.dir;
         if (lv == rv) { // Both motors going in the same direction
-            let distance = rv * this.tickRate/1000;
-            dx = distance * Math.cos(radian)
-            dy = distance * Math.sin(radian)
+            //TODO: make this general for left & right motors
+            if (lv > 0 && this.currentVel < this.vel) {
+                this.currentVel += this.accel;
+                if (this.currentVel > this.vel) {
+                  this.currentVel = this.vel;
+                }
+            }
+            if (lv < 0 && this.currentVel > -this.vel) {
+                this.currentVel -= this.accel;
+                if (this.currentVel < -this.vel) {
+                  this.currentVel = -this.vel;
+                }
+            }
+            if (lv == 0) {
+                if (this.currentVel > 0) {
+                   this.currentVel -= this.accel;
+                   if (this.currentVel < 0) {
+                      this.currentVel = 0;
+                   }
+                }
+                if (this.currentVel < 0) {
+                    this.currentVel += this.accel;
+                    if (this.currentVel > 0) {
+                        this.currentVel = 0;
+                    }
+                }
+            }
+            let distance = this.currentVel;
+            dx = distance * Math.cos(radian);
+            dy = distance * Math.sin(radian);
         }
         else { // Motors going in different directions
             let rt = this.width/2 * (lv+rv)/(rv-lv);
