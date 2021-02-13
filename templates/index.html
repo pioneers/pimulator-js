@@ -374,8 +374,9 @@
                                             </div>
                                             <div id="help-sensor" class="collapse" aria-labelledby="help-sensor">
                                                 <div class="card-body">
+                                                    
+                                                    <h3> <b>Limit Switches</b> </h3>
                                                     <p>
-                                                        <h3> <b>Limit Switches</b> </h3>
                                                         <div><b>Usage: <code></b>Robot.get_value(device_id, param)</div></code>
                                                         <b>Parameters:</b>
                                                         <ul>
@@ -385,10 +386,13 @@
                                                         </ul>
                                                         <b>Return:</b> Returns a boolean where <code>True</code> indicates that the switch is in contact with a surface and 
                                                         <code>False</code> indicates that the switch is not in contact with any surface on the field.
-                                                        <div><b>Sample Usage: </b><code>Robot.get_value(limit_switch, "switch0")</code></div>
                                                     </p>
                                                     <p>
-                                                        <h3> <b>Line Followers</b> </h3>
+                                                        <b>Sample Usage: </b> <code>Robot.get_value("limit_switch", "switch0")</code>
+                                                    </p>
+                                                    <br>
+                                                    <h3> <b>Line Followers</b> </h3>
+                                                    <p>
                                                         <div><b>Usage: <code></b>Robot.get_value(device_id, param)</div></code>
                                                         <b>Parameters:</b>
                                                         <ul>
@@ -399,7 +403,9 @@
                                                         <b>Return:</b> Returns a <code>float</code> value in the range [0,1] inclusive that 
                                                         describes the amount of light being reflected into the sensor where 1 indicates that the sensor 
                                                         is directly over a line, and 0 indicates that the line is reasonably far away.
-                                                        <div><b>Sample Usage: </b><div><code>Robot.get_value("line_follower", "center")</code></div>
+                                                    </p>
+                                                    <p>
+                                                        <b>Sample Usage: </b><code>Robot.get_value("line_follower", "center")</code>
                                                     </p>
                                                     
                                                 </div>
