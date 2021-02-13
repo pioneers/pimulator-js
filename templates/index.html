@@ -1,4 +1,5 @@
 {# This is actually a jinja template visit https://jinja.palletsprojects.com/en/2.11.x/intro for more info #}
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -16,6 +17,17 @@
     <!-- Disables scrolling with arrow keys and spacebar -->
     <script src="/static/js/disable_scrolling.js?t={[ git_hash }}"></script>
     <link rel="icon" href="https://staff.pierobotics.org/wiki/w/images/thumb/0/0a/Sprocket.png/800px-Sprocket.png" width="16" height="16">
+
+    <style>
+        code {
+          font-family: Consolas,"courier new";
+          color: rgba(20, 123, 220, 0.911);
+          background-color: #f1f1f1;
+          padding: 2px;
+          font-size: 105%;
+        }
+    </style>
+
   </head>
 
   <body>
@@ -349,6 +361,47 @@
                                                             </tr>
                                                         </tbody>
                                                     </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Help: Sensors -->
+                                        <div class="card">
+                                            <div class="card-header" id="help-sensor-heading">
+                                                <details class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-sensor" aria-expanded="true" aria-controls="help-sensor">
+                                                    <summary>Sensors</summary>
+                                                </details>
+                                            </div>
+                                            <div id="help-sensor" class="collapse" aria-labelledby="help-sensor">
+                                                <div class="card-body">
+                                                    <p>
+                                                        <h3> <b>Limit Switches</b> </h3>
+                                                        <div><b>Usage: <code></b>Robot.get_value(device_id, param)</div></code>
+                                                        <b>Parameters:</b>
+                                                        <ul>
+                                                            <li><code>device_id</code>: Pass in "limit_switch"</li>
+                                                            <li><code>param</code>: Pass "switch0" or "switch1" to specify which switch you want the status of
+                                                                where switch0 is the switch on the front of the robot and switch1 is on the back</li>
+                                                        </ul>
+                                                        <b>Return:</b> Returns a boolean where <code>True</code> indicates that the switch is in contact with a surface and 
+                                                        <code>False</code> indicates that the switch is not in contact with any surface on the field.
+                                                        <div><b>Sample Usage: </b><code>Robot.get_value(limit_switch, "switch0")</code></div>
+                                                    </p>
+                                                    <p>
+                                                        <h3> <b>Line Followers</b> </h3>
+                                                        <div><b>Usage: <code></b>Robot.get_value(device_id, param)</div></code>
+                                                        <b>Parameters:</b>
+                                                        <ul>
+                                                            <li><code>device_id</code>: Pass in "line_follower"</li>
+                                                            <li><code>param</code>: Pass "left", "center", or "right" to specify the sensor you want data from.
+                                                            </li>
+                                                        </ul>
+                                                        <b>Return:</b> Returns a <code>float</code> value in the range [0,1] inclusive that 
+                                                        describes the amount of light being reflected into the sensor where 1 indicates that the sensor 
+                                                        is directly over a line, and 0 indicates that the line is reasonably far away.
+                                                        <div><b>Sample Usage: </b><div><code>Robot.get_value("line_follower", "center")</code></div>
+                                                    </p>
+                                                    
                                                 </div>
                                             </div>
                                         </div>
