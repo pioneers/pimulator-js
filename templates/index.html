@@ -131,9 +131,9 @@
                                             $(".btn:first-child").html($(this).text()+' <span class="caret"></span>');
                                         });
                                         </script>
-                                        <a class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             Theme <span class="caret"></span>
-                                        </a>
+                                        </button>
                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                             <a class="dropdown-item" href="#" onclick="changeTheme(0)">Default</a>
                                             <a class="dropdown-item" href="#" onclick="changeTheme(1)">Dark Mode</a>
@@ -602,15 +602,14 @@
         changeTheme(0)
       }
       darkToggle = !darkToggle
-      localStorage.setItem("mode",darkToggle)
+      localStorage.setItem("mode", darkToggle)
 
     }
-     let savedMode = localStorage.getItem("mode")
-    console.log(savedMode)
+    var savedMode = localStorage.getItem("mode")
+    var savedTheme = localStorage.getItem("theme")
     if (savedMode === 'true') {
       toggle()
     }
-    var savedTheme = localStorage.getItem("theme")
     if (savedTheme == "" || savedTheme === null) {
       cm.setOption("theme",'default');
     } else {
