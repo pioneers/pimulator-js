@@ -49,9 +49,8 @@ class RobotClass {
     MaxX = 144;                 // maximum X value, inches, field is 12'x12'
     MaxY = 144;                 // maximum Y value, inches, field is 12'x12'
     neg = -1;                    // negate left motor calculation
-    accel = 0.054125
-    vel = 1.265
-    currentVel = 0
+    accel = 0.054125;              // acceleration in inches/tick^2
+    vel = 1.236;                // max velocity in inches/tick
     startX = 70.0;
     startY = 70.0;
     topL = Array(2);
@@ -62,11 +61,13 @@ class RobotClass {
     constructor(simulator) {
         this.X = this.startX;     // current X position of the center of the robot
         this.Y = this.startY;     // current Y position of the center of the robot
-        this.Wl = 0.0;           // angular velocity of l wheel, radians/s
-        this.Wr = 0.0;           // angular velocity of r wheel, radians/s
+        this.Wl = 0.0;           // requested angular velocity of l wheel, radians/s
+        this.Wr = 0.0;           // requested angular velocity of r wheel, radians/s
         this.ltheta = 0.0;       // angular position of l wheel, degrees
         this.rtheta = 0.0;       // angular position of r wheel, degrees
         this.dir = 0.0;          // Direction of the robot facing, degrees
+        this.currentLv = 0;       // current velocity of left wheel, in inches/s
+        this.currentRv = 0;       // current velocity of right wheel, in inches/s
 
         //corners are relative to the robot facing up
 
@@ -283,48 +284,44 @@ class RobotClass {
         // this.Wl and this.Wr are the requested speed for the left and right motors
         // Compare the current speed of each motor to the requested speed, and accelerate in the correct direction
 
-        let lv = this.Wl * this.wRadius;
-        let rv = this.Wr * this.wRadius * this.neg;
         let radian = Math.PI*this.dir/180;
         let dx;
         let dy;
         let dir = this.dir;
-        if (lv == rv) { // Both motors going in the same direction
+        if (this.requestedLv > this.currentLv) {
+            this.currentLv += this.accel;
+            if (this.currentLv > this.requestedLv) {
+              this.currentLv = this.requestedLv;
+            }
+        }
+        if (this.requestedLv < this.currentLv) {
+            this.currentLv -= this.accel;
+            if (this.currentLv < this.requestedLv) {
+              this.currentLv = this.requestedLv;
+            }
+        }
+        if (this.requestedRv > this.currentRv) {
+            this.currentRv += this.accel;
+            if (this.currentRv > this.requestedRv) {
+              this.currentRv = this.requestedRv;
+            }
+        }
+        if (this.requestedRv < this.currentRv) {
+            this.currentRv -= this.accel;
+            if (this.currentRv < this.requestedRv) {
+              this.currentRv = this.requestedRv;
+            }
+        }
+        if (this.currentLv == this.currentRv) { // Both motors going in the same direction
             //TODO: make this general for left & right motors
-            if (lv > 0 && this.currentVel < this.vel) {
-                this.currentVel += this.accel;
-                if (this.currentVel > this.vel) {
-                  this.currentVel = this.vel;
-                }
-            }
-            if (lv < 0 && this.currentVel > -this.vel) {
-                this.currentVel -= this.accel;
-                if (this.currentVel < -this.vel) {
-                  this.currentVel = -this.vel;
-                }
-            }
-            if (lv == 0) {
-                if (this.currentVel > 0) {
-                   this.currentVel -= this.accel;
-                   if (this.currentVel < 0) {
-                      this.currentVel = 0;
-                   }
-                }
-                if (this.currentVel < 0) {
-                    this.currentVel += this.accel;
-                    if (this.currentVel > 0) {
-                        this.currentVel = 0;
-                    }
-                }
-            }
-            let distance = this.currentVel;
+            let distance = this.currentRv;
             dx = distance * Math.cos(radian);
             dy = distance * Math.sin(radian);
         }
         else { // Motors going in different directions
-            let rt = this.width/2 * (lv+rv)/(rv-lv);
-            let wt = (rv-lv)/this.width;
-            let theta = wt * this.tickRate/1000;
+            let rt = this.width/2 * (this.currentLv+this.currentRv)/(this.currentRv-this.currentLv);
+            let wt = (this.currentRv-this.currentLv)/this.width;
+            let theta = wt;
             let i = rt * (1 - Math.cos(theta));
             let j = Math.sin(theta) * rt;
             dx = i * Math.sin(radian) + j * Math.cos(radian);
@@ -427,9 +424,9 @@ class RobotClass {
             throw new Error('"duty_cycle" is the only currently supported parameter');
         }
         if (device === "left_motor") {
-            this.Wl = speed * 9;
+            this.requestedLv = speed * this.vel;
         } else if (device === "right_motor") {
-            this.Wr = speed * 9;
+            this.requestedRv = speed * this.vel * this.neg;
         } else {
             throw new Error("Cannot find device name: " + device);
         }
