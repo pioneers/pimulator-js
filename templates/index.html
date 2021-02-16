@@ -76,7 +76,7 @@
                                 </svg>
                             </button>
                         </div>
-                        <div class="card-body text-center border-primary" style="padding:0px;height:432px">
+                        <div class="card-body text-center border-primary" id="field" style="padding:0px;height:432px">
                             <div class="d-inline-flex flex-row bd-highlight">
                                 <div class="bd-highlight" style="position: relative;">
                                   <canvas id="fieldCanvas" width="432" height="432"></canvas>
@@ -180,7 +180,7 @@
                                     <p id="input-mode"> Mode:
                                     <button type="button" id="dark-toggle" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="toggle()">Dark Mode</button>
                                     </p>
-                                </div>
+
 
                                 <!-- Help -->
                                 <div class="tab-pane fade" id="help" role="tabpanel" aria-labelledby="settings-tab" style="height:520px;margin-bottom:0px">
@@ -659,6 +659,7 @@
       let tableElements = document.getElementsByTagName("table")
       let codeElements = document.getElementsByTagName("code")
       let consoleLog = document.getElementById("console")
+      let field = document.getElementById("field")
       if (!darkToggle){
         for (var h = 0; h < headerElements.length; h++){
           headerElements[h].style.backgroundColor = "#313131"
@@ -676,6 +677,7 @@
           codeElements[h].style.backgroundColor = "#3f3f3f"
         }
         consoleLog.style.color = "#f5f5f5"
+        field.style.backgroundColor = "#bbbbbb"
         changeTheme(1)
 
       } else {
