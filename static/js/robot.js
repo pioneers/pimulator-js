@@ -50,7 +50,7 @@ class RobotClass {
     MaxY = 144;                 // maximum Y value, inches, field is 12'x12'
     neg = -1;                    // negate left motor calculation
     accel = 0.054125;              // acceleration in inches/tick^2
-    vel = 1.236;                // max velocity in inches/tick
+    maxVel = 1.236;                // max velocity in inches/tick
     startX = 70.0;
     startY = 70.0;
     topL = Array(2);
@@ -288,29 +288,24 @@ class RobotClass {
         let dx;
         let dy;
         let dir = this.dir;
+
+        //TODO: Test with Gamepad. Compare with real tested values if possible
+
+        //TODO: remove inner loop
+
+        //TODO: handling, edit the Lv and Rv such that difference is low
+
         if (this.requestedLv > this.currentLv) {
-            this.currentLv += this.accel;
-            if (this.currentLv > this.requestedLv) {
-              this.currentLv = this.requestedLv;
-            }
+            this.currentLv = Math.min(this.currentLv + this.accel, this.requestedLv);
         }
         if (this.requestedLv < this.currentLv) {
-            this.currentLv -= this.accel;
-            if (this.currentLv < this.requestedLv) {
-              this.currentLv = this.requestedLv;
-            }
+            this.currentLv = Math.max(this.currentLv - this.accel, this.requestedLv);
         }
         if (this.requestedRv > this.currentRv) {
-            this.currentRv += this.accel;
-            if (this.currentRv > this.requestedRv) {
-              this.currentRv = this.requestedRv;
-            }
+            this.currentRv = Math.min(this.currentRv + this.accel, this.requestedRv);
         }
         if (this.requestedRv < this.currentRv) {
-            this.currentRv -= this.accel;
-            if (this.currentRv < this.requestedRv) {
-              this.currentRv = this.requestedRv;
-            }
+            this.currentRv = Math.max(this.currentRv - this.accel, this.requestedRv);
         }
         if (this.currentLv == this.currentRv) { // Both motors going in the same direction
             //TODO: make this general for left & right motors
@@ -424,9 +419,9 @@ class RobotClass {
             throw new Error('"duty_cycle" is the only currently supported parameter');
         }
         if (device === "left_motor") {
-            this.requestedLv = speed * this.vel;
+            this.requestedLv = speed * this.maxVel;
         } else if (device === "right_motor") {
-            this.requestedRv = speed * this.vel * this.neg;
+            this.requestedRv = speed * this.maxVel * this.neg;
         } else {
             throw new Error("Cannot find device name: " + device);
         }
