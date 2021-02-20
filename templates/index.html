@@ -30,12 +30,11 @@
           font-size: 105%;
         }
     </style>
-
   </head>
 
   <body>
     <!-- Header Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg">
         <span class="navbar-brand mb-0 h1">
             <img src="https://staff.pierobotics.org/wiki/w/images/thumb/0/0a/Sprocket.png/800px-Sprocket.png" width="30" height="30" class="d-inline-block align-top" alt="">
             PiE Robotics Simulator
@@ -77,7 +76,7 @@
                                 </svg>
                             </button>
                         </div>
-                        <div class="card-body text-center border-primary" style="padding:0px;height:432px">
+                        <div class="card-body text-center border-primary" id="field" style="padding:0px;height:432px">
                             <div class="d-inline-flex flex-row bd-highlight">
                                 <div class="bd-highlight" style="position: relative;">
                                   <canvas id="fieldCanvas" width="432" height="432"></canvas>
@@ -134,13 +133,55 @@
                                 <pre class="tab-pane fade show active" id="console" role="tabpanel" aria-labelledby="console-tab" style="overflow:scroll;height:520px;margin-bottom:0px;padding-left:0.5rem;padding-top:0.4rem" ></pre>
 
                                 <!-- Settings -->
-                                <div class="tab-pane fade p-3" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                                <div class="tab-pane fade p-3" id="settings" role="tabpanel" aria-labelledby="settings-tab" style="margin-bottom:5px;padding-top:0.4rem">
                                     <p id="input-mode">Input:
-                                    <button type="button" id="keyboard-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchInput(0)">Keyboard</button>
-                                    <button type="button" id="gamepad-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchInput(1)">Gamepad</button>
+                                        <button type="button" id="keyboard-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchInput(0)">Keyboard</button>
+                                        <button type="button" id="gamepad-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchInput(1)">Gamepad</button>
                                     </p>
-                                </div>
+                                    <div class="dropdown">
+                                        <script>
+                                        $(".dropdown-menu li a").click(function(){
+                                            $(".btn:first-child").html($(this).text()+' <span class="caret"></span>');
+                                        });
+                                        </script>
+                                        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Theme <span class="caret"></span>
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <a class="dropdown-item" href="#" onclick="changeTheme(0)">Default</a>
+                                            <a class="dropdown-item" href="#" onclick="changeTheme(1)">Dark Mode</a>
+                                            <a class="dropdown-item" href="#" onclick="changeTheme(2)">Monokai</a>
+                                            <a class="dropdown-item" href="#" onclick="changeTheme(3)">Cobalt</a>
+                                            <a class="dropdown-item" href="#" onclick="changeTheme(4)">Solarized</a>
+                                            <a class="dropdown-item" href="#" onclick="changeTheme(5)">Yeti</a>
+                                        </div>
+                                        <script>
+                                            function changeTheme(theme) {
+                                              localStorage.setItem("theme",theme)
+                                              if (theme == 0) {
+                                                cm.setOption("theme",'default');
+                                              } else if (theme == 1){
+                                                cm.setOption("theme",'blackboard');
+                                              } else if (theme == 2){
+                                                cm.setOption("theme",'monokai');
+                                              } else if (theme == 3){
+                                                cm.setOption("theme",'cobalt');
+                                              } else if (theme == 4){
+                                                cm.setOption("theme",'solarized');
+                                              } else if (theme == 5){
+                                                cm.setOption("theme",'yeti');
+                                              } else if (theme == 6){
+                                                cm.setOption("theme",'midnight');
+                                              }
+                                            }
+                                        </script>
+                                    </div>
+                                    <p> </p>
+                                    <p id="input-mode"> Mode:
+                                    <button type="button" id="dark-toggle" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="toggle()">Dark Mode</button>
+                                    </p>
 
+                                </div>
                                 <!-- Help -->
                                 <div class="tab-pane fade" id="help" role="tabpanel" aria-labelledby="settings-tab" style="height:520px;margin-bottom:0px">
                                     <div class="accordion" id="help-accordion">
@@ -390,7 +431,7 @@
                                             </div>
                                             <div id="help-sensor" class="collapse" aria-labelledby="help-sensor">
                                                 <div class="card-body">
-                                                    
+
                                                     <h3> <b>Limit Switches</b> </h3>
                                                     <p>
                                                         <div><b>Usage: <code></b>Robot.get_value(device_id, param)</div></code>
@@ -400,7 +441,7 @@
                                                             <li><code>param</code>: Pass "switch0" or "switch1" to specify which switch you want the status of
                                                                 where switch0 is the switch on the front of the robot and switch1 is on the back</li>
                                                         </ul>
-                                                        <b>Return:</b> Returns a boolean where <code>True</code> indicates that the switch is in contact with a surface and 
+                                                        <b>Return:</b> Returns a boolean where <code>True</code> indicates that the switch is in contact with a surface and
                                                         <code>False</code> indicates that the switch is not in contact with any surface on the field.
                                                     </p>
                                                     <p>
@@ -416,14 +457,14 @@
                                                             <li><code>param</code>: Pass "left", "center", or "right" to specify the sensor you want data from
                                                             </li>
                                                         </ul>
-                                                        <b>Return:</b> Returns a <code>float</code> value in the range [0,1] inclusive that 
-                                                        describes the amount of light being reflected into the sensor where 1 indicates that the sensor 
+                                                        <b>Return:</b> Returns a <code>float</code> value in the range [0,1] inclusive that
+                                                        describes the amount of light being reflected into the sensor where 1 indicates that the sensor
                                                         is directly over a line, and 0 indicates that the line is reasonably far away.
                                                     </p>
                                                     <p>
                                                         <b>Sample Usage: </b><code>Robot.get_value("line_follower", "center")</code>
                                                     </p>
-                                                    
+
                                                 </div>
                                             </div>
                                         </div>
@@ -461,9 +502,16 @@
                         <!-- CodeMirror -->
                         <div class="tab-pane fade show active" id="code-mirror" role="tabpanel" aria-labelledby="home-tab">
                             <!-- Create a simple CodeMirror instance -->
-                            <script src="/static/js/codemirror.js?t={[ git_hash }}"></script>
+                            <script src="/static/js/codemirror.js?t={{ git_hash }}"></script>
                             <link rel="stylesheet" href="/static/css/codemirror.css?t={[ git_hash }}">
-                            <script src="/static/js/python.js?t={[ git_hash }}"></script>
+                            <script src="/static/js/python.js?t={{ git_hash }}"></script>
+                            <link rel="stylesheet" href="/static/css/cobalt.css">
+                            <link rel="stylesheet" href="/static/css/monokai.css">
+                            <link rel="stylesheet" href="/static/css/solarized.css">
+                            <link rel="stylesheet" href="/static/css/yeti.css">
+                            <link rel="stylesheet" href="/static/css/blackboard.css">
+                            <link rel="stylesheet" href="/static/css/midnight.css">
+                            <script src="/static/js/sublime.js"></script>
 
                             <div class="container" id="cmblock" style="padding-left:0px;padding-right:0px">
                                 <script>
@@ -488,8 +536,15 @@
                                     value: "",
                                     mode:  "python",
                                     lineNumbers: true,
-                                    indentUnit: 4
+                                    keyMap: "sublime",
+                                    indentUnit: 4,
+                                    autoCloseBrackets: true,
+                                    matchBrackets: true,
+                                    showCursorWhenSelecting: true,
+                                    theme: "default",
+                                    tabSize: 4
                                   });
+
                                   cm.setSize(width="100%", height="1000px");
                                   cm.setOption("extraKeys", {
                                    Tab: function(cm) {
@@ -591,6 +646,76 @@
     <script src="/static/js/joypad.js?t={{ git_hash }}"></script>
     <script src="/static/js/gamepad.js?t={{ git_hash }}"></script>
     <script src="/static/js/base.js?t={{ git_hash }}"></script>
+    <script src="https://cdn.jsdelivr.net/gh/fcmam5/nightly.js@v1.0/dist/nightly.min.js"></script>
+    <script>
+    var darkToggle = false;
+    var nightly = new Nightly();
+    function toggle() {
+      console.log("toggling")
+      nightly.toggle();
+      let headerElements = document.getElementsByClassName('card-header')
+      let bodyElements = document.getElementsByClassName('card-body')
+      let footerElements = document.getElementsByClassName('card-footer')
+      let tableElements = document.getElementsByTagName("table")
+      let codeElements = document.getElementsByTagName("code")
+      let consoleLog = document.getElementById("console")
+      let field = document.getElementById("field")
+      if (!darkToggle){
+        for (var h = 0; h < headerElements.length; h++){
+          headerElements[h].style.backgroundColor = "#313131"
+        }
+        for (var h = 0; h < bodyElements.length; h++){
+          bodyElements[h].style.backgroundColor = "#313131"
+        }
+        for (var h = 0; h < footerElements.length; h++){
+          footerElements[h].style.backgroundColor = "#313131"
+        }
+        for (var h = 0; h < tableElements.length; h++){
+          tableElements[h].style.color = "#ffffff"
+        }
+        for (var h = 0; h < codeElements.length; h++){
+          codeElements[h].style.backgroundColor = "#3f3f3f"
+        }
+        consoleLog.style.color = "#f5f5f5"
+        field.style.backgroundColor = "#bbbbbb"
+        changeTheme(1)
 
+      } else {
+        for (var h = 0; h < headerElements.length; h++){
+          headerElements[h].style.backgroundColor = "#ffffff"
+        }
+        for (var h = 0; h < bodyElements.length; h++){
+          bodyElements[h].style.backgroundColor = "#ffffff"
+        }
+        for (var h = 0; h < footerElements.length; h++){
+          footerElements[h].style.backgroundColor = "#ffffff"
+        }
+        for (var h = 0; h < tableElements.length; h++){
+          tableElements[h].style.color = "#000000"
+        }
+        for (var h = 0; h < codeElements.length; h++){
+          codeElements[h].style.backgroundColor = "#f1f1f1"
+        }
+        consoleLog.style.color = "#000000"
+
+        changeTheme(0)
+      }
+      darkToggle = !darkToggle
+      localStorage.setItem("mode", darkToggle)
+
+    }
+    var savedMode = localStorage.getItem("mode")
+    var savedTheme = localStorage.getItem("theme")
+    if (savedMode === 'true') {
+      toggle()
+    }
+    if (savedTheme == "" || savedTheme === null) {
+      cm.setOption("theme",'default');
+    } else {
+      changeTheme(savedTheme)
+    }
+
+   </script>
   </body>
+
 </html>
