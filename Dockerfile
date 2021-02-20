@@ -11,7 +11,7 @@ WORKDIR /simulator
 # We then pass this git hash into jinja so we can render the html
 COPY . /simulator
 RUN GIT_SHA=$(date +%Y%m%d%H%M) && \
-    echo "{\"git_hash\": \"$GIT_SHA\"}" > context.json && \
+    echo "{\"git_hash\": \"$GIT_SHA\", \"prod\": true}" > context.json && \
     jinja -d context.json templates/index.html > rendered_index.html
 
 
