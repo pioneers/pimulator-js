@@ -16,7 +16,6 @@ function toggle() {
   let consoleLog = document.getElementById("console")
   let field = document.getElementById("field")
   let summaryElements = document.getElementsByTagName("summary")
-  let dropdownMenuElements = document.getElementsByClassName("dropdown-menu")
   console.log(dropdownMenuElements)
   let colorDefault = "#000000"
   let backgroundColorDefault = "#ffffff"
@@ -50,9 +49,6 @@ function toggle() {
       summaryElements[h].style.color = linkDarkColor
     }
 
-    for (var h = 0; h < dropdownMenuElements.length; h++){
-      dropdownMenuElements[h].style.backgroundColor = buttonDarkBackground
-    }
 
 
     consoleLog.style.color = colorDark
@@ -79,9 +75,6 @@ function toggle() {
       summaryElements[h].style.color = linkColor
     }
 
-    for (var h = 0; h < dropdownMenuElements.length; h++){
-      dropdownMenuElements[h].style.backgroundColor = buttonBackground
-    }
 
 
     consoleLog.style.color = colorDefault

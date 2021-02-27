@@ -151,22 +151,24 @@
                                         <button type="button" id="gamepad-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchInput(1)">Gamepad</button>
                                     </p>
                                     <div class="dropdown">
+
+                                        Editor:
+                                            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Default <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(0)">Default</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(1)">Dark Mode</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(2)">Monokai</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(3)">Cobalt</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(4)">Solarized</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(5)">Yeti</a></li>
+                                            </ul>
                                         <script>
                                         $(".dropdown-menu li a").click(function(){
-                                            $(".btn:first-child").html($(this).text()+' <span class="caret"></span>');
+                                            $("#dropdownMenuButton").html($(this).text()+' <span class="caret"></span>');
                                         });
                                         </script>
-                                        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            Theme <span class="caret"></span>
-                                        </button>
-                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item" href="#" onclick="changeTheme(0)">Default</a>
-                                            <a class="dropdown-item" href="#" onclick="changeTheme(1)">Dark Mode</a>
-                                            <a class="dropdown-item" href="#" onclick="changeTheme(2)">Monokai</a>
-                                            <a class="dropdown-item" href="#" onclick="changeTheme(3)">Cobalt</a>
-                                            <a class="dropdown-item" href="#" onclick="changeTheme(4)">Solarized</a>
-                                            <a class="dropdown-item" href="#" onclick="changeTheme(5)">Yeti</a>
-                                        </div>
                                         <script>
                                             function changeTheme(theme) {
                                               localStorage.setItem("theme",theme)
@@ -188,7 +190,7 @@
                                             }
                                         </script>
                                     </div>
-                                    <p> </p>
+                                    <br>
                                     <p id="input-mode"> Mode:
                                     <button type="button" id="dark-toggle" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="toggle()">Dark Mode</button>
                                     </p>
