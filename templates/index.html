@@ -153,11 +153,11 @@
                                     <div class="dropdown">
                                         Editor:
                                             <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                Default <span class="caret"></span>
+                                                Theme <span class="caret"></span>
                                             </button>
                                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(0)">Default</a></li>
-                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(1)">Dark Mode</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(0)">Default Light</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(1)">Default Dark</a></li>
                                                 <li><a class="dropdown-item" href="#" onclick="changeTheme(2)">Monokai</a></li>
                                                 <li><a class="dropdown-item" href="#" onclick="changeTheme(3)">Cobalt</a></li>
                                                 <li><a class="dropdown-item" href="#" onclick="changeTheme(4)">Solarized</a></li>
@@ -171,7 +171,7 @@
                                         <script>
                                             function changeTheme(theme,save=true) {
                                               if (save === true){
-                                                localStorage.setItem("theme",theme)
+                                                localStorage.setItem("theme", theme);
                                               }
                                               if (theme == 0) {
                                                 cm.setOption("theme",'default');
