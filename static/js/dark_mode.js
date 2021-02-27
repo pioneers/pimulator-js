@@ -16,16 +16,19 @@ function toggle() {
   let consoleLog = document.getElementById("console")
   let field = document.getElementById("field")
   let summaryElements = document.getElementsByTagName("summary")
-
+  let dropdownMenuElements = document.getElementsByClassName("dropdown-menu")
+  console.log(dropdownMenuElements)
   let colorDefault = "#000000"
   let backgroundColorDefault = "#ffffff"
   let colorDark = "#ffffff"
   let backgroundColorDark = "#313131"
   let fieldColorDark = "#bbbbbb"
   let codeElementsBackgroundColor = "#f1f1f1"
-  let codeElementsDarkBackgroundCOlor = "#3f3f3f"
+  let codeElementsDarkBackgroundColor = "#3f3f3f"
   let linkDarkColor = "#009688"
   let linkColor = "#007bff"
+  let buttonDarkBackground = "#757575"
+  let buttonBackground = "#007bff"
 
   if (!darkToggle){
     for (var h = 0; h < headerElements.length; h++){
@@ -41,11 +44,17 @@ function toggle() {
       tableElements[h].style.color = colorDark
     }
     for (var h = 0; h < codeElements.length; h++){
-      codeElements[h].style.backgroundColor = codeElementsDarkBackgroundCOlor
+      codeElements[h].style.backgroundColor = codeElementsDarkBackgroundColor
     }
     for (var h = 0; h < summaryElements.length; h++){
       summaryElements[h].style.color = linkDarkColor
     }
+
+    for (var h = 0; h < dropdownMenuElements.length; h++){
+      dropdownMenuElements[h].style.backgroundColor = buttonDarkBackground
+    }
+
+
     consoleLog.style.color = colorDark
     field.style.backgroundColor = fieldColorDark
     changeTheme(1)
@@ -70,6 +79,11 @@ function toggle() {
       summaryElements[h].style.color = linkColor
     }
 
+    for (var h = 0; h < dropdownMenuElements.length; h++){
+      dropdownMenuElements[h].style.backgroundColor = buttonBackground
+    }
+
+
     consoleLog.style.color = colorDefault
     changeTheme(0)
   }
@@ -85,5 +99,5 @@ if (savedMode === 'true') {
 if (savedTheme == "" || savedTheme === null) {
   cm.setOption("theme",'default');
 } else {
-   changeTheme(savedTheme)
+  changeTheme(savedTheme)
 }
