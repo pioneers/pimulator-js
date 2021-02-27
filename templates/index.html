@@ -170,8 +170,10 @@
                                         });
                                         </script>
                                         <script>
-                                            function changeTheme(theme) {
-                                              localStorage.setItem("theme",theme)
+                                            function changeTheme(theme,save=true) {
+                                              if (save === true){
+                                                localStorage.setItem("theme",theme)
+                                              }
                                               if (theme == 0) {
                                                 cm.setOption("theme",'default');
                                               } else if (theme == 1){

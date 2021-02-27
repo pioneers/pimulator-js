@@ -5,7 +5,6 @@ var darkToggle = false;
 var nightly = new Nightly();
 function toggle() {
 
-  console.log("toggling")
   nightly.toggle();
    //TODO: Fix into CSS-variables next time
   let headerElements = document.getElementsByClassName('card-header')
@@ -16,7 +15,7 @@ function toggle() {
   let consoleLog = document.getElementById("console")
   let field = document.getElementById("field")
   let summaryElements = document.getElementsByTagName("summary")
-  console.log(dropdownMenuElements)
+
   let colorDefault = "#000000"
   let backgroundColorDefault = "#ffffff"
   let colorDark = "#ffffff"
@@ -28,7 +27,6 @@ function toggle() {
   let linkColor = "#007bff"
   let buttonDarkBackground = "#757575"
   let buttonBackground = "#007bff"
-
   if (!darkToggle){
     for (var h = 0; h < headerElements.length; h++){
       headerElements[h].style.backgroundColor =  backgroundColorDark
@@ -53,7 +51,8 @@ function toggle() {
 
     consoleLog.style.color = colorDark
     field.style.backgroundColor = fieldColorDark
-    changeTheme(1)
+
+    changeTheme(1, false)
 
   } else {
     for (var h = 0; h < headerElements.length; h++){
@@ -75,14 +74,16 @@ function toggle() {
       summaryElements[h].style.color = linkColor
     }
 
-
-
     consoleLog.style.color = colorDefault
-    changeTheme(0)
+    changeTheme(0, false)
   }
   darkToggle = !darkToggle
   localStorage.setItem("mode", darkToggle)
-
+  let tempTheme = localStorage.getItem("theme")
+  if (savedTheme == "" || savedTheme === null) {
+  } else {
+    changeTheme(tempTheme)
+  }
 }
 var savedMode = localStorage.getItem("mode")
 var savedTheme = localStorage.getItem("theme")
