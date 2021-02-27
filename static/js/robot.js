@@ -68,6 +68,7 @@ class RobotClass {
         this.dir = 0.0;          // Direction of the robot facing, degrees
         this.currentLv = 0;       // current velocity of left wheel, in inches/s
         this.currentRv = 0;       // current velocity of right wheel, in inches/s
+        this.type = 4;            // Type of robot. 3 = small, 4 = medium, 5 = large
 
         //corners are relative to the robot facing up
 
@@ -289,9 +290,11 @@ class RobotClass {
         let dy;
         let dir = this.dir;
 
+        //console.log(this.currentLv);
         //TODO: Test with Gamepad. Compare with real tested values if possible
 
-        //TODO: remove inner loop
+        //TODO: make 3 robot profiles. Edit onmessage to change maxVel and acceleration
+        //whenever message is received.
 
         //TODO: handling, edit the Lv and Rv such that difference is low
 
@@ -577,7 +580,7 @@ function translateToMovement(keyCode) {
     simulator.robot.updatePosition();
 }
 
-/*********************** GAMEPAD INPUT GAMEPAD FUNCTIONS ***********************/
+/*********************** GAMEPAD a GAMEPAD FUNCTIONS ***********************/
 
 /**
  * A mapping from the button names of the controller to the button names
@@ -723,6 +726,7 @@ class Simulator{
         */
         this.robot = null;
         this.mode = "idle";
+        this.roboMode = 4; //3 is small, 4 is medium, 5 is large
         this.gamepad = new GamepadClass();
         this.keyboard = new Keyboard();
         this.current = [];
@@ -806,6 +810,9 @@ class Simulator{
             mode: this.mode
         });
         this.robot = new RobotClass(this);
+        console.log(this.roboMode);
+        this.robot.accel = (8 - this.roboMode) / 4 * 0.054125;
+        this.robot.maxVel = this.roboMode / 4 * 1.236;
         this.loadStudentCode();
         this.teleop_setup();
         this.consistentLoop(this.robot.tickRate, this.teleop_main);
@@ -817,6 +824,8 @@ class Simulator{
             mode: this.mode
         });
         this.robot = new RobotClass(this);
+        this.robot.accel = (8 - this.roboMode) / 4 * 0.054125;
+        this.robot.maxVel = this.roboMode / 4 * 1.236;
         this.loadStudentCode();
         this.timeout = setTimeout(function() { this.stop(); }.bind(this), 30*1000);
         this.robot.simStartTime = new Date().getTime();
@@ -850,6 +859,19 @@ this.onmessage = function(e) {
                 }
             }
             simulate();
+        }
+    }
+
+    //change robot mode
+    if (e.data.roboMode !== undefined) {
+        if (e.data.roboMode === "small") {
+            simulator.roboMode = 2;
+        }
+        else if (e.data.roboMode === "medium") {
+            simulator.roboMode = 5;
+        }
+        else if (e.data.roboMode === "large") {
+            simulator.roboMode = 6;
         }
     }
 

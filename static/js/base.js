@@ -3,6 +3,7 @@ var worker = new Worker("static/js/robot.js?t=" + gitHash);
 worker.postMessage({gitHash: gitHash});
 var timer;
 var inputMode = "keyboard";
+var roboMode = "medium";
 var codeUploaded = false;
 const scaleFactor = 3;
 
@@ -81,6 +82,39 @@ function switchInput(state) {
             //document.getElementById("input-mode").innerText = "Input: Keyboard";
             $("#gamepad-btn").button('toggle');
         }
+    }
+}
+function roboInput(state) {
+    if (state === 0) {
+        if (roboMode === "medium") {
+            $("#medium-btn").button('toggle');
+        } else if (roboMode === "large") {
+            $("#large-btn").button('toggle');
+        } else {
+            $("#small-btn").button('toggle');
+        }
+        roboMode = "small";
+        worker.postMessage({roboMode: roboMode});
+    } else if (state === 1) {
+        if (roboMode === "small") {
+            $("#small-btn").button('toggle');
+        } else if (roboMode === "large") {
+            $("#large-btn").button('toggle');
+        } else {
+            $("#medium-btn").button('toggle');
+        }
+        roboMode = "medium";
+        worker.postMessage({keyMode: roboMode});
+    } else if (state === 2) {
+        if (roboMode === "small") {
+            $("#small-btn").button('toggle');
+        } else if (roboMode === "medium") {
+            $("#medium-btn").button('toggle');
+        } else {
+            $("#large-btn").button('toggle');
+        }
+        roboMode = "large";
+        worker.postMessage({keyMode: roboMode});
     }
 }
 
