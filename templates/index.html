@@ -1,9 +1,22 @@
 {# This is actually a jinja template visit https://jinja.palletsprojects.com/en/2.11.x/intro for more info #}
+
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    {%- if prod %}
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9FNRKJ31JM"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-9FNRKJ31JM');
+    </script>
+    {% endif %}
 
     <!-- Bootstrap CSS & JS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -19,11 +32,21 @@
     <!-- Disables scrolling with arrow keys and spacebar -->
     <script src="/static/js/disable_scrolling.js?t={{ git_hash }}"></script>
     <link rel="icon" href="https://staff.pierobotics.org/wiki/w/images/thumb/0/0a/Sprocket.png/800px-Sprocket.png" width="16" height="16">
+
+    <style>
+        code {
+          font-family: Consolas,"courier new";
+          color: rgba(20, 123, 220, 0.911);
+          background-color: #f1f1f1;
+          padding: 2px;
+          font-size: 105%;
+        }
+    </style>
   </head>
 
   <body>
     <!-- Header Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg">
         <span class="navbar-brand mb-0 h1">
             <img src="https://staff.pierobotics.org/wiki/w/images/thumb/0/0a/Sprocket.png/800px-Sprocket.png" width="30" height="30" class="d-inline-block align-top" alt="">
             PiE Robotics Simulator
@@ -65,7 +88,7 @@
                                 </svg>
                             </button>
                         </div>
-                        <div class="card-body text-center border-primary" style="padding:0px;height:432px">
+                        <div class="card-body text-center border-primary" id="field" style="padding:0px;height:432px">
                             <div class="d-inline-flex flex-row bd-highlight">
                                 <div class="bd-highlight" style="position: relative;">
                                   <canvas id="fieldCanvas" width="432" height="432"></canvas>
@@ -122,10 +145,55 @@
                                 <pre class="tab-pane fade show active" id="console" role="tabpanel" aria-labelledby="console-tab" style="overflow:scroll;height:520px;margin-bottom:0px;padding-left:0.5rem;padding-top:0.4rem" ></pre>
 
                                 <!-- Settings -->
-                                <div class="tab-pane fade p-3" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                                <div class="tab-pane fade p-3" id="settings" role="tabpanel" aria-labelledby="settings-tab" style="margin-bottom:5px;padding-top:0.4rem">
                                     <p id="input-mode">Input:
-                                    <button type="button" id="keyboard-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchInput(0)">Keyboard</button>
-                                    <button type="button" id="gamepad-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchInput(1)">Gamepad</button>
+                                        <button type="button" id="keyboard-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchInput(0)">Keyboard</button>
+                                        <button type="button" id="gamepad-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchInput(1)">Gamepad</button>
+                                    </p>
+                                    <div class="dropdown">
+                                        Editor:
+                                            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Theme <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(0)">Default Light</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(1)">Default Dark</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(2)">Monokai</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(3)">Cobalt</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(4)">Solarized</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(5)">Yeti</a></li>
+                                            </ul>
+                                        <script>
+                                        $(".dropdown-menu li a").click(function(){
+                                            $("#dropdownMenuButton").html($(this).text()+' <span class="caret"></span>');
+                                        });
+                                        </script>
+                                        <script>
+                                            function changeTheme(theme,save=true) {
+                                              if (save === true){
+                                                localStorage.setItem("theme", theme);
+                                              }
+                                              if (theme == 0) {
+                                                cm.setOption("theme",'default');
+                                              } else if (theme == 1){
+                                                cm.setOption("theme",'blackboard');
+                                              } else if (theme == 2){
+                                                cm.setOption("theme",'monokai');
+                                              } else if (theme == 3){
+                                                cm.setOption("theme",'cobalt');
+                                              } else if (theme == 4){
+                                                cm.setOption("theme",'solarized');
+                                              } else if (theme == 5){
+                                                cm.setOption("theme",'yeti');
+                                              } else if (theme == 6){
+                                                cm.setOption("theme",'midnight');
+                                              }
+                                            }
+                                        </script>
+                                    </div>
+                                    <p></p>
+                                    <p id="input-mode"> Mode:
+                                    <button type="button" id="dark-toggle" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="toggle()">Dark Mode</button>
                                     </p>
                                     <p id="input-mode">Robot Size:
                                     <button type="button" id="small-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="roboInput(0)">Light</button>
@@ -134,6 +202,7 @@
                                     </p>
                                 </div>
 
+                                </div>
                                 <!-- Help -->
                                 <div class="tab-pane fade" id="help" role="tabpanel" aria-labelledby="settings-tab" style="height:520px;margin-bottom:0px">
                                     <div class="accordion" id="help-accordion">
@@ -373,6 +442,69 @@
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <!-- Help: Sensors -->
+                                        <div class="card">
+                                            <div class="card-header" id="help-sensor-heading">
+                                                <details class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-sensor" aria-expanded="true" aria-controls="help-sensor">
+                                                    <summary>Sensors</summary>
+                                                </details>
+                                            </div>
+                                            <div id="help-sensor" class="collapse" aria-labelledby="help-sensor">
+                                                <div class="card-body">
+
+                                                    <h3> <b>Limit Switches</b> </h3>
+                                                    <p>
+                                                        <div><b>Usage: <code></b>Robot.get_value(device_id, param)</div></code>
+                                                        <b>Parameters:</b>
+                                                        <ul>
+                                                            <li><code>device_id</code>: Pass in "limit_switch"</li>
+                                                            <li><code>param</code>: Pass "switch0" or "switch1" to specify which switch you want the status of
+                                                                where switch0 is the switch on the front of the robot and switch1 is on the back</li>
+                                                        </ul>
+                                                        <b>Return:</b> Returns a boolean where <code>True</code> indicates that the switch is in contact with a surface and
+                                                        <code>False</code> indicates that the switch is not in contact with any surface on the field.
+                                                    </p>
+                                                    <p>
+                                                        <b>Sample Usage: </b> <code>Robot.get_value("limit_switch", "switch0")</code>
+                                                    </p>
+                                                    <br>
+                                                    <h3> <b>Line Followers</b> </h3>
+                                                    <p>
+                                                        <div><b>Usage: <code></b>Robot.get_value(device_id, param)</div></code>
+                                                        <b>Parameters:</b>
+                                                        <ul>
+                                                            <li><code>device_id</code>: Pass in "line_follower"</li>
+                                                            <li><code>param</code>: Pass "left", "center", or "right" to specify the sensor you want data from
+                                                            </li>
+                                                        </ul>
+                                                        <b>Return:</b> Returns a <code>float</code> value in the range [0,1] inclusive that
+                                                        describes the amount of light being reflected into the sensor where 1 indicates that the sensor
+                                                        is directly over a line, and 0 indicates that the line is reasonably far away.
+                                                    </p>
+                                                    <p>
+                                                        <b>Sample Usage: </b><code>Robot.get_value("line_follower", "center")</code>
+                                                    </p>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Help: Debug Tab -->
+                                        <div class="card">
+                                            <div class="card-header" id="help-debug-heading">
+                                                <details class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-debug" aria-expanded="true" aria-controls="help-debug">
+                                                    <summary>Feedback/Bug Reports</summary>
+                                                </details>
+                                            </div>
+                                            <div id="help-debug" class="collapse" aria-labelledby="help-debug">
+                                                <div class="card-body">
+                                                    If you encountered a bug that you feel requires attention from staff, please submit a report at this link:
+                                                    <a href="https://forms.gle/i4q48q7fxBxRxDSb6" target="_blank"> Submit a Bug Report </a>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -407,9 +539,16 @@
                         <!-- CodeMirror -->
                         <div class="tab-pane fade show active" id="code-mirror" role="tabpanel" aria-labelledby="home-tab">
                             <!-- Create a simple CodeMirror instance -->
-                            <script src="/static/js/codemirror.js?t={[ git_hash }}"></script>
+                            <script src="/static/js/codemirror.js?t={{ git_hash }}"></script>
                             <link rel="stylesheet" href="/static/css/codemirror.css?t={[ git_hash }}">
-                            <script src="/static/js/python.js?t={[ git_hash }}"></script>
+                            <script src="/static/js/python.js?t={{ git_hash }}"></script>
+                            <link rel="stylesheet" href="/static/css/cobalt.css">
+                            <link rel="stylesheet" href="/static/css/monokai.css">
+                            <link rel="stylesheet" href="/static/css/solarized.css">
+                            <link rel="stylesheet" href="/static/css/yeti.css">
+                            <link rel="stylesheet" href="/static/css/blackboard.css">
+                            <link rel="stylesheet" href="/static/css/midnight.css">
+                            <script src="/static/js/sublime.js"></script>
 
                             <div class="container" id="cmblock" style="padding-left:0px;padding-right:0px">
                                 <script>
@@ -434,8 +573,15 @@
                                     value: "",
                                     mode:  "python",
                                     lineNumbers: true,
-                                    indentUnit: 4
+                                    keyMap: "sublime",
+                                    indentUnit: 4,
+                                    autoCloseBrackets: true,
+                                    matchBrackets: true,
+                                    showCursorWhenSelecting: true,
+                                    theme: "default",
+                                    tabSize: 4
                                   });
+
                                   cm.setSize(width="100%", height="1000px");
                                   cm.setOption("extraKeys", {
                                    Tab: function(cm) {
@@ -538,5 +684,9 @@
     <script src="/static/js/gamepad.js?t={{ git_hash }}"></script>
     <script src="/static/js/base.js?t={{ git_hash }}"></script>
 
+    <!-- Dark mode: this should be at the bottom so all elements get switched. -->
+    <script src="https://cdn.jsdelivr.net/gh/fcmam5/nightly.js@v1.0/dist/nightly.min.js"></script>
+    <script src="/static/js/dark_mode.js"></script>
   </body>
+
 </html>

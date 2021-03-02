@@ -23,7 +23,7 @@ class LineFollower{
          let m = tapeLine.slope
          if (m === "horizontal") {
            let distY = Math.abs(sensor_y-tapeLine.startY)
-           if (tapeLine.startX <= sensor_x && sensor_x <= tapeLine.endX) {
+           if ((tapeLine.startX <= sensor_x && sensor_x <= tapeLine.endX) || (tapeLine.startX >= sensor_x && sensor_x >= tapeLine.endX)){
              let distSquared = (distY*distY)
              totalLine += Math.min(1,3/distSquared)
            } else {
@@ -33,7 +33,7 @@ class LineFollower{
              }
          } else if (m === "vertical") {
            let distX = Math.abs(sensor_x-tapeLine.startX)
-           if (tapeLine.startY <= sensor_y && sensor_y <= tapeLine.endY) {
+           if ((tapeLine.startY <= sensor_y && sensor_y <= tapeLine.endY) || (tapeLine.startY >= sensor_y && sensor_y >= tapeLine.endY)) {
              let distSquared = (distX*distX)
              totalLine += Math.min(1,3/distSquared)
            } else {
