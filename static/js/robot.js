@@ -55,6 +55,7 @@ class RobotClass {
     topR = Array(2);
     botL = Array(2);
     botR = Array(2);
+    leeway = 1;
 
     constructor(simulator) {
         this.X = this.startX;     // current X position of the center of the robot
@@ -90,6 +91,7 @@ class RobotClass {
         this.simulator = simulator;
         this.lineFollower = new LineFollower(this);
         this.limitSwitch = new LimitSwitch(this);
+        this.attachedObj = null;
     }
 
     intersectRobotRef(obj, corners) {
@@ -327,8 +329,22 @@ class RobotClass {
         let newState = {
             X: this.X,
             Y: this.Y,
-            dir: this.dir
+            dir: this.dir,
         };
+
+        if (this.attachedObj) {
+            newState = {
+                X: this.X,
+                Y: this.Y,
+                dir: this.dir,
+                attachedObj: {
+                    X: this.attachedObj.x,
+                    Y: this.attachedObj.y,
+                    w: this.attachedObj.w,
+                    h: this.attachedObj.h
+                }
+            };
+        }
 
         this.lineFollower.update();
         this.limitSwitch.update();
@@ -376,6 +392,65 @@ class RobotClass {
         dict.botR[1] = newY + (this.height/2) * sin - (this.width/2) * cos;
 
         return dict;
+    }
+
+    grabObj() {
+        const X = this.X;
+        const Y = this.Y;
+
+        let obj = findGrabbableObj();
+        if (obj) {
+            //grab the object
+            this.attachedObj = obj;
+            obstacle.grab();
+
+            //update object's position
+            // b is the length of the front robot edges not covered by the object
+            var b = (this.width - object.width) / 2;
+            obstacle.botL[0] = this.topL[0] + b * Math.cos((90.0 - this.dir) * Math.pi / 180);
+            obstacle.botL[1] = this.topL[1] + b * Math.sin((90.0 - this.dir) * Math.pi / 180);
+            obstacle.topL[0] = object.botL[0] + object.h * Math.cos(this.dir * Math.pi / 180);
+            obstacle.topL[1] = object.botL[1] + object.h * Math.sin(this.dir * Math.pi / 180);
+
+            obstacle.topR[0] = obstacle.topL[0] + obstacle.w * Math.sin(this.dir * Math.pi / 180);
+            obstacle.topR[1] = obstacle.topL[1] - obstacle.w * Math.sin(this.dir * Math.pi / 180);
+            obstacle.botR[0] = obstacle.botL[0] + obstacle.w * Math.sin(this.dir * Math.pi / 180);
+            obstacle.botR[1] = obstacle.botL[1] - obstacle.w * Math.sin(this.dir * Math.pi / 180);
+            obstacle.x = obstacle.topL[0];
+            obstacle.y = obstacle.topL[1];
+        }
+    }
+
+    dropObj() {
+        if (this.attachedObj) {
+            let obstacle = this.attachedObj;
+            this.attachedObj.release();
+            this.attachedObj = null;
+        }
+        return;
+    }
+
+    findGrabbableObj() {
+        console.log("beginning search for grabbable object");
+        const switch0X = (this.topL[0] + this.topR[0]) / 2;
+        const switch0Y = (this.topL[1] + this.topR[1]) / 2;
+        const switch1X = (this.botL[0] + this.botR[0]) / 2;
+        const switch1Y = (this.botL[1] + this.botR[1]) / 2;
+
+        for (let obstacle of this.simulator.grabbableObjs) {
+            const minX = obstacle.topL[0] - this.leeway;
+            const minY = obstacle.topL[1] - this.leeway;
+            const maxX = obstacle.botR[0] + this.leeway;
+            const maxY = obstacle.botR[1] + this.leeway;
+            if (switch0X >= minX && switch0X <= maxX && switch0Y >= minY && switch0Y <= maxY) {
+                if (!obstacle.isGrabbed()) {
+                  console.log("Found object to grab");
+                    return obstacle;
+                }
+            }
+        }
+        console.log("No object found");
+        return null;
     }
 
     set_value(device, param, speed) {
@@ -698,11 +773,16 @@ class Simulator{
         this.current = [];
         this.tapeLines = [];
         this.obstacles = [];
+        this.grabbableObjs = [];
         for (let newLine of objects.tapeLinesData) {
             this.tapeLines.push(new TapeLine(newLine.x1, newLine.y1, newLine.x2, newLine.y2, newLine.color));
         }
         for (let newWall of objects.wallsData) {
             this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, newWall.color));
+        }
+        for (let grabbableObj of objects.grabbableData) {
+            this.grabbableObjs.push(new GrabbableObj(grabbableObj.x, grabbableObj.y, grabbableObj.w, grabbableObj.h, grabbableObj.color));
+            this.obstacles.push(new GrabbableObj(grabbableObj.x, grabbableObj.y, grabbableObj.w, grabbableObj.h, grabbableObj.color));
         }
 
         this.drawObjs();

@@ -5,6 +5,8 @@ var timer;
 var inputMode = "keyboard";
 var codeUploaded = false;
 const scaleFactor = 3;
+var objects = [];
+var tapelines = [];
 
 // Handle messages from worker
 function onmessage(e) {
@@ -35,8 +37,7 @@ worker.onmessage = onmessage;
 
 function drawObjs(objs, type) {
     /* Draw objects received from the worker. */
-    const canvas = document.getElementById('fieldCanvas');
-    const ctx = canvas.getContext('2d');
+
     if (type === "obstacle") {
         for (let i = 0; i < objs.length; i++) {
             ctx.beginPath();
@@ -48,6 +49,7 @@ function drawObjs(objs, type) {
                 objs[i].h*scaleFactor
             );
         }
+        objects = objs;
     } else if (type === "tapeLine") {
         ctx.lineWidth = 5;
         for (let i = 0; i < objs.length; i++) {
@@ -60,6 +62,7 @@ function drawObjs(objs, type) {
             );
             ctx.stroke();
         }
+        tapelines = objs;
     }
 }
 
@@ -119,9 +122,73 @@ function update(state) {
     const centerX = state.X * scaleFactor;
     const centerY = state.Y * scaleFactor;
     const dir = state.dir/180*Math.PI;  // Convert to Radians
-    document.getElementById("demo").innerHTML = "x: " + state.X.toFixed(2) + ", y: " + state.Y.toFixed(2)
-    const sensorPoints = document.querySelectorAll("circle")
+    document.getElementById("demo").innerHTML = "x: " + state.X.toFixed(2) + ", y: " + state.Y.toFixed(2);
+    //const sensorPoints = document.querySelectorAll("circle")
 
+    const canvas = document.getElementById('fieldCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawObjs(objects, "obstacle");
+    drawObjs(tapelines, "tapeLine");
+
+    // Draw Rectangle
+    ctx.lineWidth = 2;
+    const topLeftCornerX = centerX - 30;
+    const topLeftCornerY = centerY - 40;
+
+    // Translate to and rotate about the center of the robot
+    ctx.translate(centerX, centerY);
+    ctx.rotate(dir);
+    ctx.translate(-centerX, -centerY);
+
+    ctx.beginPath();
+    ctx.rect(topLeftCornerX, topLeftCornerY, 60, 80);
+    ctx.closePath();
+    ctx.strokeStyle = 'navy';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // Draw Circles
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, 3, 0, 2 * Math.PI);
+    ctx.moveTo(centerX, centerY-15);
+    ctx.arc(centerX, centerY-15, 3, 0, 2 * Math.PI);
+    ctx.moveTo(centerX, centerY+15);
+    ctx.arc(centerX, centerY+15, 3, 0, 2 * Math.PI);
+    ctx.closePath();
+    ctx.strokeStyle = 'red';
+    ctx.stroke();
+    ctx.fillStyle = 'red';
+    ctx.fill();
+    // Draw Triangle
+    ctx.beginPath();
+    ctx.moveTo(centerX-24, centerY);
+    ctx.lineTo(centerX-18, centerY+3.5);
+    ctx.lineTo(centerX-18, centerY-3.5);
+    ctx.lineTo(centerX-24, centerY);
+    ctx.closePath();
+    ctx.strokeStyle = 'blue';
+    ctx.stroke();
+    ctx.fillStyle = 'blue';
+    ctx.fill();
+
+    if (state.attachedObj !== undefined) {
+        //draw the object
+        ctx.beginPath();
+        ctx.moveTo(centerX + 30, centerY - state.attachedObj.w / 2);
+        ctx.rect(centerX + 30, centerY - state.attachedObj.w / 2, state.attachedObj.w, state.attachedObj.h);
+        ctx.closePath();
+        ctx.strokeStyle = 'green';
+        ctx.stroke();
+    }
+
+    // Translate to and rotate back
+    ctx.translate(centerX, centerY);
+    ctx.rotate(-dir);
+    ctx.translate(-centerX, -centerY);
+
+    /*
     // Set sensors
     sensorPoints[0].setAttributeNS(null, "cx", centerX)
     sensorPoints[0].setAttributeNS(null, "cy", centerY)
@@ -151,6 +218,7 @@ function update(state) {
     const trianglePoint3 = `${baseTriangleX+sideDist*Math.sin(dir)},${baseTriangleY-sideDist*Math.cos(dir)}`
     const triangleStr = `${topTriangleX},${topTriangleY} ` + trianglePoint2 + trianglePoint3;
     triangle.setAttributeNS(null, "points",triangleStr);
+    */
 }
 
 function updateSensors(sensorValues) {
