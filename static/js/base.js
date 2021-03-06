@@ -251,7 +251,8 @@ function clearConsole(){
 clearConsole()
 
 function log(text) {
-    const array = ['pyodide.py', '<eval>', 'pyodide/_base.py', 'eval(compile('];
+    // TODO: Filter out unwanted messages in a smarter way
+    const array = ['pyodide.py', '<eval>', 'pyodide/_base.py', 'eval(compile(', 'File "<exec>", line 4, in'];
     for (string of array){
         if(text.includes(string)){
             return
