@@ -49,8 +49,6 @@ class RobotClass {
     MaxX = 144;                 // maximum X value, inches, field is 12'x12'
     MaxY = 144;                 // maximum Y value, inches, field is 12'x12'
     neg = -1;                    // negate left motor calculation
-    accel = 0.054125;              // acceleration in inches/tick^2
-    maxVel = 1.236;                // max velocity in inches/tick
     startX = 70.0;
     startY = 70.0;
     topL = Array(2);
@@ -58,7 +56,7 @@ class RobotClass {
     botL = Array(2);
     botR = Array(2);
 
-    constructor(simulator) {
+    constructor(simulator, robotInfo) {
         this.X = this.startX;     // current X position of the center of the robot
         this.Y = this.startY;     // current Y position of the center of the robot
         this.Wl = 0.0;           // requested angular velocity of l wheel, radians/s
@@ -68,7 +66,21 @@ class RobotClass {
         this.dir = 0.0;          // Direction of the robot facing, degrees
         this.currentLv = 0;       // current velocity of left wheel, in inches/s
         this.currentRv = 0;       // current velocity of right wheel, in inches/s
-        this.type = 4;            // Type of robot. 3 = small, 4 = medium, 5 = large
+
+        // Set speed/acceleration based on robot type
+        const robotType = robotInfo.robotType
+        let robotTypeNum = 4 // robot type is medium by default
+        if (robotType === "light") {
+            robotTypeNum = 3;
+        }
+        else if (robotType === "medium") {
+            robotTypeNum = 4;
+        }
+        else if (robotType === "heavy") {
+            robotTypeNum = 5;
+        }
+        this.accel = (8 - robotTypeNum) / 4 * 0.054125; // Larger robots accelerate more slowly
+        this.maxVel = robotTypeNum / 4 * 1.236;         // Larger robots have a higher top speed
 
         //corners are relative to the robot facing up
 
@@ -726,7 +738,6 @@ class Simulator{
         */
         this.robot = null;
         this.mode = "idle";
-        this.roboMode = 4; //3 is small, 4 is medium, 5 is large
         this.gamepad = new GamepadClass();
         this.keyboard = new Keyboard();
         this.current = [];
@@ -801,7 +812,7 @@ class Simulator{
         });
     }
 
-    simulateTeleop(){
+    simulateTeleop(robotInfo) {
         /* Simulate execution of the robot code.
         Run setup once before continuously looping main. */
 
@@ -809,23 +820,18 @@ class Simulator{
         postMessage({
             mode: this.mode
         });
-        this.robot = new RobotClass(this);
-        console.log(this.roboMode);
-        this.robot.accel = (8 - this.roboMode) / 4 * 0.054125;
-        this.robot.maxVel = this.roboMode / 4 * 1.236;
+        this.robot = new RobotClass(this, robotInfo);
         this.loadStudentCode();
         this.teleop_setup();
         this.consistentLoop(this.robot.tickRate, this.teleop_main);
     }
 
-    simulateAuto() {
+    simulateAuto(robotInfo) {
         this.mode = "auto";
         postMessage({
             mode: this.mode
         });
-        this.robot = new RobotClass(this);
-        this.robot.accel = (8 - this.roboMode) / 4 * 0.054125;
-        this.robot.maxVel = this.roboMode / 4 * 1.236;
+        this.robot = new RobotClass(this, robotInfo);
         this.loadStudentCode();
         this.timeout = setTimeout(function() { this.stop(); }.bind(this), 30*1000);
         this.robot.simStartTime = new Date().getTime();
@@ -851,27 +857,15 @@ this.onmessage = function(e) {
         else {
             let simulate = function () {
                 if (typeof pyodide !== "undefined" && typeof pyodide.version !== "undefined") {
-                    if (e.data.mode === "auto") simulator.simulateAuto();
-                    else if (e.data.mode === "teleop") simulator.simulateTeleop();
+                    // Assume robotInfo is a key in the posted message
+                    if (e.data.mode === "auto") simulator.simulateAuto(e.data.robotInfo);
+                    else if (e.data.mode === "teleop") simulator.simulateTeleop(e.data.robotInfo);
                 }
                 else {
                     setTimeout(simulate, 500);
                 }
             }
             simulate();
-        }
-    }
-
-    //change robot mode
-    if (e.data.roboMode !== undefined) {
-        if (e.data.roboMode === "small") {
-            simulator.roboMode = 2;
-        }
-        else if (e.data.roboMode === "medium") {
-            simulator.roboMode = 5;
-        }
-        else if (e.data.roboMode === "large") {
-            simulator.roboMode = 6;
         }
     }
 

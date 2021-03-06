@@ -147,8 +147,8 @@
                                 <!-- Settings -->
                                 <div class="tab-pane fade p-3" id="settings" role="tabpanel" aria-labelledby="settings-tab" style="margin-bottom:5px;padding-top:0.4rem">
                                     <p id="input-mode">Input:
-                                        <button type="button" id="keyboard-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchInput(0)">Keyboard</button>
-                                        <button type="button" id="gamepad-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchInput(1)">Gamepad</button>
+                                        <button type="button" id="keyboard-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchInput('keyboard')">Keyboard</button>
+                                        <button type="button" id="gamepad-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchInput('gamepad')">Gamepad</button>
                                     </p>
                                     <div class="dropdown">
                                         Editor:
@@ -196,13 +196,12 @@
                                     <button type="button" id="dark-toggle" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="toggle()">Dark Mode</button>
                                     </p>
                                     <p id="input-mode">Robot Size:
-                                    <button type="button" id="small-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="roboInput(0)">Light</button>
-                                    <button type="button" id="medium-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="roboInput(1)">Medium</button>
-                                    <button type="button" id="large-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="roboInput(2)">Heavy</button>
+                                    <button type="button" id="light-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchRobotType('light')">Light</button>
+                                    <button type="button" id="medium-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchRobotType('medium')">Medium</button>
+                                    <button type="button" id="heavy-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchRobotType('heavy')">Heavy</button>
                                     </p>
                                 </div>
 
-                                </div>
                                 <!-- Help -->
                                 <div class="tab-pane fade" id="help" role="tabpanel" aria-labelledby="settings-tab" style="height:520px;margin-bottom:0px">
                                     <div class="accordion" id="help-accordion">

@@ -3,7 +3,7 @@ var worker = new Worker("static/js/robot.js?t=" + gitHash);
 worker.postMessage({gitHash: gitHash});
 var timer;
 var inputMode = "keyboard";
-var roboMode = "medium";
+var robotType = "medium";
 var codeUploaded = false;
 const scaleFactor = 3;
 
@@ -64,58 +64,18 @@ function drawObjs(objs, type) {
     }
 }
 
-// Switch input mode between 'keyboard' and 'gamepad'
-function switchInput(state) {
-    if (state === 1) {
-        if (inputMode === "gamepad") {
-            $("#gamepad-btn").button('toggle');
-        } else {
-            inputMode = "gamepad";
-            //document.getElementById("input-mode").innerText = "Input: Gamepad";
-            $("#keyboard-btn").button('toggle');
-        }
-    } else if (state === 0) {
-        if (inputMode === "keyboard") {
-            $("#keyboard-btn").button('toggle');
-        } else {
-            inputMode = "keyboard";
-            //document.getElementById("input-mode").innerText = "Input: Keyboard";
-            $("#gamepad-btn").button('toggle');
-        }
-    }
+/* Switch input mode between 'keyboard' and 'gamepad' */
+function switchInput(newInputMode) {
+    // Toggle previously activated button off (or retoggle currently activated button on)
+    $("#" + inputMode + "-btn").button('toggle');
+    inputMode = newInputMode;
 }
-function roboInput(state) {
-    if (state === 0) {
-        if (roboMode === "medium") {
-            $("#medium-btn").button('toggle');
-        } else if (roboMode === "large") {
-            $("#large-btn").button('toggle');
-        } else {
-            $("#small-btn").button('toggle');
-        }
-        roboMode = "small";
-        worker.postMessage({roboMode: roboMode});
-    } else if (state === 1) {
-        if (roboMode === "small") {
-            $("#small-btn").button('toggle');
-        } else if (roboMode === "large") {
-            $("#large-btn").button('toggle');
-        } else {
-            $("#medium-btn").button('toggle');
-        }
-        roboMode = "medium";
-        worker.postMessage({keyMode: roboMode});
-    } else if (state === 2) {
-        if (roboMode === "small") {
-            $("#small-btn").button('toggle');
-        } else if (roboMode === "medium") {
-            $("#medium-btn").button('toggle');
-        } else {
-            $("#large-btn").button('toggle');
-        }
-        roboMode = "large";
-        worker.postMessage({keyMode: roboMode});
-    }
+
+/* Switch robot type between 'light', 'medium', and 'heavy' */ 
+function switchRobotType(newRobotType) {
+    // Toggle previously activated button off (or retoggle currently activated button on)
+    $("#" + robotType + "-btn").button('toggle');
+    robotType = newRobotType;
 }
 
 // In teleop mode, if the input is set to the keyboard, send keyCodes to the worker
@@ -210,24 +170,28 @@ function start(auto=false) {
     else {
         clearInterval(timer);
         if (codeUploaded) {
+            let robotInfo = {
+                robotType: robotType
+            }
+
             if (auto === false) {
                 $("#teleop-btn").removeClass("btn-outline-primary").addClass("btn-primary")
-                worker.postMessage({start:true, mode:"teleop"})
+                worker.postMessage({start:true, mode:"teleop", robotInfo:robotInfo})
             } else if (auto === true) {
                 $("#autonomous-btn").removeClass("btn-outline-primary").addClass("btn-primary")
-                worker.postMessage({start:true, mode:"auto"})
+                worker.postMessage({start:true, mode:"auto", robotInfo:robotInfo})
             }
             document.getElementById("stop-btn").disabled = false;
             document.getElementById("teleop-btn").disabled = true;
             document.getElementById("autonomous-btn").disabled = true;
-        } else {
+        }
+        else {
             if (auto === false) {
                 $("#teleop-btn").button('toggle')
-                worker.postMessage({start:true, mode:"teleop"})
             } else if (auto === true) {
                 $("#autonomous-btn").button('toggle')
-                worker.postMessage({start:true, mode:"auto"})
             }
+            log("Please upload code first");
         }
     }
 };
