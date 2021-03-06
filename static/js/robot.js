@@ -49,16 +49,18 @@ class RobotClass {
     MaxX = 144;                 // maximum X value, inches, field is 12'x12'
     MaxY = 144;                 // maximum Y value, inches, field is 12'x12'
     neg = -1;                    // negate left motor calculation
-    startX = 70.0;
-    startY = 70.0;
+    startXDefault = 70.0;
+    startYDefault = 70.0;
     topL = Array(2);
     topR = Array(2);
     botL = Array(2);
     botR = Array(2);
 
-    constructor(simulator) {
-        this.X = this.startX;     // current X position of the center of the robot
-        this.Y = this.startY;     // current Y position of the center of the robot
+    constructor(simulator, startX = this.startXDefault, startY = this.startYDefault) {
+        console.log(startX);
+        this.X = startX;     // current X position of the center of the robot
+        this.Y = startY;     // current Y position of the center of the robot
+        console.log(this.X);
         this.Wl = 0.0;           // angular velocity of l wheel, radians/s
         this.Wr = 0.0;           // angular velocity of r wheel, radians/s
         this.ltheta = 0.0;       // angular position of l wheel, degrees
@@ -767,7 +769,7 @@ class Simulator{
         });
     }
 
-    simulateTeleop(){
+    simulateTeleop(startX = 70.0, startY = 70.0){
         /* Simulate execution of the robot code.
         Run setup once before continuously looping main. */
 
@@ -775,18 +777,19 @@ class Simulator{
         postMessage({
             mode: this.mode
         });
-        this.robot = new RobotClass(this);
+        console.log(startX);
+        this.robot = new RobotClass(this, startX, startY);
         this.loadStudentCode();
         this.teleop_setup();
         this.consistentLoop(this.robot.tickRate, this.teleop_main);
     }
 
-    simulateAuto() {
+    simulateAuto(startX = 70.0, startY = 70.0) {
         this.mode = "auto";
         postMessage({
             mode: this.mode
         });
-        this.robot = new RobotClass(this);
+        this.robot = new RobotClass(this, startX, startY);
         this.loadStudentCode();
         this.timeout = setTimeout(function() { this.stop(); }.bind(this), 30*1000);
         this.robot.simStartTime = new Date().getTime();
@@ -811,17 +814,19 @@ this.onmessage = function(e) {
         }
         else {
             // Set coordinates of the robot
+            this.startX = 70.0;
+            this.startY = 70.0;
             if (e.data.xpos !== undefined && e.data.ypos !== undefined) {
-                console.log(e.data.start);
-                //let startingC = e.data.coords;
-                this.startX = e.data.xpos;
-                this.startY = e.data.ypos;
+                this.startX = Math.max(e.data.xpos, 12.0);
+                this.startX = Math.min(this.startX, 131.80);
+                this.startY = Math.max(e.data.ypos, 15.5);
+                this.startY = Math.min(startY, 128.0);
             }
-            console.log(e.data.xpos);
+            console.log(this.startX);
             let simulate = function () {
                 if (typeof pyodide !== "undefined" && typeof pyodide.version !== "undefined") {
-                    if (e.data.mode === "auto") simulator.simulateAuto();
-                    else if (e.data.mode === "teleop") simulator.simulateTeleop();
+                    if (e.data.mode === "auto") simulator.simulateAuto(this.startX, this.startY);
+                    else if (e.data.mode === "teleop") simulator.simulateTeleop(this.startX, this.startY);
                 }
                 else {
                     setTimeout(simulate, 500);

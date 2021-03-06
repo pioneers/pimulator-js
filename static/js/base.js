@@ -119,6 +119,7 @@ function update(state) {
     const centerX = state.X * scaleFactor;
     const centerY = state.Y * scaleFactor;
     const dir = state.dir/180*Math.PI;  // Convert to Radians
+    console.log(state.X);
     document.getElementById("demo").innerHTML = "x: " + state.X.toFixed(2) + ", y: " + state.Y.toFixed(2)
     const sensorPoints = document.querySelectorAll("circle")
 
@@ -178,10 +179,10 @@ function start(auto=false) {
         if (codeUploaded) {
             if (auto === false) {
                 $("#teleop-btn").removeClass("btn-outline-primary").addClass("btn-primary")
-                worker.postMessage({start:true, mode:"teleop"})
+                worker.postMessage({start:true, mode:"teleop", xpos:document.getElementById("xpos").value, ypos:document.getElementById("ypos").value})
             } else if (auto === true) {
                 $("#autonomous-btn").removeClass("btn-outline-primary").addClass("btn-primary")
-                worker.postMessage({start:true, mode:"auto"})
+                worker.postMessage({start:true, mode:"auto", xpos:document.getElementById("xpos").value, ypos:document.getElementById("ypos").value})
             }
             document.getElementById("stop-btn").disabled = false;
             document.getElementById("teleop-btn").disabled = true;
@@ -190,19 +191,11 @@ function start(auto=false) {
             if (auto === false) {
                 $("#teleop-btn").button('toggle')
                 console.log(auto)
-                worker.postMessage({start:true, mode:"teleop", xpos:document.getElementById("xpos").value, ypos:document.getElementById("ypos").value})
+                worker.postMessage({start:true, mode:"teleop"})
             } else if (auto === true) {
                 $("#autonomous-btn").button('toggle')
-                worker.postMessage({start:true, mode:"auto", xpos:document.getElementById("xpos").value, ypos:document.getElementById("ypos").value})
+                worker.postMessage({start:true, mode:"auto"})
             } 
-            
-            /*
-            if (document.getElementById("xpos").value !== 70 || document.getElementById("ypos").value !== 70) {
-                //worker.postMessage({xpos:document.getElementById("xpos").value, ypos:document.getElementById("ypos").value});
-                console.log("EDIT");
-                worker.postMessage({coords:[document.getElementById("xpos").value, document.getElementById("ypos").value]});
-            }
-            */
         }
     }
 };
