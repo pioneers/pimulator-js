@@ -847,7 +847,9 @@ this.onmessage = function(e) {
     // Code upload
     if (e.data.code !== undefined){
         code = e.data.code;
-        console.log("Code upload successful");
+        if (e.data.newCode === true) {
+            console.log("Code upload successful");
+        }
     }
 
     // Start simulation

@@ -99,8 +99,8 @@ document.addEventListener('keyup', up);
 // "Upload Code" button sends code to the worker
 function uploadCode() {
     code = cm.getValue();
-    localStorage.setItem("code",code)
-    worker.postMessage({code:code});
+    localStorage.setItem("code",code);
+    worker.postMessage({code:code, newCode:true});
     codeUploaded = true;
 };
 
@@ -225,7 +225,6 @@ function stop() {
     worker.postMessage({gitHash: gitHash});
     worker.postMessage({code:code});
     mode = "idle";
-    update({X:70,Y:70,dir:0}); // in inches
     autonomousReset()
 };
 
