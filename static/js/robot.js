@@ -841,6 +841,7 @@ class Simulator{
 }
 
 var simulator = new Simulator();
+var robotType = "medium"
 
 this.onmessage = function(e) {
     // Code upload
@@ -855,10 +856,19 @@ this.onmessage = function(e) {
             console.log("Please upload code first");
         }
         else {
+            if (e.data.robotInfo.robotType !== robotType) {
+                robotType = e.data.robotInfo.robotType;
+                console.log("Robot type changed to " + robotType);
+            }
+            if (typeof pyodide === "undefined" && typeof pyodide.version === "undefined") {
+                console.log("Loading new simulation...")
+            }
+
             let simulate = function () {
+                // Wait for pyodide to load
                 if (typeof pyodide !== "undefined" && typeof pyodide.version !== "undefined") {
                     // Assume robotInfo is a key in the posted message
-                    if (e.data.mode === "auto") simulator.simulateAuto(e.data.robotInfo);
+                    if (e.data.mode === "auto") simulator.simulateAuto(e.data.robotInfo); 
                     else if (e.data.mode === "teleop") simulator.simulateTeleop(e.data.robotInfo);
                 }
                 else {
