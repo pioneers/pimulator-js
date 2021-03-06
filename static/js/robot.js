@@ -9,18 +9,30 @@ var console=(function(oldCons){
         },
         info: function (text) {
             oldCons.info(text);
-            // code
         },
         warn: function (text) {
             oldCons.warn(text);
-            // code
         },
         error: function (text) {
             oldCons.error(text);
-            // code
         }
     };
 }(console));
+
+var log = console.log
+console.log = function () {
+    const first_parameter = arguments[0];
+    const other_parameters = Array.prototype.slice.call(arguments, 1);
+
+    function formatConsoleDate (date) {
+        const hour = date.getHours();
+        const minutes = date.getMinutes();
+
+        return '[' + ((hour < 10) ? '0' + hour: hour) + ':' + ((minutes < 10) ? '0' + minutes: minutes) + '] ';
+    }
+
+    log.apply(console, [formatConsoleDate(new Date()) + first_parameter].concat(other_parameters));
+};
 
 // Query string used when creating the worker, including the ampersand separator
 var queryString = location.search;

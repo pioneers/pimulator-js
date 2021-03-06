@@ -251,7 +251,7 @@ function clearConsole(){
 clearConsole()
 
 function log(text) {
-    const array = ['pyodide.py', '<eval>'];
+    const array = ['pyodide.py', '<eval>', 'pyodide/_base.py', 'eval(compile('];
     for (string of array){
         if(text.includes(string)){
             return
