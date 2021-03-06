@@ -79,8 +79,8 @@ class RobotClass {
         else if (robotType === "heavy") {
             robotTypeNum = 5;
         }
-        this.accel = (8 - robotTypeNum) / 4 * 0.054125; // Larger robots accelerate more slowly
-        this.maxVel = robotTypeNum / 4 * 1.236;         // Larger robots have a higher top speed
+        this.accel = (8 - robotTypeNum) / 5 * 0.05413; // Larger robots accelerate more slowly
+        this.maxVel = robotTypeNum / 5 * 1.236;         // Larger robots have a higher top speed
 
         //corners are relative to the robot facing up
 
