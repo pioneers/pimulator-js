@@ -326,7 +326,6 @@ class RobotClass {
         let dy;
         let dir = this.dir;
 
-        //console.log(this.currentLv);
         //TODO: Test with Gamepad. Compare with real tested values if possible
 
         //TODO: make 3 robot profiles. Edit onmessage to change maxVel and acceleration
@@ -618,7 +617,7 @@ function translateToMovement(keyCode) {
     simulator.robot.updatePosition();
 }
 
-/*********************** GAMEPAD a GAMEPAD FUNCTIONS ***********************/
+/*********************** GAMEPAD INPUT GAMEPAD FUNCTIONS ***********************/
 
 /**
  * A mapping from the button names of the controller to the button names
