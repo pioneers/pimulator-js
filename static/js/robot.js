@@ -76,8 +76,12 @@ class RobotClass {
         else if (robotType === "heavy") {
             robotTypeNum = 5;
         }
+
+        // Max speed is 0.628 m/s = 24.72 in/s and max acceleration is 0.55 m/s^2 = 21.65 in/s^2
+        // Refresh rate = 0.05/s
+        // Max speed is 1.236 in/tick and max acceleration is 0.05413 in/tick^2
         this.accel = (8 - robotTypeNum) / 5 * 0.05413; // Larger robots accelerate more slowly
-        this.maxVel = robotTypeNum / 5 * 1.236;         // Larger robots have a higher top speed
+        this.maxVel = robotTypeNum / 5 * 1.236;        // Larger robots have a higher top speed
 
         //corners are relative to the robot facing up
 
@@ -317,13 +321,6 @@ class RobotClass {
         Derived with reference to:
         https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf*/
 
-        // Max speed is 0.628 m/s = 24.72 in/s and max acceleration is 0.55 m/s^2 = 21.65 in/s^2
-        // Refresh rate = 0.05/s
-        // Max speed is 1.236 in/tick and max acceleration is 0.054125 in/tick^2
-
-        // this.Wl and this.Wr are the requested speed for the left and right motors
-        // Compare the current speed of each motor to the requested speed, and accelerate in the correct direction
-
         let radian = Math.PI*this.dir/180;
         let dx;
         let dy;
@@ -337,6 +334,7 @@ class RobotClass {
 
         //TODO: handling, edit the Lv and Rv such that difference is low
 
+        // Compare the current speed of each motor to the requested speed, and accelerate in the correct direction
         if (this.requestedLv > this.currentLv) {
             this.currentLv = Math.min(this.currentLv + this.accel, this.requestedLv);
         }
@@ -349,8 +347,9 @@ class RobotClass {
         if (this.requestedRv < this.currentRv) {
             this.currentRv = Math.max(this.currentRv - this.accel, this.requestedRv);
         }
+
+        // Compute change in position and direction
         if (this.currentLv == this.currentRv) { // Both motors going in the same direction
-            //TODO: make this general for left & right motors
             let distance = this.currentRv;
             dx = distance * Math.cos(radian);
             dy = distance * Math.sin(radian);
