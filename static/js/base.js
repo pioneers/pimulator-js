@@ -189,11 +189,20 @@ function start(auto=false) {
         } else {
             if (auto === false) {
                 $("#teleop-btn").button('toggle')
-                worker.postMessage({start:true, mode:"teleop"})
+                console.log(auto)
+                worker.postMessage({start:true, mode:"teleop", xpos:document.getElementById("xpos").value, ypos:document.getElementById("ypos").value})
             } else if (auto === true) {
                 $("#autonomous-btn").button('toggle')
-                worker.postMessage({start:true, mode:"auto"})
+                worker.postMessage({start:true, mode:"auto", xpos:document.getElementById("xpos").value, ypos:document.getElementById("ypos").value})
+            } 
+            
+            /*
+            if (document.getElementById("xpos").value !== 70 || document.getElementById("ypos").value !== 70) {
+                //worker.postMessage({xpos:document.getElementById("xpos").value, ypos:document.getElementById("ypos").value});
+                console.log("EDIT");
+                worker.postMessage({coords:[document.getElementById("xpos").value, document.getElementById("ypos").value]});
             }
+            */
         }
     }
 };

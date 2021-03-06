@@ -799,8 +799,8 @@ var simulator = new Simulator();
 
 this.onmessage = function(e) {
     // Code upload
-    if (e.data.code !== undefined){
-        code = e.data.code;
+    if (e.data.code !== undefined) {
+        code = e.data.code; 
         console.log("Code upload successful");
     }
 
@@ -810,6 +810,14 @@ this.onmessage = function(e) {
             console.log("Please upload code first");
         }
         else {
+            // Set coordinates of the robot
+            if (e.data.xpos !== undefined && e.data.ypos !== undefined) {
+                console.log(e.data.start);
+                //let startingC = e.data.coords;
+                this.startX = e.data.xpos;
+                this.startY = e.data.ypos;
+            }
+            console.log(e.data.xpos);
             let simulate = function () {
                 if (typeof pyodide !== "undefined" && typeof pyodide.version !== "undefined") {
                     if (e.data.mode === "auto") simulator.simulateAuto();
