@@ -1,8 +1,12 @@
-class Sensor{
+class LineFollower{
    constructor(robot) {
      this.robot = robot;
+     this.left = 0;
+     this.center = 0;
+     this.right = 0;
    }
-   get_val(){
+
+   update(){
      var sensorsY = [this.robot.Y - 5*Math.cos(this.robot.dir/180*Math.PI), this.robot.Y, this.robot.Y + 5*Math.cos(this.robot.dir/180*Math.PI)]
      var sensorsX = [this.robot.X - 5*Math.sin(-this.robot.dir/180*Math.PI), this.robot.X, this.robot.X + 5*Math.sin(-this.robot.dir/180*Math.PI)]
 
@@ -19,7 +23,7 @@ class Sensor{
          let m = tapeLine.slope
          if (m === "horizontal") {
            let distY = Math.abs(sensor_y-tapeLine.startY)
-           if (tapeLine.startX <= sensor_x && sensor_x <= tapeLine.endX) {
+           if ((tapeLine.startX <= sensor_x && sensor_x <= tapeLine.endX) || (tapeLine.startX >= sensor_x && sensor_x >= tapeLine.endX)){
              let distSquared = (distY*distY)
              totalLine += Math.min(1,3/distSquared)
            } else {
@@ -29,7 +33,7 @@ class Sensor{
              }
          } else if (m === "vertical") {
            let distX = Math.abs(sensor_x-tapeLine.startX)
-           if (tapeLine.startY <= sensor_y && sensor_y <= tapeLine.endY) {
+           if ((tapeLine.startY <= sensor_y && sensor_y <= tapeLine.endY) || (tapeLine.startY >= sensor_y && sensor_y >= tapeLine.endY)) {
              let distSquared = (distX*distX)
              totalLine += Math.min(1,3/distSquared)
            } else {
@@ -62,18 +66,18 @@ class Sensor{
        }
        total.push(Math.min(totalLine, 1))
      }
-     this.robot.leftSensor = total[0]
-     this.robot.centerSensor = total[1]
-     this.robot.rightSensor = total[2]
-     return total
+     this.left = total[2]
+     this.center = total[1]
+     this.right = total[0]
    }
 }
 class TapeLine{
-  constructor(x1, y1, x2, y2) {
+  constructor(x1, y1, x2, y2, color = "green") {
     this.startX = x1
     this.startY = y1
     this.endX = x2
     this.endY = y2
+    this.color = color
     if (this.startX === this.endX) {
       this.slope = "vertical"
     } else if (this.startY === this.endY) {
@@ -83,4 +87,37 @@ class TapeLine{
       this.y_int = y1 - this.slope*x1
     }
   }
+}
+
+class LimitSwitch{
+  constructor(robot) {
+    this.robot = robot;
+    this.switch0 = false;
+    this.switch1 = false;
+    this.leeway = 1; // in inches
+  }
+
+  update() {
+    this.switch0 = false;
+    this.switch1 = false;
+    const switch0X = (this.robot.topL[0] + this.robot.topR[0]) / 2;
+    const switch0Y = (this.robot.topL[1] + this.robot.topR[1]) / 2;
+    const switch1X = (this.robot.botL[0] + this.robot.botR[0]) / 2;
+    const switch1Y = (this.robot.botL[1] + this.robot.botR[1]) / 2;
+
+    for (let obstacle of this.robot.simulator.obstacles) {
+      const minX = obstacle.topL[0] - this.leeway;
+      const minY = obstacle.topL[1] - this.leeway;
+      const maxX = obstacle.botR[0] + this.leeway;
+      const maxY = obstacle.botR[1] + this.leeway;
+      if (switch0X >= minX && switch0X <= maxX && switch0Y >= minY && switch0Y <= maxY) {
+        this.switch0 = true;
+      }
+      if (switch1X >= minX && switch1X <= maxX && switch1Y >= minY && switch1Y <= maxY) {
+        this.switch1 = true;
+      }
+    }
+
+  }
+
 }

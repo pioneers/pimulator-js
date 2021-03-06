@@ -1,8 +1,22 @@
+{# This is actually a jinja template visit https://jinja.palletsprojects.com/en/2.11.x/intro for more info #}
+
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    {%- if prod %}
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9FNRKJ31JM"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-9FNRKJ31JM');
+    </script>
+    {% endif %}
 
     <!-- Bootstrap CSS & JS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
@@ -12,13 +26,31 @@
 
     <title>PiE Robotics Simulator</title>
 
+    <!-- Store git_hash -->
+    <script>var gitHash = "{{ git_hash }}";</script>
+
     <!-- Disables scrolling with arrow keys and spacebar -->
-    <script src="/static/js/disable_scrolling.js"></script>
+    <script src="/static/js/disable_scrolling.js?t={{ git_hash }}"></script>
+    <link rel="icon" href="https://staff.pierobotics.org/wiki/w/images/thumb/0/0a/Sprocket.png/800px-Sprocket.png" width="16" height="16">
+
+    <style>
+        code {
+          font-family: Consolas,"courier new";
+          color: rgba(20, 123, 220, 0.911);
+          background-color: #f1f1f1;
+          padding: 2px;
+          font-size: 105%;
+        }
+    </style>
   </head>
 
   <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <span class="navbar-brand mb-0 h1">PiE Robotics Simulator</span>
+    <!-- Header Navigation Bar -->
+    <nav class="navbar navbar-expand-lg">
+        <span class="navbar-brand mb-0 h1">
+            <img src="https://staff.pierobotics.org/wiki/w/images/thumb/0/0a/Sprocket.png/800px-Sprocket.png" width="30" height="30" class="d-inline-block align-top" alt="">
+            PiE Robotics Simulator
+        </span>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -29,21 +61,38 @@
         </div>
     </nav>
 
+    <!-- Body of Content -->
     <div class="container">
+
+        <!-- Row 1: Field & Simulator Info -->
         <div class="row">
             <div class="d-flex flex-fill flex-row bd-highlight mb-3">
+                <!-- Field -->
                 <div class="bd-highlight mr-3">
                     <div class="card d-inline-flex border-primary">
                         <div class="card-header d-flex border-primary">
-                            Simulator
+                            <button type="button" id="teleop-btn" onclick="start(auto=false)" class="btn btn-outline-primary mr-2" data-toggle="button" data-toggle="tooltip" data-placement="right" title="Start Teleop Simulation">
+                                Teleop <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-joystick" viewBox="0 0 16 16" style="margin-bottom:4px;margin-left:4px">
+                                  <path d="M10 2a2 2 0 0 1-1.5 1.937v5.087c.863.083 1.5.377 1.5.726 0 .414-.895.75-2 .75s-2-.336-2-.75c0-.35.637-.643 1.5-.726V3.937A2 2 0 1 1 10 2z"/>
+                                  <path d="M0 9.665v1.717a1 1 0 0 0 .553.894l6.553 3.277a2 2 0 0 0 1.788 0l6.553-3.277a1 1 0 0 0 .553-.894V9.665c0-.1-.06-.19-.152-.23L9.5 6.715v.993l5.227 2.178a.125.125 0 0 1 .001.23l-5.94 2.546a2 2 0 0 1-1.576 0l-5.94-2.546a.125.125 0 0 1 .001-.23L6.5 7.708l-.013-.988L.152 9.435a.25.25 0 0 0-.152.23z"/>
+                                </svg>
+                            </button>
+                            <button type="button" id="autonomous-btn" onclick="start(auto=true)" class="btn btn-outline-primary mr-2" data-toggle="button" data-toggle="tooltip" data-placement="right" title="Start Autonomous Simulation" style="padding-right:9px">
+                                Autonomous <svg width="16px" height="16px" viewBox="4 3 10 10" class="bi bi-play" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:3px;margin-left:4px">
+                                    <path fill-rule="evenodd" d="M10.804 8L5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"/>
+                                </svg>
+                            </button>
+                            <button type="button" id="stop-btn" onclick="stop()" class="btn btn-outline-danger mr-2" data-toggle="button" style="padding-left:7px;padding-right:7px;padding-top:5.5px" data-toggle="tooltip" data-placement="right" title="Stop Simulation" disabled>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="26px" height="26px" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                  <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </button>
                         </div>
-                        <div class="card-body text-center border-primary" style="padding:0px">
+                        <div class="card-body text-center border-primary" id="field" style="padding:0px;height:432px">
                             <div class="d-inline-flex flex-row bd-highlight">
-                                <div class="bd-highlight">
-                                  <svg width="432" height="432" version="1.1" xmlns="http://www.w3.org/2000/svg" style="border:1px solid black">
-                                    <line x1="81" y1="81" x2="345" y2="345" stroke="green" stroke-width="5" />
-                                    <!-- <line x1="375" y1="121" x2="375" y2="385" stroke="green" stroke-width="5" /> -->
-                                    <!-- <line x1="111" y1="121" x2="375" y2="121" stroke="green" stroke-width="5" /> -->
+                                <div class="bd-highlight" style="position: relative;">
+                                  <canvas id="fieldCanvas" width="432" height="432"></canvas>
+                                  <svg width="432" height="432" version="1.1" xmlns="http://www.w3.org/2000/svg" style="position: absolute; left: 0px; top: 0px; border:1px solid black">
                                     <rect x="180"
                                           y="170"
                                           width="60"
@@ -54,65 +103,403 @@
                                           fill="transparent"
                                           transform="rotate(0)"
                                           stroke-width="2"/>
-                                    <circle cx="210" cy="210" r="4" stroke="red" stroke-width="3" fill="red" />
-                                    <circle cx="210" cy="195" r="4" stroke="red" stroke-width="3" fill="red" />
-                                    <circle cx="210" cy="225" r="4" stroke="red" stroke-width="3" fill="red" />
+                                    <circle cx="210" cy="210" r="3" stroke="red" stroke-width="2" fill="red" />
+                                    <circle cx="210" cy="195" r="3" stroke="red" stroke-width="2" fill="red" />
+                                    <circle cx="210" cy="225" r="3" stroke="red" stroke-width="2" fill="red" />
+                                    <polygon points="186,210 192,213.5, 192,206.5" stroke="blue" stroke-width="3" fill="blue" />
                                   </svg>
-                                </div>
-                                <div class="d-flex flex-column bd-highlight">
-                                    <div class="bd-highlight">
-                                        <a onclick="start(auto=0)" aria-controls="home" aria-selected="true" class="text-decoration-none h2" data-toggle="tooltip" data-placement="right" title="Start Teleop Simulation" style="cursor:pointer">
-                                            <svg width="1.2em" height="1.2em" viewBox="0 0 16 16" class="bi bi-controller" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                                  <path fill-rule="evenodd" d="M11.119 2.693c.904.19 1.75.495 2.235.98.407.408.779 1.05 1.094 1.772.32.733.599 1.591.805 2.466.206.875.34 1.78.364 2.606.024.815-.059 1.602-.328 2.21a1.42 1.42 0 0 1-1.445.83c-.636-.067-1.115-.394-1.513-.773a11.307 11.307 0 0 1-.739-.809c-.126-.147-.25-.291-.368-.422-.728-.804-1.597-1.527-3.224-1.527-1.627 0-2.496.723-3.224 1.527-.119.131-.242.275-.368.422-.243.283-.494.576-.739.81-.398.378-.877.705-1.513.772a1.42 1.42 0 0 1-1.445-.83c-.27-.608-.352-1.395-.329-2.21.024-.826.16-1.73.365-2.606.206-.875.486-1.733.805-2.466.315-.722.687-1.364 1.094-1.772.486-.485 1.331-.79 2.235-.98.932-.196 2.03-.292 3.119-.292 1.089 0 2.187.096 3.119.292zm-6.032.979c-.877.185-1.469.443-1.733.708-.276.276-.587.783-.885 1.465a13.748 13.748 0 0 0-.748 2.295 12.351 12.351 0 0 0-.339 2.406c-.022.755.062 1.368.243 1.776a.42.42 0 0 0 .426.24c.327-.034.61-.199.929-.502.212-.202.4-.423.615-.674.133-.156.276-.323.44-.505C4.861 9.97 5.978 9.026 8 9.026s3.139.943 3.965 1.855c.164.182.307.35.44.505.214.25.403.472.615.674.318.303.601.468.929.503a.42.42 0 0 0 .426-.241c.18-.408.265-1.02.243-1.776a12.354 12.354 0 0 0-.339-2.406 13.753 13.753 0 0 0-.748-2.295c-.298-.682-.61-1.19-.885-1.465-.264-.265-.856-.523-1.733-.708-.85-.179-1.877-.27-2.913-.27-1.036 0-2.063.091-2.913.27z"/>
-                                                  <path d="M11.5 6.026a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm-1 1a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm2 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm-1 1a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0zm-7-2.5h1v3h-1v-3z"/>
-                                                  <path d="M3.5 6.526h3v1h-3v-1zM3.051 3.26a.5.5 0 0 1 .354-.613l1.932-.518a.5.5 0 0 1 .258.966l-1.932.518a.5.5 0 0 1-.612-.354zm9.976 0a.5.5 0 0 0-.353-.613l-1.932-.518a.5.5 0 1 0-.259.966l1.932.518a.5.5 0 0 0 .612-.354z"/>
-                                            </svg>
-                                        </a>
-                                    </div>
-                                    <div class="bd-highlight">
-                                        <a onclick="start(auto=1)" aria-controls="home" aria-selected="true" class="text-decoration-none h2" data-toggle="tooltip" data-placement="right" title="Start Autonomous Simulation" style="cursor:pointer">
-                                            <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" class="bi bi-play" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                                <path fill-rule="evenodd" d="M10.804 8L5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"/>
-                                            </svg>
-                                        </a>
-                                    </div>
-                                    <div class="bd-highlight">
-                                        <a onclick="stop()" aria-controls="home" aria-selected="true" class="text-decoration-none text-danger h2" data-toggle="tooltip" data-placement="right" title="Stop Simulation" style="cursor:pointer">
-                                            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x-octagon" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                                <path fill-rule="evenodd" d="M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353L4.54.146zM5.1 1L1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1H5.1z"/>
-                                                <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                                            </svg>
-                                        </a>
-                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="card-footer border-primary">
                             <div id="demo">
-                              x and y coordinates updated here
+                                x and y coordinates updated here
                             </div>
-                            <div id="timer">Autonomous Timer: </div>
+                            <div id="timer">
+                                Autonomous Timer:
+                            </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Simulator Info -->
                 <div class="bd-highlight flex-fill">
                     <div class="card border-primary h-100">
-                        <div class="card-header">
+                        <div class="card-header" style="padding-top:7px">
+                            <!-- Simulator Nav Tabs -->
                             <ul class="nav nav-tabs card-header-tabs" id="set-tabs">
                                 <li class="nav-item">
-                                    <a href="#console" class="nav-link active" id="code-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Console</a>
+                                    <a href="#console" class="nav-link active" id="console-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Console</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="#settings" class="nav-link" id="gamepad-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Settings</a>
+                                    <a href="#settings" class="nav-link" id="settings-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Settings</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#help" class="nav-link" id="help-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Help</a>
                                 </li>
                             </ul>
                         </div>
                         <div class="card-body" style="padding:0.1rem">
-                            <div class="tab-content" id="view-tab-content">
-                                <pre class="tab-pane fade show active" id="console" role="tabpanel" aria-labelledby="console-tab" style="overflow:scroll;height:497px;margin-bottom:0px;padding-left:0.5rem;padding-top:0.4rem" ></pre>
-                                <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="gamepad-tab">
-                                    <button type="button" class="btn btn-info" id="input-mode" onclick="switchInput()">Input: Keyboard</button>
+                            <div class="tab-content overflow-auto" id="view-tab-content">
+                                <!-- Console -->
+                                <pre class="tab-pane fade show active" id="console" role="tabpanel" aria-labelledby="console-tab" style="overflow:scroll;height:520px;margin-bottom:0px;padding-left:0.5rem;padding-top:0.4rem" ></pre>
+
+                                <!-- Settings -->
+                                <div class="tab-pane fade p-3" id="settings" role="tabpanel" aria-labelledby="settings-tab" style="margin-bottom:5px;padding-top:0.4rem">
+                                    <p id="input-mode">Input:
+                                        <button type="button" id="keyboard-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchInput(0)">Keyboard</button>
+                                        <button type="button" id="gamepad-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchInput(1)">Gamepad</button>
+                                    </p>
+                                    <div class="dropdown">
+                                        Editor:
+                                            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Theme <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(0)">Default Light</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(1)">Default Dark</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(2)">Monokai</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(3)">Cobalt</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(4)">Solarized</a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="changeTheme(5)">Yeti</a></li>
+                                            </ul>
+                                        <script>
+                                        $(".dropdown-menu li a").click(function(){
+                                            $("#dropdownMenuButton").html($(this).text()+' <span class="caret"></span>');
+                                        });
+                                        </script>
+                                        <script>
+                                            function changeTheme(theme,save=true) {
+                                              if (save === true){
+                                                localStorage.setItem("theme", theme);
+                                              }
+                                              if (theme == 0) {
+                                                cm.setOption("theme",'default');
+                                              } else if (theme == 1){
+                                                cm.setOption("theme",'blackboard');
+                                              } else if (theme == 2){
+                                                cm.setOption("theme",'monokai');
+                                              } else if (theme == 3){
+                                                cm.setOption("theme",'cobalt');
+                                              } else if (theme == 4){
+                                                cm.setOption("theme",'solarized');
+                                              } else if (theme == 5){
+                                                cm.setOption("theme",'yeti');
+                                              } else if (theme == 6){
+                                                cm.setOption("theme",'midnight');
+                                              }
+                                            }
+                                        </script>
+                                    </div>
+                                    <p></p>
+                                    <p id="input-mode"> Mode:
+                                    <button type="button" id="dark-toggle" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="toggle()">Dark Mode</button>
+                                    </p>
+
+                                </div>
+                                <!-- Help -->
+                                <div class="tab-pane fade" id="help" role="tabpanel" aria-labelledby="settings-tab" style="height:520px;margin-bottom:0px">
+                                    <div class="accordion" id="help-accordion">
+                                        <!-- Help: General -->
+                                        <div class="card">
+                                            <div class="card-header" id="help-general-heading">
+                                                <details class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-general-body" aria-expanded="true" aria-controls="help-general-body">
+                                                    <summary>General</summary>
+                                                </details>
+                                            </div>
+                                            <div id="help-general-body" class="collapse" aria-labelledby="help-general-heading">
+                                                <div class="card-body">
+                                                    <p>
+                                                        Once Python has been initialized (when the Console outputs 'Python initialization
+                                                        complete'), the simulator is ready for use.
+                                                    </p>
+                                                    <p>
+                                                        You can copy/paste code into 'Code' section or type in your code directly. Be sure to upload your code using the 'Upload Code' button. When your code has been uploaded, the console will output 'Code upload successful'. Now everything is ready for simulation!
+                                                    </p>
+                                                    <p>
+                                                        You can start and stop simulations by clicking the buttons to the right of the field.
+                                                    </p>
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Icon</th>
+                                                                <th scope="col">Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-joystick" viewBox="0 0 16 16">
+                                                                      <path d="M10 2a2 2 0 0 1-1.5 1.937v5.087c.863.083 1.5.377 1.5.726 0 .414-.895.75-2 .75s-2-.336-2-.75c0-.35.637-.643 1.5-.726V3.937A2 2 0 1 1 10 2z"/>
+                                                                      <path d="M0 9.665v1.717a1 1 0 0 0 .553.894l6.553 3.277a2 2 0 0 0 1.788 0l6.553-3.277a1 1 0 0 0 .553-.894V9.665c0-.1-.06-.19-.152-.23L9.5 6.715v.993l5.227 2.178a.125.125 0 0 1 .001.23l-5.94 2.546a2 2 0 0 1-1.576 0l-5.94-2.546a.125.125 0 0 1 .001-.23L6.5 7.708l-.013-.988L.152 9.435a.25.25 0 0 0-.152.23z"/>
+                                                                    </svg>
+                                                                </td>
+                                                                <td>Starts Teleop Mode</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-play" viewBox="3 3 12 12">
+                                                                        <path d="M10.804 8L5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"/>
+                                                                    </svg>
+                                                                </td>
+                                                                <td>Starts Autonomous Mode</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-x-octagon" viewBox="0 0 16 16">
+                                                                        <path d="M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353L4.54.146zM5.1 1L1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1H5.1z"/>
+                                                                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                                                    </svg>
+                                                                </td>
+                                                                <td>Stops Simulation</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Help: Keyboard -->
+                                        <div class="card">
+                                            <div class="card-header" id="help-keyboard-heading">
+                                                <details class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-keyboard-body" aria-expanded="true" aria-controls="help-keyboard-body">
+                                                    <summary>Keyboard</summary>
+                                                </details>
+                                            </div>
+                                            <div id="help-keyboard-body" class="collapse" aria-labelledby="help-keyboard-heading">
+                                                <div class="card-body">
+                                                    <p>
+                                                        There are two different ways you can configure your robot's controls with your keyboard.
+                                                    </p>
+                                                    <p>
+
+                                                        Using the <b>Keyboard Class</b>, you can customize which keyboard inputs control your robot's
+                                                        motors. For more information about which keys are supported and how to use this class
+                                                        in your code, visit the Keyboard Class section of the Robot API.
+                                                    </p>
+                                                    <p>
+
+                                                        Using the <b>Gamepad Class</b>, WASD and the arrow keys correspond to what would be the left
+                                                        and right joysticks on a gamepad, respectively. In addition, these controls correspond
+                                                        to specific input names that you can reference in your code:
+                                                    </p>
+                                                    <h1 style="font-size:18px">
+
+                                                        Gamepad Class Controls
+                                                    </h1>
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Keyboard Inputs</th>
+                                                                <th scope="col">Gamepad</th>
+                                                                <th scope="col">Robot API</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>A/D</td>
+                                                                <td>Left Joystick Left/Right</td>
+                                                                <td>joystick_left_x</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>W/S</td>
+                                                                <td>Left Joystick Up/Down</td>
+                                                                <td>joystick_left_y</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Left/Right Arrow</td>
+                                                                <td>Right Joystick Left/Right</td>
+                                                                <td>joystick_right_x</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Up/Down Arrow</td>
+                                                                <td>Right Joystick Up/Down</td>
+                                                                <td>joystick_right_y</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                    <p>
+                                                        For more information about accessing these values in your code, you can visit the
+                                                        Gamepad Class section of the Robot API.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Help: Gamepad -->
+                                        <div class="card">
+                                            <div class="card-header" id="help-gamepad-heading">
+                                                <details class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-gamepad-body" aria-expanded="true" aria-controls="help-gamepad-body">
+                                                    <summary>Gamepad</summary>
+                                                </details>
+                                            </div>
+                                            <div id="help-gamepad-body" class="collapse" aria-labelledby="help-gamepad-heading">
+                                                <div class="card-body">
+                                                    <p>
+                                                        Keyboard inputs only support joystick controls. For more functionality, a game
+                                                        controller can be connected to the simulator. To input a game controller, connect it
+                                                        to your computer and click any button. Confirm that the controller has successfully
+                                                        been connected by checking the 'Gamepad' section. The following are button mappings
+                                                        between a generic game controller and the Robot API:
+                                                    </p>
+                                                    <img src="https://user-images.githubusercontent.com/580022/45268303-10a03e80-b4ce-11e8-883c-1f586566c040.png" alt="" class="img-thumbnail mb-3">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Game Controller</th>
+                                                                <th scope="col">Robot API</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>A</td>
+                                                                <td>button_a</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>B</td>
+                                                                <td>button_b</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>X</td>
+                                                                <td>button_x</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Y</td>
+                                                                <td>button_y</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>LB</td>
+                                                                <td>l_bumper</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>RB</td>
+                                                                <td>r_bumper</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>LT</td>
+                                                                <td>l_trigger</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>RT</td>
+                                                                <td>r_trigger</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Back</td>
+                                                                <td>button_back</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Start</td>
+                                                                <td>button_start</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>LSB (Pressed)</td>
+                                                                <td>l_stick</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>RSB (Pressed)</td>
+                                                                <td>r_stick</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>D-pad Up</td>
+                                                                <td>dpad_up</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>D-pad Down</td>
+                                                                <td>dpad_down</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>D-pad Left</td>
+                                                                <td>dpad_left</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>D-pad Right</td>
+                                                                <td>dpad_right</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Axis 0 / LSB (Left & Right)</td>
+                                                                <td>joystick_left_x</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Axis 1 / LSB (Up & Down)</td>
+                                                                <td>joystick_left_y</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Axis 2 / RSB (Left & Right)</td>
+                                                                <td>joystick_right_x</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Axis 3 / RSB (Up & Down)</td>
+                                                                <td>joystick_right_y</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Help: Sensors -->
+                                        <div class="card">
+                                            <div class="card-header" id="help-sensor-heading">
+                                                <details class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-sensor" aria-expanded="true" aria-controls="help-sensor">
+                                                    <summary>Sensors</summary>
+                                                </details>
+                                            </div>
+                                            <div id="help-sensor" class="collapse" aria-labelledby="help-sensor">
+                                                <div class="card-body">
+
+                                                    <h3> <b>Limit Switches</b> </h3>
+                                                    <p>
+                                                        <div><b>Usage: <code></b>Robot.get_value(device_id, param)</div></code>
+                                                        <b>Parameters:</b>
+                                                        <ul>
+                                                            <li><code>device_id</code>: Pass in "limit_switch"</li>
+                                                            <li><code>param</code>: Pass "switch0" or "switch1" to specify which switch you want the status of
+                                                                where switch0 is the switch on the front of the robot and switch1 is on the back</li>
+                                                        </ul>
+                                                        <b>Return:</b> Returns a boolean where <code>True</code> indicates that the switch is in contact with a surface and
+                                                        <code>False</code> indicates that the switch is not in contact with any surface on the field.
+                                                    </p>
+                                                    <p>
+                                                        <b>Sample Usage: </b> <code>Robot.get_value("limit_switch", "switch0")</code>
+                                                    </p>
+                                                    <br>
+                                                    <h3> <b>Line Followers</b> </h3>
+                                                    <p>
+                                                        <div><b>Usage: <code></b>Robot.get_value(device_id, param)</div></code>
+                                                        <b>Parameters:</b>
+                                                        <ul>
+                                                            <li><code>device_id</code>: Pass in "line_follower"</li>
+                                                            <li><code>param</code>: Pass "left", "center", or "right" to specify the sensor you want data from
+                                                            </li>
+                                                        </ul>
+                                                        <b>Return:</b> Returns a <code>float</code> value in the range [0,1] inclusive that
+                                                        describes the amount of light being reflected into the sensor where 1 indicates that the sensor
+                                                        is directly over a line, and 0 indicates that the line is reasonably far away.
+                                                    </p>
+                                                    <p>
+                                                        <b>Sample Usage: </b><code>Robot.get_value("line_follower", "center")</code>
+                                                    </p>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Help: Debug Tab -->
+                                        <div class="card">
+                                            <div class="card-header" id="help-debug-heading">
+                                                <details class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-debug" aria-expanded="true" aria-controls="help-debug">
+                                                    <summary>Feedback/Bug Reports</summary>
+                                                </details>
+                                            </div>
+                                            <div id="help-debug" class="collapse" aria-labelledby="help-debug">
+                                                <div class="card-body">
+                                                    If you encountered a bug that you feel requires attention from staff, please submit a report at this link:
+                                                    <a href="https://forms.gle/i4q48q7fxBxRxDSb6" target="_blank"> Submit a Bug Report </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -120,9 +507,12 @@
                 </div>
             </div>
         </div>
+
+        <!-- Row 2: Code & I/O -->
         <div class="row">
             <div class="card w-100 border-primary">
                 <div class="card-header d-flex mb-3 align-items-end" style="margin-bottom:0px!important;padding:0px">
+                    <!-- I/O Nav Tabs -->
                     <ul class="nav nav-tabs card-header-tabs mr-auto p-2" style="margin:0px;margin-left:29px;padding:0px!important" id="view-tabs">
                         <li class="nav-item">
                             <a href="#code-mirror" class="nav-link active" id="code-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Code</a>
@@ -140,11 +530,19 @@
                 </div>
                 <div class="card-body" style="padding:0px">
                     <div class="tab-content" id="view-tab-content">
+                        <!-- CodeMirror -->
                         <div class="tab-pane fade show active" id="code-mirror" role="tabpanel" aria-labelledby="home-tab">
                             <!-- Create a simple CodeMirror instance -->
-                            <script src="/static/js/codemirror.js"></script>
-                            <link rel="stylesheet" href="/static/css/codemirror.css">
-                            <script src="/static/js/python.js"></script>
+                            <script src="/static/js/codemirror.js?t={{ git_hash }}"></script>
+                            <link rel="stylesheet" href="/static/css/codemirror.css?t={[ git_hash }}">
+                            <script src="/static/js/python.js?t={{ git_hash }}"></script>
+                            <link rel="stylesheet" href="/static/css/cobalt.css">
+                            <link rel="stylesheet" href="/static/css/monokai.css">
+                            <link rel="stylesheet" href="/static/css/solarized.css">
+                            <link rel="stylesheet" href="/static/css/yeti.css">
+                            <link rel="stylesheet" href="/static/css/blackboard.css">
+                            <link rel="stylesheet" href="/static/css/midnight.css">
+                            <script src="/static/js/sublime.js"></script>
 
                             <div class="container" id="cmblock" style="padding-left:0px;padding-right:0px">
                                 <script>
@@ -169,15 +567,32 @@
                                     value: "",
                                     mode:  "python",
                                     lineNumbers: true,
-                                    indentUnit: 4
+                                    keyMap: "sublime",
+                                    indentUnit: 4,
+                                    autoCloseBrackets: true,
+                                    matchBrackets: true,
+                                    showCursorWhenSelecting: true,
+                                    theme: "default",
+                                    tabSize: 4
                                   });
-                                  cm.setSize(width="100%", height="1000px");
 
+                                  cm.setSize(width="100%", height="1000px");
+                                  cm.setOption("extraKeys", {
+                                   Tab: function(cm) {
+                                     if (cm.somethingSelected()) {
+                                       cm.indentSelection("add");
+                                     } else {
+                                       cm.replaceSelection(cm.getOption("indentWithTabs")? "\t":
+                                       Array(cm.getOption("indentUnit") + 1).join(" "), "end", "+input");
+                                     }
+                                   }
+                                 });
+                                 CodeMirror.keyMap.default["Shift-Tab"] = "indentLess";
                                   // var code = getCookie("code");
-                                  var code = "";
+                                  var code = localStorage.getItem("code")
                                   if (code == "" || code === null) {
                                     var xhr=new XMLHttpRequest();
-                                    xhr.open("GET","/static/student_code_file.py");
+                                    xhr.open("GET","/static/student_code_file.py?t={[ git_hash }}");
                                     xhr.onload = () => {
                                       code = xhr.responseText;
                                       // setCookie("code", code)
@@ -185,40 +600,72 @@
                                     }
                                     xhr.send();
                                   }
+                                  else {
+                                    cm.setValue(code)
+                                  }
                                 </script>
                             </div>
                         </div>
+
+                        <!-- Gamepad Readings -->
                         <div class="tab-pane fade" id="gamepad-menu" role="tabpanel" aria-labelledby="gamepad-tab">
                             <div class="container">
                                 <h2 id="heading"></h2>
                                 <p id="message"></p>
-                                <p id="button_0">button_a: </p>
-                                <p id="button_1">button_b: </p>
-                                <p id="button_2">button_x: </p>
-                                <p id="button_3">button_y: </p>
-                                <p id="button_4">l_bumper: </p>
-                                <p id="button_5">r_bumper: </p>
-                                <p id="button_6">l_trigger: </p>
-                                <p id="button_7">r_trigger: </p>
-                                <p id="button_8">button_back: </p>
-                                <p id="button_9">button_start: </p>
-                                <p id="button_10">l_stick: </p>
-                                <p id="button_11">r_stick: </p>
-                                <p id="button_12">dpad_up: </p>
-                                <p id="button_13">dpad_down: </p>
-                                <p id="button_14">dpad_left: </p>
-                                <p id="button_15">dpad_right: </p>
-                                <p id="axis_0">LH: </p>
-                                <p id="axis_1">LV: </p>
-                                <p id="axis_2">RH: </p>
-                                <p id="axis_3">RV: </p>
+                                <p id="button_0">button_a: 0</p>
+                                <p id="button_1">button_b: 0</p>
+                                <p id="button_2">button_x: 0</p>
+                                <p id="button_3">button_y: 0</p>
+                                <p id="button_4">l_bumper: 0</p>
+                                <p id="button_5">r_bumper: 0</p>
+                                <p id="button_6">l_trigger: 0</p>
+                                <p id="button_7">r_trigger: 0</p>
+                                <p id="button_8">button_back: 0</p>
+                                <p id="button_9">button_start: 0</p>
+                                <p id="button_10">l_stick: 0</p>
+                                <p id="button_11">r_stick: 0</p>
+                                <p id="button_12">dpad_up: 0</p>
+                                <p id="button_13">dpad_down: 0</p>
+                                <p id="button_14">dpad_left: 0</p>
+                                <p id="button_15">dpad_right: 0</p>
+                                <p id="axis_0">axis_0: 0</p>
+                                <p id="axis_1">axis_1: 0</p>
+                                <p id="axis_2">axis_2: 0</p>
+                                <p id="axis_3">axis_3: 0</p>
                             </div>
                         </div>
+
+                        <!-- Sensor Readings -->
                         <div class="tab-pane fade" id="sensor-menu" role="tabpanel" aria-labelledby="sensor-menu">
-                            <div class="container">
-                                <p id="left-sensor">Left Sensor:</p>
-                                <p id="center-sensor">Center Sensor:</p>
-                                <p id="right-sensor">Right Sensor:</p>
+                            <div class="container pt-3" style="padding-left: 25%; padding-right:25%">
+                                <div class="row">
+                                    <div class="col">
+                                        <p class="text-left"> <b> Line Follower: </b> </p>
+                                    </div>
+                                    <div class="col">
+                                        <p id="left-sensor" class="text-left">Left: 0.000</p>
+                                    </div>
+                                    <div class="col">
+                                        <p id="center-sensor" class="text-left">Center: 0.000</p>
+                                    </div>
+                                    <div class="col">
+                                        <p id="right-sensor" class="text-left">Right: 0.000</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <p class="text-left"> <b> Limit Switch: </b> </p>
+                                    </div>
+                                    <div class="col">
+                                        <p id="front-switch" class="text-left">Front: False</p>
+                                    </div>
+                                    <div class="col">
+                                        <p id="back-switch" class="text-left">Back: False</p>
+                                    </div>
+                                    <div class="col">
+                                    </div>
+                                </div>
+                                <p style="font-size:10px" class="text-sensor font-weight-light text-center"><i>For more information on how to use these sensors, visit the <a href="https://pioneers.berkeley.edu/software/robot_api" target="_blank">Robot API</a></i></p>
                             </div>
                         </div>
                     </div>
@@ -227,9 +674,13 @@
         </div>
     </div>
 
-    <script src="/static/js/joypad.js"></script>
-    <script src="/static/js/gamepad.js"></script>
-    <script src="/static/js/base.js"></script>
+    <script src="/static/js/joypad.js?t={{ git_hash }}"></script>
+    <script src="/static/js/gamepad.js?t={{ git_hash }}"></script>
+    <script src="/static/js/base.js?t={{ git_hash }}"></script>
 
+    <!-- Dark mode: this should be at the bottom so all elements get switched. -->
+    <script src="https://cdn.jsdelivr.net/gh/fcmam5/nightly.js@v1.0/dist/nightly.min.js"></script>
+    <script src="/static/js/dark_mode.js"></script>
   </body>
+
 </html>
