@@ -146,9 +146,10 @@
 
                                 <!-- Settings -->
                                 <div class="tab-pane fade p-3" id="settings" role="tabpanel" aria-labelledby="settings-tab" style="margin-bottom:5px;padding-top:0.4rem">
+                                    <h4>General</h4>
                                     <p id="input-mode">Input:
-                                        <button type="button" id="keyboard-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchInput(0)">Keyboard</button>
-                                        <button type="button" id="gamepad-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchInput(1)">Gamepad</button>
+                                        <button type="button" id="keyboard-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchInput('keyboard')">Keyboard</button>
+                                        <button type="button" id="gamepad-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchInput('gamepad')">Gamepad</button>
                                     </p>
                                     <div class="dropdown">
                                         Editor:
@@ -196,7 +197,22 @@
                                     <button type="button" id="dark-toggle" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="toggle()">Dark Mode</button>
                                     </p>
 
+                                    <h4>Robot</h4>
+                                    <p><b> Starting position refers to the center of the robot, where the top left corner of the field is (0, 0).</b></p>
+                                    <label for="xpos">Starting Robot X-Position:</label>
+                                    <input type="number" step="0.001" id="xpos" name="xpos" value=70.0>
+
+                                    <label for="ypos">Starting Robot Y-Position:</label>
+                                    <input type="number" step="0.001" id="ypos" name="ypos" value=70.0>
+                                    <p></p>
+
+                                    <p id="input-mode">Robot Type:
+                                    <button type="button" id="light-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchRobotType('light')">Light</button>
+                                    <button type="button" id="medium-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchRobotType('medium')">Medium</button>
+                                    <button type="button" id="heavy-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchRobotType('heavy')">Heavy</button>
+                                    </p>
                                 </div>
+
                                 <!-- Help -->
                                 <div class="tab-pane fade" id="help" role="tabpanel" aria-labelledby="settings-tab" style="height:520px;margin-bottom:0px">
                                     <div class="accordion" id="help-accordion">
@@ -498,7 +514,6 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        
                                     </div>
                                 </div>
                             </div>

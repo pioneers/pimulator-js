@@ -9,15 +9,12 @@ var console=(function(oldCons){
         },
         info: function (text) {
             oldCons.info(text);
-            // code
         },
         warn: function (text) {
             oldCons.warn(text);
-            // code
         },
         error: function (text) {
             oldCons.error(text);
-            // code
         }
     };
 }(console));
@@ -49,21 +46,42 @@ class RobotClass {
     MaxX = 144;                 // maximum X value, inches, field is 12'x12'
     MaxY = 144;                 // maximum Y value, inches, field is 12'x12'
     neg = -1;                    // negate left motor calculation
-    startX = 70.0;
-    startY = 70.0;
+    startXDefault = 70.0;
+    startYDefault = 70.0;
     topL = Array(2);
     topR = Array(2);
     botL = Array(2);
     botR = Array(2);
 
-    constructor(simulator) {
-        this.X = this.startX;     // current X position of the center of the robot
-        this.Y = this.startY;     // current Y position of the center of the robot
-        this.Wl = 0.0;           // angular velocity of l wheel, radians/s
-        this.Wr = 0.0;           // angular velocity of r wheel, radians/s
+    constructor(simulator, robotInfo) {
+        this.X = this.getValidXPosition(robotInfo.xpos); // current X position of the center of the robot
+        this.Y = this.getValidYPosition(robotInfo.ypos); // current Y position of the center of the robot
+        this.Wl = 0.0;           // requested angular velocity of l wheel, radians/s
+        this.Wr = 0.0;           // requested angular velocity of r wheel, radians/s
         this.ltheta = 0.0;       // angular position of l wheel, degrees
         this.rtheta = 0.0;       // angular position of r wheel, degrees
         this.dir = 0.0;          // Direction of the robot facing, degrees
+        this.currentLv = 0;       // current velocity of left wheel, in inches/s
+        this.currentRv = 0;       // current velocity of right wheel, in inches/s
+
+        // Set speed/acceleration based on robot type
+        const robotType = robotInfo.robotType
+        let robotTypeNum = 4 // robot type is medium by default
+        if (robotType === "light") {
+            robotTypeNum = 3;
+        }
+        else if (robotType === "medium") {
+            robotTypeNum = 4;
+        }
+        else if (robotType === "heavy") {
+            robotTypeNum = 5;
+        }
+
+        // Max speed is 0.628 m/s = 24.72 in/s and max acceleration is 0.55 m/s^2 = 21.65 in/s^2
+        // Refresh rate = 0.05/s
+        // Max speed is 1.236 in/tick and max acceleration is 0.05413 in/tick^2
+        this.accel = (8 - robotTypeNum) / 5 * 0.05413; // Larger robots accelerate more slowly
+        this.maxVel = robotTypeNum / 5 * 1.236;        // Larger robots have a higher top speed
 
         //corners are relative to the robot facing up
 
@@ -90,6 +108,36 @@ class RobotClass {
         this.simulator = simulator;
         this.lineFollower = new LineFollower(this);
         this.limitSwitch = new LimitSwitch(this);
+    }
+
+    /** Validate the input starting X coordinate of the robot
+    *   pos is the value we want to set the coordinate to */
+   getValidXPosition(pos) {
+        // Check is pos is a number or not
+        let posNum = Number(pos);
+        if (isNaN(posNum)) {
+            return this.startXDefault;
+        }
+        // Bound the coordinate
+        posNum = Math.max(posNum, this.height/2 + 3);
+        posNum = Math.min(posNum, this.MaxX - this.height/2 - 3);
+
+        return posNum
+    }
+
+    /** Validate the input starting Y coordinate of the robot
+    *   pos is the value we want to set the coordinate to */
+    getValidYPosition(pos) {
+        // Check is pos is a number or not
+        let posNum = Number(pos);
+        if (isNaN(posNum)) {
+            return this.startYDefault;
+        }
+        // Bound the coordinate
+        posNum = Math.max(posNum, this.width/2 + 3);
+        posNum = Math.min(posNum, this.MaxY - this.width/2 - 3);
+
+        return posNum
     }
 
     intersectRobotRef(obj, corners) {
@@ -272,21 +320,43 @@ class RobotClass {
         /* Updates position of the  Robot using differential drive equations
         Derived with reference to:
         https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf*/
-        let lv = this.Wl * this.wRadius;
-        let rv = this.Wr * this.wRadius * this.neg;
+
         let radian = Math.PI*this.dir/180;
         let dx;
         let dy;
         let dir = this.dir;
-        if (lv == rv) {
-            let distance = rv * this.tickRate/1000;
-            dx = distance * Math.cos(radian)
-            dy = distance * Math.sin(radian)
+
+        //TODO: Test with Gamepad. Compare with real tested values if possible
+
+        //TODO: make 3 robot profiles. Edit onmessage to change maxVel and acceleration
+        //whenever message is received.
+
+        //TODO: handling, edit the Lv and Rv such that difference is low
+
+        // Compare the current speed of each motor to the requested speed, and accelerate in the correct direction
+        if (this.requestedLv > this.currentLv) {
+            this.currentLv = Math.min(this.currentLv + this.accel, this.requestedLv);
         }
-        else {
-            let rt = this.width/2 * (lv+rv)/(rv-lv);
-            let wt = (rv-lv)/this.width;
-            let theta = wt * this.tickRate/1000;
+        if (this.requestedLv < this.currentLv) {
+            this.currentLv = Math.max(this.currentLv - this.accel, this.requestedLv);
+        }
+        if (this.requestedRv > this.currentRv) {
+            this.currentRv = Math.min(this.currentRv + this.accel, this.requestedRv);
+        }
+        if (this.requestedRv < this.currentRv) {
+            this.currentRv = Math.max(this.currentRv - this.accel, this.requestedRv);
+        }
+
+        // Compute change in position and direction
+        if (this.currentLv == this.currentRv) { // Both motors going in the same direction
+            let distance = this.currentRv;
+            dx = distance * Math.cos(radian);
+            dy = distance * Math.sin(radian);
+        }
+        else { // Motors going in different directions
+            let rt = this.width/2 * (this.currentLv+this.currentRv)/(this.currentRv-this.currentLv);
+            let wt = (this.currentRv-this.currentLv)/this.width;
+            let theta = wt;
             let i = rt * (1 - Math.cos(theta));
             let j = Math.sin(theta) * rt;
             dx = i * Math.sin(radian) + j * Math.cos(radian);
@@ -389,9 +459,9 @@ class RobotClass {
             throw new Error('"duty_cycle" is the only currently supported parameter');
         }
         if (device === "left_motor") {
-            this.Wl = speed * 9;
+            this.requestedLv = speed * this.maxVel;
         } else if (device === "right_motor") {
-            this.Wr = speed * 9;
+            this.requestedRv = speed * this.maxVel * this.neg;
         } else {
             throw new Error("Cannot find device name: " + device);
         }
@@ -767,7 +837,7 @@ class Simulator{
         });
     }
 
-    simulateTeleop(){
+    simulateTeleop(robotInfo) {
         /* Simulate execution of the robot code.
         Run setup once before continuously looping main. */
 
@@ -775,18 +845,18 @@ class Simulator{
         postMessage({
             mode: this.mode
         });
-        this.robot = new RobotClass(this);
+        this.robot = new RobotClass(this, robotInfo);
         this.loadStudentCode();
         this.teleop_setup();
         this.consistentLoop(this.robot.tickRate, this.teleop_main);
     }
 
-    simulateAuto() {
+    simulateAuto(robotInfo) {
         this.mode = "auto";
         postMessage({
             mode: this.mode
         });
-        this.robot = new RobotClass(this);
+        this.robot = new RobotClass(this, robotInfo);
         this.loadStudentCode();
         this.timeout = setTimeout(function() { this.stop(); }.bind(this), 30*1000);
         this.robot.simStartTime = new Date().getTime();
@@ -813,9 +883,11 @@ this.onmessage = function(e) {
         }
         else {
             let simulate = function () {
+                // Wait for pyodide to load
                 if (typeof pyodide !== "undefined" && typeof pyodide.version !== "undefined") {
-                    if (e.data.mode === "auto") simulator.simulateAuto();
-                    else if (e.data.mode === "teleop") simulator.simulateTeleop();
+                    // Assume robotInfo is a key in the posted message
+                    if (e.data.mode === "auto") simulator.simulateAuto(e.data.robotInfo); 
+                    else if (e.data.mode === "teleop") simulator.simulateTeleop(e.data.robotInfo);
                 }
                 else {
                     setTimeout(simulate, 500);
