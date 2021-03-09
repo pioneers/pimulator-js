@@ -4,6 +4,7 @@ worker.postMessage({gitHash: gitHash});
 var timer;
 var inputMode = "keyboard";
 var robotType = "medium";
+var direction = "left";
 var codeUploaded = false;
 const scaleFactor = 3;
 
@@ -71,11 +72,16 @@ function switchInput(newInputMode) {
     inputMode = newInputMode;
 }
 
-/* Switch robot type between 'light', 'medium', and 'heavy' */ 
+/* Switch robot type between 'light', 'medium', and 'heavy' */
 function switchRobotType(newRobotType) {
     // Toggle previously activated button off (or retoggle currently activated button on)
     $("#" + robotType + "-btn").button('toggle');
     robotType = newRobotType;
+}
+
+function switchDirection(newDirection) {
+    $("#" + direction + "-btn").button('toggle');
+    direction = newDirection;
 }
 
 // In teleop mode, if the input is set to the keyboard, send keyCodes to the worker
@@ -174,6 +180,7 @@ function start(auto=false) {
                 robotType: robotType,
                 xpos: $("#xpos").val(),
                 ypos: $("#ypos").val()
+                dir: direction
             }
 
             if (auto === false) {
