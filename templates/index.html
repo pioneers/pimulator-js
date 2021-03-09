@@ -13,8 +13,11 @@
 
     <title>PiE Robotics Simulator</title>
 
+    <!-- Store git_hash -->
+    <script>var gitHash = "{{ git_hash }}";</script>
+
     <!-- Disables scrolling with arrow keys and spacebar -->
-    <script src="/static/js/disable_scrolling.js?t={[ git_hash }}"></script>
+    <script src="/static/js/disable_scrolling.js?t={{ git_hash }}"></script>
     <link rel="icon" href="https://staff.pierobotics.org/wiki/w/images/thumb/0/0a/Sprocket.png/800px-Sprocket.png" width="16" height="16">
   </head>
 
@@ -65,23 +68,65 @@
                         <div class="card-body text-center border-primary" style="padding:0px;height:432px">
                             <div class="d-inline-flex flex-row bd-highlight">
                                 <div class="bd-highlight" style="position: relative;">
-                                  <canvas id="fieldCanvas" width="432" height="432"></canvas>
+                                  <canvas id="fieldCanvas" width="432" height="432">
+
+                                  </canvas>
+
+                                  <script>
+                                      const canvas = document.getElementById('fieldCanvas');
+                                      const ctx = canvas.getContext('2d');
+
+                                      // Draw Rectangle
+                                      ctx.beginPath();
+                                      ctx.rect(180, 170, 60, 80);
+                                      ctx.closePath();
+                                      ctx.strokeStyle = 'navy';
+                                      ctx.lineWidth = 2;
+                                      ctx.stroke();
+                                      // Draw Circles
+                                      ctx.beginPath();
+                                      ctx.moveTo(210, 210);
+                                      ctx.arc(210, 210, 3, 0, 2 * Math.PI);
+                                      ctx.moveTo(210, 195);
+                                      ctx.arc(210, 195, 3, 0, 2 * Math.PI);
+                                      ctx.moveTo(210, 225);
+                                      ctx.arc(210, 225, 3, 0, 2 * Math.PI);
+                                      ctx.closePath();
+                                      ctx.strokeStyle = 'red';
+                                      ctx.stroke();
+                                      ctx.fillStyle = 'red';
+                                      ctx.fill();
+                                      // Draw Triangle
+                                      ctx.beginPath();
+                                      ctx.moveTo(186, 210);
+                                      ctx.lineTo(192, 213.5);
+                                      ctx.lineTo(192, 206.5);
+                                      ctx.lineTo(186, 210);
+                                      ctx.closePath();
+                                      ctx.strokeStyle = 'blue';
+                                      ctx.stroke();
+                                      ctx.fillStyle = 'blue';
+                                      ctx.fill();
+                                  </script>
+
+                                  <!--
                                   <svg width="432" height="432" version="1.1" xmlns="http://www.w3.org/2000/svg" style="position: absolute; left: 0px; top: 0px; border:1px solid black">
-                                    <rect x="180"
-                                          y="170"
-                                          width="60"
-                                          height="80"
-                                          rx="6"
-                                          ry="6"
-                                          stroke="navy"
-                                          fill="transparent"
-                                          transform="rotate(0)"
-                                          stroke-width="2"/>
-                                    <circle cx="210" cy="210" r="3" stroke="red" stroke-width="2" fill="red" />
-                                    <circle cx="210" cy="195" r="3" stroke="red" stroke-width="2" fill="red" />
-                                    <circle cx="210" cy="225" r="3" stroke="red" stroke-width="2" fill="red" />
-                                    <polygon points="186,210 192,213.5, 192,206.5" stroke="blue" stroke-width="3" fill="blue" />
+                                      <rect x="180"
+                                            y="170"
+                                            width="60"
+                                            height="80"
+                                            rx="6"
+                                            ry="6"
+                                            stroke="navy"
+                                            fill="transparent"
+                                            transform="rotate(0)"
+                                            stroke-width="2"/>
+                                      <circle cx="210" cy="210" r="3" stroke="red" stroke-width="2" fill="red" />
+                                      <circle cx="210" cy="195" r="3" stroke="red" stroke-width="2" fill="red" />
+                                      <circle cx="210" cy="225" r="3" stroke="red" stroke-width="2" fill="red" />
+                                      <polygon points="186,210 192,213.5, 192,206.5" stroke="blue" stroke-width="3" fill="blue" />
                                   </svg>
+                                -->
                                 </div>
                             </div>
                         </div>
