@@ -176,8 +176,8 @@ function update(state) {
     if (state.attachedObj !== undefined) {
         //draw the object
         ctx.beginPath();
-        ctx.moveTo(centerX + 30, centerY - (state.attachedObj.w * scaleFactor) / 2);
-        ctx.rect(centerX + 30, centerY - (state.attachedObj.w * scaleFactor) / 2, state.attachedObj.w * scaleFactor, state.attachedObj.h * scaleFactor);
+        ctx.moveTo(centerX - 30 - (state.attachedObj.h * scaleFactor), centerY - (state.attachedObj.w * scaleFactor) / 2);
+        ctx.rect(centerX - 30 - (state.attachedObj.h * scaleFactor), centerY - (state.attachedObj.w * scaleFactor) / 2, state.attachedObj.w * scaleFactor, state.attachedObj.h * scaleFactor);
         ctx.closePath();
         ctx.strokeStyle = 'green';
         ctx.stroke();
