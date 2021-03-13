@@ -3,6 +3,7 @@ var worker = new Worker("static/js/robot.js?t=" + gitHash);
 worker.postMessage({gitHash: gitHash});
 var timer;
 var inputMode = "keyboard";
+var robotType = "medium";
 var codeUploaded = false;
 const scaleFactor = 3;
 
@@ -63,25 +64,18 @@ function drawObjs(objs, type) {
     }
 }
 
-// Switch input mode between 'keyboard' and 'gamepad'
-function switchInput(state) {
-    if (state === 1) {
-        if (inputMode === "gamepad") {
-            $("#gamepad-btn").button('toggle');
-        } else {
-            inputMode = "gamepad";
-            //document.getElementById("input-mode").innerText = "Input: Gamepad";
-            $("#keyboard-btn").button('toggle');
-        }
-    } else if (state === 0) {
-        if (inputMode === "keyboard") {
-            $("#keyboard-btn").button('toggle');
-        } else {
-            inputMode = "keyboard";
-            //document.getElementById("input-mode").innerText = "Input: Keyboard";
-            $("#gamepad-btn").button('toggle');
-        }
-    }
+/* Switch input mode between 'keyboard' and 'gamepad' */
+function switchInput(newInputMode) {
+    // Toggle previously activated button off (or retoggle currently activated button on)
+    $("#" + inputMode + "-btn").button('toggle');
+    inputMode = newInputMode;
+}
+
+/* Switch robot type between 'light', 'medium', and 'heavy' */ 
+function switchRobotType(newRobotType) {
+    // Toggle previously activated button off (or retoggle currently activated button on)
+    $("#" + robotType + "-btn").button('toggle');
+    robotType = newRobotType;
 }
 
 // In teleop mode, if the input is set to the keyboard, send keyCodes to the worker
@@ -105,8 +99,8 @@ document.addEventListener('keyup', up);
 // "Upload Code" button sends code to the worker
 function uploadCode() {
     code = cm.getValue();
-    localStorage.setItem("code",code)
-    worker.postMessage({code:code});
+    localStorage.setItem("code",code);
+    worker.postMessage({code:code, newCode:true});
     codeUploaded = true;
 };
 
@@ -176,24 +170,30 @@ function start(auto=false) {
     else {
         clearInterval(timer);
         if (codeUploaded) {
+            let robotInfo = {
+                robotType: robotType,
+                xpos: $("#xpos").val(),
+                ypos: $("#ypos").val()
+            }
+
             if (auto === false) {
                 $("#teleop-btn").removeClass("btn-outline-primary").addClass("btn-primary")
-                worker.postMessage({start:true, mode:"teleop"})
+                worker.postMessage({start:true, mode:"teleop", robotInfo:robotInfo})
             } else if (auto === true) {
                 $("#autonomous-btn").removeClass("btn-outline-primary").addClass("btn-primary")
-                worker.postMessage({start:true, mode:"auto"})
+                worker.postMessage({start:true, mode:"auto", robotInfo:robotInfo})
             }
             document.getElementById("stop-btn").disabled = false;
             document.getElementById("teleop-btn").disabled = true;
             document.getElementById("autonomous-btn").disabled = true;
-        } else {
+        }
+        else {
             if (auto === false) {
                 $("#teleop-btn").button('toggle')
-                worker.postMessage({start:true, mode:"teleop"})
             } else if (auto === true) {
                 $("#autonomous-btn").button('toggle')
-                worker.postMessage({start:true, mode:"auto"})
             }
+            log("Please upload code first");
         }
     }
 };
@@ -221,13 +221,13 @@ function stop() {
     /*
     Stop the robot thread
     */
+    log("Simulation stopped. Reloading resources...");
     worker.terminate();
     worker = new Worker("static/js/robot.js?t=" + gitHash);
     worker.onmessage = onmessage;
     worker.postMessage({gitHash: gitHash});
     worker.postMessage({code:code});
     mode = "idle";
-    update({X:70,Y:70,dir:0}); // in inches
     autonomousReset()
 };
 
@@ -254,13 +254,20 @@ function clearConsole(){
 clearConsole()
 
 function log(text) {
-    const array = ['pyodide.py', '<eval>'];
+    // TODO: Filter out unwanted messages in a smarter way
+    const array = ['pyodide.py', '<eval>', 'pyodide/_base.py', 'eval(compile(', 'File "<exec>", line 4, in'];
     for (string of array){
         if(text.includes(string)){
             return
         }
     }
+
+    const date = new Date();
+    const hour = date.getHours();
+    const minutes = date.getMinutes();
+    const time = '[' + ((hour < 10) ? '0' + hour: hour) + ':' + ((minutes < 10) ? '0' + minutes: minutes) + '] ';
+
     let consoleLog = document.getElementById("console");
-    logged = consoleLog.innerHTML += text + "<br>";
+    consoleLog.innerHTML += time + text + "<br>";
     consoleLog.scrollTop = consoleLog.scrollHeight;
 }
