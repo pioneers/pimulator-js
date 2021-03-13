@@ -176,11 +176,13 @@ function update(state) {
     if (state.attachedObj !== undefined) {
         //draw the object
         ctx.beginPath();
-        ctx.moveTo(centerX + 30, centerY - state.attachedObj.w / 2);
-        ctx.rect(centerX + 30, centerY - state.attachedObj.w / 2, state.attachedObj.w, state.attachedObj.h);
+        ctx.moveTo(centerX + 30, centerY - (state.attachedObj.w * scaleFactor) / 2);
+        ctx.rect(centerX + 30, centerY - (state.attachedObj.w * scaleFactor) / 2, state.attachedObj.w * scaleFactor, state.attachedObj.h * scaleFactor);
         ctx.closePath();
         ctx.strokeStyle = 'green';
         ctx.stroke();
+        ctx.fillStyle = 'green';
+        ctx.fill();
     }
 
     // Translate to and rotate back

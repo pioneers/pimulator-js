@@ -398,19 +398,19 @@ class RobotClass {
         const X = this.X;
         const Y = this.Y;
 
-        let obj = findGrabbableObj();
-        if (obj) {
+        let obstacle = this.findGrabbableObj();
+        if (obstacle) {
             //grab the object
-            this.attachedObj = obj;
+            this.attachedObj = obstacle;
             obstacle.grab();
 
             //update object's position
             // b is the length of the front robot edges not covered by the object
-            var b = (this.width - object.width) / 2;
+            var b = (this.width - obstacle.width) / 2;
             obstacle.botL[0] = this.topL[0] + b * Math.cos((90.0 - this.dir) * Math.pi / 180);
             obstacle.botL[1] = this.topL[1] + b * Math.sin((90.0 - this.dir) * Math.pi / 180);
-            obstacle.topL[0] = object.botL[0] + object.h * Math.cos(this.dir * Math.pi / 180);
-            obstacle.topL[1] = object.botL[1] + object.h * Math.sin(this.dir * Math.pi / 180);
+            obstacle.topL[0] = obstacle.botL[0] + obstacle.h * Math.cos(this.dir * Math.pi / 180);
+            obstacle.topL[1] = obstacle.botL[1] + obstacle.h * Math.sin(this.dir * Math.pi / 180);
 
             obstacle.topR[0] = obstacle.topL[0] + obstacle.w * Math.sin(this.dir * Math.pi / 180);
             obstacle.topR[1] = obstacle.topL[1] - obstacle.w * Math.sin(this.dir * Math.pi / 180);
@@ -431,12 +431,14 @@ class RobotClass {
     }
 
     findGrabbableObj() {
-        console.log("beginning search for grabbable object");
+        //console.log("beginning search for grabbable object");
         const switch0X = (this.topL[0] + this.topR[0]) / 2;
         const switch0Y = (this.topL[1] + this.topR[1]) / 2;
         const switch1X = (this.botL[0] + this.botR[0]) / 2;
         const switch1Y = (this.botL[1] + this.botR[1]) / 2;
-
+        if (this.simulator.grabbableObjs.length == 0) {
+            return;
+        }
         for (let obstacle of this.simulator.grabbableObjs) {
             const minX = obstacle.topL[0] - this.leeway;
             const minY = obstacle.topL[1] - this.leeway;
@@ -449,7 +451,7 @@ class RobotClass {
                 }
             }
         }
-        console.log("No object found");
+        //console.log("No object found");
         return null;
     }
 
