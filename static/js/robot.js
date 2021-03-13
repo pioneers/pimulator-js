@@ -333,17 +333,8 @@ class RobotClass {
         };
 
         if (this.attachedObj) {
-            newState = {
-                X: this.X,
-                Y: this.Y,
-                dir: this.dir,
-                attachedObj: {
-                    X: this.attachedObj.x,
-                    Y: this.attachedObj.y,
-                    w: this.attachedObj.w,
-                    h: this.attachedObj.h
-                }
-            };
+            this.updateGrabbableObjs(this.attachedObj);
+            this.simulator.drawObjs();
         }
 
         this.lineFollower.update();
@@ -363,6 +354,22 @@ class RobotClass {
             sensors: sensorValues,
             switches: switchValues
         })
+    }
+
+    updateGrabbableObjs(obstacle) {
+        var b = (this.width - obstacle.w) / 2;
+        obstacle.botL[0] = this.topL[0] + b * Math.cos((90.0 - this.dir) * Math.PI / 180);
+        obstacle.botL[1] = this.topL[1] + b * Math.sin((90.0 - this.dir) * Math.PI / 180) - obstacle.h;
+        obstacle.topL[0] = obstacle.botL[0] + obstacle.h * Math.cos(this.dir * Math.PI / 180);
+        obstacle.topL[1] = obstacle.botL[1] + obstacle.h * Math.sin(this.dir * Math.PI / 180) - obstacle.h;
+
+        obstacle.topR[0] = obstacle.topL[0] + obstacle.w * Math.sin(this.dir * Math.PI / 180);
+        obstacle.topR[1] = obstacle.topL[1] - obstacle.w * Math.sin(this.dir * Math.PI / 180) - obstacle.h;
+        obstacle.botR[0] = obstacle.botL[0] + obstacle.w * Math.sin(this.dir * Math.PI / 180);
+        obstacle.botR[1] = obstacle.botL[1] - obstacle.w * Math.sin(this.dir * Math.PI / 180) - obstacle.h;
+        obstacle.x = obstacle.topL[0];
+        obstacle.y = obstacle.topL[1];
+        //console.log("grabbable object coordinates updated");
     }
 
     updateCorners(newX, newY, dir) {
@@ -406,18 +413,18 @@ class RobotClass {
 
             //update object's position
             // b is the length of the front robot edges not covered by the object
-            var b = (this.width - obstacle.width) / 2;
-            obstacle.botL[0] = this.topL[0] + b * Math.cos((90.0 - this.dir) * Math.pi / 180);
-            obstacle.botL[1] = this.topL[1] + b * Math.sin((90.0 - this.dir) * Math.pi / 180);
-            obstacle.topL[0] = obstacle.botL[0] + obstacle.h * Math.cos(this.dir * Math.pi / 180);
-            obstacle.topL[1] = obstacle.botL[1] + obstacle.h * Math.sin(this.dir * Math.pi / 180);
-
-            obstacle.topR[0] = obstacle.topL[0] + obstacle.w * Math.sin(this.dir * Math.pi / 180);
-            obstacle.topR[1] = obstacle.topL[1] - obstacle.w * Math.sin(this.dir * Math.pi / 180);
-            obstacle.botR[0] = obstacle.botL[0] + obstacle.w * Math.sin(this.dir * Math.pi / 180);
-            obstacle.botR[1] = obstacle.botL[1] - obstacle.w * Math.sin(this.dir * Math.pi / 180);
-            obstacle.x = obstacle.topL[0];
-            obstacle.y = obstacle.topL[1];
+            // var b = (this.width - obstacle.w) / 2;
+            // obstacle.botL[0] = this.topL[0] + b * Math.cos((90.0 - this.dir) * Math.PI / 180);
+            // obstacle.botL[1] = this.topL[1] + b * Math.sin((90.0 - this.dir) * Math.PI / 180) - obstacle.h;
+            // obstacle.topL[0] = obstacle.botL[0] + obstacle.h * Math.cos(this.dir * Math.PI / 180);
+            // obstacle.topL[1] = obstacle.botL[1] + obstacle.h * Math.sin(this.dir * Math.PI / 180) - obstacle.h;
+            //
+            // obstacle.topR[0] = obstacle.topL[0] + obstacle.w * Math.sin(this.dir * Math.PI / 180);
+            // obstacle.topR[1] = obstacle.topL[1] - obstacle.w * Math.sin(this.dir * Math.PI / 180) - obstacle.h;
+            // obstacle.botR[0] = obstacle.botL[0] + obstacle.w * Math.sin(this.dir * Math.PI / 180);
+            // obstacle.botR[1] = obstacle.botL[1] - obstacle.w * Math.sin(this.dir * Math.PI / 180) - obstacle.h;
+            // obstacle.x = obstacle.topL[0];
+            // obstacle.y = obstacle.topL[1];
         }
     }
 
@@ -437,7 +444,7 @@ class RobotClass {
         const switch1X = (this.botL[0] + this.botR[0]) / 2;
         const switch1Y = (this.botL[1] + this.botR[1]) / 2;
         if (this.simulator.grabbableObjs.length == 0) {
-            return;
+            return null;
         }
         for (let obstacle of this.simulator.grabbableObjs) {
             const minX = obstacle.topL[0] - this.leeway;
@@ -446,7 +453,7 @@ class RobotClass {
             const maxY = obstacle.botR[1] + this.leeway;
             if (switch0X >= minX && switch0X <= maxX && switch0Y >= minY && switch0Y <= maxY) {
                 if (!obstacle.isGrabbed()) {
-                  console.log("Found object to grab");
+                    console.log("Found object to grab");
                     return obstacle;
                 }
             }
@@ -460,7 +467,7 @@ class RobotClass {
            Motor as device name and speed bounded by [-1,1]. */
 
         if (speed > 1.0 || speed < -1.0){
-            throw new Error("Speed cannot be great than 1.0 or less than -1.0.");
+            throw new Error("Speed cannot be greater than 1.0 or less than -1.0.");
         }
         if (param !== "duty_cycle") {
             throw new Error('"duty_cycle" is the only currently supported parameter');
@@ -627,8 +634,8 @@ function translateToMovement(keyCode) {
 /*********************** GAMEPAD INPUT GAMEPAD FUNCTIONS ***********************/
 
 /**
- * A mapping from the button names of the controller to the button names
- * in the PiE Robot API.
+ * A mapPIng from the button names of the controller to the button names
+ * in the PIE Robot API.
  */
 const padMap = {
     button_0: "button_a",
@@ -783,8 +790,9 @@ class Simulator{
             this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, newWall.color));
         }
         for (let grabbableObj of objects.grabbableData) {
-            this.grabbableObjs.push(new GrabbableObj(grabbableObj.x, grabbableObj.y, grabbableObj.w, grabbableObj.h, grabbableObj.color));
-            this.obstacles.push(new GrabbableObj(grabbableObj.x, grabbableObj.y, grabbableObj.w, grabbableObj.h, grabbableObj.color));
+            let newGrabbableObj = new GrabbableObj(grabbableObj.x, grabbableObj.y, grabbableObj.w, grabbableObj.h, grabbableObj.color);
+            this.grabbableObjs.push(newGrabbableObj);
+            this.obstacles.push(newGrabbableObj);
         }
 
         this.drawObjs();
@@ -851,7 +859,7 @@ class Simulator{
 
     simulateTeleop(){
         /* Simulate execution of the robot code.
-        Run setup once before continuously looping main. */
+        Run setup once before continuously looPIng main. */
 
         this.mode = "teleop"
         postMessage({

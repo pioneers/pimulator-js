@@ -129,6 +129,18 @@ function update(state) {
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    if (state.attachedObj !== undefined) {
+        //move the object
+        ctx.beginPath();
+        ctx.moveTo(centerX - 30 - (state.attachedObj.h * scaleFactor), centerY - (state.attachedObj.w * scaleFactor) / 2);
+        ctx.rect(centerX - 30 - (state.attachedObj.h * scaleFactor), centerY - (state.attachedObj.w * scaleFactor) / 2, state.attachedObj.w * scaleFactor, state.attachedObj.h * scaleFactor);
+        ctx.closePath();
+        ctx.strokeStyle = 'green';
+        ctx.stroke();
+        ctx.fillStyle = 'green';
+        ctx.fill();
+    }
+
     drawObjs(objects, "obstacle");
     drawObjs(tapelines, "tapeLine");
 
@@ -172,18 +184,6 @@ function update(state) {
     ctx.stroke();
     ctx.fillStyle = 'blue';
     ctx.fill();
-
-    if (state.attachedObj !== undefined) {
-        //draw the object
-        ctx.beginPath();
-        ctx.moveTo(centerX - 30 - (state.attachedObj.h * scaleFactor), centerY - (state.attachedObj.w * scaleFactor) / 2);
-        ctx.rect(centerX - 30 - (state.attachedObj.h * scaleFactor), centerY - (state.attachedObj.w * scaleFactor) / 2, state.attachedObj.w * scaleFactor, state.attachedObj.h * scaleFactor);
-        ctx.closePath();
-        ctx.strokeStyle = 'green';
-        ctx.stroke();
-        ctx.fillStyle = 'green';
-        ctx.fill();
-    }
 
     // Translate to and rotate back
     ctx.translate(centerX, centerY);
