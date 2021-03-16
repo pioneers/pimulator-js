@@ -71,7 +71,7 @@ function switchInput(newInputMode) {
     inputMode = newInputMode;
 }
 
-/* Switch robot type between 'light', 'medium', and 'heavy' */ 
+/* Switch robot type between 'light', 'medium', and 'heavy' */
 function switchRobotType(newRobotType) {
     // Toggle previously activated button off (or retoggle currently activated button on)
     $("#" + robotType + "-btn").button('toggle');
@@ -104,6 +104,10 @@ function uploadCode() {
     codeUploaded = true;
 };
 
+function uploadObjects(){
+    codeObjects = cmJS.getValue();
+    localStorage.setItem("objects",objects)
+}
 function update(state) {
     /*
     Update the state (position and direction) of the center of the robot.
