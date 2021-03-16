@@ -54,8 +54,6 @@ class RobotClass {
     botR = Array(2);
 
     constructor(simulator, robotInfo) {
-        this.X = this.getValidXPosition(robotInfo.xpos); // current X position of the center of the robot
-        this.Y = this.getValidYPosition(robotInfo.ypos); // current Y position of the center of the robot
         this.Wl = 0.0;           // requested angular velocity of l wheel, radians/s
         this.Wr = 0.0;           // requested angular velocity of r wheel, radians/s
         this.ltheta = 0.0;       // angular position of l wheel, degrees
@@ -64,17 +62,30 @@ class RobotClass {
         this.currentLv = 0;       // current velocity of left wheel, in inches/s
         this.currentRv = 0;       // current velocity of right wheel, in inches/s
 
-        // Set speed/acceleration based on robot type
-        const robotType = robotInfo.robotType
-        let robotTypeNum = 4 // robot type is medium by default
+        // Set robot attributes based on type
+        let robotType = robotInfo.robotType;
+        const validTypes = ["light", "medium", "heavy"];
+        if (!validTypes.includes(robotType)) {
+            robotType = "medium"; // robot type is medium by default
+        }
+        let robotTypeNum;
         if (robotType === "light") {
             robotTypeNum = 3;
+            // this.width = 14.18;      // Robot width, inches
+            // this.height = 12.5;      // Robot height, inches
+            this.wheelWidth = 9.06;  // Wheelbase width, inches
         }
         else if (robotType === "medium") {
             robotTypeNum = 4;
+            // this.width = 19.3;
+            // this.height = 14;
+            this.wheelWidth = 12.39;
         }
         else if (robotType === "heavy") {
             robotTypeNum = 5;
+            // this.width = 10.7;
+            // this.height = 14.06;
+            this.wheelWidth = 8.98;
         }
 
         // Max speed is 0.628 m/s = 24.72 in/s and max acceleration is 0.55 m/s^2 = 21.65 in/s^2
@@ -82,12 +93,14 @@ class RobotClass {
         // Max speed is 1.236 in/tick and max acceleration is 0.05413 in/tick^2
         this.accel = (8 - robotTypeNum) / 5 * 0.05413; // Larger robots accelerate more slowly
         this.maxVel = robotTypeNum / 5 * 1.236;        // Larger robots have a higher top speed
-
-        // Set wheelbase width, in inches
         this.wheelWidth = robotTypeNum / 5 * 20;       // Larger robots have a wider wheelbase
 
-        //corners are relative to the robot facing up
+        // Set robot position
+        this.X = this.getValidXPosition(robotInfo.xpos); // current X position of the center of the robot
+        this.Y = this.getValidYPosition(robotInfo.ypos); // current Y position of the center of the robot
 
+        // Set robot corner positions
+        // Corners are relative to the robot facing up
         //coordinates for top right corner of robot
         this.topR[0] = this.X - this.height/2;
         this.topR[1] = this.Y - this.width/2;
@@ -400,7 +413,9 @@ class RobotClass {
         let newState = {
             X: this.X,
             Y: this.Y,
-            dir: this.dir
+            dir: this.dir,
+            width: this.width,
+            height: this.height
         };
 
         this.lineFollower.update();
