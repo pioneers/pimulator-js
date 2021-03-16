@@ -39,13 +39,13 @@ const SCREENWIDTH = 48;
 class RobotClass {
     /*The MODEL for this simulator. Stores robot data and handles position
        calculations & Runtime API calls """*/
-    tickRate = 50;          // in ms
-    width = 26.7;                  // width of robot , inches
-    height = 20;
+    tickRate = 50;              // in ms
+    width = 26.7;               // width of robot, inches
+    height = 20;                // height or robot, inches
     wRadius = 2;                // radius of a wheel, inches
     MaxX = 144;                 // maximum X value, inches, field is 12'x12'
     MaxY = 144;                 // maximum Y value, inches, field is 12'x12'
-    neg = -1;                    // negate left motor calculation
+    neg = -1;                   // negate left motor calculation
     startXDefault = 70.0;
     startYDefault = 70.0;
     topL = Array(2);
@@ -82,6 +82,9 @@ class RobotClass {
         // Max speed is 1.236 in/tick and max acceleration is 0.05413 in/tick^2
         this.accel = (8 - robotTypeNum) / 5 * 0.05413; // Larger robots accelerate more slowly
         this.maxVel = robotTypeNum / 5 * 1.236;        // Larger robots have a higher top speed
+
+        // Set wheelbase width, in inches
+        this.wheelWidth = robotTypeNum / 5 * 20;       // Larger robots have a wider wheelbase
 
         //corners are relative to the robot facing up
 
@@ -354,8 +357,8 @@ class RobotClass {
             dy = distance * Math.sin(radian);
         }
         else { // Motors going in different directions
-            let rt = this.width/2 * (this.currentLv+this.currentRv)/(this.currentRv-this.currentLv);
-            let wt = (this.currentRv-this.currentLv)/this.width;
+            let rt = this.wheelWidth/2 * (this.currentLv+this.currentRv)/(this.currentRv-this.currentLv);
+            let wt = (this.currentRv-this.currentLv)/this.wheelWidth;
             let theta = wt;
             let i = rt * (1 - Math.cos(theta));
             let j = Math.sin(theta) * rt;
