@@ -32,6 +32,7 @@ class GrabbableObj extends FieldObj {
     constructor(x, y, w, h, color = "red") {
         super(x, y, w, h, color);
         this.attached = false;
+        this.direction = 0;
     }
 
     grab() {
@@ -44,5 +45,9 @@ class GrabbableObj extends FieldObj {
 
     isGrabbed() {
         return this.attached;
+    }
+
+    setDirection(dir) {
+      this.direction = dir;
     }
 }

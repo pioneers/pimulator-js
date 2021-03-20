@@ -41,13 +41,12 @@ function drawObjs(objs, type) {
     if (type === "obstacle") {
         for (let i = 0; i < objs.length; i++) {
             ctx.beginPath();
+            ctx.moveTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
+            ctx.lineTo(objs[i].topR[0]*scaleFactor, objs[i].topR[1]*scaleFactor);
+            ctx.lineTo(objs[i].botR[0]*scaleFactor, objs[i].botR[1]*scaleFactor);
+            ctx.lineTo(objs[i].botL[0]*scaleFactor, objs[i].botL[1]*scaleFactor);
             ctx.fillStyle = objs[i].color;
-            ctx.fillRect(
-                objs[i].x*scaleFactor,
-                objs[i].y*scaleFactor,
-                objs[i].w*scaleFactor,
-                objs[i].h*scaleFactor
-            );
+            ctx.fill();
         }
         objects = objs;
     } else if (type === "tapeLine") {

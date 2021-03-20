@@ -307,6 +307,9 @@ class RobotClass {
         let inter = false;
         for (let i=0; i < simulator.obstacles.length; i++) {
             inter = this.intersectOne(simulator.obstacles[i], corners);
+            if ((simulator.obstacles[i] instanceof GrabbableObj && simulator.obstacles[i].isGrabbed())) {
+                inter = false;
+            }
             if (inter) {
                 break;
             }
@@ -357,18 +360,19 @@ class RobotClass {
     }
 
     updateGrabbableObjs(obstacle) {
-        var b = (this.width - obstacle.w) / 2;
+        let b = (this.width - obstacle.w) / 2;
         obstacle.botL[0] = this.topL[0] + b * Math.cos((90.0 - this.dir) * Math.PI / 180);
-        obstacle.botL[1] = this.topL[1] + b * Math.sin((90.0 - this.dir) * Math.PI / 180) - obstacle.h;
-        obstacle.topL[0] = obstacle.botL[0] + obstacle.h * Math.cos(this.dir * Math.PI / 180);
-        obstacle.topL[1] = obstacle.botL[1] + obstacle.h * Math.sin(this.dir * Math.PI / 180) - obstacle.h;
+        obstacle.botL[1] = this.topL[1] - b * Math.sin((90.0 - this.dir) * Math.PI / 180);
+        obstacle.topL[0] = obstacle.botL[0] - obstacle.h * Math.cos(this.dir * Math.PI / 180);
+        obstacle.topL[1] = obstacle.botL[1] - obstacle.h * Math.sin(this.dir * Math.PI / 180);
 
         obstacle.topR[0] = obstacle.topL[0] + obstacle.w * Math.sin(this.dir * Math.PI / 180);
-        obstacle.topR[1] = obstacle.topL[1] - obstacle.w * Math.sin(this.dir * Math.PI / 180) - obstacle.h;
+        obstacle.topR[1] = obstacle.topL[1] - obstacle.w * Math.cos(this.dir * Math.PI / 180);
         obstacle.botR[0] = obstacle.botL[0] + obstacle.w * Math.sin(this.dir * Math.PI / 180);
-        obstacle.botR[1] = obstacle.botL[1] - obstacle.w * Math.sin(this.dir * Math.PI / 180) - obstacle.h;
-        obstacle.x = obstacle.topL[0];
-        obstacle.y = obstacle.topL[1];
+        obstacle.botR[1] = obstacle.botL[1] - obstacle.w * Math.cos(this.dir * Math.PI / 180);
+        obstacle.x = obstacle.topL[0]; //this.X - (this.height + obstacle.h) * Math.cos(this.dir * Math.PI / 180) / 2;
+        obstacle.y = obstacle.topL[1]; //this.Y - (this.height + obstacle.h) * Math.sin(this.dir * Math.PI / 180) / 2;
+        obstacle.setDirection(this.dir);
         //console.log("grabbable object coordinates updated");
     }
 
@@ -402,29 +406,14 @@ class RobotClass {
     }
 
     grabObj() {
-        const X = this.X;
-        const Y = this.Y;
 
         let obstacle = this.findGrabbableObj();
         if (obstacle) {
             //grab the object
             this.attachedObj = obstacle;
             obstacle.grab();
+            obstacle.setDirection(this.dir);
 
-            //update object's position
-            // b is the length of the front robot edges not covered by the object
-            // var b = (this.width - obstacle.w) / 2;
-            // obstacle.botL[0] = this.topL[0] + b * Math.cos((90.0 - this.dir) * Math.PI / 180);
-            // obstacle.botL[1] = this.topL[1] + b * Math.sin((90.0 - this.dir) * Math.PI / 180) - obstacle.h;
-            // obstacle.topL[0] = obstacle.botL[0] + obstacle.h * Math.cos(this.dir * Math.PI / 180);
-            // obstacle.topL[1] = obstacle.botL[1] + obstacle.h * Math.sin(this.dir * Math.PI / 180) - obstacle.h;
-            //
-            // obstacle.topR[0] = obstacle.topL[0] + obstacle.w * Math.sin(this.dir * Math.PI / 180);
-            // obstacle.topR[1] = obstacle.topL[1] - obstacle.w * Math.sin(this.dir * Math.PI / 180) - obstacle.h;
-            // obstacle.botR[0] = obstacle.botL[0] + obstacle.w * Math.sin(this.dir * Math.PI / 180);
-            // obstacle.botR[1] = obstacle.botL[1] - obstacle.w * Math.sin(this.dir * Math.PI / 180) - obstacle.h;
-            // obstacle.x = obstacle.topL[0];
-            // obstacle.y = obstacle.topL[1];
         }
     }
 
@@ -439,26 +428,33 @@ class RobotClass {
 
     findGrabbableObj() {
         //console.log("beginning search for grabbable object");
-        const switch0X = (this.topL[0] + this.topR[0]) / 2;
-        const switch0Y = (this.topL[1] + this.topR[1]) / 2;
-        const switch1X = (this.botL[0] + this.botR[0]) / 2;
-        const switch1Y = (this.botL[1] + this.botR[1]) / 2;
+        // const switch0X = (this.topL[0] + this.topR[0]) / 2;
+        // const switch0Y = (this.topL[1] + this.topR[1]) / 2;
+        // const switch1X = (this.botL[0] + this.botR[0]) / 2;
+        // const switch1Y = (this.botL[1] + this.botR[1]) / 2;
         if (this.simulator.grabbableObjs.length == 0) {
             return null;
         }
+
+        const width = 5;
+        const height = 5;
+        const b = (this.width - width) / 2;
+        let collidableRegion = {topR: Array(2), topL: Array(2), botL: Array(2), botR: Array(2)};
+        collidableRegion.botL[0] = this.topL[0] + b * Math.cos((90.0 - this.dir) * Math.PI / 180);
+        collidableRegion.botL[1] = this.topL[1] - b * Math.sin((90.0 - this.dir) * Math.PI / 180);
+        collidableRegion.topL[0] = collidableRegion.botL[0] - height * Math.cos(this.dir * Math.PI / 180);
+        collidableRegion.topL[1] = collidableRegion.botL[1] - height * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.topR[0] = collidableRegion.topL[0] + width * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.topR[1] = collidableRegion.topL[1] - width * Math.cos(this.dir * Math.PI / 180);
+        collidableRegion.botR[0] = collidableRegion.botL[0] + width * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.botR[1] = collidableRegion.botL[1] - width * Math.cos(this.dir * Math.PI / 180);
+
         for (let obstacle of this.simulator.grabbableObjs) {
-            const minX = obstacle.topL[0] - this.leeway;
-            const minY = obstacle.topL[1] - this.leeway;
-            const maxX = obstacle.botR[0] + this.leeway;
-            const maxY = obstacle.botR[1] + this.leeway;
-            if (switch0X >= minX && switch0X <= maxX && switch0Y >= minY && switch0Y <= maxY) {
-                if (!obstacle.isGrabbed()) {
-                    console.log("Found object to grab");
-                    return obstacle;
-                }
+            let inter = this.intersectOne(obstacle, collidableRegion);
+            if (inter) {
+              return obstacle;
             }
         }
-        //console.log("No object found");
         return null;
     }
 
