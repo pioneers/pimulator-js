@@ -140,8 +140,8 @@ function update(state) {
         ctx.fill();
     }
 
-    drawObjs(objects, "obstacle");
     drawObjs(tapelines, "tapeLine");
+    drawObjs(objects, "obstacle");
 
     // Draw Rectangle
     ctx.lineWidth = 2;

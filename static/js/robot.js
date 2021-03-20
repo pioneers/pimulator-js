@@ -790,13 +790,12 @@ class Simulator{
             this.grabbableObjs.push(newGrabbableObj);
             this.obstacles.push(newGrabbableObj);
         }
-
         this.drawObjs();
     }
 
     drawObjs() {
-        postMessage({objs: this.obstacles, type: "obstacle"});
         postMessage({objs: this.tapeLines, type: "tapeLine"});
+        postMessage({objs: this.obstacles, type: "obstacle"});
     }
 
     loadStudentCode(){
