@@ -769,6 +769,7 @@ class Simulator{
         this.tapeLines = [];
         this.obstacles = [];
         for (let newLine of objects.tapeLinesData) {
+
             this.tapeLines.push(new TapeLine(newLine.x1, newLine.y1, newLine.x2, newLine.y2, newLine.color));
         }
         for (let newWall of objects.wallsData) {
@@ -875,7 +876,15 @@ this.onmessage = function(e) {
             console.log("Code upload successful");
         }
     }
-
+    if (e.data.objects !== undefined){
+        let temp = 'return ' + e.data.objects
+        let f = new Function (temp)
+        objects = f()
+        if (e.data.newObjects === true) {
+            console.log("Objects upload successful");
+        }
+        simulator = new Simulator()
+    }
     // Start simulation
     if (e.data.start === true) {
         if (code === ""){
@@ -886,7 +895,7 @@ this.onmessage = function(e) {
                 // Wait for pyodide to load
                 if (typeof pyodide !== "undefined" && typeof pyodide.version !== "undefined") {
                     // Assume robotInfo is a key in the posted message
-                    if (e.data.mode === "auto") simulator.simulateAuto(e.data.robotInfo); 
+                    if (e.data.mode === "auto") simulator.simulateAuto(e.data.robotInfo);
                     else if (e.data.mode === "teleop") simulator.simulateTeleop(e.data.robotInfo);
                 }
                 else {

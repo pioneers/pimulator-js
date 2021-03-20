@@ -99,14 +99,15 @@ document.addEventListener('keyup', up);
 // "Upload Code" button sends code to the worker
 function uploadCode() {
     code = cm.getValue();
-    localStorage.setItem("code",code);
+    localStorage.setItem("code", code);
     worker.postMessage({code:code, newCode:true});
     codeUploaded = true;
 };
 
 function uploadObjects(){
-    codeObjects = cmJS.getValue();
-    localStorage.setItem("objects",objects)
+    objects = cmJS.getValue();
+    localStorage.setItem("objects", objects)
+    worker.postMessage({objects:objects, newObjects:true})
 }
 function update(state) {
     /*
