@@ -531,6 +531,29 @@
                                             </div>
                                         </div>
 
+                                        <!--Help: Interactable Objects Tab -->
+                                        <div class="card">
+                                            <div class="card-header" id="help-interactable-heading">
+                                                <details class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-interactable" aria-expanded="true" aria-controls="help-interactable">
+                                                    <summary>Interactable Objects</summary>
+                                                </details>
+                                            </div>
+                                            <div id="help-interactable" class="collapse" aria-labelledby="help-interactable">
+                                                <div class="card-body">
+                                                    <p>
+                                                        Some objects on the field are interactable. Your robot can pick up, move, and drop these objects.
+                                                    </p>
+                                                    <p>
+                                                        When you bring the center of your robot's front side close to the object, you can pick it up using <code>Robot.pick_up()</code>.
+                                                        After you pick up an object, you can move your robot around as usual, and your robot will carry the object on the center of its front side.
+                                                    </p>
+                                                    <p>
+                                                        To drop an object the robot is carrying, use <code>Robot.drop()</code>. After an object is dropped, it will stay in the same place you dropped it, unless you pick it up again.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <!-- Help: Debug Tab -->
                                         <div class="card">
                                             <div class="card-header" id="help-debug-heading">
