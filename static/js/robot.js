@@ -427,11 +427,6 @@ class RobotClass {
     }
 
     findGrabbableObj() {
-        //console.log("beginning search for grabbable object");
-        // const switch0X = (this.topL[0] + this.topR[0]) / 2;
-        // const switch0Y = (this.topL[1] + this.topR[1]) / 2;
-        // const switch1X = (this.botL[0] + this.botR[0]) / 2;
-        // const switch1Y = (this.botL[1] + this.botR[1]) / 2;
         if (this.simulator.grabbableObjs.length == 0) {
             return null;
         }

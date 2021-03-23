@@ -188,38 +188,6 @@ function update(state) {
     ctx.translate(centerX, centerY);
     ctx.rotate(-dir);
     ctx.translate(-centerX, -centerY);
-
-    /*
-    // Set sensors
-    sensorPoints[0].setAttributeNS(null, "cx", centerX)
-    sensorPoints[0].setAttributeNS(null, "cy", centerY)
-    sensorPoints[1].setAttributeNS(null, "cy", centerY+(15*Math.cos(dir)))
-    sensorPoints[1].setAttributeNS(null, "cx", centerX+(-15*Math.sin(dir)))
-    sensorPoints[2].setAttributeNS(null, "cy", centerY-(15*Math.cos(dir)))
-    sensorPoints[2].setAttributeNS(null, "cx", centerX-(-15*Math.sin(dir)))
-
-    // Set robot coordinates
-    const topLeftCornerX = centerX - 30
-    const topLeftCornerY = centerY - 40
-    const robotRect = document.querySelector("rect")
-    robotRect.setAttributeNS(null, "x", topLeftCornerX)
-    robotRect.setAttributeNS(null, "y", topLeftCornerY)
-    const rotateStr = `rotate(${state.dir} ${centerX} ${centerY})`
-    robotRect.setAttribute("transform", rotateStr)
-
-    // Set triangle on robot
-    const triangle = document.querySelector("polygon")
-    const dirRotate = (state.dir+90)/180*Math.PI
-    const topTriangleX = centerX - 24*Math.sin(dirRotate)
-    const topTriangleY = centerY + 24*Math.cos(dirRotate)
-    const baseTriangleX = 3*topTriangleX/4 +  1* centerX/4
-    const baseTriangleY = 3*topTriangleY/4 + 1*centerY/4
-    const sideDist = 6/Math.sqrt(3)
-    const trianglePoint2 = `${baseTriangleX-sideDist*Math.sin(dir)},${baseTriangleY+sideDist*Math.cos(dir)} `
-    const trianglePoint3 = `${baseTriangleX+sideDist*Math.sin(dir)},${baseTriangleY-sideDist*Math.cos(dir)}`
-    const triangleStr = `${topTriangleX},${topTriangleY} ` + trianglePoint2 + trianglePoint3;
-    triangle.setAttributeNS(null, "points",triangleStr);
-    */
 }
 
 function updateSensors(sensorValues) {
