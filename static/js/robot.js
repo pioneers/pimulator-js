@@ -493,7 +493,7 @@ class RobotClass {
         return dict;
     }
 
-    grabObj() {
+    pick_up() {
 
         let obstacle = this.findGrabbableObj();
         if (obstacle) {
@@ -505,7 +505,7 @@ class RobotClass {
         }
     }
 
-    dropObj() {
+    drop() {
         if (this.attachedObj) {
             let obstacle = this.attachedObj;
             this.attachedObj.release();
