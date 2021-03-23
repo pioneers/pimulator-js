@@ -29,7 +29,6 @@ importScripts("./FieldObj.js" + queryString);
 importScripts("./keyboard.js" + queryString);
 
 var code = "";
-var objects = {};
 var env = {};
 languagePluginLoader.then(() => function () {});
 
@@ -865,6 +864,10 @@ class Simulator{
     }
 
     defineObjs(objects) {
+        this.tapeLines = [];
+        this.obstacles = [];
+        this.grabbableObjs = [];
+
         for (let newLine of objects.tapeLinesData) {
             this.tapeLines.push(new TapeLine(newLine.x1, newLine.y1, newLine.x2, newLine.y2, newLine.color));
         }
@@ -975,16 +978,22 @@ this.onmessage = function(e) {
             console.log("Code upload successful");
         }
     }
-    if (e.data.objectsCode !== undefined){
-        let returnString = "return " + e.data.objectsCode;
-        let f = new Function(returnString);
-        let objects = f();
+    // Give simulator the list of objects
+    if (e.data.objectsCode !== undefined) {
+        if (e.data.objectsCode !== null) {
+            let returnString = "return " + e.data.objectsCode;
+            let f = new Function(returnString);
+            let objects = f();
+            simulator.defineObjs(objects);
 
-        if (e.data.newObjects === true) {
-            console.log("Objects upload successful");
+            if (e.data.newObjects === true) {
+                console.log("Objects upload successful");
+            }
         }
-        console.log(objects);
-        simulator.defineObjs(objects);
+    }
+    // Draw the objects
+    if (e.data.drawObjs === true) {
+        simulator.drawObjs();
     }
     // Start simulation
     if (e.data.start === true) {

@@ -1,8 +1,6 @@
 var mode = "idle"; // or auto or teleop
 var worker = new Worker("static/js/robot.js?t=" + gitHash);
 worker.postMessage({gitHash: gitHash});
-console.log(objectsCode);
-worker.postMessage({objectsCode:objectsCode});
 var timer;
 var inputMode = "keyboard";
 var robotType = "medium";
@@ -109,10 +107,20 @@ function uploadCode() {
 }
 
 function uploadObjects(){
-    objects = cmObjects.getValue();
+    objectsCode = cmObjects.getValue();
     localStorage.setItem("objectsCode", objectsCode);
     worker.postMessage({objectsCode:objectsCode, newObjects:true});
 }
+
+function uploadObjectsOnce() {
+    if (objectsCode !== null) {
+        worker.postMessage({objectsCode:objectsCode, newObjects:false});
+        worker.postMessage({drawObjs:true});
+    } else {
+        setTimeout(uploadObjectsOnce, 100);
+    }
+}
+uploadObjectsOnce();
 
 function update(state) {
     /*
