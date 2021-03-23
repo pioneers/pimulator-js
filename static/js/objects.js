@@ -1,4 +1,4 @@
-var objects = {
+var fieldObjects = {
     tapeLinesData: [
         {x1: 24, y1: 72, x2: 120, y2: 72, color: "green"},
         {x1: 24, y1: 24, x2: 24, y2: 72, color: "green"},

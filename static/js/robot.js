@@ -25,11 +25,11 @@ var queryString = location.search;
 importScripts("https://cdn.jsdelivr.net/pyodide/v0.16.1/full/pyodide.js");
 importScripts("./GamepadClass.js" + queryString);
 importScripts("./Sensor.js" + queryString);
-importScripts("./objects.js" + queryString);
 importScripts("./FieldObj.js" + queryString);
 importScripts("./keyboard.js" + queryString);
 
 var code = "";
+var objects = ""
 var env = {};
 languagePluginLoader.then(() => function () {});
 
@@ -874,6 +874,8 @@ class Simulator{
             this.grabbableObjs.push(newGrabbableObj);
             this.obstacles.push(newGrabbableObj);
         }
+
+
         //this.drawObjs();
     }
 
@@ -975,9 +977,8 @@ this.onmessage = function(e) {
         }
     }
     if (e.data.objects !== undefined){
-        let temp = 'return ' + e.data.objects
-        let f = new Function (temp)
-        objects = f()
+        
+        objects = e.data.objects
         if (e.data.newObjects === true) {
             console.log("Objects upload successful");
         }

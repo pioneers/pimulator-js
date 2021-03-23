@@ -9,6 +9,19 @@ const scaleFactor = 3;
 var objects = [];
 var tapelines = [];
 
+let objectString = localStorage.getItem("objects")
+if (temp == "" || temp === null) {
+    // objects is defined in the objects script
+    importScripts("./objects.js" + queryString);
+    worker.postMessage({objects:fieldObjects, newObjects:false})
+} else {
+    let temp = 'return ' + objectString
+    let f = new Function (temp)
+    var fieldObjects = f()
+    worker.postMessage({objects:fieldObjects, newObjects:false})
+}
+
+
 // Handle messages from worker
 function onmessage(e) {
     if (e.data.robot !== undefined) {
@@ -269,6 +282,7 @@ function stop() {
     worker.onmessage = onmessage;
     worker.postMessage({gitHash: gitHash});
     worker.postMessage({code:code});
+    worker.postMessage({objects:fieldObjects});
     mode = "idle";
     autonomousReset()
 };
