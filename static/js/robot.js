@@ -54,13 +54,13 @@ class RobotClass {
     botR = Array(2);
 
     constructor(simulator, robotInfo) {
-        this.X = this.getValidXPosition(robotInfo.xpos); // current X position of the center of the robot
-        this.Y = this.getValidYPosition(robotInfo.ypos); // current Y position of the center of the robot
+        this.X = this.getValidXPosition(robotInfo.xpos, robotInfo.dir); // current X position of the center of the robot
+        this.Y = this.getValidYPosition(robotInfo.ypos, robotInfo.dir); // current Y position of the center of the robot
         this.Wl = 0.0;           // requested angular velocity of l wheel, radians/s
         this.Wr = 0.0;           // requested angular velocity of r wheel, radians/s
         this.ltheta = 0.0;       // angular position of l wheel, degrees
         this.rtheta = 0.0;       // angular position of r wheel, degrees
-        this.dir = 0.0;          // Direction of the robot facing, degrees
+        this.dir = robotInfo.dir;          // Direction of the robot facing, degrees
         this.currentLv = 0;       // current velocity of left wheel, in inches/s
         this.currentRv = 0;       // current velocity of right wheel, in inches/s
 
@@ -112,31 +112,39 @@ class RobotClass {
 
     /** Validate the input starting X coordinate of the robot
     *   pos is the value we want to set the coordinate to */
-   getValidXPosition(pos) {
+   getValidXPosition(pos, dir) {
         // Check is pos is a number or not
         let posNum = Number(pos);
         if (isNaN(posNum)) {
             return this.startXDefault;
         }
         // Bound the coordinate
-        posNum = Math.max(posNum, this.height/2 + 3);
-        posNum = Math.min(posNum, this.MaxX - this.height/2 - 3);
-
+        if (dir == 0 || dir == 180) {
+          posNum = Math.max(posNum, this.height/2 + 3);
+          posNum = Math.min(posNum, this.MaxX - this.height/2 - 3);
+        } else {
+          posNum = Math.max(posNum, this.width/2 + 3);
+          posNum = Math.min(posNum, this.MaxX - this.width/2 - 3);
+        }
         return posNum
     }
 
     /** Validate the input starting Y coordinate of the robot
     *   pos is the value we want to set the coordinate to */
-    getValidYPosition(pos) {
+    getValidYPosition(pos, dir) {
         // Check is pos is a number or not
         let posNum = Number(pos);
         if (isNaN(posNum)) {
             return this.startYDefault;
         }
         // Bound the coordinate
-        posNum = Math.max(posNum, this.width/2 + 3);
-        posNum = Math.min(posNum, this.MaxY - this.width/2 - 3);
-
+        if (dir == 90 || dir == 270) {
+          posNum = Math.max(posNum, this.height/2 + 3);
+          posNum = Math.min(posNum, this.MaxY - this.height/2 - 3);
+        } else {
+          posNum = Math.max(posNum, this.width/2 + 3);
+          posNum = Math.min(posNum, this.MaxY - this.width/2 - 3);
+        }
         return posNum
     }
 
@@ -886,7 +894,7 @@ this.onmessage = function(e) {
                 // Wait for pyodide to load
                 if (typeof pyodide !== "undefined" && typeof pyodide.version !== "undefined") {
                     // Assume robotInfo is a key in the posted message
-                    if (e.data.mode === "auto") simulator.simulateAuto(e.data.robotInfo); 
+                    if (e.data.mode === "auto") simulator.simulateAuto(e.data.robotInfo);
                     else if (e.data.mode === "teleop") simulator.simulateTeleop(e.data.robotInfo);
                 }
                 else {

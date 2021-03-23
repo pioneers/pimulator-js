@@ -200,17 +200,30 @@
                                     <h4>Robot</h4>
                                     <p><b> Starting position refers to the center of the robot, where the top left corner of the field is (0, 0).</b></p>
                                     <p>
-                                    <label for="xpos">Starting Robot X:</label>
+                                    <label for="xpos">Starting X:</label>
                                     <input type="number" step="0.001" id="xpos" name="xpos" value=70.0 style="width: 60px;">
-                                    <label for="ypos"> Robot Y:</label>
+                                    <label for="ypos">Y:</label>
                                     <input type="number" step="0.001" id="ypos" name="ypos" value=70.0 style="width: 60px;">
+
+                                    Direction:
+                                        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdowndir" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Dir <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <li><a class="dropdown-item" href="#" onclick="changeDirection(0)">Left</a></li>
+                                            <li><a class="dropdown-item" href="#" onclick="changeDirection(90)">Up</a></li>
+                                            <li><a class="dropdown-item" href="#" onclick="changeDirection(180)">Right</a></li>
+                                            <li><a class="dropdown-item" href="#" onclick="changeDirection(270)">Down</a></li>
+                                        </ul>
+
+
                                     </p>
 
                                     <p id="input-mode">Starting Robot Direction:
-                                    <button type="button" id="up-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchDirection('up')">Up</button>
-                                    <button type="button" id="right-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchDirection('right')">Right</button>
-                                    <button type="button" id="down-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchDirection('down')">Down</button>
-                                    <button type="button" id="left-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchDirection('left')">Left</button>
+                                    <button type="button" id="up-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchDirection(90)">Up</button>
+                                    <button type="button" id="right-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchDirection(180)">Right</button>
+                                    <button type="button" id="down-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchDirection(270)">Down</button>
+                                    <button type="button" id="left-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchDirection(0)">Left</button>
                                     </p>
 
                                     <p id="input-mode">Robot Type:

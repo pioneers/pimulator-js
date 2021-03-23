@@ -4,7 +4,7 @@ worker.postMessage({gitHash: gitHash});
 var timer;
 var inputMode = "keyboard";
 var robotType = "medium";
-var direction = "left";
+var direction = 0;
 var codeUploaded = false;
 const scaleFactor = 3;
 
@@ -80,7 +80,8 @@ function switchRobotType(newRobotType) {
 }
 
 function switchDirection(newDirection) {
-    $("#" + direction + "-btn").button('toggle');
+    const directionArray = ["left", "up", "right", "down"]
+    $("#" + directionArray[direction / 90] + "-btn").button('toggle');
     direction = newDirection;
 }
 
@@ -179,7 +180,7 @@ function start(auto=false) {
             let robotInfo = {
                 robotType: robotType,
                 xpos: $("#xpos").val(),
-                ypos: $("#ypos").val()
+                ypos: $("#ypos").val(),
                 dir: direction
             }
 
