@@ -1,26 +1,15 @@
 var mode = "idle"; // or auto or teleop
 var worker = new Worker("static/js/robot.js?t=" + gitHash);
 worker.postMessage({gitHash: gitHash});
+console.log(objectsCode);
+worker.postMessage({objectsCode:objectsCode});
 var timer;
 var inputMode = "keyboard";
 var robotType = "medium";
 var codeUploaded = false;
 const scaleFactor = 3;
-var objects = [];
+var obstacles = [];
 var tapelines = [];
-
-let objectString = localStorage.getItem("objects")
-if (temp == "" || temp === null) {
-    // objects is defined in the objects script
-    importScripts("./objects.js" + queryString);
-    worker.postMessage({objects:fieldObjects, newObjects:false})
-} else {
-    let temp = 'return ' + objectString
-    let f = new Function (temp)
-    var fieldObjects = f()
-    worker.postMessage({objects:fieldObjects, newObjects:false})
-}
-
 
 // Handle messages from worker
 function onmessage(e) {
@@ -53,7 +42,7 @@ function drawObjs(objs, type) {
     /* Draw objects received from the worker. */
 
     if (type === "obstacle") {
-        objects = objs;
+        obstacles = objs;
         for (let i = 0; i < objs.length; i++) {
             ctx.beginPath();
             ctx.moveTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
@@ -117,13 +106,14 @@ function uploadCode() {
     localStorage.setItem("code", code);
     worker.postMessage({code:code, newCode:true});
     codeUploaded = true;
-};
+}
 
 function uploadObjects(){
-    objects = cmJS.getValue();
-    localStorage.setItem("objects", objects)
-    worker.postMessage({objects:objects, newObjects:true})
+    objects = cmObjects.getValue();
+    localStorage.setItem("objectsCode", objectsCode);
+    worker.postMessage({objectsCode:objectsCode, newObjects:true});
 }
+
 function update(state) {
     /*
     Update the state (position and direction) of the center of the robot.
@@ -153,7 +143,7 @@ function update(state) {
     }
 
     drawObjs(tapelines, "tapeLine");
-    drawObjs(objects, "obstacle");
+    drawObjs(obstacles, "obstacle");
 
     // Draw Rectangle
     ctx.lineWidth = 2;
@@ -282,7 +272,7 @@ function stop() {
     worker.onmessage = onmessage;
     worker.postMessage({gitHash: gitHash});
     worker.postMessage({code:code});
-    worker.postMessage({objects:fieldObjects});
+    worker.postMessage({objectsCode:objectsCode});
     mode = "idle";
     autonomousReset()
 };

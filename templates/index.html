@@ -199,25 +199,25 @@
                                               }
                                               if (theme == 0) {
                                                 cm.setOption("theme",'default');
-                                                cmJS.setOption("theme",'default');
+                                                cmObjects.setOption("theme",'default');
                                               } else if (theme == 1){
                                                 cm.setOption("theme",'blackboard');
-                                                cmJS.setOption("theme",'blackboard');
+                                                cmObjects.setOption("theme",'blackboard');
                                               } else if (theme == 2){
                                                 cm.setOption("theme",'monokai');
-                                                cmJS.setOption("theme",'monokai');
+                                                cmObjects.setOption("theme",'monokai');
                                               } else if (theme == 3){
                                                 cm.setOption("theme",'cobalt');
-                                                cmJS.setOption("theme",'cobalt');
+                                                cmObjects.setOption("theme",'cobalt');
                                               } else if (theme == 4){
                                                 cm.setOption("theme",'solarized');
-                                                cmJS.setOption("theme",'solarized');
+                                                cmObjects.setOption("theme",'solarized');
                                               } else if (theme == 5){
                                                 cm.setOption("theme",'yeti');
-                                                cmJS.setOption("theme",'yeti');
+                                                cmObjects.setOption("theme",'yeti');
                                               } else if (theme == 6){
                                                 cm.setOption("theme",'midnight');
-                                                cmJS.setOption("theme",'midnight');
+                                                cmObjects.setOption("theme",'midnight');
                                               }
                                             }
                                         </script>
@@ -665,7 +665,7 @@
                             <script src="/static/js/javascript.js"></script>
 
                             <script>
-                            var cmJS = CodeMirror(document.getElementById("cmblock-js"), { //place the codemirror inside the div container
+                            var cmObjects = CodeMirror(document.getElementById("cmblock-js"), { //place the codemirror inside the div container
                               value: "",
                               mode:  "javascript",
                               lineNumbers: true,
@@ -680,35 +680,35 @@
                               tabSize: 4
                             });
 
-                            cmJS.setSize(width="100%", height="1000px");
-                            cmJS.setOption("extraKeys", {
-                             Tab: function(cm) {
-                               if (cm.somethingSelected()) {
-                                 cm.indentSelection("add");
-                               } else {
-                                 cm.replaceSelection(cm.getOption("indentWithTabs")? "\t":
-                                 Array(cm.getOption("indentUnit") + 1).join(" "), "end", "+input");
-                               }
-                             }
-                           });
-                           CodeMirror.keyMap.default["Shift-Tab"] = "indentLess";
-                            var codeJS = localStorage.getItem("code-JS")
-                            if (codeJS == "" || codeJS === null) {
+                            cmObjects.setSize(width="100%", height="1000px");
+                            cmObjects.setOption("extraKeys", {
+                              Tab: function(cm) {
+                                if (cm.somethingSelected()) {
+                                  cm.indentSelection("add");
+                                } else {
+                                  cm.replaceSelection(cm.getOption("indentWithTabs")? "\t":
+                                  Array(cm.getOption("indentUnit") + 1).join(" "), "end", "+input");
+                                }
+                              }
+                            });
+                            CodeMirror.keyMap.default["Shift-Tab"] = "indentLess";
+                            var objectsCode = localStorage.getItem("objectsCode");
+                            if (objectsCode == "" || objectsCode === null) {
                               var xhrJS=new XMLHttpRequest();
                               xhrJS.open("GET","/static/js/objects.js");
                               xhrJS.onload = () => {
-                                codeJS = xhrJS.responseText;
-                                cmJS.setValue(codeJS);
+                                objectsCode = xhrJS.responseText;
+                                cmObjects.setValue(objectsCode);
                                 setTimeout(function() {
-                                  cmJS.refresh();
+                                  cmObjects.refresh();
                                 },1);
                               }
                               xhrJS.send();
                             }
                             else {
-                              cmJS.setValue(codeJS)
+                              cmObjects.setValue(objectsCode)
                               setTimeout(function() {
-                                cmJS.refresh();
+                                cmObjects.refresh();
                               },1);
                             }
                           </script>

@@ -29,7 +29,7 @@ importScripts("./FieldObj.js" + queryString);
 importScripts("./keyboard.js" + queryString);
 
 var code = "";
-var objects = ""
+var objects = {};
 var env = {};
 languagePluginLoader.then(() => function () {});
 
@@ -862,8 +862,10 @@ class Simulator{
         this.tapeLines = [];
         this.obstacles = [];
         this.grabbableObjs = [];
-        for (let newLine of objects.tapeLinesData) {
+    }
 
+    defineObjs(objects) {
+        for (let newLine of objects.tapeLinesData) {
             this.tapeLines.push(new TapeLine(newLine.x1, newLine.y1, newLine.x2, newLine.y2, newLine.color));
         }
         for (let newWall of objects.wallsData) {
@@ -874,9 +876,6 @@ class Simulator{
             this.grabbableObjs.push(newGrabbableObj);
             this.obstacles.push(newGrabbableObj);
         }
-
-
-        //this.drawObjs();
     }
 
     drawObjs() {
@@ -976,13 +975,16 @@ this.onmessage = function(e) {
             console.log("Code upload successful");
         }
     }
-    if (e.data.objects !== undefined){
-        
-        objects = e.data.objects
+    if (e.data.objectsCode !== undefined){
+        let returnString = "return " + e.data.objectsCode;
+        let f = new Function(returnString);
+        let objects = f();
+
         if (e.data.newObjects === true) {
             console.log("Objects upload successful");
         }
-        simulator = new Simulator()
+        console.log(objects);
+        simulator.defineObjs(objects);
     }
     // Start simulation
     if (e.data.start === true) {
