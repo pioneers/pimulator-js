@@ -6,6 +6,8 @@ var inputMode = "keyboard";
 var robotType = "medium";
 var codeUploaded = false;
 const scaleFactor = 3;
+var objects = [];
+var tapelines = [];
 
 // Handle messages from worker
 function onmessage(e) {
@@ -36,20 +38,20 @@ worker.onmessage = onmessage;
 
 function drawObjs(objs, type) {
     /* Draw objects received from the worker. */
-    const canvas = document.getElementById('fieldCanvas');
-    const ctx = canvas.getContext('2d');
+
     if (type === "obstacle") {
+        objects = objs;
         for (let i = 0; i < objs.length; i++) {
             ctx.beginPath();
+            ctx.moveTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
+            ctx.lineTo(objs[i].topR[0]*scaleFactor, objs[i].topR[1]*scaleFactor);
+            ctx.lineTo(objs[i].botR[0]*scaleFactor, objs[i].botR[1]*scaleFactor);
+            ctx.lineTo(objs[i].botL[0]*scaleFactor, objs[i].botL[1]*scaleFactor);
             ctx.fillStyle = objs[i].color;
-            ctx.fillRect(
-                objs[i].x*scaleFactor,
-                objs[i].y*scaleFactor,
-                objs[i].w*scaleFactor,
-                objs[i].h*scaleFactor
-            );
+            ctx.fill();
         }
     } else if (type === "tapeLine") {
+        tapelines = objs;
         ctx.lineWidth = 5;
         for (let i = 0; i < objs.length; i++) {
             ctx.beginPath();
@@ -118,38 +120,73 @@ function update(state) {
     const centerX = state.X * scaleFactor;
     const centerY = state.Y * scaleFactor;
     const dir = state.dir/180*Math.PI;  // Convert to Radians
-    document.getElementById("demo").innerHTML = "x: " + state.X.toFixed(2) + ", y: " + state.Y.toFixed(2)
-    const sensorPoints = document.querySelectorAll("circle")
+    document.getElementById("demo").innerHTML = "x: " + state.X.toFixed(2) + ", y: " + state.Y.toFixed(2);
+    //const sensorPoints = document.querySelectorAll("circle")
 
-    // Set sensors
-    sensorPoints[0].setAttributeNS(null, "cx", centerX)
-    sensorPoints[0].setAttributeNS(null, "cy", centerY)
-    sensorPoints[1].setAttributeNS(null, "cy", centerY+(15*Math.cos(dir)))
-    sensorPoints[1].setAttributeNS(null, "cx", centerX+(-15*Math.sin(dir)))
-    sensorPoints[2].setAttributeNS(null, "cy", centerY-(15*Math.cos(dir)))
-    sensorPoints[2].setAttributeNS(null, "cx", centerX-(-15*Math.sin(dir)))
+    const canvas = document.getElementById('fieldCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Set robot coordinates
-    const topLeftCornerX = centerX - 30
-    const topLeftCornerY = centerY - 40
-    const robotRect = document.querySelector("rect")
-    robotRect.setAttributeNS(null, "x", topLeftCornerX)
-    robotRect.setAttributeNS(null, "y", topLeftCornerY)
-    const rotateStr = `rotate(${state.dir} ${centerX} ${centerY})`
-    robotRect.setAttribute("transform", rotateStr)
+    if (state.attachedObj !== undefined) {
+        //move the object
+        ctx.beginPath();
+        ctx.moveTo(centerX - 30 - (state.attachedObj.h * scaleFactor), centerY - (state.attachedObj.w * scaleFactor) / 2);
+        ctx.rect(centerX - 30 - (state.attachedObj.h * scaleFactor), centerY - (state.attachedObj.w * scaleFactor) / 2, state.attachedObj.w * scaleFactor, state.attachedObj.h * scaleFactor);
+        ctx.closePath();
+        ctx.strokeStyle = 'green';
+        ctx.stroke();
+        ctx.fillStyle = 'green';
+        ctx.fill();
+    }
 
-    // Set triangle on robot
-    const triangle = document.querySelector("polygon")
-    const dirRotate = (state.dir+90)/180*Math.PI
-    const topTriangleX = centerX - 24*Math.sin(dirRotate)
-    const topTriangleY = centerY + 24*Math.cos(dirRotate)
-    const baseTriangleX = 3*topTriangleX/4 +  1* centerX/4
-    const baseTriangleY = 3*topTriangleY/4 + 1*centerY/4
-    const sideDist = 6/Math.sqrt(3)
-    const trianglePoint2 = `${baseTriangleX-sideDist*Math.sin(dir)},${baseTriangleY+sideDist*Math.cos(dir)} `
-    const trianglePoint3 = `${baseTriangleX+sideDist*Math.sin(dir)},${baseTriangleY-sideDist*Math.cos(dir)}`
-    const triangleStr = `${topTriangleX},${topTriangleY} ` + trianglePoint2 + trianglePoint3;
-    triangle.setAttributeNS(null, "points",triangleStr);
+    drawObjs(tapelines, "tapeLine");
+    drawObjs(objects, "obstacle");
+
+    // Draw Rectangle
+    ctx.lineWidth = 2;
+    const topLeftCornerX = centerX - 30;
+    const topLeftCornerY = centerY - 40;
+
+    // Translate to and rotate about the center of the robot
+    ctx.translate(centerX, centerY);
+    ctx.rotate(dir);
+    ctx.translate(-centerX, -centerY);
+
+    ctx.beginPath();
+    ctx.rect(topLeftCornerX, topLeftCornerY, 60, 80);
+    ctx.closePath();
+    ctx.strokeStyle = 'navy';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // Draw Circles
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, 3, 0, 2 * Math.PI);
+    ctx.moveTo(centerX, centerY-15);
+    ctx.arc(centerX, centerY-15, 3, 0, 2 * Math.PI);
+    ctx.moveTo(centerX, centerY+15);
+    ctx.arc(centerX, centerY+15, 3, 0, 2 * Math.PI);
+    ctx.closePath();
+    ctx.strokeStyle = 'red';
+    ctx.stroke();
+    ctx.fillStyle = 'red';
+    ctx.fill();
+    // Draw Triangle
+    ctx.beginPath();
+    ctx.moveTo(centerX-24, centerY);
+    ctx.lineTo(centerX-18, centerY+3.5);
+    ctx.lineTo(centerX-18, centerY-3.5);
+    ctx.lineTo(centerX-24, centerY);
+    ctx.closePath();
+    ctx.strokeStyle = 'blue';
+    ctx.stroke();
+    ctx.fillStyle = 'blue';
+    ctx.fill();
+
+    // Translate to and rotate back
+    ctx.translate(centerX, centerY);
+    ctx.rotate(-dir);
+    ctx.translate(-centerX, -centerY);
 }
 
 function updateSensors(sensorValues) {

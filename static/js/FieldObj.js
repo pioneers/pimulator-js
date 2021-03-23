@@ -1,22 +1,11 @@
-function FieldObj() {
-    if (!(this instanceof FieldObj)) {
-        return new FieldObj;
-    }
-    this.x=0;
-    this.y=0;
-    this.w=0;
-    this.h=0;
-}
-
-class Wall extends FieldObj {
+class FieldObj {
 
     topL = Array(2);
     topR = Array(2);
     botL = Array(2);
     botR = Array(2);
 
-    constructor(x, y, w, h, color = "black") {
-        super();
+    constructor(x, y, w, h, color) {
         this.x = x;
         this.y = y;
         this.w = w;
@@ -30,5 +19,35 @@ class Wall extends FieldObj {
         this.botL[1] = y + h;
         this.botR[0] = x + w;
         this.botR[1] = y + h;
+    }
+}
+
+class Wall extends FieldObj {
+    constructor(x, y, w, h, color = "black") {
+        super(x, y, w, h, color);
+    }
+}
+
+class GrabbableObj extends FieldObj {
+    constructor(x, y, w, h, color = "red") {
+        super(x, y, w, h, color);
+        this.attached = false;
+        this.direction = 0;
+    }
+
+    grab() {
+        this.attached = true;
+    }
+
+    release() {
+        this.attached = false;
+    }
+
+    isGrabbed() {
+        return this.attached;
+    }
+
+    setDirection(dir) {
+      this.direction = dir;
     }
 }
