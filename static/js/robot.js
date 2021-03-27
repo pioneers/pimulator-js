@@ -425,7 +425,7 @@ class RobotClass {
         if (this.attachedObj) {
             this.updateGrabbableObjs(this.attachedObj);
         }
-        this.simulator.drawObjs();
+        // this.simulator.drawObjs();
 
         this.lineFollower.update();
         this.limitSwitch.update();
@@ -439,10 +439,16 @@ class RobotClass {
             backSwitch: this.limitSwitch.switch1
         };
 
+        let objects = {
+            tapeLines: this.simulator.tapeLines,
+            obstacles: this.simulator.obstacles,
+        }
+
         postMessage({
             robot: newState,
             sensors: sensorValues,
-            switches: switchValues
+            switches: switchValues,
+            objects: objects
         })
     }
 
@@ -492,8 +498,11 @@ class RobotClass {
         return dict;
     }
 
+    /* Robot API function. If Robot has no attached object, pick up a nearby object */
     pick_up() {
-
+        if (this.attachedObj) {
+            return
+        }
         let obstacle = this.findGrabbableObj();
         if (obstacle) {
             //grab the object
@@ -506,7 +515,6 @@ class RobotClass {
 
     drop() {
         if (this.attachedObj) {
-            let obstacle = this.attachedObj;
             this.attachedObj.release();
             this.attachedObj = null;
         }
@@ -864,6 +872,11 @@ class Simulator{
     }
 
     defineObjs(objects) {
+        /** tapeLines contains TapeLines.
+         *  obstacles contains Walls and GrabbableObjs.
+         *  grabbableObjs contains GrabbableObjs.
+         *  grabbableObjs have two references to them.
+        */
         this.tapeLines = [];
         this.obstacles = [];
         this.grabbableObjs = [];
@@ -884,6 +897,7 @@ class Simulator{
     drawObjs() {
         postMessage({objs: this.tapeLines, type: "tapeLine"});
         postMessage({objs: this.obstacles, type: "obstacle"});
+        // postMessage({objs: this.grabbableObjs, type: "obstacle"});
     }
 
     loadStudentCode(){
@@ -980,21 +994,27 @@ this.onmessage = function(e) {
     }
     // Give simulator the list of objects
     if (e.data.objectsCode !== undefined) {
-        if (e.data.objectsCode !== null) {
-            let returnString = "return " + e.data.objectsCode;
-            let f = new Function(returnString);
-            let objects = f();
-            simulator.defineObjs(objects);
+        let returnString = "return " + e.data.objectsCode;
+        let f = new Function(returnString);
+        let objects = f();
+        simulator.defineObjs(objects);
 
-            if (e.data.newObjects === true) {
-                console.log("Objects upload successful");
-            }
+        // if (e.data.newObjects === true) {
+        //     console.log("Field upload successful");
+        // }
+        
+        // Draw objects if no active simulation
+        if (simulator.mode == "idle") {
+            simulator.drawObjs();
+        }
+        if (simulator.mode == "teleop") {
+            simulator.robot.attachedObj = null;
         }
     }
     // Draw the objects
-    if (e.data.drawObjs === true) {
-        simulator.drawObjs();
-    }
+    // if (e.data.drawObjs === true) {
+    //     simulator.drawObjs();
+    // }
     // Start simulation
     if (e.data.start === true) {
         if (code === ""){
