@@ -4,11 +4,27 @@ class LineFollower{
      this.left = 0;
      this.center = 0;
      this.right = 0;
+     this.offsetX = 20;
+     this.offsetY = 0;
+
    }
 
+
+
    update(){
-     var sensorsY = [this.robot.Y - 5*Math.cos(this.robot.dir/180*Math.PI), this.robot.Y, this.robot.Y + 5*Math.cos(this.robot.dir/180*Math.PI)]
-     var sensorsX = [this.robot.X - 5*Math.sin(-this.robot.dir/180*Math.PI), this.robot.X, this.robot.X + 5*Math.sin(-this.robot.dir/180*Math.PI)]
+     // Adding offset code
+     var s = Math.sin(this.robot.dir/180*Math.PI)
+     var c = Math.sin(-this.robot.dir/180*Math.PI)
+     // Sensors are offset 5 to left and right
+     var s_left_x = ((this.offsetX - 5) * c - this.offsetY * s) + this.robot.X;
+     var s_left_y = ((this.offsetX - 5) * s + this.offsetY * c) + this.robot.Y;
+     var s_center_x = (this.offsetX * c - this.offsetY * s) + this.robot.X;
+     var s_center_y = (this.offsetX * s + this.offsetY * c) + this.robot.Y;
+     var s_right_x = ((this.offsetX + 5) * c - this.offsetY * s) + this.robot.X;
+     var s_right_y = ((this.offsetX + 5) * s + this.offsetY * c) + this.robot.Y;
+     // Trig calculated for each sensor, Now it is offset.
+     var sensorsY = [s_left_y, s_center_y, s_right_y]
+     var sensorsX = [s_left_x, s_center_x, s_right_x]
 
      var tapeLines = this.robot.simulator.tapeLines
      let total = []
