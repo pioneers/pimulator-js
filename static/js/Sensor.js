@@ -16,12 +16,12 @@ class LineFollower{
      var s = Math.sin(this.robot.dir/180*Math.PI)
      var c = Math.cos(this.robot.dir/180*Math.PI)
      // Sensors are offset 5 to left and right
-     var s_left_x = ((this.offsetY * c) - ((this.offsetX - 5) * s)) + this.robot.X;
-     var s_left_y = ((this.offsetY * s) + (this.offsetX - 5) * c) + this.robot.Y;
+     var s_left_x = ((this.offsetY * c) - ((this.offsetX + 5) * s)) + this.robot.X;
+     var s_left_y = ((this.offsetY * s) + (this.offsetX + 5) * c) + this.robot.Y;
      var s_center_x = ((this.offsetY * c) - ((this.offsetX) * s)) + this.robot.X;
      var s_center_y = ((this.offsetY * s) + ((this.offsetX) * c)) + this.robot.Y;
-     var s_right_x = ((this.offsetY * c) - ((this.offsetX + 5) * s)) + this.robot.X;
-     var s_right_y = ((this.offsetY * s) + ((this.offsetX + 5) * c)) + this.robot.Y;
+     var s_right_x = ((this.offsetY * c) - ((this.offsetX - 5) * s)) + this.robot.X;
+     var s_right_y = ((this.offsetY * s) + ((this.offsetX - 5) * c)) + this.robot.Y;
      // Trig calculated for each sensor, Now it is offset.
      var sensorsY = [s_left_y, s_center_y, s_right_y]
      var sensorsX = [s_left_x, s_center_x, s_right_x]
