@@ -116,13 +116,25 @@ function update(state) {
     document.getElementById("demo").innerHTML = "x: " + state.X.toFixed(2) + ", y: " + state.Y.toFixed(2)
     const sensorPoints = document.querySelectorAll("circle")
 
+    const offsetY = -10 * scaleFactor;
+    const offsetX = 0 * scaleFactor;
+    const sens = 5 * scaleFactor;
+    var s = Math.sin(dir)
+    var c = Math.cos(dir)
+
     // Set sensors
-    sensorPoints[0].setAttributeNS(null, "cx", centerX)
-    sensorPoints[0].setAttributeNS(null, "cy", centerY)
-    sensorPoints[1].setAttributeNS(null, "cy", centerY+(15*Math.cos(dir)))
-    sensorPoints[1].setAttributeNS(null, "cx", centerX+(-15*Math.sin(dir)))
-    sensorPoints[2].setAttributeNS(null, "cy", centerY-(15*Math.cos(dir)))
-    sensorPoints[2].setAttributeNS(null, "cx", centerX-(-15*Math.sin(dir)))
+    var s_left_x = ((offsetY * c) - ((offsetX - sens) * s));
+    var s_left_y = ((offsetY * s) + (offsetX - sens) * c);
+    var s_center_x = ((offsetY * c) - ((offsetX) * s));
+    var s_center_y = ((offsetY * s) + ((offsetX) * c));
+    var s_right_x = ((offsetY * c) - ((offsetX + sens) * s));
+    var s_right_y = ((offsetY * s) + ((offsetX + sens) * c));
+    sensorPoints[0].setAttributeNS(null, "cx", centerX + s_center_x)
+    sensorPoints[0].setAttributeNS(null, "cy", centerY + s_center_y)
+    sensorPoints[1].setAttributeNS(null, "cx", centerX + s_left_x)
+    sensorPoints[1].setAttributeNS(null, "cy", centerY + s_left_y)
+    sensorPoints[2].setAttributeNS(null, "cx", centerX + s_right_x)
+    sensorPoints[2].setAttributeNS(null, "cy", centerY + s_right_y)
 
     // Set robot coordinates
     const topLeftCornerX = centerX - 30
