@@ -4,7 +4,7 @@ class LineFollower{
      this.left = 0;
      this.center = 0;
      this.right = 0;
-     this.offsetX = -20;
+     this.offsetX = -10;
      this.offsetY = 0;
 
    }
