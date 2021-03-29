@@ -14,7 +14,7 @@ class LineFollower{
    update(){
      // Adding offset code
      var s = Math.sin(this.robot.dir/180*Math.PI)
-     var c = Math.sin(-this.robot.dir/180*Math.PI)
+     var c = Math.sin(this.robot.dir/180*Math.PI)
      // Sensors are offset 5 to left and right
      var s_left_x = ((this.offsetX - 5) * c - this.offsetY * s) + this.robot.X;
      var s_left_y = ((this.offsetX - 5) * s + this.offsetY * c) + this.robot.Y;
