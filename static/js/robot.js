@@ -400,7 +400,7 @@ class RobotClass {
         let inter = false;
         for (let i=0; i < simulator.obstacles.length; i++) {
             inter = this.intersectOne(simulator.obstacles[i], corners);
-            if ((simulator.obstacles[i] instanceof GrabbableObj && simulator.obstacles[i].isGrabbed())) {
+            if ((simulator.obstacles[i] instanceof InteractableObj && simulator.obstacles[i].isAttached())) {
                 inter = false;
             }
             if (inter) {
@@ -431,7 +431,7 @@ class RobotClass {
         };
 
         if (this.attachedObj) {
-            this.updateGrabbableObjs(this.attachedObj);
+            this.updateInteractableObjs(this.attachedObj);
         }
         // this.simulator.drawObjs();
 
@@ -460,7 +460,7 @@ class RobotClass {
         })
     }
 
-    updateGrabbableObjs(obstacle) {
+    updateInteractableObjs(obstacle) {
         let b = (this.width - obstacle.w) / 2;
         obstacle.botL[0] = this.topL[0] + b * Math.cos((90.0 - this.dir) * Math.PI / 180);
         obstacle.botL[1] = this.topL[1] - b * Math.sin((90.0 - this.dir) * Math.PI / 180);
@@ -474,7 +474,7 @@ class RobotClass {
         obstacle.x = obstacle.topL[0]; //this.X - (this.height + obstacle.h) * Math.cos(this.dir * Math.PI / 180) / 2;
         obstacle.y = obstacle.topL[1]; //this.Y - (this.height + obstacle.h) * Math.sin(this.dir * Math.PI / 180) / 2;
         obstacle.setDirection(this.dir);
-        //console.log("grabbable object coordinates updated");
+        //console.log("interactable object coordinates updated");
     }
 
     updateCorners(newX, newY, dir) {
@@ -511,11 +511,11 @@ class RobotClass {
         if (this.attachedObj) {
             return
         }
-        let obstacle = this.findGrabbableObj();
+        let obstacle = this.findInteractableObj();
         if (obstacle) {
-            //grab the object
+            // Attach the object
             this.attachedObj = obstacle;
-            obstacle.grab();
+            obstacle.attach();
             obstacle.setDirection(this.dir);
 
         }
@@ -529,8 +529,8 @@ class RobotClass {
         return;
     }
 
-    findGrabbableObj() {
-        if (this.simulator.grabbableObjs.length == 0) {
+    findInteractableObj() {
+        if (this.simulator.interactableObjs.length == 0) {
             return null;
         }
 
@@ -547,7 +547,7 @@ class RobotClass {
         collidableRegion.botR[0] = collidableRegion.botL[0] + width * Math.sin(this.dir * Math.PI / 180);
         collidableRegion.botR[1] = collidableRegion.botL[1] - width * Math.cos(this.dir * Math.PI / 180);
 
-        for (let obstacle of this.simulator.grabbableObjs) {
+        for (let obstacle of this.simulator.interactableObjs) {
             let inter = this.intersectOne(obstacle, collidableRegion);
             if (inter) {
               return obstacle;
@@ -876,36 +876,41 @@ class Simulator{
         this.current = [];
         this.tapeLines = [];
         this.obstacles = [];
-        this.grabbableObjs = [];
+        this.interactableObjs = [];
     }
 
     defineObjs(objects) {
         /** tapeLines contains TapeLines.
-         *  obstacles contains Walls and GrabbableObjs.
-         *  grabbableObjs contains GrabbableObjs.
-         *  grabbableObjs have two references to them.
+         *  obstacles contains Walls and InteractableObjs.
+         *  interactableObjs contains InteractableObjs.
+         *  interactableObjs have two references to them.
         */
         this.tapeLines = [];
         this.obstacles = [];
-        this.grabbableObjs = [];
+        this.interactableObjs = [];
 
-        for (let newLine of objects.tapeLinesData) {
-            this.tapeLines.push(new TapeLine(newLine.x1, newLine.y1, newLine.x2, newLine.y2, newLine.color));
+        if (objects.tapeLinesData !== undefined) {
+            for (let newLine of objects.tapeLinesData) {
+                this.tapeLines.push(new TapeLine(newLine.x1, newLine.y1, newLine.x2, newLine.y2, newLine.color));
+            }
         }
-        for (let newWall of objects.wallsData) {
-            this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, newWall.color));
+        if (objects.wallsData !== undefined) {
+            for (let newWall of objects.wallsData) {
+                this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, newWall.color));
+            }
         }
-        for (let grabbableObj of objects.grabbableData) {
-            let newGrabbableObj = new GrabbableObj(grabbableObj.x, grabbableObj.y, grabbableObj.w, grabbableObj.h, grabbableObj.color);
-            this.grabbableObjs.push(newGrabbableObj);
-            this.obstacles.push(newGrabbableObj);
+        if (objects.interactableData !== undefined) {
+            for (let interactableObj of objects.interactableData) {
+                let newInteractableObj = new InteractableObj(interactableObj.x, interactableObj.y, interactableObj.w, interactableObj.h, interactableObj.color);
+                this.interactableObjs.push(newInteractableObj);
+                this.obstacles.push(newInteractableObj);
+            }
         }
     }
 
     drawObjs() {
         postMessage({objs: this.tapeLines, type: "tapeLine"});
         postMessage({objs: this.obstacles, type: "obstacle"});
-        // postMessage({objs: this.grabbableObjs, type: "obstacle"});
     }
 
     loadStudentCode(){

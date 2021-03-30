@@ -28,14 +28,14 @@ class Wall extends FieldObj {
     }
 }
 
-class GrabbableObj extends FieldObj {
+class InteractableObj extends FieldObj {
     constructor(x, y, w, h, color = "red") {
         super(x, y, w, h, color);
         this.attached = false;
         this.direction = 0;
     }
 
-    grab() {
+    attach() {
         this.attached = true;
     }
 
@@ -43,11 +43,11 @@ class GrabbableObj extends FieldObj {
         this.attached = false;
     }
 
-    isGrabbed() {
+    isAttached() {
         return this.attached;
     }
 
     setDirection(dir) {
-      this.direction = dir;
+        this.direction = dir;
     }
 }

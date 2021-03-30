@@ -11,7 +11,7 @@
         {x: 142, y: 0, w: 2, h: 144},
         {x: 0, y: 142, w: 144, h: 2}
     ],
-    grabbableData: [
+    interactableData: [
         {x: 20, y: 20, w: 10, h: 10}
     ]
 }

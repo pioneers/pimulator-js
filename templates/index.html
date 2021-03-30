@@ -282,6 +282,52 @@
                                             </div>
                                         </div>
 
+                                        <!-- Help: Field -->
+                                        <div class="card">
+                                            <div class="card-header" id="help-field-heading">
+                                                <details class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-field-body" aria-expanded="true" aria-controls="help-field-body">
+                                                    <summary>Field</summary>
+                                                </details>
+                                            </div>
+                                            <div id="help-field-body" class="collapse" aria-labelledby="help-field-heading">
+                                                <div class="card-body">
+                                                    <p>
+                                                        The field consists of walls, interactable objects, and tape lines (to be used with line followers).
+                                                        If you wish to update any of the objects, you can update them by uploading your own code in the <b>Field</b> section
+                                                        and pressing the 'Upload Field' button.
+                                                    </p>
+                                                    <p> <b> Walls: </b> </p>
+                                                    <p>
+                                                    Walls are listed under the key <code>wallsData</code> and consist of 4 key-value pairs,
+                                                    with keys <code>x</code>, <code>y</code>, <code>w</code>, <code>h</code>.
+                                                    The <code>x</code> and <code>y</code> values represent the top left corner of the wall.
+                                                    <code>w</code> and <code>h</code> represent the width and height of the line respectively.
+                                                    </p>
+                                                    <p> <b> Interactable Objects:  </b> </p>
+                                                    <p>
+                                                    Interactable objects are listed under the key <code>interactableData</code> and consist of 4 key-value pairs,
+                                                    with keys <code>x</code>, <code>y</code>, <code>w</code>, <code>h</code>.
+                                                    The <code>x</code> and <code>y</code> values represent the top left corner of the wall.
+                                                    </p>
+                                                    <p> Note: Walls and interactable objects can only be oriented perpendicular to the field. </p>
+                                                    <p> <b> Tape Lines: </b></p>
+                                                    <p>
+                                                        Tape lines are listed under the key <code>tapeLinesData</code> and consist of 4 key-value pairs,
+                                                        with keys <code>x1</code>, <code>y1</code>, <code>x2</code>, and <code>y2</code>.
+                                                        The <code>x1</code> and <code>y1</code> coordinates correspond to one end, while the <code>x2</code>, <code>y2</code> coordinates
+                                                        correspond to the opposite end of the line. </p>
+                                                    <p>
+                                                        The field description follows the format of a JSON object.
+                                                        For more information, you can look through the documentation of the JSON object format
+                                                        <a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON">here</a>.
+                                                    </p>
+                                                    <p>
+                                                        For an example field description, view the default configuration in the <b>Field</b> section below.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
                                         <!-- Help: Keyboard -->
                                         <div class="card">
                                             <div class="card-header" id="help-keyboard-heading">

@@ -9,11 +9,6 @@ var codeUploaded = false;
 const scaleFactor = 3;
 const canvas = document.getElementById('fieldCanvas');
 const ctx = canvas.getContext('2d');
-var globalRobot = null;
-var globalObjects = null;
-
-// var obstacles = [];
-// var tapelines = [];
 
 // Handle messages from worker
 function onmessage(e) {
@@ -124,7 +119,7 @@ function drawRobot(robot) {
 drawRobot({
     X: Number($("#xpos").val()),
     Y: Number($("#ypos").val()),
-    dir: 0
+    dir: direction
 });
 
 function drawObjs(objs, type) {
@@ -223,7 +218,7 @@ function uploadObjects(){
         let robot = {
             X: Number($("#xpos").val()),
             Y: Number($("#ypos").val()),
-            dir: 0
+            dir: direction
         };
         drawRobot(robot);
     }
