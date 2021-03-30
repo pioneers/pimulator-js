@@ -46,6 +46,30 @@ function drawRobot(robot) {
     const centerY = robot.Y * scaleFactor;
     const dir = robot.dir/180*Math.PI;  // Convert to Radians
 
+    let robotWidth = 26.7;
+    let robotHeight = 20;
+
+    // if (robotType === "light") {
+    //     robotWidth = 14.18;      // Robot width, inches
+    //     robotHeight = 12.5;      // Robot height, inches
+    // }
+    // else if (robotType == "medium") {
+    //     robotWidth = 19.3;
+    //     robotHeight = 14;
+    // }
+    // else if (robotType === "heavy") {
+    //     robotWidth = 5;
+    //     robotHeight = 3;
+    // }
+
+    // coordinates of center of front side of robot (for drawing sensors)
+    const scaledTopRX = (robot.X - robotHeight/2) * scaleFactor;
+    const scaledTopRY = (robot.Y - robotWidth/2) * scaleFactor;
+    const scaledTopLX = (robot.X - robotHeight/2) * scaleFactor;
+    const scaledTopLY = (robot.Y + robotWidth/2) * scaleFactor;
+    const frontCenterX = (scaledTopLX + scaledTopRX) / 2;
+    const frontCenterY = (scaledTopLY + scaledTopRY) / 2;
+
     // Draw Rectangle
     ctx.lineWidth = 2;
     const topLeftCornerX = centerX - 30;
@@ -64,12 +88,12 @@ function drawRobot(robot) {
     ctx.stroke();
     // Draw Circles
     ctx.beginPath();
-    ctx.moveTo(centerX, centerY);
-    ctx.arc(centerX, centerY, 2, 0, 2 * Math.PI);
-    ctx.moveTo(centerX, centerY-9);
-    ctx.arc(centerX, centerY-9, 2, 0, 2 * Math.PI);
-    ctx.moveTo(centerX, centerY+9);
-    ctx.arc(centerX, centerY+9, 2, 0, 2 * Math.PI);
+    ctx.moveTo(frontCenterX, frontCenterY);
+    ctx.arc(frontCenterX, frontCenterY, 2, 0, 2 * Math.PI);
+    ctx.moveTo(frontCenterX, frontCenterY-9);
+    ctx.arc(frontCenterX, frontCenterY-9, 2, 0, 2 * Math.PI);
+    ctx.moveTo(frontCenterX, frontCenterY+9);
+    ctx.arc(frontCenterX, frontCenterY+9, 2, 0, 2 * Math.PI);
     ctx.closePath();
     ctx.strokeStyle = 'red';
     ctx.stroke();
