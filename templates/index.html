@@ -221,9 +221,9 @@
                                     </div></p>
 
                                     <p id="input-mode">Robot Type:
-                                        <button type="button" id="light-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchRobotType('light')">Light</button>
-                                        <button type="button" id="medium-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchRobotType('medium')">Medium</button>
-                                        <button type="button" id="heavy-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchRobotType('heavy')">Heavy</button>
+                                        <button type="button" id="light-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchRobotType('light')">Spry</button>
+                                        <button type="button" id="medium-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchRobotType('medium')">Swift</button>
+                                        <button type="button" id="heavy-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchRobotType('heavy')">Sturdy</button>
                                     </p>
                                 </div>
 
@@ -565,6 +565,7 @@
                             <script src="/static/js/codemirror.js?t={{ git_hash }}"></script>
                             <link rel="stylesheet" href="/static/css/codemirror.css?t={[ git_hash }}">
                             <script src="/static/js/python.js?t={{ git_hash }}"></script>
+                            <script src="/static/js/comment.js"></script>
                             <link rel="stylesheet" href="/static/css/cobalt.css">
                             <link rel="stylesheet" href="/static/css/monokai.css">
                             <link rel="stylesheet" href="/static/css/solarized.css">
@@ -602,6 +603,7 @@
                                     matchBrackets: true,
                                     showCursorWhenSelecting: true,
                                     theme: "default",
+                                    comment: true,
                                     tabSize: 4
                                   });
 
