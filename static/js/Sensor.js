@@ -7,8 +7,9 @@ class LineFollower{
    }
 
    update(){
-     var sensorsY = [this.robot.Y - 3*Math.cos(this.robot.dir/180*Math.PI), this.robot.Y, this.robot.Y + 3*Math.cos(this.robot.dir/180*Math.PI)]
-     var sensorsX = [this.robot.X - 3*Math.sin(-this.robot.dir/180*Math.PI), this.robot.X, this.robot.X + 3*Math.sin(-this.robot.dir/180*Math.PI)]
+     var frontCenter = [(this.robot.topL[0] + this.robot.topR[0]) / 2, (this.robot.topL[1] + this.robot.topR[1]) / 2]
+     var sensorsY = [frontCenter[1] - 3*Math.cos(this.robot.dir/180*Math.PI), frontCenter[1], frontCenter[1] + 3*Math.cos(this.robot.dir/180*Math.PI)]
+     var sensorsX = [frontCenter[0] - 3*Math.sin(-this.robot.dir/180*Math.PI), frontCenter[0], frontCenter[0] + 3*Math.sin(-this.robot.dir/180*Math.PI)]
 
      var tapeLines = this.robot.simulator.tapeLines
      let total = []

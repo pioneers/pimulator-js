@@ -1002,7 +1002,7 @@ this.onmessage = function(e) {
         // if (e.data.newObjects === true) {
         //     console.log("Field upload successful");
         // }
-        
+
         // Draw objects if no active simulation
         if (simulator.mode == "idle") {
             simulator.drawObjs();
