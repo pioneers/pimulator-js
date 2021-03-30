@@ -102,7 +102,6 @@ function drawObjs(objs, type) {
     /* Draw objects received from the worker. */
 
     if (type === "obstacle") {
-        // obstacles = objs;
         for (let i = 0; i < objs.length; i++) {
             ctx.beginPath();
             ctx.moveTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
@@ -113,7 +112,6 @@ function drawObjs(objs, type) {
             ctx.fill();
         }
     } else if (type === "tapeLine") {
-        // tapelines = objs;
         ctx.lineWidth = 5;
         for (let i = 0; i < objs.length; i++) {
             ctx.beginPath();

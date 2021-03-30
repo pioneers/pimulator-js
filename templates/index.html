@@ -740,7 +740,7 @@
                             var objectsCode = localStorage.getItem("objectsCode");
                             if (objectsCode == "" || objectsCode === null) {
                               var xhrJS=new XMLHttpRequest();
-                              xhrJS.open("GET","/static/js/objects.js");
+                              xhrJS.open("GET","/static/field.json");
                               xhrJS.onload = () => {
                                 objectsCode = xhrJS.responseText;
                                 cmObjects.setValue(objectsCode);
