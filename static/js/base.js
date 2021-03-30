@@ -69,11 +69,11 @@ function drawRobot(robot) {
     // Draw Circles
     ctx.beginPath();
     ctx.moveTo(centerX, centerY);
-    ctx.arc(centerX, centerY, 3, 0, 2 * Math.PI);
-    ctx.moveTo(centerX, centerY-15);
-    ctx.arc(centerX, centerY-15, 3, 0, 2 * Math.PI);
-    ctx.moveTo(centerX, centerY+15);
-    ctx.arc(centerX, centerY+15, 3, 0, 2 * Math.PI);
+    ctx.arc(centerX, centerY, 2, 0, 2 * Math.PI);
+    ctx.moveTo(centerX, centerY-9);
+    ctx.arc(centerX, centerY-9, 2, 0, 2 * Math.PI);
+    ctx.moveTo(centerX, centerY+9);
+    ctx.arc(centerX, centerY+9, 2, 0, 2 * Math.PI);
     ctx.closePath();
     ctx.strokeStyle = 'red';
     ctx.stroke();
