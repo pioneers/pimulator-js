@@ -91,23 +91,9 @@
                         <div class="card-body text-center border-primary" id="field" style="padding:0px;height:432px">
                             <div class="d-inline-flex flex-row bd-highlight">
                                 <div class="bd-highlight" style="position: relative;">
-                                  <canvas id="fieldCanvas" width="432" height="432"></canvas>
-                                  <svg width="432" height="432" version="1.1" xmlns="http://www.w3.org/2000/svg" style="position: absolute; left: 0px; top: 0px; border:1px solid black">
-                                    <rect x="180"
-                                          y="170"
-                                          width="60"
-                                          height="80"
-                                          rx="6"
-                                          ry="6"
-                                          stroke="navy"
-                                          fill="transparent"
-                                          transform="rotate(0)"
-                                          stroke-width="2"/>
-                                    <circle cx="210" cy="210" r="3" stroke="red" stroke-width="2" fill="red" />
-                                    <circle cx="210" cy="195" r="3" stroke="red" stroke-width="2" fill="red" />
-                                    <circle cx="210" cy="225" r="3" stroke="red" stroke-width="2" fill="red" />
-                                    <polygon points="186,210 192,213.5, 192,206.5" stroke="blue" stroke-width="3" fill="blue" />
-                                  </svg>
+                                  <canvas id="fieldCanvas" width="432" height="432">
+
+                                  </canvas>
                                 </div>
                             </div>
                         </div>
@@ -176,18 +162,25 @@
                                               }
                                               if (theme == 0) {
                                                 cm.setOption("theme",'default');
+                                                cmObjects.setOption("theme",'default');
                                               } else if (theme == 1){
                                                 cm.setOption("theme",'blackboard');
+                                                cmObjects.setOption("theme",'blackboard');
                                               } else if (theme == 2){
                                                 cm.setOption("theme",'monokai');
+                                                cmObjects.setOption("theme",'monokai');
                                               } else if (theme == 3){
                                                 cm.setOption("theme",'cobalt');
+                                                cmObjects.setOption("theme",'cobalt');
                                               } else if (theme == 4){
                                                 cm.setOption("theme",'solarized');
+                                                cmObjects.setOption("theme",'solarized');
                                               } else if (theme == 5){
                                                 cm.setOption("theme",'yeti');
+                                                cmObjects.setOption("theme",'yeti');
                                               } else if (theme == 6){
                                                 cm.setOption("theme",'midnight');
+                                                cmObjects.setOption("theme",'midnight');
                                               }
                                             }
                                         </script>
@@ -289,6 +282,52 @@
                                             </div>
                                         </div>
 
+                                        <!-- Help: Field -->
+                                        <div class="card">
+                                            <div class="card-header" id="help-field-heading">
+                                                <details class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-field-body" aria-expanded="true" aria-controls="help-field-body">
+                                                    <summary>Field</summary>
+                                                </details>
+                                            </div>
+                                            <div id="help-field-body" class="collapse" aria-labelledby="help-field-heading">
+                                                <div class="card-body">
+                                                    <p>
+                                                        The field consists of walls, interactable objects, and tape lines (to be used with line followers).
+                                                        If you wish to update any of the objects, you can update them by uploading your own code in the <b>Field</b> section
+                                                        and pressing the 'Upload Field' button.
+                                                    </p>
+                                                    <p> <b> Walls: </b> </p>
+                                                    <p>
+                                                    Walls are listed under the key <code>wallsData</code> and consist of 4 key-value pairs,
+                                                    with keys <code>x</code>, <code>y</code>, <code>w</code>, <code>h</code>.
+                                                    The <code>x</code> and <code>y</code> values represent the top left corner of the wall.
+                                                    <code>w</code> and <code>h</code> represent the width and height of the line respectively.
+                                                    </p>
+                                                    <p> <b> Interactable Objects:  </b> </p>
+                                                    <p>
+                                                    Interactable objects are listed under the key <code>interactableData</code> and consist of 4 key-value pairs,
+                                                    with keys <code>x</code>, <code>y</code>, <code>w</code>, <code>h</code>.
+                                                    The <code>x</code> and <code>y</code> values represent the top left corner of the wall.
+                                                    </p>
+                                                    <p> Note: Walls and interactable objects can only be oriented perpendicular to the field. </p>
+                                                    <p> <b> Tape Lines: </b></p>
+                                                    <p>
+                                                        Tape lines are listed under the key <code>tapeLinesData</code> and consist of 4 key-value pairs,
+                                                        with keys <code>x1</code>, <code>y1</code>, <code>x2</code>, and <code>y2</code>.
+                                                        The <code>x1</code> and <code>y1</code> coordinates correspond to one end, while the <code>x2</code>, <code>y2</code> coordinates
+                                                        correspond to the opposite end of the line. </p>
+                                                    <p>
+                                                        The field description follows the format of a JSON object.
+                                                        For more information, you can look through the documentation of the JSON object format
+                                                        <a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON">here</a>.
+                                                    </p>
+                                                    <p>
+                                                        For an example field description, view the default configuration in the <b>Field</b> section below.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
                                         <!-- Help: Keyboard -->
                                         <div class="card">
                                             <div class="card-header" id="help-keyboard-heading">
@@ -514,6 +553,29 @@
                                             </div>
                                         </div>
 
+                                        <!--Help: Interactable Objects Tab -->
+                                        <div class="card">
+                                            <div class="card-header" id="help-interactable-heading">
+                                                <details class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-interactable" aria-expanded="true" aria-controls="help-interactable">
+                                                    <summary>Interactable Objects</summary>
+                                                </details>
+                                            </div>
+                                            <div id="help-interactable" class="collapse" aria-labelledby="help-interactable">
+                                                <div class="card-body">
+                                                    <p>
+                                                        Some objects on the field are interactable. Your robot can pick up, move, and drop these objects.
+                                                    </p>
+                                                    <p>
+                                                        When you bring the center of your robot's front side close to the object, you can pick it up using <code>Robot.pick_up()</code>.
+                                                        After you pick up an object, you can move your robot around as usual, and your robot will carry the object on the center of its front side.
+                                                    </p>
+                                                    <p>
+                                                        To drop an object the robot is carrying, use <code>Robot.drop()</code>. After an object is dropped, it will stay in the same place you dropped it, unless you pick it up again.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <!-- Help: Debug Tab -->
                                         <div class="card">
                                             <div class="card-header" id="help-debug-heading">
@@ -547,12 +609,18 @@
                             <a href="#code-mirror" class="nav-link active" id="code-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Code</a>
                         </li>
                         <li class="nav-item">
+                            <a href="#code-mirror-js" class="nav-link" id="code-tab-js" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Field</a>
+                        </li>
+                        <li class="nav-item">
                             <a href="#gamepad-menu" class="nav-link" id="gamepad-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Gamepad</a>
                         </li>
                         <li class="nav-item">
                             <a href="#sensor-menu" class="nav-link" id="sensor-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Sensors</a>
                         </li>
                     </ul>
+                    <div class="p-2">
+                        <button type="button" class="btn btn-success" onclick="uploadObjects()">Upload Field</button>
+                    </div>
                     <div class="p-2">
                         <button type="button" class="btn btn-success" onclick="uploadCode()">Upload Code</button>
                     </div>
@@ -566,6 +634,7 @@
                             <link rel="stylesheet" href="/static/css/codemirror.css?t={[ git_hash }}">
                             <script src="/static/js/python.js?t={{ git_hash }}"></script>
                             <script src="/static/js/comment.js"></script>
+                            <script src="/static/js/autorefresh.js"></script>
                             <link rel="stylesheet" href="/static/css/cobalt.css">
                             <link rel="stylesheet" href="/static/css/monokai.css">
                             <link rel="stylesheet" href="/static/css/solarized.css">
@@ -619,7 +688,6 @@
                                    }
                                  });
                                  CodeMirror.keyMap.default["Shift-Tab"] = "indentLess";
-                                  // var code = getCookie("code");
                                   var code = localStorage.getItem("code")
                                   if (code == "" || code === null) {
                                     var xhr=new XMLHttpRequest();
@@ -637,7 +705,60 @@
                                 </script>
                             </div>
                         </div>
+                        <div class="tab-pane fade" id="code-mirror-js" role="tabpanel" aria-labelledby="code-tab-js">
+                          <div class="container" id="cmblock-js" style="padding-left:0px;padding-right:0px">
+                            <script src="/static/js/javascript.js"></script>
 
+                            <script>
+                            var cmObjects = CodeMirror(document.getElementById("cmblock-js"), { //place the codemirror inside the div container
+                              value: "",
+                              mode:  "javascript",
+                              lineNumbers: true,
+                              keyMap: "sublime",
+                              indentUnit: 4,
+                              autoRefresh:true,
+                              autoCloseBrackets: true,
+                              matchBrackets: true,
+                              showCursorWhenSelecting: true,
+                              theme: "default",
+                              comment: true,
+                              tabSize: 4
+                            });
+
+                            cmObjects.setSize(width="100%", height="1000px");
+                            cmObjects.setOption("extraKeys", {
+                              Tab: function(cm) {
+                                if (cm.somethingSelected()) {
+                                  cm.indentSelection("add");
+                                } else {
+                                  cm.replaceSelection(cm.getOption("indentWithTabs")? "\t":
+                                  Array(cm.getOption("indentUnit") + 1).join(" "), "end", "+input");
+                                }
+                              }
+                            });
+                            CodeMirror.keyMap.default["Shift-Tab"] = "indentLess";
+                            var objectsCode = localStorage.getItem("objectsCode");
+                            if (objectsCode == "" || objectsCode === null) {
+                              var xhrJS=new XMLHttpRequest();
+                              xhrJS.open("GET","/static/field.json?t={[ git_hash }}");
+                              xhrJS.onload = () => {
+                                objectsCode = xhrJS.responseText;
+                                cmObjects.setValue(objectsCode);
+                                setTimeout(function() {
+                                  cmObjects.refresh();
+                                },1);
+                              }
+                              xhrJS.send();
+                            }
+                            else {
+                              cmObjects.setValue(objectsCode)
+                              setTimeout(function() {
+                                cmObjects.refresh();
+                              },1);
+                            }
+                          </script>
+                          </div>
+                        </div>
                         <!-- Gamepad Readings -->
                         <div class="tab-pane fade" id="gamepad-menu" role="tabpanel" aria-labelledby="gamepad-tab">
                             <div class="container">

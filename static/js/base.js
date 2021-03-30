@@ -7,11 +7,13 @@ var robotType = "medium";
 var direction = 0;
 var codeUploaded = false;
 const scaleFactor = 3;
+const canvas = document.getElementById('fieldCanvas');
+const ctx = canvas.getContext('2d');
 
 // Handle messages from worker
 function onmessage(e) {
-    if (e.data.robot !== undefined) {
-        update(e.data.robot);
+    if (e.data.robot !== undefined && e.data.objects !== undefined) {
+        update(e.data.robot, e.data.objects);
     }
     if (e.data.sensors !== undefined) {
         updateSensors(e.data.sensors);
@@ -35,20 +37,79 @@ function onmessage(e) {
 }
 worker.onmessage = onmessage;
 
+function drawRobot(robot) {
+    // Update text
+    document.getElementById("demo").innerHTML = "x: " + robot.X.toFixed(2) + ", y: " + robot.Y.toFixed(2);
+
+    // Draw the robot
+    const centerX = robot.X * scaleFactor;
+    const centerY = robot.Y * scaleFactor;
+    const dir = robot.dir/180*Math.PI;  // Convert to Radians
+
+    // Draw Rectangle
+    ctx.lineWidth = 2;
+    const topLeftCornerX = centerX - 30;
+    const topLeftCornerY = centerY - 40;
+
+    // Translate to and rotate about the center of the robot
+    ctx.translate(centerX, centerY);
+    ctx.rotate(dir);
+    ctx.translate(-centerX, -centerY);
+
+    ctx.beginPath();
+    ctx.rect(topLeftCornerX, topLeftCornerY, 60, 80);
+    ctx.closePath();
+    ctx.strokeStyle = 'navy';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // Draw Circles
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, 3, 0, 2 * Math.PI);
+    ctx.moveTo(centerX, centerY-15);
+    ctx.arc(centerX, centerY-15, 3, 0, 2 * Math.PI);
+    ctx.moveTo(centerX, centerY+15);
+    ctx.arc(centerX, centerY+15, 3, 0, 2 * Math.PI);
+    ctx.closePath();
+    ctx.strokeStyle = 'red';
+    ctx.stroke();
+    ctx.fillStyle = 'red';
+    ctx.fill();
+    // Draw Triangle
+    ctx.beginPath();
+    ctx.moveTo(centerX-24, centerY);
+    ctx.lineTo(centerX-18, centerY+3.5);
+    ctx.lineTo(centerX-18, centerY-3.5);
+    ctx.lineTo(centerX-24, centerY);
+    ctx.closePath();
+    ctx.strokeStyle = 'blue';
+    ctx.stroke();
+    ctx.fillStyle = 'blue';
+    ctx.fill();
+
+    // Translate to and rotate back
+    ctx.translate(centerX, centerY);
+    ctx.rotate(-dir);
+    ctx.translate(-centerX, -centerY);
+}
+drawRobot({
+    X: Number($("#xpos").val()),
+    Y: Number($("#ypos").val()),
+    dir: direction
+});
+
 function drawObjs(objs, type) {
     /* Draw objects received from the worker. */
-    const canvas = document.getElementById('fieldCanvas');
-    const ctx = canvas.getContext('2d');
+
     if (type === "obstacle") {
         for (let i = 0; i < objs.length; i++) {
             ctx.beginPath();
+            ctx.moveTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
+            ctx.lineTo(objs[i].topR[0]*scaleFactor, objs[i].topR[1]*scaleFactor);
+            ctx.lineTo(objs[i].botR[0]*scaleFactor, objs[i].botR[1]*scaleFactor);
+            ctx.lineTo(objs[i].botL[0]*scaleFactor, objs[i].botL[1]*scaleFactor);
             ctx.fillStyle = objs[i].color;
-            ctx.fillRect(
-                objs[i].x*scaleFactor,
-                objs[i].y*scaleFactor,
-                objs[i].w*scaleFactor,
-                objs[i].h*scaleFactor
-            );
+            ctx.fill();
         }
     } else if (type === "tapeLine") {
         ctx.lineWidth = 5;
@@ -63,6 +124,10 @@ function drawObjs(objs, type) {
             ctx.stroke();
         }
     }
+}
+
+function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 /* Switch input mode between 'keyboard' and 'gamepad' */
@@ -105,52 +170,56 @@ document.addEventListener('keyup', up);
 // "Upload Code" button sends code to the worker
 function uploadCode() {
     code = cm.getValue();
-    localStorage.setItem("code",code);
+    localStorage.setItem("code", code);
     worker.postMessage({code:code, newCode:true});
     codeUploaded = true;
-};
+}
 
-function update(state) {
+function uploadObjects(){
+    if (mode === "idle") {
+        clearCanvas();
+    }
+    objectsCode = cmObjects.getValue();
+    localStorage.setItem("objectsCode", objectsCode);
+    worker.postMessage({objectsCode:objectsCode, newObjects:true});
+    log("Field upload successful");
+    if (mode === "auto") {
+        log("Field will update when autonomous simulation ends")
+    }
+    if (mode === "idle") {
+        // Redraw robot
+        // TODO: Get robot position and direction from settings
+        let robot = {
+            X: Number($("#xpos").val()),
+            Y: Number($("#ypos").val()),
+            dir: direction
+        };
+        drawRobot(robot);
+    }
+}
+
+function uploadObjectsOnce() {
+    if (objectsCode !== null) {
+        worker.postMessage({objectsCode:objectsCode, newObjects:false});
+        // worker.postMessage({drawObjs:true});
+    } else {
+        setTimeout(uploadObjectsOnce, 100);
+    }
+}
+uploadObjectsOnce();
+
+function update(robot, objects) {
     /*
     Update the state (position and direction) of the center of the robot.
     Input position is in inches. scaleFactor convers inches -> pixels.
     Example of state: {x:72, y:72, dir:0}
     */
-    const centerX = state.X * scaleFactor;
-    const centerY = state.Y * scaleFactor;
-    const dir = state.dir/180*Math.PI;  // Convert to Radians
-    document.getElementById("demo").innerHTML = "x: " + state.X.toFixed(2) + ", y: " + state.Y.toFixed(2)
-    const sensorPoints = document.querySelectorAll("circle")
+    clearCanvas();
 
-    // Set sensors
-    sensorPoints[0].setAttributeNS(null, "cx", centerX)
-    sensorPoints[0].setAttributeNS(null, "cy", centerY)
-    sensorPoints[1].setAttributeNS(null, "cy", centerY+(15*Math.cos(dir)))
-    sensorPoints[1].setAttributeNS(null, "cx", centerX+(-15*Math.sin(dir)))
-    sensorPoints[2].setAttributeNS(null, "cy", centerY-(15*Math.cos(dir)))
-    sensorPoints[2].setAttributeNS(null, "cx", centerX-(-15*Math.sin(dir)))
+    drawObjs(objects.tapeLines, "tapeLine");
+    drawObjs(objects.obstacles, "obstacle");
 
-    // Set robot coordinates
-    const topLeftCornerX = centerX - 30
-    const topLeftCornerY = centerY - 40
-    const robotRect = document.querySelector("rect")
-    robotRect.setAttributeNS(null, "x", topLeftCornerX)
-    robotRect.setAttributeNS(null, "y", topLeftCornerY)
-    const rotateStr = `rotate(${state.dir} ${centerX} ${centerY})`
-    robotRect.setAttribute("transform", rotateStr)
-
-    // Set triangle on robot
-    const triangle = document.querySelector("polygon")
-    const dirRotate = (state.dir+90)/180*Math.PI
-    const topTriangleX = centerX - 24*Math.sin(dirRotate)
-    const topTriangleY = centerY + 24*Math.cos(dirRotate)
-    const baseTriangleX = 3*topTriangleX/4 +  1* centerX/4
-    const baseTriangleY = 3*topTriangleY/4 + 1*centerY/4
-    const sideDist = 6/Math.sqrt(3)
-    const trianglePoint2 = `${baseTriangleX-sideDist*Math.sin(dir)},${baseTriangleY+sideDist*Math.cos(dir)} `
-    const trianglePoint3 = `${baseTriangleX+sideDist*Math.sin(dir)},${baseTriangleY-sideDist*Math.cos(dir)}`
-    const triangleStr = `${topTriangleX},${topTriangleY} ` + trianglePoint2 + trianglePoint3;
-    triangle.setAttributeNS(null, "points",triangleStr);
+    drawRobot(robot);
 }
 
 function updateSensors(sensorValues) {
@@ -234,6 +303,7 @@ function stop() {
     worker.onmessage = onmessage;
     worker.postMessage({gitHash: gitHash});
     worker.postMessage({code:code});
+    worker.postMessage({objectsCode:objectsCode});
     mode = "idle";
     autonomousReset()
 };
