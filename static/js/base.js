@@ -6,13 +6,18 @@ var inputMode = "keyboard";
 var robotType = "medium";
 var codeUploaded = false;
 const scaleFactor = 3;
-var obstacles = [];
-var tapelines = [];
+const canvas = document.getElementById('fieldCanvas');
+const ctx = canvas.getContext('2d');
+var globalRobot = null;
+var globalObjects = null;
+
+// var obstacles = [];
+// var tapelines = [];
 
 // Handle messages from worker
 function onmessage(e) {
-    if (e.data.robot !== undefined) {
-        update(e.data.robot);
+    if (e.data.robot !== undefined && e.data.objects !== undefined) {
+        update(e.data.robot, e.data.objects);
     }
     if (e.data.sensors !== undefined) {
         updateSensors(e.data.sensors);
@@ -36,122 +41,14 @@ function onmessage(e) {
 }
 worker.onmessage = onmessage;
 
-function drawObjs(objs, type) {
-    /* Draw objects received from the worker. */
+function drawRobot(robot) {
+    // Update text
+    document.getElementById("demo").innerHTML = "x: " + robot.X.toFixed(2) + ", y: " + robot.Y.toFixed(2);
 
-    if (type === "obstacle") {
-        obstacles = objs;
-        for (let i = 0; i < objs.length; i++) {
-            ctx.beginPath();
-            ctx.moveTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
-            ctx.lineTo(objs[i].topR[0]*scaleFactor, objs[i].topR[1]*scaleFactor);
-            ctx.lineTo(objs[i].botR[0]*scaleFactor, objs[i].botR[1]*scaleFactor);
-            ctx.lineTo(objs[i].botL[0]*scaleFactor, objs[i].botL[1]*scaleFactor);
-            ctx.fillStyle = objs[i].color;
-            ctx.fill();
-        }
-    } else if (type === "tapeLine") {
-        tapelines = objs;
-        ctx.lineWidth = 5;
-        for (let i = 0; i < objs.length; i++) {
-            ctx.beginPath();
-            ctx.strokeStyle = objs[i].color;
-            ctx.moveTo(objs[i].startX*scaleFactor, objs[i].startY*scaleFactor)
-            ctx.lineTo(
-                objs[i].endX*scaleFactor,
-                objs[i].endY*scaleFactor,
-            );
-            ctx.stroke();
-        }
-    }
-}
-
-/* Switch input mode between 'keyboard' and 'gamepad' */
-function switchInput(newInputMode) {
-    // Toggle previously activated button off (or retoggle currently activated button on)
-    $("#" + inputMode + "-btn").button('toggle');
-    inputMode = newInputMode;
-}
-
-/* Switch robot type between 'light', 'medium', and 'heavy' */
-function switchRobotType(newRobotType) {
-    // Toggle previously activated button off (or retoggle currently activated button on)
-    $("#" + robotType + "-btn").button('toggle');
-    robotType = newRobotType;
-}
-
-// In teleop mode, if the input is set to the keyboard, send keyCodes to the worker
-function down(e){
-    if (mode === "teleop") {
-        if (inputMode === "keyboard") {
-            worker.postMessage({keyMode: inputMode, keyCode: e.keyCode, up: false});
-        }
-    }
-}
-function up(e){
-    if (mode === "teleop") {
-        if (inputMode === "keyboard") {
-            worker.postMessage({keyMode: inputMode, keyCode: e.keyCode, up: true});
-        }
-    }
-}
-document.addEventListener('keydown', down);
-document.addEventListener('keyup', up);
-
-// "Upload Code" button sends code to the worker
-function uploadCode() {
-    code = cm.getValue();
-    localStorage.setItem("code", code);
-    worker.postMessage({code:code, newCode:true});
-    codeUploaded = true;
-}
-
-function uploadObjects(){
-    objectsCode = cmObjects.getValue();
-    localStorage.setItem("objectsCode", objectsCode);
-    worker.postMessage({objectsCode:objectsCode, newObjects:true});
-}
-
-function uploadObjectsOnce() {
-    if (objectsCode !== null) {
-        worker.postMessage({objectsCode:objectsCode, newObjects:false});
-        worker.postMessage({drawObjs:true});
-    } else {
-        setTimeout(uploadObjectsOnce, 100);
-    }
-}
-uploadObjectsOnce();
-
-function update(state) {
-    /*
-    Update the state (position and direction) of the center of the robot.
-    Input position is in inches. scaleFactor convers inches -> pixels.
-    Example of state: {x:72, y:72, dir:0}
-    */
-    const centerX = state.X * scaleFactor;
-    const centerY = state.Y * scaleFactor;
-    const dir = state.dir/180*Math.PI;  // Convert to Radians
-    document.getElementById("demo").innerHTML = "x: " + state.X.toFixed(2) + ", y: " + state.Y.toFixed(2);
-    //const sensorPoints = document.querySelectorAll("circle")
-
-    const canvas = document.getElementById('fieldCanvas');
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    if (state.attachedObj !== undefined) {
-        //move the object
-        ctx.beginPath();
-        ctx.moveTo(centerX - 30 - (state.attachedObj.h * scaleFactor), centerY - (state.attachedObj.w * scaleFactor) / 2);
-        ctx.rect(centerX - 30 - (state.attachedObj.h * scaleFactor), centerY - (state.attachedObj.w * scaleFactor) / 2, state.attachedObj.w * scaleFactor, state.attachedObj.h * scaleFactor);
-        ctx.closePath();
-        ctx.strokeStyle = 'green';
-        ctx.stroke();
-        ctx.fillStyle = 'green';
-        ctx.fill();
-    }
-
-    drawObjs(tapelines, "tapeLine");
-    drawObjs(obstacles, "obstacle");
+    // Draw the robot
+    const centerX = robot.X * scaleFactor;
+    const centerY = robot.Y * scaleFactor;
+    const dir = robot.dir/180*Math.PI;  // Convert to Radians
 
     // Draw Rectangle
     ctx.lineWidth = 2;
@@ -198,6 +95,132 @@ function update(state) {
     ctx.translate(centerX, centerY);
     ctx.rotate(-dir);
     ctx.translate(-centerX, -centerY);
+}
+drawRobot({
+    X: Number($("#xpos").val()),
+    Y: Number($("#ypos").val()),
+    dir: 0
+});
+
+function drawObjs(objs, type) {
+    /* Draw objects received from the worker. */
+
+    if (type === "obstacle") {
+        // obstacles = objs;
+        for (let i = 0; i < objs.length; i++) {
+            ctx.beginPath();
+            ctx.moveTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
+            ctx.lineTo(objs[i].topR[0]*scaleFactor, objs[i].topR[1]*scaleFactor);
+            ctx.lineTo(objs[i].botR[0]*scaleFactor, objs[i].botR[1]*scaleFactor);
+            ctx.lineTo(objs[i].botL[0]*scaleFactor, objs[i].botL[1]*scaleFactor);
+            ctx.fillStyle = objs[i].color;
+            ctx.fill();
+        }
+    } else if (type === "tapeLine") {
+        // tapelines = objs;
+        ctx.lineWidth = 5;
+        for (let i = 0; i < objs.length; i++) {
+            ctx.beginPath();
+            ctx.strokeStyle = objs[i].color;
+            ctx.moveTo(objs[i].startX*scaleFactor, objs[i].startY*scaleFactor)
+            ctx.lineTo(
+                objs[i].endX*scaleFactor,
+                objs[i].endY*scaleFactor,
+            );
+            ctx.stroke();
+        }
+    }
+}
+
+function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+/* Switch input mode between 'keyboard' and 'gamepad' */
+function switchInput(newInputMode) {
+    // Toggle previously activated button off (or retoggle currently activated button on)
+    $("#" + inputMode + "-btn").button('toggle');
+    inputMode = newInputMode;
+}
+
+/* Switch robot type between 'light', 'medium', and 'heavy' */
+function switchRobotType(newRobotType) {
+    // Toggle previously activated button off (or retoggle currently activated button on)
+    $("#" + robotType + "-btn").button('toggle');
+    robotType = newRobotType;
+}
+
+// In teleop mode, if the input is set to the keyboard, send keyCodes to the worker
+function down(e){
+    if (mode === "teleop") {
+        if (inputMode === "keyboard") {
+            worker.postMessage({keyMode: inputMode, keyCode: e.keyCode, up: false});
+        }
+    }
+}
+function up(e){
+    if (mode === "teleop") {
+        if (inputMode === "keyboard") {
+            worker.postMessage({keyMode: inputMode, keyCode: e.keyCode, up: true});
+        }
+    }
+}
+document.addEventListener('keydown', down);
+document.addEventListener('keyup', up);
+
+// "Upload Code" button sends code to the worker
+function uploadCode() {
+    code = cm.getValue();
+    localStorage.setItem("code", code);
+    worker.postMessage({code:code, newCode:true});
+    codeUploaded = true;
+}
+
+function uploadObjects(){
+    if (mode === "idle") {
+        clearCanvas();
+    }
+    objectsCode = cmObjects.getValue();
+    localStorage.setItem("objectsCode", objectsCode);
+    worker.postMessage({objectsCode:objectsCode, newObjects:true});
+    log("Field upload successful");
+    if (mode === "auto") {
+        log("Field will update when autonomous simulation ends")
+    }
+    if (mode === "idle") {
+        // Redraw robot
+        // TODO: Get robot position and direction from settings
+        let robot = {
+            X: Number($("#xpos").val()),
+            Y: Number($("#ypos").val()),
+            dir: 0
+        };
+        drawRobot(robot);
+    }
+}
+
+function uploadObjectsOnce() {
+    if (objectsCode !== null) {
+        worker.postMessage({objectsCode:objectsCode, newObjects:false});
+        // worker.postMessage({drawObjs:true});
+    } else {
+        setTimeout(uploadObjectsOnce, 100);
+    }
+}
+uploadObjectsOnce();
+
+function update(robot, objects) {
+    /*
+    Update the state (position and direction) of the center of the robot.
+    Input position is in inches. scaleFactor convers inches -> pixels.
+    Example of state: {x:72, y:72, dir:0}
+    */
+    clearCanvas();
+
+    drawObjs(objects.tapeLines, "tapeLine");
+    drawObjs(objects.obstacles, "obstacle");
+
+    drawRobot(robot);
 }
 
 function updateSensors(sensorValues) {

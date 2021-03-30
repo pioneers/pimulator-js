@@ -94,43 +94,6 @@
                                   <canvas id="fieldCanvas" width="432" height="432">
 
                                   </canvas>
-
-                                  <script>
-                                      const canvas = document.getElementById('fieldCanvas');
-                                      const ctx = canvas.getContext('2d');
-
-                                      // Draw Rectangle
-                                      ctx.beginPath();
-                                      ctx.rect(180, 170, 60, 80);
-                                      ctx.closePath();
-                                      ctx.strokeStyle = 'navy';
-                                      ctx.lineWidth = 2;
-                                      ctx.stroke();
-                                      // Draw Circles
-                                      ctx.beginPath();
-                                      ctx.moveTo(210, 210);
-                                      ctx.arc(210, 210, 3, 0, 2 * Math.PI);
-                                      ctx.moveTo(210, 195);
-                                      ctx.arc(210, 195, 3, 0, 2 * Math.PI);
-                                      ctx.moveTo(210, 225);
-                                      ctx.arc(210, 225, 3, 0, 2 * Math.PI);
-                                      ctx.closePath();
-                                      ctx.strokeStyle = 'red';
-                                      ctx.stroke();
-                                      ctx.fillStyle = 'red';
-                                      ctx.fill();
-                                      // Draw Triangle
-                                      ctx.beginPath();
-                                      ctx.moveTo(186, 210);
-                                      ctx.lineTo(192, 213.5);
-                                      ctx.lineTo(192, 206.5);
-                                      ctx.lineTo(186, 210);
-                                      ctx.closePath();
-                                      ctx.strokeStyle = 'blue';
-                                      ctx.stroke();
-                                      ctx.fillStyle = 'blue';
-                                      ctx.fill();
-                                  </script>
                                 </div>
                             </div>
                         </div>
