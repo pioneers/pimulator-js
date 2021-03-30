@@ -4,6 +4,7 @@ worker.postMessage({gitHash: gitHash});
 var timer;
 var inputMode = "keyboard";
 var robotType = "medium";
+var direction = 0;
 var codeUploaded = false;
 const scaleFactor = 3;
 const canvas = document.getElementById('fieldCanvas');
@@ -150,6 +151,11 @@ function switchRobotType(newRobotType) {
     robotType = newRobotType;
 }
 
+/* Switch robot starting direction (in degrees) between 0 (left), 90 (up), and 180 (right), and 270 (down) */
+function switchDirection(newDirection) {
+    direction = newDirection;
+}
+
 // In teleop mode, if the input is set to the keyboard, send keyCodes to the worker
 function down(e){
     if (mode === "teleop") {
@@ -249,7 +255,8 @@ function start(auto=false) {
             let robotInfo = {
                 robotType: robotType,
                 xpos: $("#xpos").val(),
-                ypos: $("#ypos").val()
+                ypos: $("#ypos").val(),
+                dir: direction
             }
 
             if (auto === false) {

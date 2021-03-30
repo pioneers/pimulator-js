@@ -58,7 +58,7 @@ class RobotClass {
         this.Wr = 0.0;           // requested angular velocity of r wheel, radians/s
         this.ltheta = 0.0;       // angular position of l wheel, degrees
         this.rtheta = 0.0;       // angular position of r wheel, degrees
-        this.dir = 0.0;          // Direction of the robot facing, degrees
+        this.dir = robotInfo.dir;          // Direction of the robot facing, degrees
         this.currentLv = 0;       // current velocity of left wheel, in inches/s
         this.currentRv = 0;       // current velocity of right wheel, in inches/s
 
@@ -96,8 +96,8 @@ class RobotClass {
         this.wheelWidth = robotTypeNum / 5 * 20;       // Larger robots have a wider wheelbase
 
         // Set robot position
-        this.X = this.getValidXPosition(robotInfo.xpos); // current X position of the center of the robot
-        this.Y = this.getValidYPosition(robotInfo.ypos); // current Y position of the center of the robot
+        this.X = this.getValidXPosition(robotInfo.xpos, robotInfo.dir); // current X position of the center of the robot
+        this.Y = this.getValidYPosition(robotInfo.ypos, robotInfo.dir); // current Y position of the center of the robot
 
         // Set robot corner positions
         // Corners are relative to the robot facing up
@@ -129,31 +129,39 @@ class RobotClass {
 
     /** Validate the input starting X coordinate of the robot
     *   pos is the value we want to set the coordinate to */
-   getValidXPosition(pos) {
+   getValidXPosition(pos, dir) {
         // Check is pos is a number or not
         let posNum = Number(pos);
         if (isNaN(posNum)) {
             return this.startXDefault;
         }
         // Bound the coordinate
-        posNum = Math.max(posNum, this.height/2 + 3);
-        posNum = Math.min(posNum, this.MaxX - this.height/2 - 3);
-
+        if (dir == 0 || dir == 180) {
+          posNum = Math.max(posNum, this.height/2 + 3);
+          posNum = Math.min(posNum, this.MaxX - this.height/2 - 3);
+        } else {
+          posNum = Math.max(posNum, this.width/2 + 3);
+          posNum = Math.min(posNum, this.MaxX - this.width/2 - 3);
+        }
         return posNum
     }
 
     /** Validate the input starting Y coordinate of the robot
     *   pos is the value we want to set the coordinate to */
-    getValidYPosition(pos) {
+    getValidYPosition(pos, dir) {
         // Check is pos is a number or not
         let posNum = Number(pos);
         if (isNaN(posNum)) {
             return this.startYDefault;
         }
         // Bound the coordinate
-        posNum = Math.max(posNum, this.width/2 + 3);
-        posNum = Math.min(posNum, this.MaxY - this.width/2 - 3);
-
+        if (dir == 90 || dir == 270) {
+          posNum = Math.max(posNum, this.height/2 + 3);
+          posNum = Math.min(posNum, this.MaxY - this.height/2 - 3);
+        } else {
+          posNum = Math.max(posNum, this.width/2 + 3);
+          posNum = Math.min(posNum, this.MaxY - this.width/2 - 3);
+        }
         return posNum
     }
 
