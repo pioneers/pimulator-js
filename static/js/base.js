@@ -79,9 +79,8 @@ function switchRobotType(newRobotType) {
     robotType = newRobotType;
 }
 
+/* Switch robot starting direction (in degrees) between 0 (left), 90 (up), and 180 (right), and 270 (down) */
 function switchDirection(newDirection) {
-    const directionArray = ["left", "up", "right", "down"]
-    $("#" + directionArray[direction / 90] + "-btn").button('toggle');
     direction = newDirection;
 }
 
