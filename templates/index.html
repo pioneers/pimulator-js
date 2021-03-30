@@ -192,18 +192,31 @@
 
                                     <h4>Robot</h4>
                                     <p><b> Starting position refers to the center of the robot, where the top left corner of the field is (0, 0).</b></p>
-                                    <p>
-                                    <label for="xpos">Starting Robot X-Position:</label>
-                                    <input type="number" step="0.001" id="xpos" name="xpos" value=70.0>
-                                    <br>
-                                    <label for="ypos">Starting Robot Y-Position:</label>
-                                    <input type="number" step="0.001" id="ypos" name="ypos" value=70.0>
-                                    </p>
+                                    <p><div class="dropdown">
+                                        <label for="xpos">Starting X:</label>
+                                        <input type="number" step="0.001" id="xpos" name="xpos" value=70.0 style="width: 60px;">
+                                        <label for="ypos">Y:</label>
+                                        <input type="number" step="0.001" id="ypos" name="ypos" value=70.0 style="width: 60px;">
+                                        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownDirMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Direction <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownDirMenuButton">
+                                            <li><a class="dropdown-item" href="#" onclick="switchDirection(0)">Left</a></li>
+                                            <li><a class="dropdown-item" href="#" onclick="switchDirection(90)">Up</a></li>
+                                            <li><a class="dropdown-item" href="#" onclick="switchDirection(180)">Right</a></li>
+                                            <li><a class="dropdown-item" href="#" onclick="switchDirection(270)">Down</a></li>
+                                        </ul>
+                                        <script>
+                                            $(".dropdown-menu li a").click(function(){
+                                                $("#dropdownDirMenuButton").html($(this).text()+' <span class="caret"></span>');
+                                            });
+                                        </script>
+                                    </div></p>
 
                                     <p id="input-mode">Robot Type:
-                                    <button type="button" id="light-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchRobotType('light')">Spry</button>
-                                    <button type="button" id="medium-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchRobotType('medium')">Swift</button>
-                                    <button type="button" id="heavy-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchRobotType('heavy')">Sturdy</button>
+                                        <button type="button" id="light-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchRobotType('light')">Spry</button>
+                                        <button type="button" id="medium-btn" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="switchRobotType('medium')">Swift</button>
+                                        <button type="button" id="heavy-btn" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="switchRobotType('heavy')">Sturdy</button>
                                     </p>
                                 </div>
 
