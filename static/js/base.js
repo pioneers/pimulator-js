@@ -270,7 +270,7 @@ function start(auto=false) {
             // Send the list of objects 
             worker.postMessage({objectsCode:objectsCode});
 
-            //  Collect the new robot position and direction
+            //  Collect the robot start position and direction
             let robotInfo = {
                 robotType: robotType,
                 xpos: $("#xpos").val(),
