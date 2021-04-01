@@ -205,14 +205,13 @@ function uploadObjects(){
     }
     objectsCode = cmObjects.getValue();
     localStorage.setItem("objectsCode", objectsCode);
-    worker.postMessage({objectsCode:objectsCode, newObjects:true});
+    worker.postMessage({objectsCode:objectsCode});
     log("Field upload successful");
     if (mode === "auto") {
         log("Field will update when autonomous simulation ends")
     }
     if (mode === "idle") {
         // Redraw robot
-        // TODO: Get robot position and direction from settings
         let robot = {
             X: Number($("#xpos").val()),
             Y: Number($("#ypos").val()),
@@ -224,8 +223,7 @@ function uploadObjects(){
 
 function uploadObjectsOnce() {
     if (objectsCode !== null) {
-        worker.postMessage({objectsCode:objectsCode, newObjects:false});
-        // worker.postMessage({drawObjs:true});
+        worker.postMessage({objectsCode:objectsCode});
     } else {
         setTimeout(uploadObjectsOnce, 100);
     }
@@ -269,13 +267,18 @@ function start(auto=false) {
     else {
         clearInterval(timer);
         if (codeUploaded) {
+            // Send the list of objects 
+            worker.postMessage({objectsCode:objectsCode});
+
+            //  Collect the new robot position and direction
             let robotInfo = {
                 robotType: robotType,
                 xpos: $("#xpos").val(),
                 ypos: $("#ypos").val(),
                 dir: direction
             }
-
+            
+            // Start the simulation
             if (auto === false) {
                 $("#teleop-btn").removeClass("btn-outline-primary").addClass("btn-primary")
                 worker.postMessage({start:true, mode:"teleop", robotInfo:robotInfo})
@@ -327,7 +330,6 @@ function stop() {
     worker.onmessage = onmessage;
     worker.postMessage({gitHash: gitHash});
     worker.postMessage({code:code});
-    worker.postMessage({objectsCode:objectsCode});
     mode = "idle";
     autonomousReset()
 };
