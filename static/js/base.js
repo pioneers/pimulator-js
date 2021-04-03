@@ -48,19 +48,18 @@ function drawRobot(robot) {
 
     let robotWidth = 26.7;
     let robotHeight = 20;
-
-    // if (robotType === "light") {
-    //     robotWidth = 14.18;      // Robot width, inches
-    //     robotHeight = 12.5;      // Robot height, inches
-    // }
-    // else if (robotType == "medium") {
-    //     robotWidth = 19.3;
-    //     robotHeight = 14;
-    // }
-    // else if (robotType === "heavy") {
-    //     robotWidth = 5;
-    //     robotHeight = 3;
-    // }
+    if (robot.type == "light") {
+        robotWidth = 14.18;      // Robot width, inches
+        robotHeight = 12.5;      // Robot height, inches
+    }
+    else if (robot.type == "medium") {
+        robotWidth = 19.3;
+        robotHeight = 14;
+    }
+    else if (robot.type == "heavy") {
+        robotWidth = 10.7;
+        robotHeight = 14.06;
+    }
 
     // coordinates of center of front side of robot (for drawing sensors)
     const scaledTopRX = (robot.X - robotHeight/2) * scaleFactor;
@@ -72,8 +71,8 @@ function drawRobot(robot) {
 
     // Draw Rectangle
     ctx.lineWidth = 2;
-    const topLeftCornerX = centerX - 30;
-    const topLeftCornerY = centerY - 40;
+    const topLeftCornerX = centerX - (robotHeight * scaleFactor) / 2;
+    const topLeftCornerY = centerY - (robotWidth * scaleFactor) / 2;
 
     // Translate to and rotate about the center of the robot
     ctx.translate(centerX, centerY);
@@ -81,7 +80,7 @@ function drawRobot(robot) {
     ctx.translate(-centerX, -centerY);
 
     ctx.beginPath();
-    ctx.rect(topLeftCornerX, topLeftCornerY, 60, 80);
+    ctx.rect(topLeftCornerX, topLeftCornerY, robotHeight * scaleFactor, robotWidth * scaleFactor);
     ctx.closePath();
     ctx.strokeStyle = 'navy';
     ctx.lineWidth = 2;
@@ -101,10 +100,10 @@ function drawRobot(robot) {
     ctx.fill();
     // Draw Triangle
     ctx.beginPath();
-    ctx.moveTo(centerX-24, centerY);
-    ctx.lineTo(centerX-18, centerY+3.5);
-    ctx.lineTo(centerX-18, centerY-3.5);
-    ctx.lineTo(centerX-24, centerY);
+    ctx.moveTo(frontCenterX + 6, frontCenterY);
+    ctx.lineTo(frontCenterX + 11, frontCenterY + 3);
+    ctx.lineTo(frontCenterX + 11, frontCenterY - 3);
+    ctx.lineTo(frontCenterX + 6, frontCenterY);
     ctx.closePath();
     ctx.strokeStyle = 'blue';
     ctx.stroke();
@@ -119,7 +118,8 @@ function drawRobot(robot) {
 drawRobot({
     X: Number($("#xpos").val()),
     Y: Number($("#ypos").val()),
-    dir: direction
+    dir: direction,
+    type: robotType
 });
 
 function drawObjs(objs, type) {
@@ -218,7 +218,8 @@ function uploadObjects(){
         let robot = {
             X: Number($("#xpos").val()),
             Y: Number($("#ypos").val()),
-            dir: direction
+            dir: direction,
+            type: robotType
         };
         drawRobot(robot);
     }

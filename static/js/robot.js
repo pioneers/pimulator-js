@@ -63,31 +63,31 @@ class RobotClass {
         this.currentRv = 0;       // current velocity of right wheel, in inches/s
 
         // Set robot attributes based on type
-        let robotType = robotInfo.robotType;
+        this.robotType = robotInfo.robotType;
         const validTypes = ["light", "medium", "heavy"];
-        if (!validTypes.includes(robotType)) {
-            robotType = "medium"; // robot type is medium by default
+        if (!validTypes.includes(this.robotType)) {
+            this.robotType = "medium"; // robot type is medium by default
         }
         let robotTypeNum;
-        if (robotType === "light") {
+        if (this.robotType === "light") {
             robotTypeNum = 3;
-            // this.width = 14.18;      // Robot width, inches
-            // this.height = 12.5;      // Robot height, inches
+            this.width = 14.18;      // Robot width, inches
+            this.height = 12.5;      // Robot height, inches
             this.wheelWidth = 9.06;  // Wheelbase width, inches
         }
-        else if (robotType === "medium") {
+        else if (this.robotType === "medium") {
             robotTypeNum = 4;
-            // this.width = 19.3;
-            // this.height = 14;
+            this.width = 19.3;
+            this.height = 14;
             this.wheelWidth = 12.39;
         }
-        else if (robotType === "heavy") {
+        else if (this.robotType === "heavy") {
             robotTypeNum = 5;
-            // this.width = 10.7;
-            // this.height = 14.06;
+            this.width = 10.7;
+            this.height = 14.06;
             this.wheelWidth = 8.98;
         }
-
+        
         // Max speed is 0.628 m/s = 24.72 in/s and max acceleration is 0.55 m/s^2 = 21.65 in/s^2
         // Refresh rate = 0.05/s
         // Max speed is 1.236 in/tick and max acceleration is 0.05413 in/tick^2
@@ -426,8 +426,7 @@ class RobotClass {
             X: this.X,
             Y: this.Y,
             dir: this.dir,
-            width: this.width,
-            height: this.height
+            type: this.robotType
         };
 
         if (this.attachedObj) {
