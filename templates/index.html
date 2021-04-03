@@ -237,9 +237,9 @@
                                                         complete'), the simulator is ready for use.
                                                     </p>
                                                     <p>
-                                                        You can copy/paste code into 'Code' tab or type in your code there directly. 
-                                                        Be sure to upload your code using the 'Upload Code' button. 
-                                                        When your code has been uploaded, the console will output 'Code upload successful'. 
+                                                        You can copy/paste code into 'Code' tab or type in your code there directly.
+                                                        Be sure to upload your code using the 'Upload Code' button.
+                                                        When your code has been uploaded, the console will output 'Code upload successful'.
                                                         Now everything is ready for simulation!
                                                     </p>
                                                     <p>
@@ -296,11 +296,7 @@
                                                 <div class="card-body">
                                                     <p>
                                                         The field consists of walls, interactable objects, and tape lines (to be used with line followers).
-<<<<<<< HEAD
-                                                        If you wish to update any of the objects, you can update them by uploading your own code in the <b>Field</b> section
-=======
                                                         If you wish to update any of the objects, you can update them by uploading your own code in the <b>Field</b> tab
->>>>>>> f8c59b14c8d36accca4fe39fe170bb802cac262a
                                                         and pressing the 'Upload Field' button.
                                                     </p>
                                                     <p> <b> Walls: </b> </p>
@@ -329,16 +325,12 @@
                                                         <a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON">here</a>.
                                                     </p>
                                                     <p>
-<<<<<<< HEAD
-                                                        For an example field description, view the default configuration in the <b>Field</b> section below.
-=======
                                                         For an example field description, view the default configuration in the <b>Field</b> tab below.
->>>>>>> f8c59b14c8d36accca4fe39fe170bb802cac262a
                                                     </p>
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                         <!-- Help: Keyboard -->
                                         <div class="card">
                                             <div class="card-header" id="help-keyboard-heading">
@@ -416,9 +408,9 @@
                                             <div id="help-gamepad-body" class="collapse" aria-labelledby="help-gamepad-heading">
                                                 <div class="card-body">
                                                     <p>
-                                                        When using the Gamepad class, keyboard inputs only support joystick controls. 
-                                                        For more functionality, a game controller can be connected to the simulator. 
-                                                        To input a game controller, connect it to your computer and click any button. 
+                                                        When using the Gamepad class, keyboard inputs only support joystick controls.
+                                                        For more functionality, a game controller can be connected to the simulator.
+                                                        To input a game controller, connect it to your computer and click any button.
                                                         Confirm that the controller has successfully been connected by checking the 'Gamepad' tab below.
                                                         The following are button mappings between a generic game controller and the Robot API:
                                                     </p>
@@ -751,11 +743,7 @@
                             var objectsCode = localStorage.getItem("objectsCode");
                             if (objectsCode == "" || objectsCode === null) {
                               var xhrJS=new XMLHttpRequest();
-<<<<<<< HEAD
-                              xhrJS.open("GET","/static/js/objects.js");
-=======
                               xhrJS.open("GET","/static/field.json?t={[ git_hash }}");
->>>>>>> f8c59b14c8d36accca4fe39fe170bb802cac262a
                               xhrJS.onload = () => {
                                 objectsCode = xhrJS.responseText;
                                 cmObjects.setValue(objectsCode);
