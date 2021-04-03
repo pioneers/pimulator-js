@@ -1011,22 +1011,33 @@ this.onmessage = function(e) {
         let objects = f();
         simulator.defineObjs(objects);
 
+<<<<<<< HEAD
         // if (e.data.newObjects === true) {
         //     console.log("Field upload successful");
         // }
 
+=======
+>>>>>>> f8c59b14c8d36accca4fe39fe170bb802cac262a
         // Draw objects if no active simulation
         if (simulator.mode == "idle") {
             simulator.drawObjs();
         }
+<<<<<<< HEAD
+=======
+        // Objects get redefined right away in teleop mode.
+        // Attached objects get removed, so set to null.
+>>>>>>> f8c59b14c8d36accca4fe39fe170bb802cac262a
         if (simulator.mode == "teleop") {
             simulator.robot.attachedObj = null;
         }
     }
+<<<<<<< HEAD
     // Draw the objects
     // if (e.data.drawObjs === true) {
     //     simulator.drawObjs();
     // }
+=======
+>>>>>>> f8c59b14c8d36accca4fe39fe170bb802cac262a
     // Start simulation
     if (e.data.start === true) {
         if (code === ""){

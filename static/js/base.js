@@ -71,8 +71,13 @@ function drawRobot(robot) {
 
     // Draw Rectangle
     ctx.lineWidth = 2;
+<<<<<<< HEAD
     const topLeftCornerX = centerX - (robotHeight * scaleFactor) / 2;
     const topLeftCornerY = centerY - (robotWidth * scaleFactor) / 2;
+=======
+    const topLeftCornerX = centerX - 30;
+    const topLeftCornerY = centerY - 40;
+>>>>>>> f8c59b14c8d36accca4fe39fe170bb802cac262a
 
     // Translate to and rotate about the center of the robot
     ctx.translate(centerX, centerY);
@@ -80,7 +85,11 @@ function drawRobot(robot) {
     ctx.translate(-centerX, -centerY);
 
     ctx.beginPath();
+<<<<<<< HEAD
     ctx.rect(topLeftCornerX, topLeftCornerY, robotHeight * scaleFactor, robotWidth * scaleFactor);
+=======
+    ctx.rect(topLeftCornerX, topLeftCornerY, 60, 80);
+>>>>>>> f8c59b14c8d36accca4fe39fe170bb802cac262a
     ctx.closePath();
     ctx.strokeStyle = 'navy';
     ctx.lineWidth = 2;
@@ -100,10 +109,17 @@ function drawRobot(robot) {
     ctx.fill();
     // Draw Triangle
     ctx.beginPath();
+<<<<<<< HEAD
     ctx.moveTo(frontCenterX + 6, frontCenterY);
     ctx.lineTo(frontCenterX + 11, frontCenterY + 3);
     ctx.lineTo(frontCenterX + 11, frontCenterY - 3);
     ctx.lineTo(frontCenterX + 6, frontCenterY);
+=======
+    ctx.moveTo(centerX-24, centerY);
+    ctx.lineTo(centerX-18, centerY+3.5);
+    ctx.lineTo(centerX-18, centerY-3.5);
+    ctx.lineTo(centerX-24, centerY);
+>>>>>>> f8c59b14c8d36accca4fe39fe170bb802cac262a
     ctx.closePath();
     ctx.strokeStyle = 'blue';
     ctx.stroke();
@@ -118,8 +134,12 @@ function drawRobot(robot) {
 drawRobot({
     X: Number($("#xpos").val()),
     Y: Number($("#ypos").val()),
+<<<<<<< HEAD
     dir: direction,
     type: robotType
+=======
+    dir: direction
+>>>>>>> f8c59b14c8d36accca4fe39fe170bb802cac262a
 });
 
 function drawObjs(objs, type) {
@@ -200,6 +220,7 @@ function uploadCode() {
     worker.postMessage({code:code, newCode:true});
     codeUploaded = true;
 }
+<<<<<<< HEAD
 
 function uploadObjects(){
     if (mode === "idle") {
@@ -225,6 +246,32 @@ function uploadObjects(){
     }
 }
 
+=======
+
+function uploadObjects(){
+    if (mode === "idle") {
+        clearCanvas();
+    }
+    objectsCode = cmObjects.getValue();
+    localStorage.setItem("objectsCode", objectsCode);
+    worker.postMessage({objectsCode:objectsCode, newObjects:true});
+    log("Field upload successful");
+    if (mode === "auto") {
+        log("Field will update when autonomous simulation ends")
+    }
+    if (mode === "idle") {
+        // Redraw robot
+        // TODO: Get robot position and direction from settings
+        let robot = {
+            X: Number($("#xpos").val()),
+            Y: Number($("#ypos").val()),
+            dir: direction
+        };
+        drawRobot(robot);
+    }
+}
+
+>>>>>>> f8c59b14c8d36accca4fe39fe170bb802cac262a
 function uploadObjectsOnce() {
     if (objectsCode !== null) {
         worker.postMessage({objectsCode:objectsCode, newObjects:false});
