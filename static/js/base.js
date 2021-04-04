@@ -208,7 +208,7 @@ function uploadObjects(){
     worker.postMessage({objectsCode:objectsCode});
     log("Field upload successful");
     if (mode === "auto") {
-        log("Field will update when autonomous simulation ends")
+        log("Autonomous simulation active: Field will update on next simulation")
     }
     if (mode === "idle") {
         // Redraw robot
