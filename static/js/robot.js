@@ -568,8 +568,8 @@ class RobotClass {
     }
 
     set_value(device, param, value) {
-        /* Runtime API method for updating L/R motor speed. Takes only L/R
-           Motor as device name and speed bounded by [-1,1]. */
+        /* Runtime API method for updating L/R motor speed. Takes device ID,
+           param, and value (speeds are bounded by [-1,1]). */
 
         if (typeof(param) !== "string") {
             console.log("ERROR: get_value() parameter must be a string")
@@ -606,8 +606,10 @@ class RobotClass {
 
     get_value(device, param) {
         /* Runtime API method for getting sensor values.
-           Currently supports reading left, center and right line followers
-           in a range of [0,1]. */
+           Supports reading left, center and right line followers
+           in a range of [0,1].
+           Supports reading front and rear limit switches. 
+           Supports reading KoalaBear velocity and invert parameters. */
         if (device === "limit_switch") {
             if (param === "switch0") {
                 return this.limitSwitch.switch0;
