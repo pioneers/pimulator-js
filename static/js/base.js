@@ -197,9 +197,10 @@ function uploadCode() {
     localStorage.setItem("code", code);
     worker.postMessage({code:code});
     codeUploaded = true;
-    log("Code upload successful");
     if (mode !== "idle") {
-        log("Simulation active: Code will update on next simulation")
+        log("Simulation active: Code will update when next simulation starts")
+    } else {
+        log("Code upload successful");
     }
 }
 
@@ -210,9 +211,10 @@ function uploadObjects(){
     objectsCode = cmObjects.getValue();
     localStorage.setItem("objectsCode", objectsCode);
     worker.postMessage({objectsCode:objectsCode});
-    log("Field upload successful");
     if (mode === "auto") {
-        log("Autonomous simulation active: Field will update on next simulation")
+        log("Autonomous simulation active: Field will update when next simulation starts")
+    } else {
+        log("Field upload successful");
     }
     if (mode === "idle") {
         // Redraw robot
