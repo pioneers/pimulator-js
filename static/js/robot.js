@@ -63,28 +63,28 @@ class RobotClass {
         this.currentRv = 0;       // current velocity of right wheel, in inches/s
 
         // Set robot attributes based on type
-        let robotType = robotInfo.robotType;
+        this.robotType = robotInfo.robotType;
         const validTypes = ["light", "medium", "heavy"];
-        if (!validTypes.includes(robotType)) {
-            robotType = "medium"; // robot type is medium by default
+        if (!validTypes.includes(this.robotType)) {
+            this.robotType = "medium"; // robot type is medium by default
         }
         let robotTypeNum;
-        if (robotType === "light") {
+        if (this.robotType === "light") {
             robotTypeNum = 3;
-            // this.width = 14.18;      // Robot width, inches
-            // this.height = 12.5;      // Robot height, inches
+            this.width = 14.18;      // Robot width, inches
+            this.height = 12.5;      // Robot height, inches
             this.wheelWidth = 9.06;  // Wheelbase width, inches
         }
-        else if (robotType === "medium") {
+        else if (this.robotType === "medium") {
             robotTypeNum = 4;
-            // this.width = 19.3;
-            // this.height = 14;
+            this.width = 19.3;
+            this.height = 14;
             this.wheelWidth = 12.39;
         }
-        else if (robotType === "heavy") {
+        else if (this.robotType === "heavy") {
             robotTypeNum = 5;
-            // this.width = 10.7;
-            // this.height = 14.06;
+            this.width = 10.7;
+            this.height = 14.06;
             this.wheelWidth = 8.98;
         }
 
@@ -426,8 +426,7 @@ class RobotClass {
             X: this.X,
             Y: this.Y,
             dir: this.dir,
-            width: this.width,
-            height: this.height
+            robotType: this.robotType
         };
 
         if (this.attachedObj) {
@@ -1016,13 +1015,14 @@ this.onmessage = function(e) {
         if (simulator.mode == "idle") {
             simulator.drawObjs();
         }
+
         // Objects get redefined right away in teleop mode.
         // Attached objects get removed, so set to null.
         if (simulator.mode == "teleop") {
             simulator.robot.attachedObj = null;
         }
     }
-    // Start simulation
+
     if (e.data.start === true) {
         if (code === ""){
             console.log("Please upload code first");
