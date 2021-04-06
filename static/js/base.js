@@ -46,9 +46,8 @@ function drawRobot(robot) {
     const centerY = robot.Y * scaleFactor;
     const dir = robot.dir/180*Math.PI;  // Convert to Radians
 
-    if (!robot.robotType) {
-        robot.robotType == "medium";
-    }
+    let robotWidth = 26.7;
+    let robotHeight = 20;
     if (robot.robotType == "light") {
         robotWidth = 14.18;      // Robot width, inches
         robotHeight = 12.5;      // Robot height, inches
