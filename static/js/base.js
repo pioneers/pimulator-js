@@ -195,8 +195,12 @@ document.addEventListener('keyup', up);
 function uploadCode() {
     code = cm.getValue();
     localStorage.setItem("code", code);
-    worker.postMessage({code:code, newCode:true});
+    worker.postMessage({code:code});
     codeUploaded = true;
+    log("Code upload successful");
+    if (mode !== "idle") {
+        log("Simulation active: Code will update on next simulation")
+    }
 }
 
 function uploadObjects(){
