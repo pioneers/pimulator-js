@@ -7,8 +7,9 @@ class LineFollower{
    }
 
    update(){
-     var sensorsY = [this.robot.Y - 5*Math.cos(this.robot.dir/180*Math.PI), this.robot.Y, this.robot.Y + 5*Math.cos(this.robot.dir/180*Math.PI)]
-     var sensorsX = [this.robot.X - 5*Math.sin(-this.robot.dir/180*Math.PI), this.robot.X, this.robot.X + 5*Math.sin(-this.robot.dir/180*Math.PI)]
+     var frontCenter = [(this.robot.topL[0] + this.robot.topR[0]) / 2, (this.robot.topL[1] + this.robot.topR[1]) / 2]
+     var sensorsY = [frontCenter[1] - 3*Math.cos(this.robot.dir/180*Math.PI), frontCenter[1], frontCenter[1] + 3*Math.cos(this.robot.dir/180*Math.PI)]
+     var sensorsX = [frontCenter[0] - 3*Math.sin(-this.robot.dir/180*Math.PI), frontCenter[0], frontCenter[0] + 3*Math.sin(-this.robot.dir/180*Math.PI)]
 
      var tapeLines = this.robot.simulator.tapeLines
      let total = []
@@ -23,7 +24,7 @@ class LineFollower{
          let m = tapeLine.slope
          if (m === "horizontal") {
            let distY = Math.abs(sensor_y-tapeLine.startY)
-           if (tapeLine.startX <= sensor_x && sensor_x <= tapeLine.endX) {
+           if ((tapeLine.startX <= sensor_x && sensor_x <= tapeLine.endX) || (tapeLine.startX >= sensor_x && sensor_x >= tapeLine.endX)){
              let distSquared = (distY*distY)
              totalLine += Math.min(1,3/distSquared)
            } else {
@@ -33,7 +34,7 @@ class LineFollower{
              }
          } else if (m === "vertical") {
            let distX = Math.abs(sensor_x-tapeLine.startX)
-           if (tapeLine.startY <= sensor_y && sensor_y <= tapeLine.endY) {
+           if ((tapeLine.startY <= sensor_y && sensor_y <= tapeLine.endY) || (tapeLine.startY >= sensor_y && sensor_y >= tapeLine.endY)) {
              let distSquared = (distX*distX)
              totalLine += Math.min(1,3/distSquared)
            } else {
@@ -100,22 +101,41 @@ class LimitSwitch{
   update() {
     this.switch0 = false;
     this.switch1 = false;
-    const switch0X = (this.robot.topL[0] + this.robot.topR[0]) / 2;
-    const switch0Y = (this.robot.topL[1] + this.robot.topR[1]) / 2;
-    const switch1X = (this.robot.botL[0] + this.robot.botR[0]) / 2;
-    const switch1Y = (this.robot.botL[1] + this.robot.botR[1]) / 2;
 
+    const width = 5;
+    const height = this.leeway;
+    const b = (this.robot.width - width) / 2;
+
+    let collidableRegionFront = {topR: Array(2), topL: Array(2), botL: Array(2), botR: Array(2)};
+    collidableRegionFront.botL[0] = this.robot.topL[0] + b * Math.cos((90.0 - this.robot.dir) * Math.PI / 180);
+    collidableRegionFront.botL[1] = this.robot.topL[1] - b * Math.sin((90.0 - this.robot.dir) * Math.PI / 180);
+    collidableRegionFront.topL[0] = collidableRegionFront.botL[0] - height * Math.cos(this.robot.dir * Math.PI / 180);
+    collidableRegionFront.topL[1] = collidableRegionFront.botL[1] - height * Math.sin(this.robot.dir * Math.PI / 180);
+    collidableRegionFront.topR[0] = collidableRegionFront.topL[0] + width * Math.sin(this.robot.dir * Math.PI / 180);
+    collidableRegionFront.topR[1] = collidableRegionFront.topL[1] - width * Math.cos(this.robot.dir * Math.PI / 180);
+    collidableRegionFront.botR[0] = collidableRegionFront.botL[0] + width * Math.sin(this.robot.dir * Math.PI / 180);
+    collidableRegionFront.botR[1] = collidableRegionFront.botL[1] - width * Math.cos(this.robot.dir * Math.PI / 180);
     for (let obstacle of this.robot.simulator.obstacles) {
-      const minX = obstacle.topL[0] - this.leeway;
-      const minY = obstacle.topL[1] - this.leeway;
-      const maxX = obstacle.botR[0] + this.leeway;
-      const maxY = obstacle.botR[1] + this.leeway;
-      if (switch0X >= minX && switch0X <= maxX && switch0Y >= minY && switch0Y <= maxY) {
-        this.switch0 = true;
-      }
-      if (switch1X >= minX && switch1X <= maxX && switch1Y >= minY && switch1Y <= maxY) {
-        this.switch1 = true;
-      }
+        if (this.robot.intersectOne(obstacle, collidableRegionFront)) {
+          this.switch0 = true;
+          break;
+        }
+    }
+
+    let collidableRegionBack = {topR: Array(2), topL: Array(2), botL: Array(2), botR: Array(2)};
+    collidableRegionBack.botL[0] = this.robot.botR[0] - b * Math.cos((90.0 - this.robot.dir) * Math.PI / 180);
+    collidableRegionBack.botL[1] = this.robot.botR[1] + b * Math.sin((90.0 - this.robot.dir) * Math.PI / 180);
+    collidableRegionBack.topL[0] = collidableRegionBack.botL[0] + height * Math.cos(this.robot.dir * Math.PI / 180);
+    collidableRegionBack.topL[1] = collidableRegionBack.botL[1] + height * Math.sin(this.robot.dir * Math.PI / 180);
+    collidableRegionBack.topR[0] = collidableRegionBack.topL[0] - width * Math.sin(this.robot.dir * Math.PI / 180);
+    collidableRegionBack.topR[1] = collidableRegionBack.topL[1] + width * Math.cos(this.robot.dir * Math.PI / 180);
+    collidableRegionBack.botR[0] = collidableRegionBack.botL[0] - width * Math.sin(this.robot.dir * Math.PI / 180);
+    collidableRegionBack.botR[1] = collidableRegionBack.botL[1] + width * Math.cos(this.robot.dir * Math.PI / 180);
+    for (let obstacle of this.robot.simulator.obstacles) {
+        if (this.robot.intersectOne(obstacle, collidableRegionBack)) {
+          this.switch1 = true;
+          break;
+        }
     }
 
   }
