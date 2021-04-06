@@ -46,8 +46,9 @@ function drawRobot(robot) {
     const centerY = robot.Y * scaleFactor;
     const dir = robot.dir/180*Math.PI;  // Convert to Radians
 
-    let robotWidth = 26.7;
-    let robotHeight = 20;
+    if (!robot.robotType) {
+        robot.robotType == "medium";
+    }
     if (robot.robotType == "light") {
         robotWidth = 14.18;      // Robot width, inches
         robotHeight = 12.5;      // Robot height, inches
@@ -268,7 +269,7 @@ function start(auto=false) {
     else {
         clearInterval(timer);
         if (codeUploaded) {
-            // Send the list of objects 
+            // Send the list of objects
             worker.postMessage({objectsCode:objectsCode});
 
             //  Collect the robot start position and direction
@@ -278,7 +279,7 @@ function start(auto=false) {
                 ypos: $("#ypos").val(),
                 dir: direction
             }
-            
+
             // Start the simulation
             if (auto === false) {
                 $("#teleop-btn").removeClass("btn-outline-primary").addClass("btn-primary")
