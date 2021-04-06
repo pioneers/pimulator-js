@@ -60,12 +60,16 @@ class RobotClass {
         this.ltheta = 0.0;        // angular position of l wheel, degrees
         this.rtheta = 0.0;        // angular position of r wheel, degrees
         this.dir = robotInfo.dir; // Direction of the robot facing, degrees
-        this.currentLv = 0;       // current velocity of left wheel, in inches/s
-        this.currentRv = 0;       // current velocity of right wheel, in inches/s
+        this.currentLv = 0;       // current velocity of left wheel, in inches/s, in [-maxVel, maxVel]
+        this.currentRv = 0;       // current velocity of right wheel, in inches/s, in [-maxVel, maxVel]
+        this.requestedLv = 0;     // requested velocity of left wheel, in [-1, 1], uninverted, where 1 corresponds to maxVel
+        this.requestedRv = 0;     // requested velocity of right wheel, in [-1, 1], uninverted, where 1 corresponds to maxVel
         this.invertL = false;         // whether the left motor is inverted (false=default, true=inverted)
         this.invertR = false;         // whether the right motor is inverted
 
         // Set robot attributes based on type
+        // Note: width and height values are replicated in base.js. 
+        // Update both files if robot size changes.
         this.robotType = robotInfo.robotType;
         const validTypes = ["light", "medium", "heavy"];
         if (!validTypes.includes(this.robotType)) {
