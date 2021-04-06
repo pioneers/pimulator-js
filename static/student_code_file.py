@@ -1,5 +1,7 @@
-# Substitute device ID when using real robot
+# Substitute device IDs when using real robot
 KOALA_BEAR = "koala_bear"
+LINE_FOLLOWER = "line_follower"
+LIMIT_SWITCH = "limit_switch"
 
 def autonomous_setup():
     print("Autonomous mode has started!")
