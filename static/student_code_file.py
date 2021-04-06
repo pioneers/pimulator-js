@@ -1,3 +1,4 @@
+# Substitute device ID when using real robot
 KOALA_BEAR = "koala_bear"
 
 def autonomous_setup():
@@ -8,6 +9,7 @@ def autonomous_main():
     pass
 
 def teleop_setup():
+    # Left motor rotates in the opposite direction
     Robot.set_value(KOALA_BEAR, "invert_b", True)
     pass
 
@@ -20,18 +22,36 @@ def teleop_main():
         Robot.set_value(KOALA_BEAR, "velocity_a", 0.7)
     elif driving_mode == 1:
         # Tank Drive
-        Robot.set_value(KOALA_BEAR, "velocity_b", Gamepad.get_value("joystick_left_y"))
-        Robot.set_value(KOALA_BEAR, "velocity_a", Gamepad.get_value("joystick_right_y"))
+        left_motor_speed = 0
+        right_motor_speed = 0
+        if Keyboard.get_value("w"):
+            left_motor_speed = 1
+        elif Keyboard.get_value("s"):
+            left_motor_speed = -1
+        elif Keyboard.get_value("up_arrow"):
+            right_motor_speed = 1
+        elif Keyboard.get_value("down_arrow"):
+            right_motor_speed = -1
+        Robot.set_value(KOALA_BEAR, "velocity_b", left_motor_speed)
+        Robot.set_value(KOALA_BEAR, "velocity_a", right_motor_speed)
     elif driving_mode == 2:
         # Arcade Drive
-        turningSpeed =  Gamepad.get_value("joystick_left_x")
-        left_y = Gamepad.get_value("joystick_left_y")
-        turningSpeed = turningSpeed * abs(turningSpeed)
-        left_y = left_y * abs(left_y)
-        Robot.set_value(KOALA_BEAR, "velocity_b", max(min((left_y + turningSpeed), 1.0), -1.0))
-        Robot.set_value(KOALA_BEAR, "velocity_a", max(min(left_y - turningSpeed, 1.0), -1.0))
+        forward_speed = 0
+        turning_speed = 0
+        if Keyboard.get_value("w"):
+            forward_speed = 1
+        elif Keyboard.get_value("s"):
+            forward_speed = -1
+        if Keyboard.get_value("d"):
+            turning_speed = 1
+        elif Keyboard.get_value("a"):
+            turning_speed = -1
+        Robot.set_value(KOALA_BEAR, "velocity_b", max(min((forward_speed + turning_speed), 1.0), -1.0))
+        Robot.set_value(KOALA_BEAR, "velocity_a", max(min(forward_speed - turning_speed, 1.0), -1.0))
 
 def autonomous_actions():
+    # Left motor rotates in the opposite direction
+    Robot.set_value(KOALA_BEAR, "invert_b", True)
     print("Action 1")
     Robot.set_value(KOALA_BEAR, "velocity_b", 1.0)
     Robot.set_value(KOALA_BEAR, "velocity_a", -1.0)
