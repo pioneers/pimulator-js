@@ -64,8 +64,8 @@ class RobotClass {
         this.currentRv = 0;       // current velocity of right wheel, in inches/s, in [-maxVel, maxVel]
         this.requestedLv = 0;     // requested velocity of left wheel, in [-1, 1], uninverted, where 1 corresponds to maxVel
         this.requestedRv = 0;     // requested velocity of right wheel, in [-1, 1], uninverted, where 1 corresponds to maxVel
-        this.invertL = false;         // whether the left motor is inverted (false=default, true=inverted)
-        this.invertR = false;         // whether the right motor is inverted (false=default, true=inverted)
+        this.invertL = false;     // whether the left motor is inverted (false=default, true=inverted)
+        this.invertR = false;     // whether the right motor is inverted (false=default, true=inverted)
 
         // Set robot attributes based on type
         // Note: width and height values are replicated in base.js. 
