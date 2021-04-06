@@ -216,7 +216,7 @@ function uploadObjects(){
             X: Number($("#xpos").val()),
             Y: Number($("#ypos").val()),
             dir: direction,
-            type: robotType
+            robotType: robotType
         };
         drawRobot(robot);
     }
@@ -268,7 +268,7 @@ function start(auto=false) {
     else {
         clearInterval(timer);
         if (codeUploaded) {
-            // Send the list of objects 
+            // Send the list of objects
             worker.postMessage({objectsCode:objectsCode});
 
             //  Collect the robot start position and direction
@@ -278,7 +278,7 @@ function start(auto=false) {
                 ypos: $("#ypos").val(),
                 dir: direction
             }
-            
+
             // Start the simulation
             if (auto === false) {
                 $("#teleop-btn").removeClass("btn-outline-primary").addClass("btn-primary")
