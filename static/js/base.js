@@ -48,15 +48,15 @@ function drawRobot(robot) {
 
     let robotWidth = 26.7;
     let robotHeight = 20;
-    if (robot.type == "light") {
+    if (robot.robotType == "light") {
         robotWidth = 14.18;      // Robot width, inches
         robotHeight = 12.5;      // Robot height, inches
     }
-    else if (robot.type == "medium") {
+    else if (robot.robotType == "medium") {
         robotWidth = 19.3;
         robotHeight = 14;
     }
-    else if (robot.type == "heavy") {
+    else if (robot.robotType == "heavy") {
         robotWidth = 10.7;
         robotHeight = 14.06;
     }
@@ -119,14 +119,13 @@ drawRobot({
     X: Number($("#xpos").val()),
     Y: Number($("#ypos").val()),
     dir: direction,
-    type: robotType
+    robotType: robotType
 });
 
 function drawObjs(objs, type) {
     /* Draw objects received from the worker. */
 
     if (type === "obstacle") {
-        // obstacles = objs;
         for (let i = 0; i < objs.length; i++) {
             ctx.beginPath();
             ctx.moveTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
@@ -137,7 +136,6 @@ function drawObjs(objs, type) {
             ctx.fill();
         }
     } else if (type === "tapeLine") {
-        // tapelines = objs;
         ctx.lineWidth = 5;
         for (let i = 0; i < objs.length; i++) {
             ctx.beginPath();

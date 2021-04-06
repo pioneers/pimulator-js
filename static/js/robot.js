@@ -426,7 +426,7 @@ class RobotClass {
             X: this.X,
             Y: this.Y,
             dir: this.dir,
-            type: this.robotType
+            robotType: this.robotType
         };
 
         if (this.attachedObj) {
@@ -1022,12 +1022,7 @@ this.onmessage = function(e) {
             simulator.robot.attachedObj = null;
         }
     }
-    // Draw the objects
-    // if (e.data.drawObjs === true) {
-    //     simulator.drawObjs();
-    // }
 
-    // Start simulation
     if (e.data.start === true) {
         if (code === ""){
             console.log("Please upload code first");
