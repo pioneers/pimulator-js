@@ -29,7 +29,7 @@ def teleop_main():
             left_motor_speed = 1
         elif Keyboard.get_value("s"):
             left_motor_speed = -1
-        elif Keyboard.get_value("up_arrow"):
+        if Keyboard.get_value("up_arrow"):
             right_motor_speed = 1
         elif Keyboard.get_value("down_arrow"):
             right_motor_speed = -1
