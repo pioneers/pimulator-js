@@ -5,12 +5,15 @@ LIMIT_SWITCH = "limit_switch"
 
 def autonomous_setup():
     print("Autonomous mode has started!")
+    # Left motor rotates in the opposite direction
+    Robot.set_value(KOALA_BEAR, "invert_b", True)
     Robot.run(autonomous_actions)
 
 def autonomous_main():
     pass
 
 def teleop_setup():
+    print("Teleop mode has started!")
     # Left motor rotates in the opposite direction
     Robot.set_value(KOALA_BEAR, "invert_b", True)
 
@@ -51,8 +54,6 @@ def teleop_main():
         Robot.set_value(KOALA_BEAR, "velocity_a", max(min(forward_speed - turning_speed, 1.0), -1.0))
 
 def autonomous_actions():
-    # Left motor rotates in the opposite direction
-    Robot.set_value(KOALA_BEAR, "invert_b", True)
     print("Action 1")
     Robot.set_value(KOALA_BEAR, "velocity_b", 1.0)
     Robot.set_value(KOALA_BEAR, "velocity_a", -1.0)
