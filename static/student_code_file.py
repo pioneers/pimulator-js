@@ -13,7 +13,6 @@ def autonomous_main():
 def teleop_setup():
     # Left motor rotates in the opposite direction
     Robot.set_value(KOALA_BEAR, "invert_b", True)
-    pass
 
 def teleop_main():
     driving_mode = 1
