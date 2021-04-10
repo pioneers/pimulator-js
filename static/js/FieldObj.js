@@ -51,3 +51,19 @@ class InteractableObj extends FieldObj {
         this.direction = dir;
     }
 }
+
+class Ramp extends FieldObj {
+    constructor(x, y, w, h, upDir = "up", incline = 25, color = "black") {
+        super(x, y, w, h, color);
+        if (upDir == "up") {
+            this.upDir = 90.0;
+        } else if (upDir == "down") {
+            this.upDir = 270.0;
+        } else if (upDir == "right") {
+            this.upDir = 180.0;
+        } else if (upDir == "left") {
+            this.upDir = 0.0;
+        }
+        this.incline = incline;
+    }
+}

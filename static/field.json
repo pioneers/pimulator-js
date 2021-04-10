@@ -13,5 +13,8 @@
     ],
     interactableData: [
         {x: 20, y: 20, w: 10, h: 10}
+    ],
+    terrainsData: [
+        {x: 0, y: 50, w: 30, h: 40, upDir: "up", incline: 25, color: "black"}
     ]
 }

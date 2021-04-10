@@ -876,6 +876,7 @@ class Simulator{
         this.tapeLines = [];
         this.obstacles = [];
         this.interactableObjs = [];
+        this.terrains = [];
     }
 
     defineObjs(objects) {
@@ -887,6 +888,7 @@ class Simulator{
         this.tapeLines = [];
         this.obstacles = [];
         this.interactableObjs = [];
+        this.terrains = [];
 
         if (objects.tapeLinesData !== undefined) {
             for (let newLine of objects.tapeLinesData) {
@@ -905,11 +907,24 @@ class Simulator{
                 this.obstacles.push(newInteractableObj);
             }
         }
+        // default Ramp
+        if (objects.terrainsData !== undefined) {
+            for (let terrainObj of objects.terrainsData) {
+                let newRamp = new Ramp(terrainObj.x, terrainObj.y, terrainObj.w, terrainObj. h, terrainObj.direction, terrainObj.color);
+                this.terrains.push(newRamp);
+                if (newRamp.upDir == 90.0) {
+                    this.obstacles.push(new Wall(newRamp.topL[0], newRamp.topL[1], 1, newRamp.h, newRamp.color));
+                    //this.obstacles.push(new Wall(newRamp.topL[0], newRamp.topL[1], newRamp.w, 1, newRamp.color));
+                    this.obstacles.push(new Wall(newRamp.topR[0], newRamp.topR[1], 1, newRamp.h, newRamp.color));
+                }
+            }
+        }
     }
 
     drawObjs() {
         postMessage({objs: this.tapeLines, type: "tapeLine"});
         postMessage({objs: this.obstacles, type: "obstacle"});
+        postMessage({objs: this.terrains, type: "terrain"});
     }
 
     loadStudentCode(){

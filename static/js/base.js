@@ -149,6 +149,9 @@ function drawObjs(objs, type) {
             ctx.stroke();
         }
     }
+    // else if (type === "terrain") {
+    //     // draw ramps!
+    // }
 }
 
 function clearCanvas() {
