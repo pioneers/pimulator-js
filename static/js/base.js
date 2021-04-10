@@ -217,7 +217,7 @@ function uploadObjects(){
             X: Number($("#xpos").val()),
             Y: Number($("#ypos").val()),
             dir: direction,
-            type: robotType
+            robotType: robotType
         };
         drawRobot(robot);
     }
