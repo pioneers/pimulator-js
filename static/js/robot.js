@@ -41,6 +41,7 @@ class RobotClass {
     tickRate = 50;              // in ms
     width = 26.7;               // width of robot, inches
     height = 20;                // height or robot, inches
+    wheelWidth = 20;            // wheelbase width, inches
     wRadius = 2;                // radius of a wheel, inches
     MaxX = 144;                 // maximum X value, inches, field is 12'x12'
     MaxY = 144;                 // maximum Y value, inches, field is 12'x12'
@@ -54,15 +55,21 @@ class RobotClass {
     leeway = 1;
 
     constructor(simulator, robotInfo) {
-        this.Wl = 0.0;           // requested angular velocity of l wheel, radians/s
-        this.Wr = 0.0;           // requested angular velocity of r wheel, radians/s
-        this.ltheta = 0.0;       // angular position of l wheel, degrees
-        this.rtheta = 0.0;       // angular position of r wheel, degrees
-        this.dir = robotInfo.dir;          // Direction of the robot facing, degrees
-        this.currentLv = 0;       // current velocity of left wheel, in inches/s
-        this.currentRv = 0;       // current velocity of right wheel, in inches/s
+        this.Wl = 0.0;            // requested angular velocity of l wheel, radians/s
+        this.Wr = 0.0;            // requested angular velocity of r wheel, radians/s
+        this.ltheta = 0.0;        // angular position of l wheel, degrees
+        this.rtheta = 0.0;        // angular position of r wheel, degrees
+        this.dir = robotInfo.dir; // Direction of the robot facing, degrees
+        this.currentLv = 0;       // current velocity of left wheel, in inches/s, in [-maxVel, maxVel]
+        this.currentRv = 0;       // current velocity of right wheel, in inches/s, in [-maxVel, maxVel]
+        this.requestedLv = 0;     // requested velocity of left wheel, in [-1, 1], uninverted, where 1 corresponds to maxVel
+        this.requestedRv = 0;     // requested velocity of right wheel, in [-1, 1], uninverted, where 1 corresponds to maxVel
+        this.invertL = false;     // whether the left motor is inverted (false=default, true=inverted)
+        this.invertR = false;     // whether the right motor is inverted (false=default, true=inverted)
 
         // Set robot attributes based on type
+        // Note: width and height values are replicated in base.js. 
+        // Update both files if robot size changes.
         this.robotType = robotInfo.robotType;
         const validTypes = ["light", "medium", "heavy"];
         if (!validTypes.includes(this.robotType)) {
@@ -93,7 +100,6 @@ class RobotClass {
         // Max speed is 1.236 in/tick and max acceleration is 0.05413 in/tick^2
         this.accel = (8 - robotTypeNum) / 5 * 0.05413; // Larger robots accelerate more slowly
         this.maxVel = robotTypeNum / 5 * 1.236;        // Larger robots have a higher top speed
-        this.wheelWidth = robotTypeNum / 5 * 20;       // Larger robots have a wider wheelbase
 
         // Set robot position
         this.X = this.getValidXPosition(robotInfo.xpos, robotInfo.dir); // current X position of the center of the robot
@@ -358,18 +364,24 @@ class RobotClass {
 
         //TODO: handling, edit the Lv and Rv such that difference is low
 
+        // Calculate the requested velocities scaled to max velocity, including possible motor inversion
+        let requestedLv = this.invertL ? -this.requestedLv : this.requestedLv;
+        requestedLv = requestedLv * this.maxVel;
+        let requestedRv = this.invertR ? -this.requestedRv : this.requestedRv;
+        requestedRv = requestedRv * this.maxVel * this.neg;
+
         // Compare the current speed of each motor to the requested speed, and accelerate in the correct direction
-        if (this.requestedLv > this.currentLv) {
-            this.currentLv = Math.min(this.currentLv + this.accel, this.requestedLv);
+        if (requestedLv > this.currentLv) {
+            this.currentLv = Math.min(this.currentLv + this.accel, requestedLv);
         }
-        if (this.requestedLv < this.currentLv) {
-            this.currentLv = Math.max(this.currentLv - this.accel, this.requestedLv);
+        if (requestedLv < this.currentLv) {
+            this.currentLv = Math.max(this.currentLv - this.accel, requestedLv);
         }
-        if (this.requestedRv > this.currentRv) {
-            this.currentRv = Math.min(this.currentRv + this.accel, this.requestedRv);
+        if (requestedRv > this.currentRv) {
+            this.currentRv = Math.min(this.currentRv + this.accel, requestedRv);
         }
-        if (this.requestedRv < this.currentRv) {
-            this.currentRv = Math.max(this.currentRv - this.accel, this.requestedRv);
+        if (requestedRv < this.currentRv) {
+            this.currentRv = Math.max(this.currentRv - this.accel, requestedRv);
         }
 
         // Compute change in position and direction
@@ -505,7 +517,7 @@ class RobotClass {
         return dict;
     }
 
-    /* Robot API function. If Robot has no attached object, pick up a nearby object */
+    /* Fake Robot API function. If Robot has no attached object, pick up a nearby object */
     pick_up() {
         if (this.attachedObj) {
             return
@@ -555,29 +567,49 @@ class RobotClass {
         return null;
     }
 
-    set_value(device, param, speed) {
-        /* Runtime API method for updating L/R motor speed. Takes only L/R
-           Motor as device name and speed bounded by [-1,1]. */
+    set_value(device, param, value) {
+        /* Runtime API method for updating L/R motor speed. Takes device ID,
+           param, and value (speeds are bounded by [-1,1]). */
 
-        if (speed > 1.0 || speed < -1.0){
-            throw new Error("Speed cannot be greater than 1.0 or less than -1.0.");
+        if (typeof(param) !== "string") {
+            console.log("ERROR: get_value() parameter must be a string")
+            return
         }
-        if (param !== "duty_cycle") {
-            throw new Error('"duty_cycle" is the only currently supported parameter');
+        if (param.includes("velocity") && value > 1.0 || value < -1.0){
+            console.log("ERROR: Speed cannot be greater than 1.0 or less than -1.0.");
+            return
         }
-        if (device === "left_motor") {
-            this.requestedLv = speed * this.maxVel;
-        } else if (device === "right_motor") {
-            this.requestedRv = speed * this.maxVel * this.neg;
+        if (param.includes("invert") && typeof(value) !== "boolean") {
+            console.log('ERROR: "invert" functions take in a boolean value')
+            return
+        }
+        if (device === "koala_bear") {
+            if (param === "velocity_b") {
+                this.requestedLv = value;
+            } else if (param === "velocity_a") {
+                this.requestedRv = value;
+            } else if (param === "invert_b") {
+                this.invertL = value;
+            } else if (param === "invert_a") {
+                this.invertR = value;
+            } else if (param === "duty_cycle") {
+                console.log('ERROR: Param name: "duty_cycle" no longer supported. See Robot API.');
+            } else {
+                console.log('ERROR: Param name: "' + param + '" invalid or not supported');
+            }
+        } else if (device === "left_motor" || device === "right_motor") {
+            console.log('ERROR: "' + device + '" no longer supported. See Robot API.');
         } else {
-            throw new Error("Cannot find device name: " + device);
+            console.log("ERROR: Cannot find device name: " + device);
         }
     }
 
     get_value(device, param) {
         /* Runtime API method for getting sensor values.
-           Currently supports reading left, center and right line followers
-           in a range of [0,1]. */
+           Supports reading left, center and right line followers
+           in a range of [0,1].
+           Supports reading front and rear limit switches. 
+           Supports reading KoalaBear velocity and invert parameters. */
         if (device === "limit_switch") {
             if (param === "switch0") {
                 return this.limitSwitch.switch0;
@@ -594,7 +626,18 @@ class RobotClass {
                 return this.lineFollower.right;
             }
         }
-        throw new Error("Device was not found" + device);
+        if (device === "koala_bear") { 
+            if (param === "velocity_b") {
+                return this.requestedLv;
+            } else if (param === "velocity_a") {
+                return this.requestedRv;
+            } else if (param === "invert_b") {
+                return this.invertL;
+            } else if (param === "invert_a") {
+                return this.invertR;
+            }
+        }
+        console.log("ERROR: Cannot find device name: " + device);
     }
 
     sleep(duration) {
@@ -1000,9 +1043,6 @@ this.onmessage = function(e) {
     // Code upload
     if (e.data.code !== undefined){
         code = e.data.code;
-        if (e.data.newCode === true) {
-            console.log("Code upload successful");
-        }
     }
     // Give simulator the list of objects
     if (e.data.objectsCode !== undefined) {
