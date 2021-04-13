@@ -408,6 +408,19 @@ class RobotClass {
             }
         }
 
+        const objCorners = this.updateInteractableObjs(this.attachedObj, corners, dir);
+
+        if (this.attachedObj && !inter) {
+            for (let i=0; i < simulator.obstacles.length; i++) {
+                if (simulator.obstacles[i] !== this.attachedObj) {
+                    inter = this.intersectOne(simulator.obstacles[i], objCorners);
+                }
+                if (inter) {
+                    break;
+                }
+            }
+        }
+
         // If no collision, update robot positional attributes
         if (!inter) {
             this.X = X;
@@ -419,6 +432,9 @@ class RobotClass {
             this.botR = corners.botR;
             this.topL = corners.topL;
             this.topR = corners.topR;
+            if (this.attachedObj) {
+                this.setInteractableObjs(this.attachedObj, objCorners);
+            }
         }
 
         // Send position and sensor readings to main thread
@@ -429,9 +445,10 @@ class RobotClass {
             robotType: this.robotType
         };
 
-        if (this.attachedObj) {
-            this.updateInteractableObjs(this.attachedObj);
-        }
+        // if (this.attachedObj) {
+        //     this.updateInteractableObjs(this.attachedObj);
+        // }
+
         // this.simulator.drawObjs();
 
         this.lineFollower.update();
@@ -459,21 +476,41 @@ class RobotClass {
         })
     }
 
-    updateInteractableObjs(obstacle) {
-        let b = (this.width - obstacle.w) / 2;
-        obstacle.botL[0] = this.topL[0] + b * Math.cos((90.0 - this.dir) * Math.PI / 180);
-        obstacle.botL[1] = this.topL[1] - b * Math.sin((90.0 - this.dir) * Math.PI / 180);
-        obstacle.topL[0] = obstacle.botL[0] - obstacle.h * Math.cos(this.dir * Math.PI / 180);
-        obstacle.topL[1] = obstacle.botL[1] - obstacle.h * Math.sin(this.dir * Math.PI / 180);
+    updateInteractableObjs(obstacle, robot, dir) {
+        let dict = {topR: Array(2), topL: Array(2), botL: Array(2), botR: Array(2)};
 
-        obstacle.topR[0] = obstacle.topL[0] + obstacle.w * Math.sin(this.dir * Math.PI / 180);
-        obstacle.topR[1] = obstacle.topL[1] - obstacle.w * Math.cos(this.dir * Math.PI / 180);
-        obstacle.botR[0] = obstacle.botL[0] + obstacle.w * Math.sin(this.dir * Math.PI / 180);
-        obstacle.botR[1] = obstacle.botL[1] - obstacle.w * Math.cos(this.dir * Math.PI / 180);
-        obstacle.x = obstacle.topL[0]; //this.X - (this.height + obstacle.h) * Math.cos(this.dir * Math.PI / 180) / 2;
-        obstacle.y = obstacle.topL[1]; //this.Y - (this.height + obstacle.h) * Math.sin(this.dir * Math.PI / 180) / 2;
+        if (obstacle) {
+            let b = (this.width - obstacle.w) / 2;
+            console.log(robot);
+            dict.botL[0] = robot.topL[0] + b * Math.cos((90.0 - dir) * Math.PI / 180);
+            dict.botL[1] = robot.topL[1] - b * Math.sin((90.0 - dir) * Math.PI / 180);
+            dict.topL[0] = obstacle.botL[0] - obstacle.h * Math.cos(dir * Math.PI / 180);
+            dict.topL[1] = obstacle.botL[1] - obstacle.h * Math.sin(dir * Math.PI / 180);
+
+            dict.topR[0] = obstacle.topL[0] + obstacle.w * Math.sin(dir * Math.PI / 180);
+            dict.topR[1] = obstacle.topL[1] - obstacle.w * Math.cos(dir * Math.PI / 180);
+            dict.botR[0] = obstacle.botL[0] + obstacle.w * Math.sin(dir * Math.PI / 180);
+            dict.botR[1] = obstacle.botL[1] - obstacle.w * Math.cos(dir * Math.PI / 180);
+            //obstacle.setDirection(this.dir);
+        }
+
+        return dict;
+    }
+
+    setInteractableObjs(obstacle, newCorners) {
+        obstacle.botL[0] = newCorners.botL[0];
+        obstacle.botL[1] = newCorners.botL[1];
+        obstacle.topL[0] = newCorners.topL[0];
+        obstacle.topL[1] = newCorners.topL[1];
+
+        obstacle.topR[0] = newCorners.topR[0];
+        obstacle.topR[1] = newCorners.topR[1];
+        obstacle.botR[0] = newCorners.botR[0];
+        obstacle.botR[1] = newCorners.botR[1];
+
+        obstacle.x = obstacle.topL[0];
+        obstacle.y = obstacle.topL[1];
         obstacle.setDirection(this.dir);
-        //console.log("interactable object coordinates updated");
     }
 
     updateCorners(newX, newY, dir) {
