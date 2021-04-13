@@ -56,13 +56,34 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                <a class="nav-item nav-link" href="https://pioneers.berkeley.edu/software/robot_api" target="_blank">Robot API</a>
+                <a class="nav-item nav-link" href="https://github.com/pioneers/runtime/wiki/Student-API" target="_blank">Robot API</a>
             </div>
         </div>
     </nav>
-
+      
     <!-- Body of Content -->
     <div class="container">
+
+        <!-- Alert -->
+        <div class="row">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <b>IMPORTANT: </b> As of 4/10/2021, the robot API used by the simulator has been updated.
+                See the Robot API link above for the current API. <br>
+                <b>Your existing simulator code will no longer work.</b>
+                For help getting started with the new API, view our starter code 
+                <a href="https://raw.githubusercontent.com/pioneers/pimulator-js/master/static/student_code_file.py" target="_blank">here</a>. 
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <b>WARNING: </b> The Gamepad Class cannot be used for the Spring 2021 Robotics Competition.
+                Only the Keyboard Class can be used.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
 
         <!-- Row 1: Field & Simulator Info -->
         <div class="row">
@@ -248,6 +269,10 @@
                                                     <p>
                                                         You can start and stop simulations by clicking the buttons to the right of the field.
                                                     </p>
+                                                    <p>
+                                                        If you're having trouble getting started, a code sample is available 
+                                                        <a href="https://raw.githubusercontent.com/pioneers/pimulator-js/master/static/student_code_file.py" target="_blank">here</a>.
+                                                    </p>
                                                     <table class="table">
                                                         <thead>
                                                             <tr>
@@ -355,8 +380,9 @@
                                                     <p>
 
                                                         Using the <b>Gamepad Class</b>, WASD and the arrow keys correspond to what would be the left
-                                                        and right joysticks on a gamepad, respectively. In addition, these controls correspond
-                                                        to specific input names that you can reference in your code:
+                                                        and right joysticks on a gamepad, respectively. <b>(Note: These controls are not available when driving a real robot.
+                                                        They are for ease of use when porting gamepad-based code to the simulator.)</b> 
+                                                        In addition, these controls correspond to specific input names that you can reference in your code:
                                                     </p>
                                                     <h1 style="font-size:18px">
 
@@ -568,6 +594,12 @@
                                             </div>
                                             <div id="help-interactable" class="collapse" aria-labelledby="help-interactable">
                                                 <div class="card-body">
+                                                    <p>
+                                                        <b>(Note: The following API calls are not available when driving a real robot.
+                                                            They are for educational purposes in the simulator only. See the Robot API
+                                                            for info about how to code for the real robot.)
+                                                        </b> 
+                                                    </p>
                                                     <p>
                                                         Some objects on the field are interactable. Your robot can pick up, move, and drop these objects.
                                                     </p>
