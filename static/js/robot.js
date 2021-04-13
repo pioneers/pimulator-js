@@ -436,7 +436,7 @@ class RobotClass {
             }
         }
 
-        // If no collision, update robot positional attributes
+        // If no collision, update robot and attached object positional attributes
         if (!inter) {
             this.X = X;
             this.Y = Y;
@@ -448,7 +448,7 @@ class RobotClass {
             this.topL = corners.topL;
             this.topR = corners.topR;
             if (this.attachedObj) {
-                this.setInteractableObjs(this.attachedObj, objCorners);
+                this.setAttachedObj(objCorners);
             }
         }
 
@@ -459,12 +459,6 @@ class RobotClass {
             dir: this.dir,
             robotType: this.robotType
         };
-
-        // if (this.attachedObj) {
-        //     this.updateInteractableObjs(this.attachedObj);
-        // }
-
-        // this.simulator.drawObjs();
 
         this.lineFollower.update();
         this.limitSwitch.update();
@@ -511,20 +505,20 @@ class RobotClass {
         return dict;
     }
 
-    setInteractableObjs(obstacle, newCorners) {
-        obstacle.botL[0] = newCorners.botL[0];
-        obstacle.botL[1] = newCorners.botL[1];
-        obstacle.topL[0] = newCorners.topL[0];
-        obstacle.topL[1] = newCorners.topL[1];
+    setAttachedObj(newCorners) {
+        this.attachedObj.botL[0] = newCorners.botL[0];
+        this.attachedObj.botL[1] = newCorners.botL[1];
+        this.attachedObj.topL[0] = newCorners.topL[0];
+        this.attachedObj.topL[1] = newCorners.topL[1];
 
-        obstacle.topR[0] = newCorners.topR[0];
-        obstacle.topR[1] = newCorners.topR[1];
-        obstacle.botR[0] = newCorners.botR[0];
-        obstacle.botR[1] = newCorners.botR[1];
+        this.attachedObj.topR[0] = newCorners.topR[0];
+        this.attachedObj.topR[1] = newCorners.topR[1];
+        this.attachedObj.botR[0] = newCorners.botR[0];
+        this.attachedObj.botR[1] = newCorners.botR[1];
 
-        obstacle.x = obstacle.topL[0];
-        obstacle.y = obstacle.topL[1];
-        obstacle.setDirection(this.dir);
+        this.attachedObj.x = this.attachedObj.topL[0];
+        this.attachedObj.y = this.attachedObj.topL[1];
+        this.attachedObj.setDirection(this.dir);
     }
 
     updateCorners(newX, newY, dir) {
