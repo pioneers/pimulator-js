@@ -106,20 +106,24 @@ class LimitSwitch{
     const height = this.leeway;
     const b = (this.robot.width - width) / 2;
 
-    let collidableRegionFront = {topR: Array(2), topL: Array(2), botL: Array(2), botR: Array(2)};
-    collidableRegionFront.botL[0] = this.robot.topL[0] + b * Math.cos((90.0 - this.robot.dir) * Math.PI / 180);
-    collidableRegionFront.botL[1] = this.robot.topL[1] - b * Math.sin((90.0 - this.robot.dir) * Math.PI / 180);
-    collidableRegionFront.topL[0] = collidableRegionFront.botL[0] - height * Math.cos(this.robot.dir * Math.PI / 180);
-    collidableRegionFront.topL[1] = collidableRegionFront.botL[1] - height * Math.sin(this.robot.dir * Math.PI / 180);
-    collidableRegionFront.topR[0] = collidableRegionFront.topL[0] + width * Math.sin(this.robot.dir * Math.PI / 180);
-    collidableRegionFront.topR[1] = collidableRegionFront.topL[1] - width * Math.cos(this.robot.dir * Math.PI / 180);
-    collidableRegionFront.botR[0] = collidableRegionFront.botL[0] + width * Math.sin(this.robot.dir * Math.PI / 180);
-    collidableRegionFront.botR[1] = collidableRegionFront.botL[1] - width * Math.cos(this.robot.dir * Math.PI / 180);
-    for (let obstacle of this.robot.simulator.obstacles) {
-        if (this.robot.intersectOne(obstacle, collidableRegionFront)) {
-          this.switch0 = true;
-          break;
-        }
+    if (this.robot.attachedObj) {
+      this.switch0 = false;
+    } else {
+      let collidableRegionFront = {topR: Array(2), topL: Array(2), botL: Array(2), botR: Array(2)};
+      collidableRegionFront.botL[0] = this.robot.topL[0] + b * Math.cos((90.0 - this.robot.dir) * Math.PI / 180);
+      collidableRegionFront.botL[1] = this.robot.topL[1] - b * Math.sin((90.0 - this.robot.dir) * Math.PI / 180);
+      collidableRegionFront.topL[0] = collidableRegionFront.botL[0] - height * Math.cos(this.robot.dir * Math.PI / 180);
+      collidableRegionFront.topL[1] = collidableRegionFront.botL[1] - height * Math.sin(this.robot.dir * Math.PI / 180);
+      collidableRegionFront.topR[0] = collidableRegionFront.topL[0] + width * Math.sin(this.robot.dir * Math.PI / 180);
+      collidableRegionFront.topR[1] = collidableRegionFront.topL[1] - width * Math.cos(this.robot.dir * Math.PI / 180);
+      collidableRegionFront.botR[0] = collidableRegionFront.botL[0] + width * Math.sin(this.robot.dir * Math.PI / 180);
+      collidableRegionFront.botR[1] = collidableRegionFront.botL[1] - width * Math.cos(this.robot.dir * Math.PI / 180);
+      for (let obstacle of this.robot.simulator.obstacles) {
+          if (this.robot.intersectOne(obstacle, collidableRegionFront)) {
+            this.switch0 = true;
+            break;
+          }
+      }
     }
 
     let collidableRegionBack = {topR: Array(2), topL: Array(2), botL: Array(2), botR: Array(2)};

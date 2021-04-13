@@ -415,6 +415,9 @@ class RobotClass {
                 if (simulator.obstacles[i] !== this.attachedObj) {
                     inter = this.intersectOne(simulator.obstacles[i], objCorners);
                 }
+                if (simulator.obstacles[i] instanceof InteractableObj) {
+                  inter = false;
+                }
                 if (inter) {
                     break;
                 }
@@ -481,16 +484,15 @@ class RobotClass {
 
         if (obstacle) {
             let b = (this.width - obstacle.w) / 2;
-            console.log(robot);
             dict.botL[0] = robot.topL[0] + b * Math.cos((90.0 - dir) * Math.PI / 180);
             dict.botL[1] = robot.topL[1] - b * Math.sin((90.0 - dir) * Math.PI / 180);
-            dict.topL[0] = obstacle.botL[0] - obstacle.h * Math.cos(dir * Math.PI / 180);
-            dict.topL[1] = obstacle.botL[1] - obstacle.h * Math.sin(dir * Math.PI / 180);
+            dict.topL[0] = dict.botL[0] - obstacle.h * Math.cos(dir * Math.PI / 180);
+            dict.topL[1] = dict.botL[1] - obstacle.h * Math.sin(dir * Math.PI / 180);
 
-            dict.topR[0] = obstacle.topL[0] + obstacle.w * Math.sin(dir * Math.PI / 180);
-            dict.topR[1] = obstacle.topL[1] - obstacle.w * Math.cos(dir * Math.PI / 180);
-            dict.botR[0] = obstacle.botL[0] + obstacle.w * Math.sin(dir * Math.PI / 180);
-            dict.botR[1] = obstacle.botL[1] - obstacle.w * Math.cos(dir * Math.PI / 180);
+            dict.topR[0] = dict.topL[0] + obstacle.w * Math.sin(dir * Math.PI / 180);
+            dict.topR[1] = dict.topL[1] - obstacle.w * Math.cos(dir * Math.PI / 180);
+            dict.botR[0] = dict.botL[0] + obstacle.w * Math.sin(dir * Math.PI / 180);
+            dict.botR[1] = dict.botL[1] - obstacle.w * Math.cos(dir * Math.PI / 180);
             //obstacle.setDirection(this.dir);
         }
 
