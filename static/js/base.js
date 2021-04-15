@@ -1,6 +1,6 @@
 var mode = "idle"; // or auto or teleop
-var worker = new Worker("static/js/robot.js?t=" + gitHash);
-worker.postMessage({gitHash: gitHash});
+var worker = new Worker("static/js/robot.js?t=" + cacheKey);
+worker.postMessage({cacheKey: cacheKey});
 var timer;
 var inputMode = "keyboard";
 var robotType = "medium";
@@ -333,9 +333,9 @@ function stop() {
     */
     log("Simulation stopped. Reloading resources...");
     worker.terminate();
-    worker = new Worker("static/js/robot.js?t=" + gitHash);
+    worker = new Worker("static/js/robot.js?t=" + cacheKey);
     worker.onmessage = onmessage;
-    worker.postMessage({gitHash: gitHash});
+    worker.postMessage({cacheKey: cacheKey});
     worker.postMessage({code:code});
     mode = "idle";
     autonomousReset()
