@@ -26,11 +26,11 @@
 
     <title>PiE Robotics Simulator</title>
 
-    <!-- Store git_hash -->
-    <script>var gitHash = "{{ git_hash }}";</script>
+    <!-- Store cache_key -->
+    <script>var cacheKey = "{{ cache_key }}";</script>
 
     <!-- Disables scrolling with arrow keys and spacebar -->
-    <script src="/static/js/disable_scrolling.js?t={{ git_hash }}"></script>
+    <script src="/static/js/disable_scrolling.js?t={{ cache_key }}"></script>
     <link rel="icon" href="https://staff.pierobotics.org/wiki/w/images/thumb/0/0a/Sprocket.png/800px-Sprocket.png" width="16" height="16">
 
     <style>
@@ -60,7 +60,7 @@
             </div>
         </div>
     </nav>
-      
+
     <!-- Body of Content -->
     <div class="container">
 
@@ -70,8 +70,8 @@
                 <b>IMPORTANT: </b> As of 4/10/2021, the robot API used by the simulator has been updated.
                 See the Robot API link above for the current API. <br>
                 <b>Your existing simulator code will no longer work.</b>
-                For help getting started with the new API, view our starter code 
-                <a href="https://raw.githubusercontent.com/pioneers/pimulator-js/master/static/student_code_file.py" target="_blank">here</a>. 
+                For help getting started with the new API, view our starter code
+                <a href="https://raw.githubusercontent.com/pioneers/pimulator-js/master/static/student_code_file.py" target="_blank">here</a>.
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
@@ -173,7 +173,7 @@
                                             </ul>
                                         <script>
                                         /* Change dropdown text to selected item.
-                                        *  Applies to all dropdowns of this type on the page. 
+                                        *  Applies to all dropdowns of this type on the page.
                                         */
                                         $( document ).ready(function() {
                                             $('.dropdown').each(function (key, dropdown) {
@@ -270,7 +270,7 @@
                                                         You can start and stop simulations by clicking the buttons to the right of the field.
                                                     </p>
                                                     <p>
-                                                        If you're having trouble getting started, a code sample is available 
+                                                        If you're having trouble getting started, a code sample is available
                                                         <a href="https://raw.githubusercontent.com/pioneers/pimulator-js/master/static/student_code_file.py" target="_blank">here</a>.
                                                     </p>
                                                     <table class="table">
@@ -381,7 +381,7 @@
 
                                                         Using the <b>Gamepad Class</b>, WASD and the arrow keys correspond to what would be the left
                                                         and right joysticks on a gamepad, respectively. <b>(Note: These controls are not available when driving a real robot.
-                                                        They are for ease of use when porting gamepad-based code to the simulator.)</b> 
+                                                        They are for ease of use when porting gamepad-based code to the simulator.)</b>
                                                         In addition, these controls correspond to specific input names that you can reference in your code:
                                                     </p>
                                                     <h1 style="font-size:18px">
@@ -598,7 +598,7 @@
                                                         <b>(Note: The following API calls are not available when driving a real robot.
                                                             They are for educational purposes in the simulator only. See the Robot API
                                                             for info about how to code for the real robot.)
-                                                        </b> 
+                                                        </b>
                                                     </p>
                                                     <p>
                                                         Some objects on the field are interactable. Your robot can pick up, move, and drop these objects.
@@ -668,9 +668,9 @@
                         <!-- CodeMirror -->
                         <div class="tab-pane fade show active" id="code-mirror" role="tabpanel" aria-labelledby="home-tab">
                             <!-- Create a simple CodeMirror instance -->
-                            <script src="/static/js/codemirror.js?t={{ git_hash }}"></script>
-                            <link rel="stylesheet" href="/static/css/codemirror.css?t={[ git_hash }}">
-                            <script src="/static/js/python.js?t={{ git_hash }}"></script>
+                            <script src="/static/js/codemirror.js?t={{ cache_key }}"></script>
+                            <link rel="stylesheet" href="/static/css/codemirror.css?t={[ cache_key }}">
+                            <script src="/static/js/python.js?t={{ cache_key }}"></script>
                             <script src="/static/js/comment.js"></script>
                             <script src="/static/js/autorefresh.js"></script>
                             <link rel="stylesheet" href="/static/css/cobalt.css">
@@ -729,7 +729,7 @@
                                   var code = localStorage.getItem("code")
                                   if (code == "" || code === null) {
                                     var xhr=new XMLHttpRequest();
-                                    xhr.open("GET","/static/student_code_file.py?t={[ git_hash }}");
+                                    xhr.open("GET","/static/student_code_file.py?t={[ cache_key }}");
                                     xhr.onload = () => {
                                       code = xhr.responseText;
                                       // setCookie("code", code)
@@ -864,9 +864,9 @@
         </div>
     </div>
 
-    <script src="/static/js/joypad.js?t={{ git_hash }}"></script>
-    <script src="/static/js/gamepad.js?t={{ git_hash }}"></script>
-    <script src="/static/js/base.js?t={{ git_hash }}"></script>
+    <script src="/static/js/joypad.js?t={{ cache_key }}"></script>
+    <script src="/static/js/gamepad.js?t={{ cache_key }}"></script>
+    <script src="/static/js/base.js?t={{ cache_key }}"></script>
 
     <!-- Dark mode: this should be at the bottom so all elements get switched. -->
     <script src="https://cdn.jsdelivr.net/gh/fcmam5/nightly.js@v1.0/dist/nightly.min.js"></script>
