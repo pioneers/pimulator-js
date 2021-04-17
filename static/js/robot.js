@@ -773,33 +773,6 @@ function onRelease(keyCode) {
     }
 }
 
-function translateToMovement(keyCode) {
-    if (simulator.current.length === 0) {
-      simulator.robot.updatePosition();
-    }
-    let k;
-    for (k of simulator.current) {
-        if (keyCode === 87) { // w
-            simulator.gamepad.joystick_left_y = 1;
-        } else if (keyCode === 65) { // a
-            simulator.gamepad.joystick_left_x = 1;
-        } else if (keyCode === 83) { // s
-            simulator.gamepad.joystick_left_y = -1;
-        } else if (keyCode === 68) { // d
-            simulator.gamepad.joystick_left_x = -1;
-        } else if (keyCode === 38) { // up
-            simulator.gamepad.joystick_right_y = 1;
-        } else if (keyCode === 40) { // down
-            simulator.gamepad.joystick_right_y = -1;
-        } else if (keyCode === 37) { // left
-            simulator.gamepad.joystick_right_x = -1;
-        } else if (keyCode === 39) { // right
-            simulator.gamepad.joystick_right_x = 1;
-        }
-    }
-    simulator.robot.updatePosition();
-}
-
 /*********************** GAMEPAD INPUT GAMEPAD FUNCTIONS ***********************/
 
 /**

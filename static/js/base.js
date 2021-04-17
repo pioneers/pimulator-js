@@ -321,7 +321,8 @@ function runAutoTimer() {
         document.getElementById("timer").innerText = "Time Left: " + timeLeft + "s";
 
         if (timeLeft < 0) {
-            autonomousReset()
+            clearInterval(timer);
+            stop()
             document.getElementById("timer").innerText = "Autonomous Mode has finished.";
         }
     }, 1000);
@@ -338,15 +339,14 @@ function stop() {
     worker.postMessage({cacheKey: cacheKey});
     worker.postMessage({code:code});
     mode = "idle";
-    autonomousReset()
+    resetSimButtons()
 };
 
-function autonomousReset() {
+function resetSimButtons() {
     /*
         Reset UI elements when autonomous ends by force (Stop) or naturally (30s).
-        Resets the timer & simulation buttons.
+        Resets the simulation buttons.
     */
-    clearInterval(timer);
     document.getElementById("stop-btn").disabled = true;
     document.getElementById("teleop-btn").disabled = false;
     document.getElementById("autonomous-btn").disabled = false;
