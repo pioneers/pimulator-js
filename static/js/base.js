@@ -200,6 +200,7 @@ function uploadCode() {
 }
 
 function uploadObjects(){
+
     if (mode === "idle") {
         clearCanvas();
     }

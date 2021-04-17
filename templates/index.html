@@ -88,6 +88,7 @@
                                 </svg>
                             </button>
                         </div>
+
                         <div class="card-body text-center border-primary" id="field" style="padding:0px;height:432px">
                             <div class="d-inline-flex flex-row bd-highlight">
                                 <div class="bd-highlight" style="position: relative;">
@@ -152,7 +153,7 @@
                                             </ul>
                                         <script>
                                         /* Change dropdown text to selected item.
-                                        *  Applies to all dropdowns of this type on the page. 
+                                        *  Applies to all dropdowns of this type on the page.
                                         */
                                         $( document ).ready(function() {
                                             $('.dropdown').each(function (key, dropdown) {
@@ -711,7 +712,33 @@
                                 </script>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="code-mirror-js" role="tabpanel" aria-labelledby="code-tab-js">
+                        <div class="tab-pane fade " id="code-mirror-js" role="tabpanel" aria-labelledby="code-tab-js">
+                          <div class="bg-light">
+                          <br>
+                         Field options:
+
+                          <button type="button" id="preset" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="uploadPreset()">Preset</button>
+                          <script>
+                              function uploadPreset() {
+                                  var xhrPreset=new XMLHttpRequest();
+                                  xhrPreset.open("GET","/static/field_preset.json")
+
+                                  xhrPreset.onload = () => {
+                                  objectsCode = xhrPreset.responseText;
+                                  cmObjects.setValue(objectsCode);
+                                  setTimeout(function() {
+                                    cmObjects.refresh();
+                                  },1);
+                                  uploadObjects()
+                                }
+                                xhrPreset.send();
+
+                            }
+
+                          </script>
+                          <br>
+                          Code:
+                        </div>
                           <div class="container" id="cmblock-js" style="padding-left:0px;padding-right:0px">
                             <script src="/static/js/javascript.js"></script>
 
