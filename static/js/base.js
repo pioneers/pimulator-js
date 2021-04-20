@@ -383,12 +383,12 @@ function log(text) {
         pythonError = true;
     }
     if (pythonError) {
-        consoleLog.innerHTML += "<span style= \"color: red;\">" + time + text + "</span>" + "<br>";
+        consoleLog.innerHTML += '<span style= "color: red;">' + time + text + "</span>" + "<br>";
         if (text.includes("Error:"))  {
             pythonError = false;
         }
     } else if (text.includes("ERROR:")) {
-        consoleLog.innerHTML += "<span style = \"color: red;\">" + time + text + "</span>" + "<br>";
+        consoleLog.innerHTML += '<span style= "color: red;">' + time + text + "</span>" + "<br>";
     } else {
         consoleLog.innerHTML += time + text + "<br>";
     }
