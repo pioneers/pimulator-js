@@ -149,9 +149,203 @@ function drawObjs(objs, type) {
             ctx.stroke();
         }
     }
-    // else if (type === "terrain") {
-    //     // draw ramps!
-    // }
+    else if (type === "ramp") {
+        ctx.lineWidth = 2;
+        for (let i = 0; i < objs.length; i++) {
+            if (objs[i].highSide == 90.0) {
+                drawArrow(
+                    "south",
+                    scaleFactor * (objs[i].topL[0]+objs[i].topR[0]) / 2,
+                    scaleFactor * (.3 * objs[i].h + objs[i].topL[1]),
+                    scaleFactor * (objs[i].topL[0]+objs[i].topR[0]) / 2,
+                    scaleFactor * (.7 * objs[i].h + objs[i].topL[1]),
+                    objs[i].color
+                );
+                drawArrow(
+                    "south",
+                    scaleFactor * ((objs[i].topL[0]+objs[i].topR[0]) / 2 + .2 * objs[i].w),
+                    scaleFactor * (.3 * objs[i].h + objs[i].topL[1]),
+                    scaleFactor * ((objs[i].topL[0]+objs[i].topR[0]) / 2 + .2 * objs[i].w),
+                    scaleFactor * (.7 * objs[i].h + objs[i].topL[1]),
+                    objs[i].color
+                );
+                drawArrow(
+                    "south",
+                    scaleFactor * ((objs[i].topL[0]+objs[i].topR[0]) / 2 - .2 * objs[i].w),
+                    scaleFactor * (.3 * objs[i].h + objs[i].topL[1]),
+                    scaleFactor * ((objs[i].topL[0]+objs[i].topR[0]) / 2 - .2 * objs[i].w),
+                    scaleFactor * (.7 * objs[i].h + objs[i].topL[1]),
+                    objs[i].color
+                );
+                ctx.beginPath();
+                ctx.strokeStyle = objs[i].color;
+                ctx.moveTo(scaleFactor * objs[i].topL[0], scaleFactor * objs[i].topL[1]);
+                ctx.setLineDash([7, 10]);
+                ctx.lineTo(scaleFactor * objs[i].topR[0], scaleFactor * objs[i].topR[1]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            } else if (objs[i].highSide == 270.0) {
+                drawArrow(
+                    "north",
+                    scaleFactor * (objs[i].topL[0]+objs[i].topR[0]) / 2,
+                    scaleFactor * (.7 * objs[i].h + objs[i].topL[1]),
+                    scaleFactor * (objs[i].topL[0]+objs[i].topR[0]) / 2,
+                    scaleFactor * (.3 * objs[i].h + objs[i].topL[1]),
+                    objs[i].color
+                );
+                drawArrow(
+                    "north",
+                    scaleFactor * ((objs[i].topL[0]+objs[i].topR[0]) / 2 + .2 * objs[i].w),
+                    scaleFactor * (.7 * objs[i].h + objs[i].topL[1]),
+                    scaleFactor * ((objs[i].topL[0]+objs[i].topR[0]) / 2 + .2 * objs[i].w),
+                    scaleFactor * (.3 * objs[i].h + objs[i].topL[1]),
+                    objs[i].color
+                );
+                drawArrow(
+                    "north",
+                    scaleFactor * ((objs[i].topL[0]+objs[i].topR[0]) / 2 - .2 * objs[i].w),
+                    scaleFactor * (.7 * objs[i].h + objs[i].topL[1]),
+                    scaleFactor * ((objs[i].topL[0]+objs[i].topR[0]) / 2 - .2 * objs[i].w),
+                    scaleFactor * (.3 * objs[i].h + objs[i].topL[1]),
+                    objs[i].color
+                );
+                ctx.beginPath();
+                ctx.strokeStyle = objs[i].color;
+                ctx.moveTo(scaleFactor * objs[i].botL[0], scaleFactor * objs[i].botL[1]);
+                ctx.setLineDash([7, 10]);
+                ctx.lineTo(scaleFactor * objs[i].botR[0], scaleFactor * objs[i].botR[1]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            } else if (objs[i].highSide == 180.0) {
+                drawArrow(
+                    "east",
+                    scaleFactor * (.3 * objs[i].w + objs[i].topL[0]),
+                    scaleFactor * (objs[i].topR[1] + objs[i].botR[1]) / 2,
+                    scaleFactor * (.7 * objs[i].w + objs[i].topL[0]),
+                    scaleFactor * (objs[i].topR[1] + objs[i].botR[1]) / 2,
+                    objs[i].color
+                );
+                drawArrow(
+                    "east",
+                    scaleFactor * (.3 * objs[i].w + objs[i].topL[0]),
+                    scaleFactor * (objs[i].topR[1] + objs[i].botR[1]) / 2 + .6 * objs[i].h,
+                    scaleFactor * (.7 * objs[i].w + objs[i].topL[0]),
+                    scaleFactor * (objs[i].topR[1] + objs[i].botR[1]) / 2 + .6 * objs[i].h,
+                    objs[i].color
+                );
+                drawArrow(
+                    "east",
+                    scaleFactor * (.3 * objs[i].w + objs[i].topL[0]),
+                    scaleFactor * (objs[i].topR[1] + objs[i].botR[1]) / 2 - .6 * objs[i].h,
+                    scaleFactor * (.7 * objs[i].w + objs[i].topL[0]),
+                    scaleFactor * (objs[i].topR[1] + objs[i].botR[1]) / 2 - .6 * objs[i].h,
+                    objs[i].color
+                );
+                ctx.beginPath();
+                ctx.strokeStyle = objs[i].color;
+                ctx.moveTo(scaleFactor * objs[i].topL[0], scaleFactor * objs[i].topL[1]);
+                ctx.setLineDash([7, 10]);
+                ctx.lineTo(scaleFactor * objs[i].botL[0], scaleFactor * objs[i].botR[1]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            } else if (objs[i].highSide == 0.0) {
+                drawArrow(
+                    "west",
+                    scaleFactor * (.7 * objs[i].w + objs[i].topL[0]),
+                    scaleFactor * (objs[i].topR[1] + objs[i].botR[1]) / 2,
+                    scaleFactor * (.3 * objs[i].w + objs[i].topL[0]),
+                    scaleFactor * (objs[i].topR[1] + objs[i].botR[1]) / 2,
+                    objs[i].color
+                );
+                drawArrow(
+                    "west",
+                    scaleFactor * (.7 * objs[i].w + objs[i].topL[0]),
+                    scaleFactor * (objs[i].topR[1] + objs[i].botR[1]) / 2 + .6 * objs[i].h,
+                    scaleFactor * (.3 * objs[i].w + objs[i].topL[0]),
+                    scaleFactor * (objs[i].topR[1] + objs[i].botR[1]) / 2 + .6 * objs[i].h,
+                    objs[i].color
+                );
+                drawArrow(
+                    "west",
+                    scaleFactor * (.7 * objs[i].w + objs[i].topL[0]),
+                    scaleFactor * (objs[i].topR[1] + objs[i].botR[1]) / 2 - .6 * objs[i].h,
+                    scaleFactor * (.3 * objs[i].w + objs[i].topL[0]),
+                    scaleFactor * (objs[i].topR[1] + objs[i].botR[1]) / 2 - .6 * objs[i].h,
+                    objs[i].color
+                );
+                ctx.beginPath();
+                ctx.strokeStyle = objs[i].color;
+                ctx.moveTo(scaleFactor * objs[i].topR[0], scaleFactor * objs[i].topR[1]);
+                ctx.setLineDash([7, 10]);
+                ctx.lineTo(scaleFactor * objs[i].botR[0], scaleFactor * objs[i].botR[1]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+    }
+}
+
+function drawArrow(cardinalDir, startX, startY, endX, endY, color) {
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    if (cardinalDir == "south") {
+        let length = endY - startY;
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.lineTo(
+            endX + 0.1 * length,
+            startY + .7 * length// + 1.7 * length
+        );
+        ctx.moveTo(endX, endY);
+        ctx.lineTo(
+            endX - 0.1 * length,
+            startY + .7 * length
+        );
+        ctx.stroke();
+    } else if (cardinalDir == "north") {
+        let length = startY - endY;
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.lineTo(
+            endX + 0.1 * length,
+            startY - .7 * length
+        );
+        ctx.moveTo(endX, endY);
+        ctx.lineTo(
+            endX - 0.1 * length,
+            startY - .7 * length
+        );
+        ctx.stroke();
+    } else if (cardinalDir == "west") {
+        let length = startX - endX;
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.lineTo(
+            endX + 0.3 * length,
+            endY + 0.1 * length
+        );
+        ctx.moveTo(endX, endY);
+        ctx.lineTo(
+            endX + 0.3 * length,
+            endY - 0.1 * length
+        );
+        ctx.stroke();
+    } else if (cardinalDir == "east") {
+        let length = endX - startX;
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.lineTo(
+            endX - 0.3 * length,
+            endY + 0.1 * length
+        );
+        ctx.moveTo(endX, endY);
+        ctx.lineTo(
+            endX - 0.3 * length,
+            endY - 0.1 * length
+        );
+        ctx.stroke();
+    }
 }
 
 function clearCanvas() {
@@ -251,6 +445,7 @@ function update(robot, objects) {
 
     drawObjs(objects.tapeLines, "tapeLine");
     drawObjs(objects.obstacles, "obstacle");
+    drawObjs(objects.ramps, "ramp");
 
     drawRobot(robot);
 }

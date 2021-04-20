@@ -68,7 +68,7 @@ class RobotClass {
         this.invertR = false;     // whether the right motor is inverted (false=default, true=inverted)
 
         // Set robot attributes based on type
-        // Note: width and height values are replicated in base.js. 
+        // Note: width and height values are replicated in base.js.
         // Update both files if robot size changes.
         this.robotType = robotInfo.robotType;
         const validTypes = ["light", "medium", "heavy"];
@@ -133,6 +133,20 @@ class RobotClass {
         this.attachedObj = null;
     }
 
+    checkRamp() {
+        let cornersX = [this.topL[0], this.topR[0], this.botR[0], this.botL[0]];
+        let cornersY = [this.topL[1], this.topR[1], this.botR[1], this.botL[1]];
+        for (let i = 0; i < this.simulator.ramps.length; i++) {
+            for (let r = 0; r < cornersX.length; r++) {
+                if (cornersX[r] < this.simulator.ramps[i].topR[0] && cornersX[r] > this.simulator.ramps[i].topL[0]) {
+                    if (cornersY[r] > this.simulator.ramps[i].topL[1] && cornersY[r] < this.simulator.ramps[i].botL[1]) {
+                        return this.simulator.ramps[i]
+                    }
+                }
+            }
+        }
+        return null;
+    }
     /** Validate the input starting X coordinate of the robot
     *   pos is the value we want to set the coordinate to */
    getValidXPosition(pos, dir) {
@@ -352,6 +366,7 @@ class RobotClass {
         Derived with reference to:
         https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf*/
 
+        let onRamp = this.checkRamp();
         let radian = Math.PI*this.dir/180;
         let dx;
         let dy;
@@ -399,6 +414,18 @@ class RobotClass {
             dx = i * Math.sin(radian) + j * Math.cos(radian);
             dy = i * Math.cos(radian) + j * Math.sin(radian);
             dir = (this.dir + theta*180/Math.PI) % 360;
+        }
+
+        if (onRamp != null) {
+            if (onRamp.highSide == 90.0) {
+                dy = dy + onRamp.incline * 0.01;
+            } else if (onRamp.highSide == 270.0) {
+                dy = dy - onRamp.incline * 0.01;
+            } else if (onRamp.highSide == 0.0) {
+                dx = dx - onRamp.incline * 0.01;
+            } else if (onRamp.highSide == 180.0) {
+                dx = dx + onRamp.incline * 0.01;
+            }
         }
 
         // Temporarily define new robot positional values
@@ -461,6 +488,7 @@ class RobotClass {
         let objects = {
             tapeLines: this.simulator.tapeLines,
             obstacles: this.simulator.obstacles,
+            ramps: this.simulator.ramps
         }
 
         postMessage({
@@ -608,7 +636,7 @@ class RobotClass {
         /* Runtime API method for getting sensor values.
            Supports reading left, center and right line followers
            in a range of [0,1].
-           Supports reading front and rear limit switches. 
+           Supports reading front and rear limit switches.
            Supports reading KoalaBear velocity and invert parameters. */
         if (device === "limit_switch") {
             if (param === "switch0") {
@@ -626,7 +654,7 @@ class RobotClass {
                 return this.lineFollower.right;
             }
         }
-        if (device === "koala_bear") { 
+        if (device === "koala_bear") {
             if (param === "velocity_b") {
                 return this.requestedLv;
             } else if (param === "velocity_a") {
@@ -919,7 +947,7 @@ class Simulator{
         this.tapeLines = [];
         this.obstacles = [];
         this.interactableObjs = [];
-        this.terrains = [];
+        this.ramps = [];
     }
 
     defineObjs(objects) {
@@ -931,7 +959,7 @@ class Simulator{
         this.tapeLines = [];
         this.obstacles = [];
         this.interactableObjs = [];
-        this.terrains = [];
+        this.ramps = [];
 
         if (objects.tapeLinesData !== undefined) {
             for (let newLine of objects.tapeLinesData) {
@@ -950,15 +978,26 @@ class Simulator{
                 this.obstacles.push(newInteractableObj);
             }
         }
-        // default Ramp
-        if (objects.terrainsData !== undefined) {
-            for (let terrainObj of objects.terrainsData) {
-                let newRamp = new Ramp(terrainObj.x, terrainObj.y, terrainObj.w, terrainObj. h, terrainObj.direction, terrainObj.color);
-                this.terrains.push(newRamp);
-                if (newRamp.upDir == 90.0) {
+        if (objects.rampsData !== undefined) {
+            for (let rampObj of objects.rampsData) {
+                let newRamp = new Ramp(rampObj.x, rampObj.y, rampObj.w, rampObj. h, rampObj.highSide, rampObj.incline, rampObj.color);
+                this.ramps.push(newRamp);
+                if (newRamp.highSide == 90.0) {
+                    // up
                     this.obstacles.push(new Wall(newRamp.topL[0], newRamp.topL[1], 1, newRamp.h, newRamp.color));
-                    //this.obstacles.push(new Wall(newRamp.topL[0], newRamp.topL[1], newRamp.w, 1, newRamp.color));
                     this.obstacles.push(new Wall(newRamp.topR[0], newRamp.topR[1], 1, newRamp.h, newRamp.color));
+                } else if (newRamp.highSide == 270.0) {
+                    // down
+                    this.obstacles.push(new Wall(newRamp.topL[0], newRamp.topL[1], 1, newRamp.h, newRamp.color));
+                    this.obstacles.push(new Wall(newRamp.topR[0], newRamp.topR[1], 1, newRamp.h, newRamp.color));
+                } else if (newRamp.highSide == 180.0) {
+                    // right
+                    this.obstacles.push(new Wall(newRamp.topL[0], newRamp.topL[1], newRamp.w, 1, newRamp.color));
+                    this.obstacles.push(new Wall(newRamp.botL[0], newRamp.botL[1], newRamp.w, 1, newRamp.color));
+                } else if (newRamp.highSide== 0.0) {
+                    // left
+                    this.obstacles.push(new Wall(newRamp.topL[0], newRamp.topL[1], newRamp.w, 1, newRamp.color));
+                    this.obstacles.push(new Wall(newRamp.botL[0], newRamp.botL[1], newRamp.w, 1, newRamp.color));
                 }
             }
         }
@@ -967,7 +1006,7 @@ class Simulator{
     drawObjs() {
         postMessage({objs: this.tapeLines, type: "tapeLine"});
         postMessage({objs: this.obstacles, type: "obstacle"});
-        postMessage({objs: this.terrains, type: "terrain"});
+        postMessage({objs: this.ramps, type: "ramp"});
     }
 
     loadStudentCode(){
