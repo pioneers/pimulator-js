@@ -2,7 +2,9 @@
 
 ## April 12, 2021
 #### Changes
-- Interactable objects now have object collision with non-interactable objects (walls)
+- Interactable object collision
+    - Interactable objects will collide with non-interactable objects (Robot, walls)
+    - Interactable objects will ***not*** collide with interactable objects (objects that can be picked up)
 <br>
 
 ## April 10, 2021

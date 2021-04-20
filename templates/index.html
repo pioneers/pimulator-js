@@ -45,6 +45,36 @@
   </head>
 
   <body>
+    <!-- Release Note Popup -->
+    <div class="modal" tabindex="-1" role="dialog" id="release-note">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">April 12, 2021 Updates</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="modal-body">
+            <ul>
+                <li>Interactable object collision</li>
+                <ul>
+                  <li>Interactable objects will collide with non-interactable objects (Robot, walls)</li>
+                  <li>Interactable objects will <b><i>not</i></b> collide with interactable objects (objects that can be picked up)</li>
+                </ul>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-primary">Release Notes</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+        $(document).ready(function(){
+            $("#release-note").modal('show');
+        });
+    </script>
     <!-- Header Navigation Bar -->
     <nav class="navbar navbar-expand-lg">
         <span class="navbar-brand mb-0 h1">
