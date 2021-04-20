@@ -6,6 +6,7 @@ var inputMode = "keyboard";
 var robotType = "medium";
 var direction = 0;
 var codeUploaded = false;
+var pythonError = false;
 const scaleFactor = 3;
 const canvas = document.getElementById('fieldCanvas');
 const ctx = canvas.getContext('2d');
@@ -378,6 +379,18 @@ function log(text) {
     const time = '[' + ((hour < 10) ? '0' + hour: hour) + ':' + ((minutes < 10) ? '0' + minutes: minutes) + '] ';
 
     let consoleLog = document.getElementById("console");
-    consoleLog.innerHTML += time + text + "<br>";
+    if (text.includes("Python exception:")) {
+        pythonError = true;
+    }
+    if (pythonError) {
+        consoleLog.innerHTML += '<span style= "color: red;">' + time + text + "</span>" + "<br>";
+        if (text.includes("Error:"))  {
+            pythonError = false;
+        }
+    } else if (text.includes("ERROR:")) {
+        consoleLog.innerHTML += '<span style= "color: red;">' + time + text + "</span>" + "<br>";
+    } else {
+        consoleLog.innerHTML += time + text + "<br>";
+    }
     consoleLog.scrollTop = consoleLog.scrollHeight;
 }
