@@ -1,23 +1,23 @@
 /* Rebind console messages. */
-var console=(function(oldCons){
-    return {
-        log: function(text){
-            oldCons.log(text);
-            postMessage({
-                log: text
-            })
-        },
-        info: function (text) {
-            oldCons.info(text);
-        },
-        warn: function (text) {
-            oldCons.warn(text);
-        },
-        error: function (text) {
-            oldCons.error(text);
-        }
-    };
-}(console));
+// var console=(function(oldCons){
+//     return {
+//         log: function(text){
+//             oldCons.log(text);
+//             postMessage({
+//                 log: text
+//             })
+//         },
+//         info: function (text) {
+//             oldCons.info(text);
+//         },
+//         warn: function (text) {
+//             oldCons.warn(text);
+//         },
+//         error: function (text) {
+//             oldCons.error(text);
+//         }
+//     };
+// }(console));
 
 // Query string used when creating the worker, including the ampersand separator
 var queryString = location.search;
@@ -893,9 +893,15 @@ class Simulator{
                 this.tapeLines.push(new TapeLine(newLine.x1, newLine.y1, newLine.x2, newLine.y2, newLine.color));
             }
         }
+
         if (objects.wallsData !== undefined) {
             for (let newWall of objects.wallsData) {
-                this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, newWall.color));
+                if (newWall.rotate !== undefined){
+                    console.log(newWall.rotate)
+                  this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, newWall.rotate, newWall.color))
+                } else {
+                this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, 0, newWall.color));
+              }
             }
         }
         if (objects.interactableData !== undefined) {
