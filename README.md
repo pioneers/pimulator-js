@@ -1,21 +1,14 @@
 # Pimulator
 
-Pimulator is a robotics simulator for the Pioneers in Engineering robotics kit. 
-Pimulator seeks to allow students to gain experience in programming their robot with any internet-accessible computer. 
-Students are able to execute code on this virtual robot, just as they can on a physical robot and receive the same feedback. 
-Pimulator seeks to allow aspiring programers the ability to iterate and explore without the constraints of a single physical robot.
+Pimulator is a robotics simulator for the Pioneers in Engineering robotics kit. Pimulator seeks to allow students to gain experience in programming their robot with any internet-accessible computer. Students are able to execute code on this virtual robot, just as they can on a physical robot and receive the same feedback. Pimulator seeks to allow aspiring programers the ability to iterate and explore without the constraints of a single physical robot.
 
-Pimulator is a fully client-side web application. It can be viewed as having two parts. 
-The simulator, which runs in a Web Worker (see static/js/robot.js) calculates and determines the state of the robot after taking into account physics, student code, the game pad, etc. 
-The UI (index.html and base.js) receives information from the simulator and displays the state of the simulator to the user.
+Pimulator is a fully client-side web application. It can be viewed as having two parts. The simulator, which runs in a Web Worker (see static/js/robot.js) calculates and determines the state of the robot after taking into account physics, student code, the game pad, etc. The UI (index.html and base.js) receives information from the simulator and displays the state of the simulator to the user.
 
 ## The Simulator
 
 The simulator was largely developed as a Python-based server side application by Wing during Spring 2017. Wing and Scott originally released the simulator using a text based UI through repl.it for general students to use. The UI along with the robustness proved too large of a challenge to prove useful for general PiE students. It was later converted to JavaScript + [Pyodide](https://github.com/iodide-project/pyodide) for running student code by Charles, Kevin, and Ryan in Summer 2020.
 
-The simulator models the robot as a cart with two independently powered wheels. 
-It provides line follower and limit switch sensors, and objects that can be interacted with through the `drop()` and `pick_up()` abstracted functions. 
-Users can input their own fields in a JSON format.
+The simulator models the robot as a cart with two independently powered wheels. It provides line follower and limit switch sensors, and objects that can be interacted with through the `drop()` and `pick_up()` abstracted functions. Users can input their own fields in a JSON format.
 
 Ideally, the simulator will later have the flexibility for the student to add on their own other motors and sensors to interact with the world.
 
