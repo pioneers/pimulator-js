@@ -47,7 +47,7 @@ function drawRobot(robot) {
     const dir = robot.dir/180*Math.PI;  // Convert to Radians
 
     if (!robot.robotType) {
-        robot.robotType == "medium";
+        robot.robotType = "medium";
     }
     if (robot.robotType == "light") {
         robotWidth = 14.18;      // Robot width, inches
@@ -153,20 +153,24 @@ function drawObjs(objs, type) {
         ctx.lineWidth = 2;
         for (let i = 0; i < objs.length; i++) {
             if (objs[i].highSide == "up" || objs[i].highSide == "down") {
-                let startYConst = .3;
-                let endYConst = .7;
+                // defining the y coordinates for start and end points of an up arrow
+                let startY = .3 * objs[i].h + objs[i].topL[1];
+                let endY = .7 * objs[i].h + objs[i].topL[1];
+                // defining starting coordinate for dashed line for up ramp
                 let dashedStart = [scaleFactor * objs[i].topL[0], scaleFactor * objs[i].topL[1]];
+                // flipping the start and end if it's a down arrow
                 if (objs[i].highSide == "down") {
-                    startYConst = .7;
-                    endYConst = .3;
+                    startY = .7 * objs[i].h + objs[i].topL[1];
+                    endY = .3 * objs[i].h + objs[i].topL[1];
+                    // setting starting coordinate for dashed line for down ramp
                     dashedStart = [scaleFactor * objs[i].botL[0], scaleFactor * objs[i].botL[1]];
                 }
                 drawArrows(
                     "vertical",
                     scaleFactor * ((objs[i].topL[0]+objs[i].topR[0]) / 2 - .2 * objs[i].w),
-                    scaleFactor * (startYConst * objs[i].h + objs[i].topL[1]),
+                    scaleFactor * startY,
                     scaleFactor * ((objs[i].topL[0]+objs[i].topR[0]) / 2 - .2 * objs[i].w),
-                    scaleFactor * (endYConst * objs[i].h + objs[i].topL[1]),
+                    scaleFactor * endY,
                     scaleFactor * .2 * objs[i].w,
                     objs[i].color
                 );
@@ -178,19 +182,23 @@ function drawObjs(objs, type) {
                 ctx.stroke();
                 ctx.setLineDash([]);
             } else if (objs[i].highSide == "left" || objs[i].highSide == "right") {
-                let startXConst = .3;
-                let endXConst = .7;
+                // defining the y coordinates for start and end points of a left arrow
+                let startX = .3 * objs[i].w + objs[i].topL[0];
+                let endX = .7 * objs[i].w + objs[i].topL[0];
+                // defining starting coordinate for dashed line for left ramp
                 let dashedStart = [scaleFactor * objs[i].topL[0], scaleFactor * objs[i].topL[1]];
+                // flipping the start and end if it's a right arrow
                 if (objs[i].highSide == "right") {
-                    startXConst = .7;
-                    endXConst = .3;
+                    startX = .7 * objs[i].w + objs[i].topL[0];
+                    endX = .3 * objs[i].w + objs[i].topL[0];
+                    // setting starting coordinate for dashed line for right ramp
                     dashedStart = [scaleFactor * objs[i].topR[0], scaleFactor * objs[i].topR[1]];
                 }
                 drawArrows(
                     "horizontal",
-                    scaleFactor * (startXConst * objs[i].w + objs[i].topL[0]),
+                    scaleFactor * startX,
                     scaleFactor * ((objs[i].topR[1] + objs[i].botR[1]) / 2 - .2 * objs[i].h),
-                    scaleFactor * (endXConst * objs[i].w + objs[i].topL[0]),
+                    scaleFactor * endX,
                     scaleFactor * ((objs[i].topR[1] + objs[i].botR[1]) / 2 - .2 * objs[i].h),
                     scaleFactor * .2 * objs[i].h,
                     objs[i].color
