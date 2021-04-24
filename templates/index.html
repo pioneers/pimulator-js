@@ -64,7 +64,7 @@
                 </ul>
           </div>
           <div class="modal-footer">
-              <button type="button" class="btn btn-primary">Release Notes</button>
+              <a href="https://github.com/pioneers/pimulator-js/blob/notes/releasenotes.md" type="button" class="btn btn-primary" target="_blank">Release Notes</a>
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
         </div>
@@ -72,7 +72,10 @@
     </div>
     <script>
         $(document).ready(function(){
+          if (localStorage.getItem("lastUpdate") !== lastUpdate) {
+            localStorage.setItem("lastUpdate", lastUpdate);
             $("#release-note").modal('show');
+          }
         });
     </script>
     <!-- Header Navigation Bar -->
@@ -87,6 +90,7 @@
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
                 <a class="nav-item nav-link" href="https://github.com/pioneers/runtime/wiki/Student-API" target="_blank">Robot API</a>
+                <a class="nav-item nav-link" href="https://github.com/pioneers/pimulator-js/blob/notes/releasenotes.md" target="_blank">Release Notes</a>
             </div>
         </div>
     </nav>

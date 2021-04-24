@@ -9,6 +9,7 @@
 
 ## April 10, 2021
 #### Changes
+- API updated for Spring 2021 Competition
 - Bug fixes
 <br>
 
