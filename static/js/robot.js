@@ -1,23 +1,23 @@
 /* Rebind console messages. */
-// var console=(function(oldCons){
-//     return {
-//         log: function(text){
-//             oldCons.log(text);
-//             postMessage({
-//                 log: text
-//             })
-//         },
-//         info: function (text) {
-//             oldCons.info(text);
-//         },
-//         warn: function (text) {
-//             oldCons.warn(text);
-//         },
-//         error: function (text) {
-//             oldCons.error(text);
-//         }
-//     };
-// }(console));
+var console=(function(oldCons){
+    return {
+        log: function(text){
+            oldCons.log(text);
+            postMessage({
+                log: text
+            })
+        },
+        info: function (text) {
+            oldCons.info(text);
+        },
+        warn: function (text) {
+            oldCons.warn(text);
+        },
+        error: function (text) {
+            oldCons.error(text);
+        }
+    };
+}(console));
 
 // Query string used when creating the worker, including the ampersand separator
 var queryString = location.search;
