@@ -13,8 +13,5 @@
     ],
     interactableData: [
         {x: 20, y: 20, w: 10, h: 10}
-    ],
-    rampsData: [
-        {x: 0, y: 50, w: 30, h: 40, highSide: "up", incline: 15, color: "black"}
     ]
 }

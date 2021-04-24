@@ -55,15 +55,7 @@ class InteractableObj extends FieldObj {
 class Ramp extends FieldObj {
     constructor(x, y, w, h, highSide = "up", incline = 15, color = "black") {
         super(x, y, w, h, color);
-        if (highSide == "up") {
-            this.highSide = 90.0;
-        } else if (highSide == "down") {
-            this.highSide = 270.0;
-        } else if (highSide == "right") {
-            this.highSide = 0.0;
-        } else if (highSide == "left") {
-            this.highSide = 180.0;
-        }
+        this.highSide = highSide;
         this.incline = incline;
     }
 }

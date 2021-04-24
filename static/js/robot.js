@@ -366,7 +366,6 @@ class RobotClass {
         Derived with reference to:
         https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf*/
 
-        let onRamp = this.checkRamp();
         let radian = Math.PI*this.dir/180;
         let dx;
         let dy;
@@ -416,15 +415,17 @@ class RobotClass {
             dir = (this.dir + theta*180/Math.PI) % 360;
         }
 
+        let onRamp = this.checkRamp();
+        let offsetConst = 0.015;
         if (onRamp != null) {
-            if (onRamp.highSide == 90.0) {
-                dy = dy + onRamp.incline * 0.01;
-            } else if (onRamp.highSide == 270.0) {
-                dy = dy - onRamp.incline * 0.01;
-            } else if (onRamp.highSide == 0.0) {
-                dx = dx - onRamp.incline * 0.01;
-            } else if (onRamp.highSide == 180.0) {
-                dx = dx + onRamp.incline * 0.01;
+            if (onRamp.highSide == "up") {
+                dy = dy + onRamp.incline * offsetConst;
+            } else if (onRamp.highSide == "down") {
+                dy = dy - onRamp.incline * offsetConst;
+            } else if (onRamp.highSide == "right") {
+                dx = dx - onRamp.incline * offsetConst;
+            } else if (onRamp.highSide == "left") {
+                dx = dx + onRamp.incline * offsetConst;
             }
         }
 
@@ -982,20 +983,10 @@ class Simulator{
             for (let rampObj of objects.rampsData) {
                 let newRamp = new Ramp(rampObj.x, rampObj.y, rampObj.w, rampObj. h, rampObj.highSide, rampObj.incline, rampObj.color);
                 this.ramps.push(newRamp);
-                if (newRamp.highSide == 90.0) {
-                    // up
+                if (newRamp.highSide == "up" || newRamp.highSide == "down") {
                     this.obstacles.push(new Wall(newRamp.topL[0], newRamp.topL[1], 1, newRamp.h, newRamp.color));
                     this.obstacles.push(new Wall(newRamp.topR[0], newRamp.topR[1], 1, newRamp.h, newRamp.color));
-                } else if (newRamp.highSide == 270.0) {
-                    // down
-                    this.obstacles.push(new Wall(newRamp.topL[0], newRamp.topL[1], 1, newRamp.h, newRamp.color));
-                    this.obstacles.push(new Wall(newRamp.topR[0], newRamp.topR[1], 1, newRamp.h, newRamp.color));
-                } else if (newRamp.highSide == 180.0) {
-                    // right
-                    this.obstacles.push(new Wall(newRamp.topL[0], newRamp.topL[1], newRamp.w, 1, newRamp.color));
-                    this.obstacles.push(new Wall(newRamp.botL[0], newRamp.botL[1], newRamp.w, 1, newRamp.color));
-                } else if (newRamp.highSide== 0.0) {
-                    // left
+                } else if (newRamp.highSide == "right" || newRamp.highSide == "left") {
                     this.obstacles.push(new Wall(newRamp.topL[0], newRamp.topL[1], newRamp.w, 1, newRamp.color));
                     this.obstacles.push(new Wall(newRamp.botL[0], newRamp.botL[1], newRamp.w, 1, newRamp.color));
                 }

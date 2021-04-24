@@ -152,7 +152,7 @@ function drawObjs(objs, type) {
     else if (type === "ramp") {
         ctx.lineWidth = 2;
         for (let i = 0; i < objs.length; i++) {
-            if (objs[i].highSide == 90.0) {
+            if (objs[i].highSide == "up") {
                 drawArrow(
                     "south",
                     scaleFactor * (objs[i].topL[0]+objs[i].topR[0]) / 2,
@@ -184,7 +184,7 @@ function drawObjs(objs, type) {
                 ctx.lineTo(scaleFactor * objs[i].topR[0], scaleFactor * objs[i].topR[1]);
                 ctx.stroke();
                 ctx.setLineDash([]);
-            } else if (objs[i].highSide == 270.0) {
+            } else if (objs[i].highSide == "down") {
                 drawArrow(
                     "north",
                     scaleFactor * (objs[i].topL[0]+objs[i].topR[0]) / 2,
@@ -216,7 +216,7 @@ function drawObjs(objs, type) {
                 ctx.lineTo(scaleFactor * objs[i].botR[0], scaleFactor * objs[i].botR[1]);
                 ctx.stroke();
                 ctx.setLineDash([]);
-            } else if (objs[i].highSide == 180.0) {
+            } else if (objs[i].highSide == "left") {
                 drawArrow(
                     "east",
                     scaleFactor * (.3 * objs[i].w + objs[i].topL[0]),
@@ -248,7 +248,7 @@ function drawObjs(objs, type) {
                 ctx.lineTo(scaleFactor * objs[i].botL[0], scaleFactor * objs[i].botR[1]);
                 ctx.stroke();
                 ctx.setLineDash([]);
-            } else if (objs[i].highSide == 0.0) {
+            } else if (objs[i].highSide == "right") {
                 drawArrow(
                     "west",
                     scaleFactor * (.7 * objs[i].w + objs[i].topL[0]),
@@ -295,7 +295,7 @@ function drawArrow(cardinalDir, startX, startY, endX, endY, color) {
         ctx.lineTo(endX, endY);
         ctx.lineTo(
             endX + 0.1 * length,
-            startY + .7 * length// + 1.7 * length
+            startY + .7 * length
         );
         ctx.moveTo(endX, endY);
         ctx.lineTo(
