@@ -152,72 +152,54 @@ function drawObjs(objs, type) {
     else if (type === "ramp") {
         ctx.lineWidth = 2;
         for (let i = 0; i < objs.length; i++) {
-            if (objs[i].highSide == "up") {
+            if (objs[i].highSide == "up" || objs[i].highSide == "down") {
+                let startYConst = .3;
+                let endYConst = .7;
+                let dashedStart = [scaleFactor * objs[i].topL[0], scaleFactor * objs[i].topL[1]];
+                if (objs[i].highSide == "down") {
+                    startYConst = .7;
+                    endYConst = .3;
+                    dashedStart = [scaleFactor * objs[i].botL[0], scaleFactor * objs[i].botL[1]];
+                }
                 drawArrows(
-                    "south",
+                    "vertical",
                     scaleFactor * ((objs[i].topL[0]+objs[i].topR[0]) / 2 - .2 * objs[i].w),
-                    scaleFactor * (.3 * objs[i].h + objs[i].topL[1]),
+                    scaleFactor * (startYConst * objs[i].h + objs[i].topL[1]),
                     scaleFactor * ((objs[i].topL[0]+objs[i].topR[0]) / 2 - .2 * objs[i].w),
-                    scaleFactor * (.7 * objs[i].h + objs[i].topL[1]),
+                    scaleFactor * (endYConst * objs[i].h + objs[i].topL[1]),
                     scaleFactor * .2 * objs[i].w,
                     objs[i].color
                 );
                 ctx.beginPath();
                 ctx.strokeStyle = objs[i].color;
-                ctx.moveTo(scaleFactor * objs[i].topL[0], scaleFactor * objs[i].topL[1]);
+                ctx.moveTo(dashedStart[0], dashedStart[1]);
                 ctx.setLineDash([7, 10]);
-                ctx.lineTo(scaleFactor * objs[i].topR[0], scaleFactor * objs[i].topR[1]);
+                ctx.lineTo(dashedStart[0] + scaleFactor * objs[i].w, dashedStart[1]);
                 ctx.stroke();
                 ctx.setLineDash([]);
-            } else if (objs[i].highSide == "down") {
+            } else if (objs[i].highSide == "left" || objs[i].highSide == "right") {
+                let startXConst = .3;
+                let endXConst = .7;
+                let dashedStart = [scaleFactor * objs[i].topL[0], scaleFactor * objs[i].topL[1]];
+                if (objs[i].highSide == "right") {
+                    startXConst = .7;
+                    endXConst = .3;
+                    dashedStart = [scaleFactor * objs[i].topR[0], scaleFactor * objs[i].topR[1]];
+                }
                 drawArrows(
-                    "north",
-                    scaleFactor * ((objs[i].topL[0]+objs[i].topR[0]) / 2 - .2 * objs[i].w),
-                    scaleFactor * (.7 * objs[i].h + objs[i].topL[1]),
-                    scaleFactor * ((objs[i].topL[0]+objs[i].topR[0]) / 2 - .2 * objs[i].w),
-                    scaleFactor * (.3 * objs[i].h + objs[i].topL[1]),
-                    scaleFactor * .2 * objs[i].w,
-                    objs[i].color
-                );
-                ctx.beginPath();
-                ctx.strokeStyle = objs[i].color;
-                ctx.moveTo(scaleFactor * objs[i].botL[0], scaleFactor * objs[i].botL[1]);
-                ctx.setLineDash([7, 10]);
-                ctx.lineTo(scaleFactor * objs[i].botR[0], scaleFactor * objs[i].botR[1]);
-                ctx.stroke();
-                ctx.setLineDash([]);
-            } else if (objs[i].highSide == "left") {
-                drawArrows(
-                    "east",
-                    scaleFactor * (.3 * objs[i].w + objs[i].topL[0]),
+                    "horizontal",
+                    scaleFactor * (startXConst * objs[i].w + objs[i].topL[0]),
                     scaleFactor * ((objs[i].topR[1] + objs[i].botR[1]) / 2 - .2 * objs[i].h),
-                    scaleFactor * (.7 * objs[i].w + objs[i].topL[0]),
+                    scaleFactor * (endXConst * objs[i].w + objs[i].topL[0]),
                     scaleFactor * ((objs[i].topR[1] + objs[i].botR[1]) / 2 - .2 * objs[i].h),
                     scaleFactor * .2 * objs[i].h,
                     objs[i].color
                 );
                 ctx.beginPath();
                 ctx.strokeStyle = objs[i].color;
-                ctx.moveTo(scaleFactor * objs[i].topL[0], scaleFactor * objs[i].topL[1]);
+                ctx.moveTo(dashedStart[0], dashedStart[1]);
                 ctx.setLineDash([7, 10]);
-                ctx.lineTo(scaleFactor * objs[i].botL[0], scaleFactor * objs[i].botR[1]);
-                ctx.stroke();
-                ctx.setLineDash([]);
-            } else if (objs[i].highSide == "right") {
-                drawArrows(
-                    "west",
-                    scaleFactor * (.7 * objs[i].w + objs[i].topL[0]),
-                    scaleFactor * (objs[i].topR[1] + objs[i].botR[1]) / 2 - .6 * objs[i].h,
-                    scaleFactor * (.3 * objs[i].w + objs[i].topL[0]),
-                    scaleFactor * (objs[i].topR[1] + objs[i].botR[1]) / 2 - .6 * objs[i].h,
-                    scaleFactor * .2 * objs[i].h,
-                    objs[i].color
-                );
-                ctx.beginPath();
-                ctx.strokeStyle = objs[i].color;
-                ctx.moveTo(scaleFactor * objs[i].topR[0], scaleFactor * objs[i].topR[1]);
-                ctx.setLineDash([7, 10]);
-                ctx.lineTo(scaleFactor * objs[i].botR[0], scaleFactor * objs[i].botR[1]);
+                ctx.lineTo(dashedStart[0], dashedStart[1] + scaleFactor * objs[i].h);
                 ctx.stroke();
                 ctx.setLineDash([]);
             }
@@ -229,7 +211,7 @@ function drawArrows(cardinalDir, startX, startY, endX, endY, space, color) {
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.strokeStyle = color;
-    if (cardinalDir == "south" || cardinalDir == "north") {
+    if (cardinalDir == "vertical") {
         let length = endY - startY;
         for (let i = 0; i < 3; i++) {
             ctx.moveTo(startX, startY);
@@ -247,7 +229,7 @@ function drawArrows(cardinalDir, startX, startY, endX, endY, space, color) {
             startX += space;
             endX += space;
         }
-    } else if (cardinalDir == "west" || cardinalDir == "east") {
+    } else if (cardinalDir == "horizontal") {
         let length = startX - endX;
         for (let i = 0; i < 3; i++) {
             ctx.moveTo(startX, startY);
@@ -266,21 +248,6 @@ function drawArrows(cardinalDir, startX, startY, endX, endY, space, color) {
             endY += space;
         }
     }
-    // else if (cardinalDir == "east") {
-    //     let length = endX - startX;
-    //     ctx.moveTo(startX, startY);
-    //     ctx.lineTo(endX, endY);
-    //     ctx.lineTo(
-    //         endX - 0.3 * length,
-    //         endY + 0.1 * length
-    //     );
-    //     ctx.moveTo(endX, endY);
-    //     ctx.lineTo(
-    //         endX - 0.3 * length,
-    //         endY - 0.1 * length
-    //     );
-    //     ctx.stroke();
-    // }
 }
 
 function clearCanvas() {
