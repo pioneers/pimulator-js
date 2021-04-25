@@ -1,4 +1,10 @@
 {
+    tapeLinesData: [
+        {x1: 15, y1: 88.5, x2: 40, y2: 88.5, color: "yellow"},
+        {x1: 40, y1: 88.5, x2: 48, y2: 84.5, color: "yellow"},
+        {x1: 48, y1: 84.5, x2:60, y2: 84.5, color: "yellow"},
+        {x1: 60, y1: 84.5, x2: 68, y2: 93, color: "yellow"}
+    ],
     wallsData: [
         {x: 0, y: 0, w: 144, h: 2},
         {x: 0, y: 0, w: 2, h: 144},
