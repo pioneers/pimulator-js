@@ -978,10 +978,10 @@ class Simulator{
             for (let newWall of objects.wallsData) {
                 if (newWall.rotate !== undefined){
                     console.log(newWall.rotate)
-                  this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, newWall.rotate, newWall.color))
+                    this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, newWall.rotate, newWall.color))
                 } else {
-                this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, 0, newWall.color));
-              }
+                    this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, 0, newWall.color));
+                }
             }
         }
         if (objects.interactableData !== undefined) {
@@ -996,20 +996,20 @@ class Simulator{
                 let newRamp = new Ramp(rampObj.x, rampObj.y, rampObj.w, rampObj. h, rampObj.highSide, rampObj.incline, rampObj.color);
                 this.ramps.push(newRamp);
                 if (newRamp.highSide == "up" || newRamp.highSide == "down") {
-                    this.obstacles.push(new Wall(newRamp.topL[0], newRamp.topL[1], 1, newRamp.h, newRamp.color));
-                    this.obstacles.push(new Wall(newRamp.topR[0], newRamp.topR[1], 1, newRamp.h, newRamp.color));
+                    this.obstacles.push(new Wall(newRamp.topL[0]-1, newRamp.topL[1], 1, newRamp.h, 0, newRamp.color));
+                    this.obstacles.push(new Wall(newRamp.topR[0], newRamp.topR[1], 1, newRamp.h, 0, newRamp.color));
                 } else if (newRamp.highSide == "right" || newRamp.highSide == "left") {
-                    this.obstacles.push(new Wall(newRamp.topL[0], newRamp.topL[1], newRamp.w, 1, newRamp.color));
-                    this.obstacles.push(new Wall(newRamp.botL[0], newRamp.botL[1], newRamp.w, 1, newRamp.color));
+                    this.obstacles.push(new Wall(newRamp.topL[0], newRamp.topL[1]-1, newRamp.w, 1, 0, newRamp.color));
+                    this.obstacles.push(new Wall(newRamp.botL[0], newRamp.botL[1], newRamp.w, 1, 0, newRamp.color));
                 }
             }
         }
     }
 
     drawObjs() {
+        postMessage({objs: this.ramps, type: "ramp"});
         postMessage({objs: this.tapeLines, type: "tapeLine"});
         postMessage({objs: this.obstacles, type: "obstacle"});
-        postMessage({objs: this.ramps, type: "ramp"});
     }
 
     loadStudentCode(){
