@@ -41,6 +41,7 @@ class RobotClass {
     tickRate = 50;              // in ms
     width = 26.7;               // width of robot, inches
     height = 20;                // height or robot, inches
+    wheelWidth = 20;            // wheelbase width, inches
     wRadius = 2;                // radius of a wheel, inches
     MaxX = 144;                 // maximum X value, inches, field is 12'x12'
     MaxY = 144;                 // maximum Y value, inches, field is 12'x12'
@@ -54,15 +55,21 @@ class RobotClass {
     leeway = 1;
 
     constructor(simulator, robotInfo) {
-        this.Wl = 0.0;           // requested angular velocity of l wheel, radians/s
-        this.Wr = 0.0;           // requested angular velocity of r wheel, radians/s
-        this.ltheta = 0.0;       // angular position of l wheel, degrees
-        this.rtheta = 0.0;       // angular position of r wheel, degrees
-        this.dir = robotInfo.dir;          // Direction of the robot facing, degrees
-        this.currentLv = 0;       // current velocity of left wheel, in inches/s
-        this.currentRv = 0;       // current velocity of right wheel, in inches/s
+        this.Wl = 0.0;            // requested angular velocity of l wheel, radians/s
+        this.Wr = 0.0;            // requested angular velocity of r wheel, radians/s
+        this.ltheta = 0.0;        // angular position of l wheel, degrees
+        this.rtheta = 0.0;        // angular position of r wheel, degrees
+        this.dir = robotInfo.dir; // Direction of the robot facing, degrees
+        this.currentLv = 0;       // current velocity of left wheel, in inches/s, in [-maxVel, maxVel]
+        this.currentRv = 0;       // current velocity of right wheel, in inches/s, in [-maxVel, maxVel]
+        this.requestedLv = 0;     // requested velocity of left wheel, in [-1, 1], uninverted, where 1 corresponds to maxVel
+        this.requestedRv = 0;     // requested velocity of right wheel, in [-1, 1], uninverted, where 1 corresponds to maxVel
+        this.invertL = false;     // whether the left motor is inverted (false=default, true=inverted)
+        this.invertR = false;     // whether the right motor is inverted (false=default, true=inverted)
 
         // Set robot attributes based on type
+        // Note: width and height values are replicated in base.js.
+        // Update both files if robot size changes.
         this.robotType = robotInfo.robotType;
         const validTypes = ["light", "medium", "heavy"];
         if (!validTypes.includes(this.robotType)) {
@@ -93,7 +100,6 @@ class RobotClass {
         // Max speed is 1.236 in/tick and max acceleration is 0.05413 in/tick^2
         this.accel = (8 - robotTypeNum) / 5 * 0.05413; // Larger robots accelerate more slowly
         this.maxVel = robotTypeNum / 5 * 1.236;        // Larger robots have a higher top speed
-        this.wheelWidth = robotTypeNum / 5 * 20;       // Larger robots have a wider wheelbase
 
         // Set robot position
         this.X = this.getValidXPosition(robotInfo.xpos, robotInfo.dir); // current X position of the center of the robot
@@ -127,6 +133,20 @@ class RobotClass {
         this.attachedObj = null;
     }
 
+    checkRamp() {
+        let cornersX = [this.topL[0], this.topR[0], this.botR[0], this.botL[0]];
+        let cornersY = [this.topL[1], this.topR[1], this.botR[1], this.botL[1]];
+        for (let i = 0; i < this.simulator.ramps.length; i++) {
+            for (let r = 0; r < cornersX.length; r++) {
+                if (cornersX[r] < this.simulator.ramps[i].topR[0] && cornersX[r] > this.simulator.ramps[i].topL[0]) {
+                    if (cornersY[r] > this.simulator.ramps[i].topL[1] && cornersY[r] < this.simulator.ramps[i].botL[1]) {
+                        return this.simulator.ramps[i]
+                    }
+                }
+            }
+        }
+        return null;
+    }
     /** Validate the input starting X coordinate of the robot
     *   pos is the value we want to set the coordinate to */
    getValidXPosition(pos, dir) {
@@ -358,18 +378,24 @@ class RobotClass {
 
         //TODO: handling, edit the Lv and Rv such that difference is low
 
+        // Calculate the requested velocities scaled to max velocity, including possible motor inversion
+        let requestedLv = this.invertL ? -this.requestedLv : this.requestedLv;
+        requestedLv = requestedLv * this.maxVel;
+        let requestedRv = this.invertR ? -this.requestedRv : this.requestedRv;
+        requestedRv = requestedRv * this.maxVel * this.neg;
+
         // Compare the current speed of each motor to the requested speed, and accelerate in the correct direction
-        if (this.requestedLv > this.currentLv) {
-            this.currentLv = Math.min(this.currentLv + this.accel, this.requestedLv);
+        if (requestedLv > this.currentLv) {
+            this.currentLv = Math.min(this.currentLv + this.accel, requestedLv);
         }
-        if (this.requestedLv < this.currentLv) {
-            this.currentLv = Math.max(this.currentLv - this.accel, this.requestedLv);
+        if (requestedLv < this.currentLv) {
+            this.currentLv = Math.max(this.currentLv - this.accel, requestedLv);
         }
-        if (this.requestedRv > this.currentRv) {
-            this.currentRv = Math.min(this.currentRv + this.accel, this.requestedRv);
+        if (requestedRv > this.currentRv) {
+            this.currentRv = Math.min(this.currentRv + this.accel, requestedRv);
         }
-        if (this.requestedRv < this.currentRv) {
-            this.currentRv = Math.max(this.currentRv - this.accel, this.requestedRv);
+        if (requestedRv < this.currentRv) {
+            this.currentRv = Math.max(this.currentRv - this.accel, requestedRv);
         }
 
         // Compute change in position and direction
@@ -387,6 +413,20 @@ class RobotClass {
             dx = i * Math.sin(radian) + j * Math.cos(radian);
             dy = i * Math.cos(radian) + j * Math.sin(radian);
             dir = (this.dir + theta*180/Math.PI) % 360;
+        }
+
+        let onRamp = this.checkRamp();
+        let offsetConst = 0.015;
+        if (onRamp != null) {
+            if (onRamp.highSide == "up") {
+                dy = dy + onRamp.incline * offsetConst;
+            } else if (onRamp.highSide == "down") {
+                dy = dy - onRamp.incline * offsetConst;
+            } else if (onRamp.highSide == "right") {
+                dx = dx - onRamp.incline * offsetConst;
+            } else if (onRamp.highSide == "left") {
+                dx = dx + onRamp.incline * offsetConst;
+            }
         }
 
         // Temporarily define new robot positional values
@@ -408,7 +448,23 @@ class RobotClass {
             }
         }
 
-        // If no collision, update robot positional attributes
+        const objCorners = this.updateInteractableObjs(this.attachedObj, corners, dir);
+
+        if (this.attachedObj && !inter) {
+            for (let i=0; i < simulator.obstacles.length; i++) {
+                if (simulator.obstacles[i] !== this.attachedObj) {
+                    inter = this.intersectOne(simulator.obstacles[i], objCorners);
+                }
+                if (simulator.obstacles[i] instanceof InteractableObj) {
+                  inter = false;
+                }
+                if (inter) {
+                    break;
+                }
+            }
+        }
+
+        // If no collision, update robot and attached object positional attributes
         if (!inter) {
             this.X = X;
             this.Y = Y;
@@ -419,6 +475,9 @@ class RobotClass {
             this.botR = corners.botR;
             this.topL = corners.topL;
             this.topR = corners.topR;
+            if (this.attachedObj) {
+                this.setAttachedObj(objCorners);
+            }
         }
 
         // Send position and sensor readings to main thread
@@ -428,11 +487,6 @@ class RobotClass {
             dir: this.dir,
             robotType: this.robotType
         };
-
-        if (this.attachedObj) {
-            this.updateInteractableObjs(this.attachedObj);
-        }
-        // this.simulator.drawObjs();
 
         this.lineFollower.update();
         this.limitSwitch.update();
@@ -449,6 +503,7 @@ class RobotClass {
         let objects = {
             tapeLines: this.simulator.tapeLines,
             obstacles: this.simulator.obstacles,
+            ramps: this.simulator.ramps
         }
 
         postMessage({
@@ -459,21 +514,40 @@ class RobotClass {
         })
     }
 
-    updateInteractableObjs(obstacle) {
-        let b = (this.width - obstacle.w) / 2;
-        obstacle.botL[0] = this.topL[0] + b * Math.cos((90.0 - this.dir) * Math.PI / 180);
-        obstacle.botL[1] = this.topL[1] - b * Math.sin((90.0 - this.dir) * Math.PI / 180);
-        obstacle.topL[0] = obstacle.botL[0] - obstacle.h * Math.cos(this.dir * Math.PI / 180);
-        obstacle.topL[1] = obstacle.botL[1] - obstacle.h * Math.sin(this.dir * Math.PI / 180);
+    updateInteractableObjs(obstacle, robot, dir) {
+        let dict = {topR: Array(2), topL: Array(2), botL: Array(2), botR: Array(2)};
 
-        obstacle.topR[0] = obstacle.topL[0] + obstacle.w * Math.sin(this.dir * Math.PI / 180);
-        obstacle.topR[1] = obstacle.topL[1] - obstacle.w * Math.cos(this.dir * Math.PI / 180);
-        obstacle.botR[0] = obstacle.botL[0] + obstacle.w * Math.sin(this.dir * Math.PI / 180);
-        obstacle.botR[1] = obstacle.botL[1] - obstacle.w * Math.cos(this.dir * Math.PI / 180);
-        obstacle.x = obstacle.topL[0]; //this.X - (this.height + obstacle.h) * Math.cos(this.dir * Math.PI / 180) / 2;
-        obstacle.y = obstacle.topL[1]; //this.Y - (this.height + obstacle.h) * Math.sin(this.dir * Math.PI / 180) / 2;
-        obstacle.setDirection(this.dir);
-        //console.log("interactable object coordinates updated");
+        if (obstacle) {
+            let b = (this.width - obstacle.w) / 2;
+            dict.botL[0] = robot.topL[0] + b * Math.cos((90.0 - dir) * Math.PI / 180);
+            dict.botL[1] = robot.topL[1] - b * Math.sin((90.0 - dir) * Math.PI / 180);
+            dict.topL[0] = dict.botL[0] - obstacle.h * Math.cos(dir * Math.PI / 180);
+            dict.topL[1] = dict.botL[1] - obstacle.h * Math.sin(dir * Math.PI / 180);
+
+            dict.topR[0] = dict.topL[0] + obstacle.w * Math.sin(dir * Math.PI / 180);
+            dict.topR[1] = dict.topL[1] - obstacle.w * Math.cos(dir * Math.PI / 180);
+            dict.botR[0] = dict.botL[0] + obstacle.w * Math.sin(dir * Math.PI / 180);
+            dict.botR[1] = dict.botL[1] - obstacle.w * Math.cos(dir * Math.PI / 180);
+            //obstacle.setDirection(this.dir);
+        }
+
+        return dict;
+    }
+
+    setAttachedObj(newCorners) {
+        this.attachedObj.botL[0] = newCorners.botL[0];
+        this.attachedObj.botL[1] = newCorners.botL[1];
+        this.attachedObj.topL[0] = newCorners.topL[0];
+        this.attachedObj.topL[1] = newCorners.topL[1];
+
+        this.attachedObj.topR[0] = newCorners.topR[0];
+        this.attachedObj.topR[1] = newCorners.topR[1];
+        this.attachedObj.botR[0] = newCorners.botR[0];
+        this.attachedObj.botR[1] = newCorners.botR[1];
+
+        this.attachedObj.x = this.attachedObj.topL[0];
+        this.attachedObj.y = this.attachedObj.topL[1];
+        this.attachedObj.setDirection(this.dir);
     }
 
     updateCorners(newX, newY, dir) {
@@ -505,7 +579,7 @@ class RobotClass {
         return dict;
     }
 
-    /* Robot API function. If Robot has no attached object, pick up a nearby object */
+    /* Fake Robot API function. If Robot has no attached object, pick up a nearby object */
     pick_up() {
         if (this.attachedObj) {
             return
@@ -555,29 +629,49 @@ class RobotClass {
         return null;
     }
 
-    set_value(device, param, speed) {
-        /* Runtime API method for updating L/R motor speed. Takes only L/R
-           Motor as device name and speed bounded by [-1,1]. */
+    set_value(device, param, value) {
+        /* Runtime API method for updating L/R motor speed. Takes device ID,
+           param, and value (speeds are bounded by [-1,1]). */
 
-        if (speed > 1.0 || speed < -1.0){
-            throw new Error("Speed cannot be greater than 1.0 or less than -1.0.");
+        if (typeof(param) !== "string") {
+            console.log("ERROR: get_value() parameter must be a string")
+            return
         }
-        if (param !== "duty_cycle") {
-            throw new Error('"duty_cycle" is the only currently supported parameter');
+        if (param.includes("velocity") && value > 1.0 || value < -1.0){
+            console.log("ERROR: Speed cannot be greater than 1.0 or less than -1.0.");
+            return
         }
-        if (device === "left_motor") {
-            this.requestedLv = speed * this.maxVel;
-        } else if (device === "right_motor") {
-            this.requestedRv = speed * this.maxVel * this.neg;
+        if (param.includes("invert") && typeof(value) !== "boolean") {
+            console.log('ERROR: "invert" functions take in a boolean value')
+            return
+        }
+        if (device === "koala_bear") {
+            if (param === "velocity_b") {
+                this.requestedLv = value;
+            } else if (param === "velocity_a") {
+                this.requestedRv = value;
+            } else if (param === "invert_b") {
+                this.invertL = value;
+            } else if (param === "invert_a") {
+                this.invertR = value;
+            } else if (param === "duty_cycle") {
+                console.log('ERROR: Param name: "duty_cycle" no longer supported. See Robot API.');
+            } else {
+                console.log('ERROR: Param name: "' + param + '" invalid or not supported');
+            }
+        } else if (device === "left_motor" || device === "right_motor") {
+            console.log('ERROR: "' + device + '" no longer supported. See Robot API.');
         } else {
-            throw new Error("Cannot find device name: " + device);
+            console.log("ERROR: Cannot find device name: " + device);
         }
     }
 
     get_value(device, param) {
         /* Runtime API method for getting sensor values.
-           Currently supports reading left, center and right line followers
-           in a range of [0,1]. */
+           Supports reading left, center and right line followers
+           in a range of [0,1].
+           Supports reading front and rear limit switches.
+           Supports reading KoalaBear velocity and invert parameters. */
         if (device === "limit_switch") {
             if (param === "switch0") {
                 return this.limitSwitch.switch0;
@@ -594,7 +688,18 @@ class RobotClass {
                 return this.lineFollower.right;
             }
         }
-        throw new Error("Device was not found" + device);
+        if (device === "koala_bear") {
+            if (param === "velocity_b") {
+                return this.requestedLv;
+            } else if (param === "velocity_a") {
+                return this.requestedRv;
+            } else if (param === "invert_b") {
+                return this.invertL;
+            } else if (param === "invert_a") {
+                return this.invertR;
+            }
+        }
+        console.log("ERROR: Cannot find device name: " + device);
     }
 
     sleep(duration) {
@@ -695,33 +800,6 @@ function onRelease(keyCode) {
     } else if (keyCode === 39) { // right
         simulator.gamepad.joystick_right_x = 0;
     }
-}
-
-function translateToMovement(keyCode) {
-    if (simulator.current.length === 0) {
-      simulator.robot.updatePosition();
-    }
-    let k;
-    for (k of simulator.current) {
-        if (keyCode === 87) { // w
-            simulator.gamepad.joystick_left_y = 1;
-        } else if (keyCode === 65) { // a
-            simulator.gamepad.joystick_left_x = 1;
-        } else if (keyCode === 83) { // s
-            simulator.gamepad.joystick_left_y = -1;
-        } else if (keyCode === 68) { // d
-            simulator.gamepad.joystick_left_x = -1;
-        } else if (keyCode === 38) { // up
-            simulator.gamepad.joystick_right_y = 1;
-        } else if (keyCode === 40) { // down
-            simulator.gamepad.joystick_right_y = -1;
-        } else if (keyCode === 37) { // left
-            simulator.gamepad.joystick_right_x = -1;
-        } else if (keyCode === 39) { // right
-            simulator.gamepad.joystick_right_x = 1;
-        }
-    }
-    simulator.robot.updatePosition();
 }
 
 /*********************** GAMEPAD INPUT GAMEPAD FUNCTIONS ***********************/
@@ -876,6 +954,7 @@ class Simulator{
         this.tapeLines = [];
         this.obstacles = [];
         this.interactableObjs = [];
+        this.ramps = [];
     }
 
     defineObjs(objects) {
@@ -887,6 +966,7 @@ class Simulator{
         this.tapeLines = [];
         this.obstacles = [];
         this.interactableObjs = [];
+        this.ramps = [];
 
         if (objects.tapeLinesData !== undefined) {
             for (let newLine of objects.tapeLinesData) {
@@ -911,11 +991,25 @@ class Simulator{
                 this.obstacles.push(newInteractableObj);
             }
         }
+        if (objects.rampsData !== undefined) {
+            for (let rampObj of objects.rampsData) {
+                let newRamp = new Ramp(rampObj.x, rampObj.y, rampObj.w, rampObj. h, rampObj.highSide, rampObj.incline, rampObj.color);
+                this.ramps.push(newRamp);
+                if (newRamp.highSide == "up" || newRamp.highSide == "down") {
+                    this.obstacles.push(new Wall(newRamp.topL[0], newRamp.topL[1], 1, newRamp.h, newRamp.color));
+                    this.obstacles.push(new Wall(newRamp.topR[0], newRamp.topR[1], 1, newRamp.h, newRamp.color));
+                } else if (newRamp.highSide == "right" || newRamp.highSide == "left") {
+                    this.obstacles.push(new Wall(newRamp.topL[0], newRamp.topL[1], newRamp.w, 1, newRamp.color));
+                    this.obstacles.push(new Wall(newRamp.botL[0], newRamp.botL[1], newRamp.w, 1, newRamp.color));
+                }
+            }
+        }
     }
 
     drawObjs() {
         postMessage({objs: this.tapeLines, type: "tapeLine"});
         postMessage({objs: this.obstacles, type: "obstacle"});
+        postMessage({objs: this.ramps, type: "ramp"});
     }
 
     loadStudentCode(){
@@ -1006,9 +1100,6 @@ this.onmessage = function(e) {
     // Code upload
     if (e.data.code !== undefined){
         code = e.data.code;
-        if (e.data.newCode === true) {
-            console.log("Code upload successful");
-        }
     }
     // Give simulator the list of objects
     if (e.data.objectsCode !== undefined) {
