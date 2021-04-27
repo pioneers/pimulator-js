@@ -976,12 +976,7 @@ class Simulator{
 
         if (objects.wallsData !== undefined) {
             for (let newWall of objects.wallsData) {
-                if (newWall.rotate !== undefined){
-                    console.log(newWall.rotate)
-                    this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, newWall.rotate, newWall.color))
-                } else {
-                    this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, 0, newWall.color));
-                }
+                this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, newWall.rotate, newWall.color));
             }
         }
         if (objects.interactableData !== undefined) {

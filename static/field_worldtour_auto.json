@@ -1,7 +1,6 @@
 {
-
     tapeLinesData: [
-        {x1: 21, y1: 88.5, x2: 46, y2: 88.5, color: "yellow"},
+        {x1: 5, y1: 88.5, x2: 46, y2: 88.5, color: "yellow"},
         {x1: 46, y1: 88.5, x2: 54, y2: 84.5, color: "yellow"},
         {x1: 54, y1: 84.5, x2: 66, y2: 84.5, color: "yellow"},
         {x1: 66, y1: 84.5, x2: 74, y2: 93, color: "yellow"},
@@ -35,11 +34,10 @@
         {x: 148, y: 141, w: 77, h:2, rotate: 180}
     ],
     rampsData: [
-        {x: 118, y: 32, w: 24, h: 40, highSide: "down", incline: 15, color: "red"},
-        {x: 118, y: 105, w: 24, h: 10, highSide: "up", incline: 15, color: "red"},
-        {x: 71, y: 115, w: 47, h: 24, highSide: "right", incline: 15, color: "red"},
-        {x: 2, y: 76.5, w: 42, h: 24, highSide: "right", incline: 15, color: "red"}
+        {x: 118, y: 32, w: 24, h: 40, highSide: "down", incline: 15, color: "tan"},
+        {x: 118, y: 105, w: 24, h: 10, highSide: "up", incline: 15, color: "tan"},
+        {x: 71, y: 115, w: 47, h: 24, highSide: "right", incline: 15, color: "tan"},
+        {x: 10, y: 76.5, w: 34, h: 24, highSide: "right", incline: 15, color: "tan"}
 
     ]
-
 }

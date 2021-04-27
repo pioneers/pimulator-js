@@ -23,7 +23,7 @@ class FieldObj {
 }
 
 class Wall extends FieldObj {
-    constructor(x, y, w, h, rotate, color = "black") {
+    constructor(x, y, w, h, rotate = 0, color = "black") {
         super(x, y, w, h, color)
         rotate = 360-rotate
         rotate = rotate * Math.PI/180
