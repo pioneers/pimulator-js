@@ -4,7 +4,7 @@
 #### New
 - Ramps added as a field element
 - Pre-set fields can be selected
-    - The Spring 2021 field has been added
+    - The autonomous section of the Spring 2021 field has been added
 - Updates will now come with Release Notes
 
 ## April 12, 2021
