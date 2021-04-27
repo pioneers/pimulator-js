@@ -11,6 +11,12 @@ const scaleFactor = 3;
 const canvas = document.getElementById('fieldCanvas');
 const ctx = canvas.getContext('2d');
 
+/* The date of the last update in the format DD-MM-YYYY
+ * where DD and MM do not have leading zeros.
+ * Must be updated upon each push to the webapp.
+ */
+const lastUpdate = "27-4-2021"
+
 // Handle messages from worker
 function onmessage(e) {
     if (e.data.robot !== undefined && e.data.objects !== undefined) {
