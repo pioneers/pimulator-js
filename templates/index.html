@@ -323,22 +323,36 @@
                                             <div id="help-field-body" class="collapse" aria-labelledby="help-field-heading">
                                                 <div class="card-body">
                                                     <p>
-                                                        The field consists of walls, interactable objects, and tape lines (to be used with line followers).
+                                                        The field consists of walls, ramps, interactable objects, and tape lines (to be used with line followers).
                                                         If you wish to update any of the objects, you can update them by uploading your own code in the <b>Field</b> tab
                                                         and pressing the 'Upload Field' button.
                                                     </p>
                                                     <p> <b> Walls: </b> </p>
                                                     <p>
                                                     Walls are listed under the key <code>wallsData</code> and consist of 4 key-value pairs,
-                                                    with keys <code>x</code>, <code>y</code>, <code>w</code>, <code>h</code>.
+                                                    with keys <code>x</code>, <code>y</code>, <code>w</code>, <code>h</code>. There is a fifth optional key: <code>rotate</code>.
                                                     The <code>x</code> and <code>y</code> values represent the top left corner of the wall.
                                                     <code>w</code> and <code>h</code> represent the width and height of the line respectively.
+                                                    The <code>rotate</code> value is the angle the wall will be rotated counterclockwise around its top left corner in degrees.
+                                                    </p>
+                                                    <p> <b> Ramps: </b> </p>
+                                                    <p>
+                                                    Ramps are listed under the key <code>rampsData</code> and consist of 6 key-value pairs,
+                                                    with keys <code>x</code>, <code>y</code>, <code>w</code>, <code>h</code>, <code>highSide</code>, <code>incline</code>.
+                                                    The <code>x</code> and <code>y</code> values represent the top left corner of the ramp.
+                                                    <code>w</code> and <code>h</code> represent the width and height of the rectangle that represents the ramp. The value for
+                                                    <code>highSide</code> should be one of the strings "up", "down", "right", or "left". <code>highSide</code> represents
+                                                    the side of the rectangle that represents the higher end of ramp; this side of the ramp is drawn with a dashed line, and the
+                                                    opposite side isn't draw at all. The <code>incline</code> value is the angle of elevation of the ramp in degrees.
+                                                    </p>
+                                                    <p>
+                                                    The arrows on the ramp represent the direction of the force acting on your robot if your robot is on the ramp.
                                                     </p>
                                                     <p> <b> Interactable Objects:  </b> </p>
                                                     <p>
                                                     Interactable objects are listed under the key <code>interactableData</code> and consist of 4 key-value pairs,
                                                     with keys <code>x</code>, <code>y</code>, <code>w</code>, <code>h</code>.
-                                                    The <code>x</code> and <code>y</code> values represent the top left corner of the wall.
+                                                    The <code>x</code> and <code>y</code> values represent the top left corner of the interactable objects.
                                                     </p>
                                                     <p> Note: Walls and interactable objects can only be oriented perpendicular to the field. </p>
                                                     <p> <b> Tape Lines: </b></p>
@@ -351,6 +365,10 @@
                                                         The field description follows the format of a JSON object.
                                                         For more information, you can look through the documentation of the JSON object format
                                                         <a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON">here</a>.
+                                                    </p>
+                                                    <p>
+                                                        You can change the color of objects by adding a string like
+                                                        "blue" or "gold" as the value of the <code>color</code> key for any type object.
                                                     </p>
                                                     <p>
                                                         For an example field description, view the default configuration in the <b>Field</b> tab below.
