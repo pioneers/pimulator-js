@@ -1097,21 +1097,30 @@ this.onmessage = function(e) {
     }
     // Give simulator the list of objects
     if (e.data.objectsCode !== undefined) {
-        let returnString = "return " + e.data.objectsCode;
-        let f = new Function(returnString);
-        let objects = f();
-        simulator.defineObjs(objects);
+      try {
+          let returnString = "return " + e.data.objectsCode;
+          let f = new Function(returnString);
+          let objects = f();
+          simulator.defineObjs(objects);
 
-        // Draw objects if no active simulation
-        if (simulator.mode == "idle") {
-            simulator.drawObjs();
-        }
+          // Draw objects if no active simulation
+          if (simulator.mode == "idle") {
+              simulator.drawObjs();
+          }
 
-        // Objects get redefined right away in teleop mode.
-        // Attached objects get removed, so set to null.
-        if (simulator.mode == "teleop") {
-            simulator.robot.attachedObj = null;
-        }
+          // Objects get redefined right away in teleop mode.
+          // Attached objects get removed, so set to null.
+          if (simulator.mode == "teleop") {
+              simulator.robot.attachedObj = null;
+          }
+
+          if (e.data.firstCodeUpload !== undefined) {
+            console.log("Field upload successful")
+          }
+      } catch(err) {
+          console.log("Error uploading code. Please check syntax.");
+      }
+
     }
 
     if (e.data.start === true) {

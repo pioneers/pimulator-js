@@ -319,11 +319,9 @@ function uploadObjects(){
     }
     objectsCode = cmObjects.getValue();
     localStorage.setItem("objectsCode", objectsCode);
-    worker.postMessage({objectsCode:objectsCode});
+    worker.postMessage({objectsCode:objectsCode, firstCodeUpload:true});
     if (mode === "auto") {
         log("Autonomous simulation active: Field will update when next simulation starts")
-    } else {
-        log("Field upload successful");
     }
     if (mode === "idle") {
         // Redraw robot
