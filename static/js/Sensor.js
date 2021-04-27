@@ -116,7 +116,7 @@ class LimitSwitch{
     collidableRegionFront.botR[0] = collidableRegionFront.botL[0] + width * Math.sin(this.robot.dir * Math.PI / 180);
     collidableRegionFront.botR[1] = collidableRegionFront.botL[1] - width * Math.cos(this.robot.dir * Math.PI / 180);
     for (let obstacle of this.robot.simulator.obstacles) {
-        if (this.robot.intersectOne(obstacle, collidableRegionFront)) {
+        if (obstacle !== this.robot.attachedObj && this.robot.intersectOne(obstacle, collidableRegionFront)) {
           this.switch0 = true;
           break;
         }

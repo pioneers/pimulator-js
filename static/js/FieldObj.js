@@ -60,3 +60,11 @@ class InteractableObj extends FieldObj {
         this.direction = dir;
     }
 }
+
+class Ramp extends FieldObj {
+    constructor(x, y, w, h, highSide = "up", incline = 15, color = "black") {
+        super(x, y, w, h, color);
+        this.highSide = highSide;
+        this.incline = incline;
+    }
+}

@@ -1,11 +1,12 @@
 var mode = "idle"; // or auto or teleop
-var worker = new Worker("static/js/robot.js?t=" + gitHash);
-worker.postMessage({gitHash: gitHash});
+var worker = new Worker("static/js/robot.js?t=" + cacheKey);
+worker.postMessage({cacheKey: cacheKey});
 var timer;
 var inputMode = "keyboard";
 var robotType = "medium";
 var direction = 0;
 var codeUploaded = false;
+var pythonError = false;
 const scaleFactor = 3;
 const canvas = document.getElementById('fieldCanvas');
 const ctx = canvas.getContext('2d');
@@ -46,8 +47,9 @@ function drawRobot(robot) {
     const centerY = robot.Y * scaleFactor;
     const dir = robot.dir/180*Math.PI;  // Convert to Radians
 
-    let robotWidth = 26.7;
-    let robotHeight = 20;
+    if (!robot.robotType) {
+        robot.robotType = "medium";
+    }
     if (robot.robotType == "light") {
         robotWidth = 14.18;      // Robot width, inches
         robotHeight = 12.5;      // Robot height, inches
@@ -148,6 +150,113 @@ function drawObjs(objs, type) {
             ctx.stroke();
         }
     }
+    else if (type === "ramp") {
+        ctx.lineWidth = 2;
+        for (let i = 0; i < objs.length; i++) {
+            if (objs[i].highSide == "up" || objs[i].highSide == "down") {
+                // defining the y coordinates for start and end points of an up arrow
+                let startY = .3 * objs[i].h + objs[i].topL[1];
+                let endY = .7 * objs[i].h + objs[i].topL[1];
+                // defining starting coordinate for dashed line for up ramp
+                let dashedStart = [scaleFactor * objs[i].topL[0], scaleFactor * objs[i].topL[1]];
+                // flipping the start and end if it's a down arrow
+                if (objs[i].highSide == "down") {
+                    startY = .7 * objs[i].h + objs[i].topL[1];
+                    endY = .3 * objs[i].h + objs[i].topL[1];
+                    // setting starting coordinate for dashed line for down ramp
+                    dashedStart = [scaleFactor * objs[i].botL[0], scaleFactor * objs[i].botL[1]];
+                }
+                drawArrows(
+                    "vertical",
+                    scaleFactor * ((objs[i].topL[0]+objs[i].topR[0]) / 2 - .2 * objs[i].w),
+                    scaleFactor * startY,
+                    scaleFactor * ((objs[i].topL[0]+objs[i].topR[0]) / 2 - .2 * objs[i].w),
+                    scaleFactor * endY,
+                    scaleFactor * .2 * objs[i].w,
+                    objs[i].color
+                );
+                ctx.beginPath();
+                ctx.strokeStyle = objs[i].color;
+                ctx.moveTo(dashedStart[0], dashedStart[1]);
+                ctx.setLineDash([7, 10]);
+                ctx.lineTo(dashedStart[0] + scaleFactor * objs[i].w, dashedStart[1]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            } else if (objs[i].highSide == "left" || objs[i].highSide == "right") {
+                // defining the y coordinates for start and end points of a left arrow
+                let startX = .3 * objs[i].w + objs[i].topL[0];
+                let endX = .7 * objs[i].w + objs[i].topL[0];
+                // defining starting coordinate for dashed line for left ramp
+                let dashedStart = [scaleFactor * objs[i].topL[0], scaleFactor * objs[i].topL[1]];
+                // flipping the start and end if it's a right arrow
+                if (objs[i].highSide == "right") {
+                    startX = .7 * objs[i].w + objs[i].topL[0];
+                    endX = .3 * objs[i].w + objs[i].topL[0];
+                    // setting starting coordinate for dashed line for right ramp
+                    dashedStart = [scaleFactor * objs[i].topR[0], scaleFactor * objs[i].topR[1]];
+                }
+                drawArrows(
+                    "horizontal",
+                    scaleFactor * startX,
+                    scaleFactor * ((objs[i].topR[1] + objs[i].botR[1]) / 2 - .2 * objs[i].h),
+                    scaleFactor * endX,
+                    scaleFactor * ((objs[i].topR[1] + objs[i].botR[1]) / 2 - .2 * objs[i].h),
+                    scaleFactor * .2 * objs[i].h,
+                    objs[i].color
+                );
+                ctx.beginPath();
+                ctx.strokeStyle = objs[i].color;
+                ctx.moveTo(dashedStart[0], dashedStart[1]);
+                ctx.setLineDash([7, 10]);
+                ctx.lineTo(dashedStart[0], dashedStart[1] + scaleFactor * objs[i].h);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+    }
+}
+
+function drawArrows(cardinalDir, startX, startY, endX, endY, space, color) {
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    if (cardinalDir == "vertical") {
+        let length = endY - startY;
+        for (let i = 0; i < 3; i++) {
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(endX, endY);
+            ctx.lineTo(
+                endX + 0.1 * length,
+                startY + .7 * length
+            );
+            ctx.moveTo(endX, endY);
+            ctx.lineTo(
+                endX - 0.1 * length,
+                startY + .7 * length
+            );
+            ctx.stroke();
+            startX += space;
+            endX += space;
+        }
+    } else if (cardinalDir == "horizontal") {
+        let length = startX - endX;
+        for (let i = 0; i < 3; i++) {
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(endX, endY);
+            ctx.lineTo(
+                endX + 0.3 * length,
+                endY + 0.1 * length
+            );
+            ctx.moveTo(endX, endY);
+            ctx.lineTo(
+                endX + 0.3 * length,
+                endY - 0.1 * length
+            );
+            ctx.stroke();
+            startY += space;
+            endY += space;
+        }
+    }
 }
 
 function clearCanvas() {
@@ -195,8 +304,13 @@ document.addEventListener('keyup', up);
 function uploadCode() {
     code = cm.getValue();
     localStorage.setItem("code", code);
-    worker.postMessage({code:code, newCode:true});
+    worker.postMessage({code:code});
     codeUploaded = true;
+    if (mode !== "idle") {
+        log("Simulation active: Code will update when next simulation starts")
+    } else {
+        log("Code upload successful");
+    }
 }
 
 function uploadObjects(){
@@ -207,9 +321,10 @@ function uploadObjects(){
     objectsCode = cmObjects.getValue();
     localStorage.setItem("objectsCode", objectsCode);
     worker.postMessage({objectsCode:objectsCode});
-    log("Field upload successful");
     if (mode === "auto") {
-        log("Autonomous simulation active: Field will update on next simulation")
+        log("Autonomous simulation active: Field will update when next simulation starts")
+    } else {
+        log("Field upload successful");
     }
     if (mode === "idle") {
         // Redraw robot
@@ -242,6 +357,7 @@ function update(robot, objects) {
 
     drawObjs(objects.tapeLines, "tapeLine");
     drawObjs(objects.obstacles, "obstacle");
+    drawObjs(objects.ramps, "ramp");
 
     drawRobot(robot);
 }
@@ -316,7 +432,8 @@ function runAutoTimer() {
         document.getElementById("timer").innerText = "Time Left: " + timeLeft + "s";
 
         if (timeLeft < 0) {
-            autonomousReset()
+            clearInterval(timer);
+            stop()
             document.getElementById("timer").innerText = "Autonomous Mode has finished.";
         }
     }, 1000);
@@ -328,20 +445,19 @@ function stop() {
     */
     log("Simulation stopped. Reloading resources...");
     worker.terminate();
-    worker = new Worker("static/js/robot.js?t=" + gitHash);
+    worker = new Worker("static/js/robot.js?t=" + cacheKey);
     worker.onmessage = onmessage;
-    worker.postMessage({gitHash: gitHash});
+    worker.postMessage({cacheKey: cacheKey});
     worker.postMessage({code:code});
     mode = "idle";
-    autonomousReset()
+    resetSimButtons()
 };
 
-function autonomousReset() {
+function resetSimButtons() {
     /*
         Reset UI elements when autonomous ends by force (Stop) or naturally (30s).
-        Resets the timer & simulation buttons.
+        Resets the simulation buttons.
     */
-    clearInterval(timer);
     document.getElementById("stop-btn").disabled = true;
     document.getElementById("teleop-btn").disabled = false;
     document.getElementById("autonomous-btn").disabled = false;
@@ -373,6 +489,18 @@ function log(text) {
     const time = '[' + ((hour < 10) ? '0' + hour: hour) + ':' + ((minutes < 10) ? '0' + minutes: minutes) + '] ';
 
     let consoleLog = document.getElementById("console");
-    consoleLog.innerHTML += time + text + "<br>";
+    if (text.includes("Python exception:")) {
+        pythonError = true;
+    }
+    if (pythonError) {
+        consoleLog.innerHTML += '<span style= "color: red;">' + time + text + "</span>" + "<br>";
+        if (text.includes("Error:"))  {
+            pythonError = false;
+        }
+    } else if (text.includes("ERROR:")) {
+        consoleLog.innerHTML += '<span style= "color: red;">' + time + text + "</span>" + "<br>";
+    } else {
+        consoleLog.innerHTML += time + text + "<br>";
+    }
     consoleLog.scrollTop = consoleLog.scrollHeight;
 }
