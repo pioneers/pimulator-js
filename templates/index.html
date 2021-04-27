@@ -795,7 +795,7 @@
                                   var code = localStorage.getItem("code")
                                   if (code == "" || code === null) {
                                     var xhr=new XMLHttpRequest();
-                                    xhr.open("GET","/static/student_code_file.py?t={[ cache_key }}");
+                                    xhr.open("GET","/static/student_code_file.py?t={{ cache_key }}");
                                     xhr.onload = () => {
                                       code = xhr.responseText;
                                       // setCookie("code", code)
@@ -817,27 +817,23 @@
                           <button type="button" id="preset" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="uploadPreset(0)">Empty</button>
                           <button type="button" id="preset1" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="uploadPreset(1)">World Tour (Auto)</button>
                           <script>
-                              function uploadPreset(x) {
-                                  var xhrPreset=new XMLHttpRequest();
-                                  if (x == 0) {
-                                    console.log("test")
-                                    xhrPreset.open("GET","/static/field_empty.json")
-                                  } else if (x == 1){
-                                    console.log("test1")
-                                    xhrPreset.open("GET","/static/field_worldtour_auto.json")
-                                  }
-                                  xhrPreset.onload = () => {
-                                  objectsCode = xhrPreset.responseText;
-                                  cmObjects.setValue(objectsCode);
-                                  setTimeout(function() {
-                                    cmObjects.refresh();
-                                  },1);
-                                  uploadObjects()
-                                }
-                                xhrPreset.send();
-
+                            function uploadPreset(x) {
+                              var xhrPreset=new XMLHttpRequest();
+                              if (x == 0) {
+                                xhrPreset.open("GET","/static/field_empty.json?t={{ cache_key }}");
+                              } else if (x == 1){
+                                xhrPreset.open("GET","/static/field_worldtour_auto.json?t={{ cache_key }}");
+                              }
+                              xhrPreset.onload = () => {
+                                objectsCode = xhrPreset.responseText;
+                                cmObjects.setValue(objectsCode);
+                                setTimeout(function() {
+                                  cmObjects.refresh();
+                                },1);
+                                uploadObjects()
+                              }
+                              xhrPreset.send();
                             }
-
                           </script>
 
                         </div>
@@ -875,7 +871,7 @@
                             var objectsCode = localStorage.getItem("objectsCode");
                             if (objectsCode == "" || objectsCode === null) {
                               var xhrJS=new XMLHttpRequest();
-                              xhrJS.open("GET","/static/field.json?t={[ git_hash }}");
+                              xhrJS.open("GET","/static/field.json?t={{ cache_key }}");
                               xhrJS.onload = () => {
                                 objectsCode = xhrJS.responseText;
                                 cmObjects.setValue(objectsCode);
