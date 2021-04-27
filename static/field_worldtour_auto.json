@@ -1,0 +1,43 @@
+{
+    tapeLinesData: [
+        {x1: 5, y1: 88.5, x2: 46, y2: 88.5, color: "yellow"},
+        {x1: 46, y1: 88.5, x2: 54, y2: 84.5, color: "yellow"},
+        {x1: 54, y1: 84.5, x2: 66, y2: 84.5, color: "yellow"},
+        {x1: 66, y1: 84.5, x2: 74, y2: 93, color: "yellow"},
+        {x1: 74, y1: 93, x2: 90, y2: 93, color: "yellow"},
+        {x1: 90, y1: 93, x2: 98, y2: 84.5, color: "yellow"},
+        {x1: 96, y1: 84.5, x2: 110, y2: 84.5, color: "yellow"},
+        {x1: 110, y1: 84.5, x2: 130, y2: 93, color: "yellow"},
+        {x1: 130, y1: 93, x2: 130, y2: 125, color: "yellow"}
+
+    ],
+    wallsData: [
+        {x: 0, y: 0, w: 144, h: 2},
+        {x: 0, y: 0, w: 2, h: 144},
+        {x: 142, y: 0, w: 2, h: 144},
+        {x: 0, y: 142, w: 144, h: 2},
+        {x: 0, y: 74.5, w: 42, h: 2},
+        {x: 0, y: 100.5, w: 42, h: 2},
+        {x: 42, y: 70, w: 74, h: 2},
+        {x: 42, y: 105, w: 74, h: 2},
+        {x: 42, y: 70, w: 2, h: 6.5},
+        {x: 42, y: 100.5, w: 2, h: 6.5},
+        {x: 56, y: 105, w: 9.5, h: 1, rotate: 70},
+        {x: 63, y: 105, w: 9.5, h: 1, rotate: 110},
+        {x: 78, y: 72, w: 9.5, h: 1, rotate: 290},
+        {x: 85, y: 72, w: 9.5, h: 1, rotate: 250},
+        {x: 100, y: 105, w: 9.5, h:1, rotate: 70},
+        {x: 107, y: 105, w: 9.5, h:1, rotate: 110},
+        {x: 116, y: 72, w: 40, h:2, rotate: 90},
+        {x: 118, y: 105, w: 10, h:2, rotate: 270},
+        {x: 116, y: 115, w: 45, h:2, rotate: 180},
+        {x: 148, y: 141, w: 77, h:2, rotate: 180}
+    ],
+    rampsData: [
+        {x: 118, y: 32, w: 24, h: 40, highSide: "down", incline: 15, color: "tan"},
+        {x: 118, y: 105, w: 24, h: 10, highSide: "up", incline: 15, color: "tan"},
+        {x: 71, y: 115, w: 47, h: 24, highSide: "right", incline: 15, color: "tan"},
+        {x: 10, y: 76.5, w: 34, h: 24, highSide: "right", incline: 15, color: "tan"}
+
+    ]
+}
