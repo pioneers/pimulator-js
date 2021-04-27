@@ -13,34 +13,34 @@ class LineFollower{
 
      var tapeLines = this.robot.simulator.tapeLines
      let total = []
-     let totalLine = 0
+     let totalLine = []
      let i = 0
      for (;i<3;i++){
        let sensor_x = sensorsX[i]
        let sensor_y = sensorsY[i]
        // https://www.geeksforgeeks.org/program-for-point-of-intersection-of-two-lines/
-       let totalLine = 0
+       let totalLine = []
        for (const tapeLine of tapeLines){
          let m = tapeLine.slope
          if (m === "horizontal") {
            let distY = Math.abs(sensor_y-tapeLine.startY)
            if ((tapeLine.startX <= sensor_x && sensor_x <= tapeLine.endX) || (tapeLine.startX >= sensor_x && sensor_x >= tapeLine.endX)){
              let distSquared = (distY*distY)
-             totalLine += Math.min(1,3/distSquared)
+             totalLine.push(Math.min(1,3/distSquared))
            } else {
              let distX = Math.min(Math.abs(tapeLine.startX-sensor_x), Math.abs(tapeLine.endX-sensor_x))
              let distSquared = (distY*distY) + (distX*distX)
-             totalLine += Math.min(1,3/distSquared)
+             totalLine.push(Math.min(1,3/distSquared))
              }
          } else if (m === "vertical") {
            let distX = Math.abs(sensor_x-tapeLine.startX)
            if ((tapeLine.startY <= sensor_y && sensor_y <= tapeLine.endY) || (tapeLine.startY >= sensor_y && sensor_y >= tapeLine.endY)) {
              let distSquared = (distX*distX)
-             totalLine += Math.min(1,3/distSquared)
+             totalLine.push(Math.min(1,3/distSquared))
            } else {
              let distY = Math.min(Math.abs(tapeLine.startY-sensor_y), Math.abs(tapeLine.endY-sensor_y))
              let distSquared = (distY*distY) + (distX*distX)
-             totalLine += Math.min(1,3/distSquared)
+             totalLine.push(Math.min(1,3/distSquared))
              }
            } else {
            // check if intersection point is inside the tapeLine
@@ -50,7 +50,7 @@ class LineFollower{
                let endDistX = Math.abs(sensor_x-tapeLine.endX)
                let endDistY = Math.abs(sensor_y-tapeLine.startY)
                let distSquared = Math.min((startDistX*startDistX+startDistY*startDistY),(endDistX*endDistX+endDistY*endDistY))
-               totalLine += Math.min(1,3/distSquared)
+               totalLine.push(Math.min(1,3/distSquared))
            } else {
              let m1 = -1/m
              let c = tapeLine.y_int
@@ -61,11 +61,11 @@ class LineFollower{
              let distX = Math.abs(sensor_x-x)
              let distY = Math.abs(sensor_y-y)
              let distSquared = (distX*distX)+(distY*distY)
-             totalLine += Math.min(1,3/distSquared)
+             totalLine.push(Math.min(1,3/distSquared))
            }
          }
        }
-       total.push(Math.min(totalLine, 1))
+       total.push(Math.max.apply(null, totalLine))
      }
      this.left = total[2]
      this.center = total[1]
