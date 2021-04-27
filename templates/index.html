@@ -109,6 +109,7 @@
                                 </svg>
                             </button>
                         </div>
+
                         <div class="card-body text-center border-primary" id="field" style="padding:0px;height:432px">
                             <div class="d-inline-flex flex-row bd-highlight">
                                 <div class="bd-highlight" style="position: relative;">
@@ -743,7 +744,38 @@
                                 </script>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="code-mirror-js" role="tabpanel" aria-labelledby="code-tab-js">
+                        <div class="tab-pane fade " id="code-mirror-js" role="tabpanel" aria-labelledby="code-tab-js">
+                          <div class="bg-light" style="padding: 1em">
+
+                         Field presets:
+
+                          <button type="button" id="preset" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="uploadPreset(0)">Empty</button>
+                          <button type="button" id="preset1" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="uploadPreset(1)">World Tour (Auto)</button>
+                          <script>
+                              function uploadPreset(x) {
+                                  var xhrPreset=new XMLHttpRequest();
+                                  if (x == 0) {
+                                    console.log("test")
+                                    xhrPreset.open("GET","/static/field_empty.json")
+                                  } else if (x == 1){
+                                    console.log("test1")
+                                    xhrPreset.open("GET","/static/field_preset.json")
+                                  }
+                                  xhrPreset.onload = () => {
+                                  objectsCode = xhrPreset.responseText;
+                                  cmObjects.setValue(objectsCode);
+                                  setTimeout(function() {
+                                    cmObjects.refresh();
+                                  },1);
+                                  uploadObjects()
+                                }
+                                xhrPreset.send();
+
+                            }
+
+                          </script>
+
+                        </div>
                           <div class="container" id="cmblock-js" style="padding-left:0px;padding-right:0px">
                             <script src="/static/js/javascript.js"></script>
 

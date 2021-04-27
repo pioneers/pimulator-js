@@ -23,8 +23,17 @@ class FieldObj {
 }
 
 class Wall extends FieldObj {
-    constructor(x, y, w, h, color = "black") {
-        super(x, y, w, h, color);
+    constructor(x, y, w, h, rotate = 0, color = "black") {
+        super(x, y, w, h, color)
+        rotate = 360-rotate
+        rotate = rotate * Math.PI/180
+        this.topR[0] = x + w*Math.cos(rotate);
+        this.topR[1] = y + w*Math.sin(rotate);
+        this.botL[0] = x + -h*Math.sin(rotate);
+        this.botL[1] = y + h*Math.cos(rotate);
+        this.botR[0] = x + w*Math.cos(rotate) - h*Math.sin(rotate);
+        this.botR[1] = y + w*Math.sin(rotate) + h*Math.cos(rotate);
+
     }
 }
 
