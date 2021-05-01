@@ -1103,7 +1103,7 @@ this.onmessage = function(e) {
           let objects = f();
           simulator.defineObjs(objects);
 
-          if (e.data.manualUpload !== undefined) {
+          if (e.data.manualUpload) {
             console.log("Field upload successful")
           }
       } catch(err) {
