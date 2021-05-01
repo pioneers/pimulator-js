@@ -603,7 +603,33 @@
                                                 </div>
                                             </div>
                                         </div>
-
+                                        <!--Actuators -->
+                                        <div class="card">
+                                            <div class="card-header" id="help-actuator-heading">
+                                                <details class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-actuator" aria-expanded="true" aria-controls="help-actuator">
+                                                    <summary>Actuators</summary>
+                                                </details>
+                                            </div>
+                                            <div id="help-actuator" class="collapse" aria-labelledby="help-actuator">
+                                                <div class="card-body">
+                                                <h3> <b>Motor Controllers</b> </h3>
+                                                <p>
+                                                    <div><b>Usage: <code></b>Robot.set_value(device_id, param, value)</div></code>
+                                                    <b>Parameters:</b>
+                                                    <ul>
+                                                        <li><code>device_id</code>: Pass in "koala_bear"</li>
+                                                        <li><code>param</code>: Pass "velocity_a" for the left motor and "velocity_b" for the right.
+                                                        </li>
+                                                        <li><code>value</code>: Pass in a <code>float</code> value in the range [-1,1] inclusive</li>
+                                                    </ul>
+                                                    <b>Return:</b> No return value
+                                                </p>
+                                                <p>
+                                                    <b>Sample Usage: </b><code>Robot.set_value("koala_bear", "velocity_a", 1)</code>
+                                                </p>
+                                              </div>
+                                            </div>
+                                        </div>
                                         <!-- Help: Sensors -->
                                         <div class="card">
                                             <div class="card-header" id="help-sensor-heading">
@@ -646,26 +672,12 @@
                                                     <p>
                                                         <b>Sample Usage: </b><code>Robot.get_value("line_follower", "center")</code>
                                                     </p>
-                                                    <br>
-                                                    <h3> <b>Motor Controllers</b> </h3>
-                                                    <p>
-                                                        <div><b>Usage: <code></b>Robot.set_value(device_id, param, value)</div></code>
-                                                        <b>Parameters:</b>
-                                                        <ul>
-                                                            <li><code>device_id</code>: Pass in "koala_bear"</li>
-                                                            <li><code>param</code>: Pass "velocity_a" for the left motor and "velocity_b" for the right.
-                                                            </li>
-                                                            <li><code>value</code>: Pass in a <code>float</code> value in the range [-1,1] inclusive</li>
-                                                        </ul>
-                                                        <b>Return:</b> No return value
-                                                    </p>
-                                                    <p>
-                                                        <b>Sample Usage: </b><code>Robot.set_value("koala_bear", "velocity_a", 1)</code>
-                                                    </p>
+
 
                                                 </div>
                                             </div>
                                         </div>
+
 
                                         <!--Help: Interactable Objects Tab -->
                                         <div class="card">
