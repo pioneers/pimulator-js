@@ -1097,12 +1097,8 @@ this.onmessage = function(e) {
         code = e.data.code;
     }
     // Give simulator the list of objects
-    if (e.data.objectsCode !== undefined) {
-        let returnString = "return " + e.data.objectsCode;
-        let f = new Function(returnString);
-        let objects = f();
-        simulator.defineObjs(objects);
-
+    if (e.data.objects !== undefined) {
+        simulator.defineObjs(e.data.objects);
         // Draw objects if no active simulation
         if (simulator.mode == "idle") {
             simulator.drawObjs();
