@@ -317,9 +317,24 @@ function uploadObjects(){
     if (mode === "idle") {
         clearCanvas();
     }
-    objectsCode = cmObjects.getValue();
-    localStorage.setItem("objectsCode", objectsCode);
-    worker.postMessage({objectsCode:objectsCode, manualUpload:true});
+
+    try {
+        newObjCode = cmObjects.getValue();
+        let returnString = "return " + newObjCode;
+        let f = new Function(returnString);
+        let objects = f();
+        worker.postMessage({objects:objects});
+
+        log("Field upload successful")
+        localStorage.setItem("objectsCode", newObjCode);
+    } catch(err) {
+        let returnString = "return " + objectsCode;
+        let f = new Function(returnString);
+        let objects = f();
+        worker.postMessage({objects:objects});
+        log(err.toString());
+    }
+
     if (mode === "auto") {
         log("Autonomous simulation active: Field will update when next simulation starts")
     }
@@ -337,7 +352,17 @@ function uploadObjects(){
 
 function uploadObjectsOnce() {
     if (objectsCode !== null) {
-        worker.postMessage({objectsCode:objectsCode});
+        try {
+            let returnString = "return " + objectsCode;
+            let f = new Function(returnString);
+            let objects = f();
+            worker.postMessage({objects:objects});
+        } catch(err) {
+            let f = new Function(returnString);
+            let objects = f();
+            worker.postMessage({objects:objects});
+            log(err.toString());
+        }
     } else {
         setTimeout(uploadObjectsOnce, 100);
     }
@@ -383,7 +408,17 @@ function start(auto=false) {
         clearInterval(timer);
         if (codeUploaded) {
             // Send the list of objects
-            worker.postMessage({objectsCode:objectsCode});
+            try {
+                let returnString = "return " + objectsCode;
+                let f = new Function(returnString);
+                let objects = f();
+                worker.postMessage({objects:objects});
+            } catch(err) {
+                let f = new Function(returnString);
+                let objects = f();
+                worker.postMessage({objects:objects});
+                log(err.toString());
+            }
 
             //  Collect the robot start position and direction
             let robotInfo = {
@@ -486,7 +521,7 @@ function log(text) {
     const time = '[' + ((hour < 10) ? '0' + hour: hour) + ':' + ((minutes < 10) ? '0' + minutes: minutes) + '] ';
 
     let consoleLog = document.getElementById("console");
-    if (text.includes("Python exception:")) {
+    if (text.includes("Python exception:") || text.includes("SyntaxError:")) {
         pythonError = true;
     }
     if (pythonError) {
