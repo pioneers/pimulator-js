@@ -618,14 +618,29 @@
                                                     <b>Parameters:</b>
                                                     <ul>
                                                         <li><code>device_id</code>: Pass in "koala_bear"</li>
-                                                        <li><code>param</code>: Pass "velocity_a" for the left motor and "velocity_b" for the right.
+                                                        <li><code>param</code>: Pass "velocity_a" to set the velocity of the left motor and "velocity_b" for the right motor. To invert the direction of rotation for the motor pass in "invert_a" and "invert_b" respectively.
                                                         </li>
-                                                        <li><code>value</code>: Pass in a <code>float</code> value in the range [-1,1] inclusive</li>
+                                                        <li><code>value</code>: Pass in a <code>float</code> value in the range [-1,1] for velocity. To invert the motor controller set this value to True/False to invert/reset your motor controller. </li>
                                                     </ul>
                                                     <b>Return:</b> No return value
                                                 </p>
                                                 <p>
                                                     <b>Sample Usage: </b><code>Robot.set_value("koala_bear", "velocity_a", 1)</code>
+                                                    <br>
+                                                    <b>Sample Inversion: </b><code>Robot.set_value("koala_bear", "invert_b", True)</code>
+                                                </p>
+                                                <p> <div><b>Usage: <code></b>Robot.get_value(device_id, param)</div></code>
+                                                  <b>Parameters:</b>
+                                                  <ul>
+                                                      <li><code>device_id</code>: Pass in "koala_bear"</li>
+                                                      <li><code>param</code>: Pass "velocity_a" or"velocity_b" to get the value of the left or right motor respectively.
+                                                      </li>
+
+                                                  </ul>
+                                                  <b>Return:</b> It returns the set velocity of the corresponding motor controller.
+                                              </p>
+                                              <p>
+                                                  <b>Sample Usage: </b><code>Robot.get_value("koala_bear", "velocity_a")</code>
                                                 </p>
                                               </div>
                                             </div>
