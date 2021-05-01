@@ -1103,11 +1103,11 @@ this.onmessage = function(e) {
           let objects = f();
           simulator.defineObjs(objects);
 
-          if (e.data.firstCodeUpload !== undefined) {
+          if (e.data.manualUpload !== undefined) {
             console.log("Field upload successful")
           }
       } catch(err) {
-          console.log("Error uploading code. Please check syntax.");
+          console.log(err.toString());
       }
       // Draw objects if no active simulation
       if (simulator.mode == "idle") {

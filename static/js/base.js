@@ -319,7 +319,7 @@ function uploadObjects(){
     }
     objectsCode = cmObjects.getValue();
     localStorage.setItem("objectsCode", objectsCode);
-    worker.postMessage({objectsCode:objectsCode, firstCodeUpload:true});
+    worker.postMessage({objectsCode:objectsCode, manualUpload:true});
     if (mode === "auto") {
         log("Autonomous simulation active: Field will update when next simulation starts")
     }
