@@ -603,7 +603,69 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <!--Actuators -->
+                                        <div class="card">
+                                            <div class="card-header" id="help-actuator-heading">
+                                                <details class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-actuator" aria-expanded="true" aria-controls="help-actuator">
+                                                    <summary>Actuators</summary>
+                                                </details>
+                                            </div>
+                                            <div id="help-actuator" class="collapse" aria-labelledby="help-actuator">
+                                                <div class="card-body">
+                                                    <h3> <b>Motor Controller (Velocity)</b> </h3>
+                                                    <p>
+                                                        <div><b>Usage: <code></b>Robot.set_value(device_id, param, value)</div></code>
+                                                        <b>Parameters:</b>
+                                                        <ul>
+                                                            <li><code>device_id</code>: Pass in "koala_bear"</li>
+                                                            <li><code>param</code>: Use "velocity_a" to set the velocity of the right motor and "velocity_b" for the left motor. </li>
+                                                            <li><code>value</code>: Pass in a <code>float</code> value in the range [-1,1], 
+                                                                where a larger magnitude corresponds to a higher velocity in either direction.
+                                                            </li>
+                                                        </ul>
+                                                        <b>Return:</b> No return value
+                                                        <br>
+                                                        <b>Sample Usage: </b><code>Robot.set_value("koala_bear", "velocity_a", 1)</code>
+                                                    </p>
+                                                    <p> <div><b>Usage: <code></b>Robot.get_value(device_id, param)</div></code>
+                                                        <b>Parameters:</b>
+                                                        <ul>
+                                                            <li><code>device_id</code>: Pass in "koala_bear"</li>
+                                                            <li><code>param</code>: Pass "velocity_a" or "velocity_b" to get the velocity of the right or left motor respectively.</li>
+                                                        </ul>
+                                                        <b>Return:</b> The previously set velocity of the corresponding motor controller.
+                                                        <br>
+                                                        <b>Sample Usage: </b><code>Robot.get_value("koala_bear", "velocity_a")</code>
+                                                    </p>
 
+                                                    <h3> <b>Motor Controller (Invert)</b> </h3>
+                                                    <p>
+                                                        <div><b>Usage: <code></b>Robot.set_value(device_id, param, value)</div></code>
+                                                        <b>Parameters:</b>
+                                                        <ul>
+                                                            <li><code>device_id</code>: Pass in "koala_bear"</li>
+                                                            <li><code>param</code>: Use "invert_a" and "invert_b" to invert the direction of rotation for the left and right motors respectively. 
+                                                                Note that due to its orientation, the left motor will send the robot backwards by default.
+                                                            </li>
+                                                            <li><code>value</code>: Pass in a <code>boolean</code> value. True means inverted, False means not inverted. </li>
+                                                        </ul>
+                                                        <b>Return:</b> No return value
+                                                        <br>
+                                                        <b>Sample Usage: </b><code>Robot.set_value("koala_bear", "invert_b", True)</code>
+                                                    </p>
+                                                    <p> <div><b>Usage: <code></b>Robot.get_value(device_id, param)</div></code>
+                                                        <b>Parameters:</b>
+                                                        <ul>
+                                                            <li><code>device_id</code>: Pass in "koala_bear"</li>
+                                                            <li><code>param</code>: Pass "invert_a" or "invert_b" to return whether the right or left motor is inverted.</li>
+                                                        </ul>
+                                                        <b>Return:</b> True if the motor is inverted, False otherwise.
+                                                        <br>
+                                                        <b>Sample Usage: </b><code>Robot.get_value("koala_bear", "invert_b")</code>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <!-- Help: Sensors -->
                                         <div class="card">
                                             <div class="card-header" id="help-sensor-heading">
@@ -614,7 +676,7 @@
                                             <div id="help-sensor" class="collapse" aria-labelledby="help-sensor">
                                                 <div class="card-body">
 
-                                                    <h3> <b>Limit Switches</b> </h3>
+                                                    <h3> <b>Limit Switch</b> </h3>
                                                     <p>
                                                         <div><b>Usage: <code></b>Robot.get_value(device_id, param)</div></code>
                                                         <b>Parameters:</b>
@@ -630,7 +692,7 @@
                                                         <b>Sample Usage: </b> <code>Robot.get_value("limit_switch", "switch0")</code>
                                                     </p>
                                                     <br>
-                                                    <h3> <b>Line Followers</b> </h3>
+                                                    <h3> <b>Line Follower</b> </h3>
                                                     <p>
                                                         <div><b>Usage: <code></b>Robot.get_value(device_id, param)</div></code>
                                                         <b>Parameters:</b>
@@ -647,9 +709,11 @@
                                                         <b>Sample Usage: </b><code>Robot.get_value("line_follower", "center")</code>
                                                     </p>
 
+
                                                 </div>
                                             </div>
                                         </div>
+
 
                                         <!--Help: Interactable Objects Tab -->
                                         <div class="card">
