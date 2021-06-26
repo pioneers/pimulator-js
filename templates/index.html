@@ -45,6 +45,40 @@
   </head>
 
   <body>
+    <!-- Release Note Popup -->
+    <div class="modal" tabindex="-1" role="dialog" id="release-note">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">April 26, 2021 Updates</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="modal-body">
+            <ul>
+                <li>Ramps added as a field element</li>
+                <li>Pre-set fields can be selected</li>
+                <ul>
+                  <li>The autonomous section of the Spring 2021 field has been added</li>
+                </ul>
+                <li>Updates will now come with Release Notes</li>
+          </div>
+          <div class="modal-footer">
+              <a href="https://github.com/pioneers/pimulator-js/blob/master/releasenotes.md" type="button" class="btn btn-primary" target="_blank">Release Notes</a>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+        $(document).ready(function(){
+          if (localStorage.getItem("lastUpdate") !== lastUpdate) {
+            localStorage.setItem("lastUpdate", lastUpdate);
+            $("#release-note").modal('show');
+          }
+        });
+    </script>
     <!-- Header Navigation Bar -->
     <nav class="navbar navbar-expand-lg">
         <span class="navbar-brand mb-0 h1">
@@ -57,6 +91,7 @@
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
                 <a class="nav-item nav-link" href="https://github.com/pioneers/runtime/wiki/Student-API" target="_blank">Robot API</a>
+                <a class="nav-item nav-link" href="https://github.com/pioneers/pimulator-js/blob/master/releasenotes.md" target="_blank">Release Notes</a>
             </div>
         </div>
     </nav>
@@ -66,22 +101,34 @@
 
         <!-- Alert -->
         <div class="row">
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <b>IMPORTANT: </b> As of 4/10/2021, the robot API used by the simulator has been updated.
-                See the Robot API link above for the current API. <br>
-                <b>Your existing simulator code will no longer work.</b>
-                For help getting started with the new API, view our starter code
-                <a href="https://raw.githubusercontent.com/pioneers/pimulator-js/master/static/student_code_file.py" target="_blank">here</a>.
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
+            <div class="alert alert-danger alert-dismissible fade show w-100 align-middle" role="alert">
+                <div class="d-inline-flex mr-auto">
+                    <p style="margin-bottom:0px!important">
+                        <b>IMPORTANT: </b> As of 4/10/2021, the robot API used by the simulator has been updated.
+                        See the Robot API link above for the current API. <br>
+                        <b>Your existing simulator code will no longer work.</b>
+                        For help getting started with the new API, view our starter code
+                        <a href="https://raw.githubusercontent.com/pioneers/pimulator-js/master/static/student_code_file.py" target="_blank">here</a>.
+                    </p>
+                </div>
+                <div class="d-inline-flex">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true" class="align-middle">&times;</span>
+                    </button>
+                </div>
             </div>
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                <b>WARNING: </b> The Gamepad Class cannot be used for the Spring 2021 Robotics Competition.
-                Only the Keyboard Class can be used.
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
+            <div class="alert alert-warning alert-dismissible fade show w-100 align-middle" role="alert">
+                <div class="d-inline-flex mr-auto">
+                    <p style="margin-bottom:0px!important">
+                        <b>WARNING: </b> The Gamepad Class cannot be used for the Spring 2021 Robotics Competition.
+                        Only the Keyboard Class can be used.
+                    </p>
+                </div>
+                <div class="d-inline-flex">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -109,6 +156,7 @@
                                 </svg>
                             </button>
                         </div>
+
                         <div class="card-body text-center border-primary" id="field" style="padding:0px;height:432px">
                             <div class="d-inline-flex flex-row bd-highlight">
                                 <div class="bd-highlight" style="position: relative;">
@@ -323,22 +371,36 @@
                                             <div id="help-field-body" class="collapse" aria-labelledby="help-field-heading">
                                                 <div class="card-body">
                                                     <p>
-                                                        The field consists of walls, interactable objects, and tape lines (to be used with line followers).
+                                                        The field consists of walls, ramps, interactable objects, and tape lines (to be used with line followers).
                                                         If you wish to update any of the objects, you can update them by uploading your own code in the <b>Field</b> tab
                                                         and pressing the 'Upload Field' button.
                                                     </p>
                                                     <p> <b> Walls: </b> </p>
                                                     <p>
                                                     Walls are listed under the key <code>wallsData</code> and consist of 4 key-value pairs,
-                                                    with keys <code>x</code>, <code>y</code>, <code>w</code>, <code>h</code>.
+                                                    with keys <code>x</code>, <code>y</code>, <code>w</code>, <code>h</code>. There is a fifth optional key: <code>rotate</code>.
                                                     The <code>x</code> and <code>y</code> values represent the top left corner of the wall.
                                                     <code>w</code> and <code>h</code> represent the width and height of the line respectively.
+                                                    The <code>rotate</code> value is the angle the wall will be rotated counterclockwise around its top left corner in degrees.
+                                                    </p>
+                                                    <p> <b> Ramps: </b> </p>
+                                                    <p>
+                                                    Ramps are listed under the key <code>rampsData</code> and consist of 6 key-value pairs,
+                                                    with keys <code>x</code>, <code>y</code>, <code>w</code>, <code>h</code>, <code>highSide</code>, <code>incline</code>.
+                                                    The <code>x</code> and <code>y</code> values represent the top left corner of the ramp.
+                                                    <code>w</code> and <code>h</code> represent the width and height of the rectangle that represents the ramp. The value for
+                                                    <code>highSide</code> should be one of the strings "up", "down", "right", or "left". <code>highSide</code> represents
+                                                    the side of the rectangle that represents the higher end of ramp; this side of the ramp is drawn with a dashed line, and the
+                                                    opposite side isn't draw at all. The <code>incline</code> value is the angle of elevation of the ramp in degrees.
+                                                    </p>
+                                                    <p>
+                                                    The arrows on the ramp represent the direction of the force acting on your robot if your robot is on the ramp.
                                                     </p>
                                                     <p> <b> Interactable Objects:  </b> </p>
                                                     <p>
                                                     Interactable objects are listed under the key <code>interactableData</code> and consist of 4 key-value pairs,
                                                     with keys <code>x</code>, <code>y</code>, <code>w</code>, <code>h</code>.
-                                                    The <code>x</code> and <code>y</code> values represent the top left corner of the wall.
+                                                    The <code>x</code> and <code>y</code> values represent the top left corner of the interactable objects.
                                                     </p>
                                                     <p> Note: Walls and interactable objects can only be oriented perpendicular to the field. </p>
                                                     <p> <b> Tape Lines: </b></p>
@@ -351,6 +413,10 @@
                                                         The field description follows the format of a JSON object.
                                                         For more information, you can look through the documentation of the JSON object format
                                                         <a href="https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON">here</a>.
+                                                    </p>
+                                                    <p>
+                                                        You can change the color of objects by adding a string like
+                                                        "blue" or "gold" as the value of the <code>color</code> key for any type object.
                                                     </p>
                                                     <p>
                                                         For an example field description, view the default configuration in the <b>Field</b> tab below.
@@ -537,7 +603,69 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <!--Actuators -->
+                                        <div class="card">
+                                            <div class="card-header" id="help-actuator-heading">
+                                                <details class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-actuator" aria-expanded="true" aria-controls="help-actuator">
+                                                    <summary>Actuators</summary>
+                                                </details>
+                                            </div>
+                                            <div id="help-actuator" class="collapse" aria-labelledby="help-actuator">
+                                                <div class="card-body">
+                                                    <h3> <b>Motor Controller (Velocity)</b> </h3>
+                                                    <p>
+                                                        <div><b>Usage: <code></b>Robot.set_value(device_id, param, value)</div></code>
+                                                        <b>Parameters:</b>
+                                                        <ul>
+                                                            <li><code>device_id</code>: Pass in "koala_bear"</li>
+                                                            <li><code>param</code>: Use "velocity_a" to set the velocity of the right motor and "velocity_b" for the left motor. </li>
+                                                            <li><code>value</code>: Pass in a <code>float</code> value in the range [-1,1], 
+                                                                where a larger magnitude corresponds to a higher velocity in either direction.
+                                                            </li>
+                                                        </ul>
+                                                        <b>Return:</b> No return value
+                                                        <br>
+                                                        <b>Sample Usage: </b><code>Robot.set_value("koala_bear", "velocity_a", 1)</code>
+                                                    </p>
+                                                    <p> <div><b>Usage: <code></b>Robot.get_value(device_id, param)</div></code>
+                                                        <b>Parameters:</b>
+                                                        <ul>
+                                                            <li><code>device_id</code>: Pass in "koala_bear"</li>
+                                                            <li><code>param</code>: Pass "velocity_a" or "velocity_b" to get the velocity of the right or left motor respectively.</li>
+                                                        </ul>
+                                                        <b>Return:</b> The previously set velocity of the corresponding motor controller.
+                                                        <br>
+                                                        <b>Sample Usage: </b><code>Robot.get_value("koala_bear", "velocity_a")</code>
+                                                    </p>
 
+                                                    <h3> <b>Motor Controller (Invert)</b> </h3>
+                                                    <p>
+                                                        <div><b>Usage: <code></b>Robot.set_value(device_id, param, value)</div></code>
+                                                        <b>Parameters:</b>
+                                                        <ul>
+                                                            <li><code>device_id</code>: Pass in "koala_bear"</li>
+                                                            <li><code>param</code>: Use "invert_a" and "invert_b" to invert the direction of rotation for the left and right motors respectively. 
+                                                                Note that due to its orientation, the left motor will send the robot backwards by default.
+                                                            </li>
+                                                            <li><code>value</code>: Pass in a <code>boolean</code> value. True means inverted, False means not inverted. </li>
+                                                        </ul>
+                                                        <b>Return:</b> No return value
+                                                        <br>
+                                                        <b>Sample Usage: </b><code>Robot.set_value("koala_bear", "invert_b", True)</code>
+                                                    </p>
+                                                    <p> <div><b>Usage: <code></b>Robot.get_value(device_id, param)</div></code>
+                                                        <b>Parameters:</b>
+                                                        <ul>
+                                                            <li><code>device_id</code>: Pass in "koala_bear"</li>
+                                                            <li><code>param</code>: Pass "invert_a" or "invert_b" to return whether the right or left motor is inverted.</li>
+                                                        </ul>
+                                                        <b>Return:</b> True if the motor is inverted, False otherwise.
+                                                        <br>
+                                                        <b>Sample Usage: </b><code>Robot.get_value("koala_bear", "invert_b")</code>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <!-- Help: Sensors -->
                                         <div class="card">
                                             <div class="card-header" id="help-sensor-heading">
@@ -548,7 +676,7 @@
                                             <div id="help-sensor" class="collapse" aria-labelledby="help-sensor">
                                                 <div class="card-body">
 
-                                                    <h3> <b>Limit Switches</b> </h3>
+                                                    <h3> <b>Limit Switch</b> </h3>
                                                     <p>
                                                         <div><b>Usage: <code></b>Robot.get_value(device_id, param)</div></code>
                                                         <b>Parameters:</b>
@@ -564,7 +692,7 @@
                                                         <b>Sample Usage: </b> <code>Robot.get_value("limit_switch", "switch0")</code>
                                                     </p>
                                                     <br>
-                                                    <h3> <b>Line Followers</b> </h3>
+                                                    <h3> <b>Line Follower</b> </h3>
                                                     <p>
                                                         <div><b>Usage: <code></b>Robot.get_value(device_id, param)</div></code>
                                                         <b>Parameters:</b>
@@ -581,9 +709,11 @@
                                                         <b>Sample Usage: </b><code>Robot.get_value("line_follower", "center")</code>
                                                     </p>
 
+
                                                 </div>
                                             </div>
                                         </div>
+
 
                                         <!--Help: Interactable Objects Tab -->
                                         <div class="card">
@@ -729,7 +859,7 @@
                                   var code = localStorage.getItem("code")
                                   if (code == "" || code === null) {
                                     var xhr=new XMLHttpRequest();
-                                    xhr.open("GET","/static/student_code_file.py?t={[ cache_key }}");
+                                    xhr.open("GET","/static/student_code_file.py?t={{ cache_key }}");
                                     xhr.onload = () => {
                                       code = xhr.responseText;
                                       // setCookie("code", code)
@@ -743,7 +873,34 @@
                                 </script>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="code-mirror-js" role="tabpanel" aria-labelledby="code-tab-js">
+                        <div class="tab-pane fade " id="code-mirror-js" role="tabpanel" aria-labelledby="code-tab-js">
+                          <div class="bg-light" style="padding: 1em">
+
+                         Field presets:
+
+                          <button type="button" id="preset" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="uploadPreset(0)">Empty</button>
+                          <button type="button" id="preset1" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="uploadPreset(1)">World Tour (Auto)</button>
+                          <script>
+                            function uploadPreset(x) {
+                              var xhrPreset=new XMLHttpRequest();
+                              if (x == 0) {
+                                xhrPreset.open("GET","/static/field_empty.json?t={{ cache_key }}");
+                              } else if (x == 1){
+                                xhrPreset.open("GET","/static/field_worldtour_auto.json?t={{ cache_key }}");
+                              }
+                              xhrPreset.onload = () => {
+                                objectsCode = xhrPreset.responseText;
+                                cmObjects.setValue(objectsCode);
+                                setTimeout(function() {
+                                  cmObjects.refresh();
+                                },1);
+                                uploadObjects()
+                              }
+                              xhrPreset.send();
+                            }
+                          </script>
+
+                        </div>
                           <div class="container" id="cmblock-js" style="padding-left:0px;padding-right:0px">
                             <script src="/static/js/javascript.js"></script>
 
@@ -778,7 +935,7 @@
                             var objectsCode = localStorage.getItem("objectsCode");
                             if (objectsCode == "" || objectsCode === null) {
                               var xhrJS=new XMLHttpRequest();
-                              xhrJS.open("GET","/static/field.json?t={[ git_hash }}");
+                              xhrJS.open("GET","/static/field.json?t={{ cache_key }}");
                               xhrJS.onload = () => {
                                 objectsCode = xhrJS.responseText;
                                 cmObjects.setValue(objectsCode);
