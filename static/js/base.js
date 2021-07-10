@@ -336,16 +336,13 @@ function uploadObjects(){
         newObjCode = cmObjects.getValue();
         let objects = processObjectsCode(newObjCode);
         worker.postMessage({objects:objects});
-        objectsCode = newObjCode;
-
         log("Field upload successful");
+
+        // Update global variable
+        objectsCode = newObjCode;
+        // Store in browser local storage for future visits
         localStorage.setItem("objectsCode", newObjCode);
     } catch(err) {
-        try {
-            // Try old code
-            let objects = processObjectsCode(objectsCode);
-            worker.postMessage({objects:objects});    
-        } catch {}
         log(err.toString());
     }
 
