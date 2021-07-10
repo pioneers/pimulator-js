@@ -332,6 +332,9 @@ function uploadObjects(){
 
     try {
         newObjCode = cmObjects.getValue();
+
+        // Convert code string to JS map
+        // This can raise an exception
         let objects = processObjectsCode(newObjCode);
 
         // Canvas not automatically cleared if simulation is idle
