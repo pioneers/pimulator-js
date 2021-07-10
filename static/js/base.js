@@ -342,6 +342,7 @@ function uploadObjects(){
         localStorage.setItem("objectsCode", newObjCode);
     } catch(err) {
         try {
+            // Try old code
             let objects = processObjectsCode(objectsCode);
             worker.postMessage({objects:objects});    
         } catch {}
