@@ -203,13 +203,11 @@
                                   let clear_btn = document.getElementById("console-clear");
 
                                   nav_item.forEach((li)=>{
-                                    li.addEventListener('click', ()=>{
+                                    li.addEventListener('click', (e)=>{
                                       let a = li.firstElementChild;
                                       console.log(a)
-                                      if(a.id == 'console-tab'){
-                                        if(a.classList.contains('active')){
-                                          clear_btn.style.display = "block";
-                                        }
+                                      if(a.id == 'console-tab' && a.getAttribute("aria-selected") == "true"){
+                                        clear_btn.style.display = "block";
                                       }else{
                                         clear_btn.style.display = "none";
                                       }
