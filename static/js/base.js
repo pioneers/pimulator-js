@@ -319,6 +319,13 @@ function uploadCode() {
     }
 }
 
+function processObjectsCode(codeString) {
+    let returnString = "return " + codeString;
+    let f = new Function(returnString);
+    let objects = f();
+    return objects;
+}
+
 function uploadObjects(){
 
     if (mode === "idle") {
@@ -327,18 +334,17 @@ function uploadObjects(){
 
     try {
         newObjCode = cmObjects.getValue();
-        let returnString = "return " + newObjCode;
-        let f = new Function(returnString);
-        let objects = f();
+        let objects = processObjectsCode(newObjCode);
         worker.postMessage({objects:objects});
+        objectsCode = newObjCode;
 
-        log("Field upload successful")
+        log("Field upload successful");
         localStorage.setItem("objectsCode", newObjCode);
     } catch(err) {
-        let returnString = "return " + objectsCode;
-        let f = new Function(returnString);
-        let objects = f();
-        worker.postMessage({objects:objects});
+        try {
+            let objects = processObjectsCode(objectsCode);
+            worker.postMessage({objects:objects});    
+        } catch {}
         log(err.toString());
     }
 
@@ -360,14 +366,9 @@ function uploadObjects(){
 function uploadObjectsOnce() {
     if (objectsCode !== null) {
         try {
-            let returnString = "return " + objectsCode;
-            let f = new Function(returnString);
-            let objects = f();
+            let objects = processObjectsCode(objectsCode);
             worker.postMessage({objects:objects});
         } catch(err) {
-            let f = new Function(returnString);
-            let objects = f();
-            worker.postMessage({objects:objects});
             log(err.toString());
         }
     } else {
@@ -416,17 +417,12 @@ function start(auto=false) {
         if (codeUploaded) {
             // Send the list of objects
             try {
-                let returnString = "return " + objectsCode;
-                let f = new Function(returnString);
-                let objects = f();
+                let objects = processObjectsCode(objectsCode);
                 worker.postMessage({objects:objects});
             } catch(err) {
-                let f = new Function(returnString);
-                let objects = f();
-                worker.postMessage({objects:objects});
                 log(err.toString());
             }
-
+    
             //  Collect the robot start position and direction
             let robotInfo = {
                 robotType: robotType,
