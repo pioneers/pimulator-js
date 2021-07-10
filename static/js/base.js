@@ -320,6 +320,8 @@ function uploadCode() {
 }
 
 function processObjectsCode(codeString) {
+    // Convert objects code (string) to JS object
+    // Warning: May raise an exception
     let returnString = "return " + codeString;
     let f = new Function(returnString);
     let objects = f();
@@ -328,16 +330,36 @@ function processObjectsCode(codeString) {
 
 function uploadObjects(){
 
-    if (mode === "idle") {
-        clearCanvas();
-    }
-
     try {
         newObjCode = cmObjects.getValue();
         let objects = processObjectsCode(newObjCode);
-        worker.postMessage({objects:objects});
-        log("Field upload successful");
 
+        // Canvas not automatically cleared if simulation is idle
+        if (mode === "idle") {
+            clearCanvas();
+        }    
+
+        // Send the new objects to the worker
+        // This also redraws the field
+        worker.postMessage({objects:objects});
+
+        // Robot not automatically drawn if simulation is idle
+        if (mode === "idle") {
+            // Redraw robot
+            let robot = {
+                X: Number($("#xpos").val()),
+                Y: Number($("#ypos").val()),
+                dir: direction,
+                robotType: robotType
+            };
+            drawRobot(robot);
+        }
+        log("Field upload successful");
+        
+        if (mode === "auto") {
+            log("Autonomous simulation active: Field will update when next simulation starts")
+        }
+    
         // Update global variable
         objectsCode = newObjCode;
         // Store in browser local storage for future visits
@@ -346,19 +368,6 @@ function uploadObjects(){
         log(err.toString());
     }
 
-    if (mode === "auto") {
-        log("Autonomous simulation active: Field will update when next simulation starts")
-    }
-    if (mode === "idle") {
-        // Redraw robot
-        let robot = {
-            X: Number($("#xpos").val()),
-            Y: Number($("#ypos").val()),
-            dir: direction,
-            robotType: robotType
-        };
-        drawRobot(robot);
-    }
 }
 
 function uploadObjectsOnce() {
