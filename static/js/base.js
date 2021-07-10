@@ -319,55 +319,66 @@ function uploadCode() {
     }
 }
 
-function uploadObjects(){
+function processObjectsCode(codeString) {
+    // Convert objects code (string) to JS object
+    // Warning: May raise an exception
+    let returnString = "return " + codeString;
+    let f = new Function(returnString);
+    let objects = f();
+    return objects;
+}
 
-    if (mode === "idle") {
-        clearCanvas();
-    }
+function uploadObjects(){
 
     try {
         newObjCode = cmObjects.getValue();
-        let returnString = "return " + newObjCode;
-        let f = new Function(returnString);
-        let objects = f();
+
+        // Convert code string to JS map
+        // This can raise an exception
+        let objects = processObjectsCode(newObjCode);
+
+        // Canvas not automatically cleared if simulation is idle
+        if (mode === "idle") {
+            clearCanvas();
+        }    
+
+        // Send the new objects to the worker
+        // This also redraws the field
         worker.postMessage({objects:objects});
 
-        log("Field upload successful")
+        // Robot not automatically drawn if simulation is idle
+        if (mode === "idle") {
+            // Redraw robot
+            let robot = {
+                X: Number($("#xpos").val()),
+                Y: Number($("#ypos").val()),
+                dir: direction,
+                robotType: robotType
+            };
+            drawRobot(robot);
+        }
+        log("Field upload successful");
+        
+        if (mode === "auto") {
+            log("Autonomous simulation active: Field will update when next simulation starts")
+        }
+    
+        // Update global variable
+        objectsCode = newObjCode;
+        // Store in browser local storage for future visits
         localStorage.setItem("objectsCode", newObjCode);
     } catch(err) {
-        let returnString = "return " + objectsCode;
-        let f = new Function(returnString);
-        let objects = f();
-        worker.postMessage({objects:objects});
         log(err.toString());
     }
 
-    if (mode === "auto") {
-        log("Autonomous simulation active: Field will update when next simulation starts")
-    }
-    if (mode === "idle") {
-        // Redraw robot
-        let robot = {
-            X: Number($("#xpos").val()),
-            Y: Number($("#ypos").val()),
-            dir: direction,
-            robotType: robotType
-        };
-        drawRobot(robot);
-    }
 }
 
 function uploadObjectsOnce() {
     if (objectsCode !== null) {
         try {
-            let returnString = "return " + objectsCode;
-            let f = new Function(returnString);
-            let objects = f();
+            let objects = processObjectsCode(objectsCode);
             worker.postMessage({objects:objects});
         } catch(err) {
-            let f = new Function(returnString);
-            let objects = f();
-            worker.postMessage({objects:objects});
             log(err.toString());
         }
     } else {
@@ -416,17 +427,12 @@ function start(auto=false) {
         if (codeUploaded) {
             // Send the list of objects
             try {
-                let returnString = "return " + objectsCode;
-                let f = new Function(returnString);
-                let objects = f();
+                let objects = processObjectsCode(objectsCode);
                 worker.postMessage({objects:objects});
             } catch(err) {
-                let f = new Function(returnString);
-                let objects = f();
-                worker.postMessage({objects:objects});
                 log(err.toString());
             }
-
+    
             //  Collect the robot start position and direction
             let robotInfo = {
                 robotType: robotType,
