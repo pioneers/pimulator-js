@@ -206,12 +206,13 @@
                                   nav_item.forEach((li)=>{
                                     li.addEventListener('click', (e)=>{
                                       let a = li.firstElementChild;
-                                      console.log(a)
-                                      if(a.id == 'console-tab' && a.getAttribute("aria-selected") == "true"){
-                                        clear_btn.style.display = "block";
-                                      }else{
-                                        clear_btn.style.display = "none";
-                                      }
+                                      setTimeout(()=>{
+                                        if(a.id == 'console-tab' && a.getAttribute("aria-selected") == "true"){
+                                          clear_btn.style.display = "block";
+                                        }else{
+                                          clear_btn.style.display = "none";
+                                        }
+                                      }, 50);
                                     });
                                   });
 
