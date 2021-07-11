@@ -888,6 +888,8 @@
                                 xhrPreset.open("GET","/static/field_empty.json?t={{ cache_key }}");
                               } else if (x == 1){
                                 xhrPreset.open("GET","/static/field_worldtour_auto.json?t={{ cache_key }}");
+                              } else if (x == 2){
+                                xhrPreset.open("GET","/static/field.json?t={{ cache_key }}");
                               }
                               xhrPreset.onload = () => {
                                 objectsCode = xhrPreset.responseText;
