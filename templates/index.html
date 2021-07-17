@@ -880,6 +880,7 @@
 
                           <button type="button" id="preset" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="uploadPreset(0)">Empty</button>
                           <button type="button" id="preset1" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="uploadPreset(1)">World Tour (Auto)</button>
+                          <button type="button" id="preset2" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="uploadPreset(2)">Default</button>
                           <script>
                             function uploadPreset(x) {
                               var xhrPreset=new XMLHttpRequest();
@@ -887,6 +888,8 @@
                                 xhrPreset.open("GET","/static/field_empty.json?t={{ cache_key }}");
                               } else if (x == 1){
                                 xhrPreset.open("GET","/static/field_worldtour_auto.json?t={{ cache_key }}");
+                              } else if (x == 2){
+                                xhrPreset.open("GET","/static/field.json?t={{ cache_key }}");
                               }
                               xhrPreset.onload = () => {
                                 objectsCode = xhrPreset.responseText;
