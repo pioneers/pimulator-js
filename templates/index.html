@@ -886,10 +886,22 @@
                               var xhrPreset=new XMLHttpRequest();
                               if (x == 0) {
                                 xhrPreset.open("GET","/static/field_empty.json?t={{ cache_key }}");
+                                // Set starting position for the empty field
+                                document.querySelector("#xpos").value = 70;
+                                document.querySelector("#ypos").value = 70;
+                                switchDirection(0);
                               } else if (x == 1){
                                 xhrPreset.open("GET","/static/field_worldtour_auto.json?t={{ cache_key }}");
+                                // Set starting position to the bottom of the World Tour entrance ramp
+                                document.querySelector("#xpos").value = 10;
+                                document.querySelector("#ypos").value = 88.5;
+                                switchDirection(180);
                               } else if (x == 2){
                                 xhrPreset.open("GET","/static/field.json?t={{ cache_key }}");
+                                // Set starting position for the default field
+                                document.querySelector("#xpos").value = 70;
+                                document.querySelector("#ypos").value = 70;
+                                switchDirection(0);
                               }
                               xhrPreset.onload = () => {
                                 objectsCode = xhrPreset.responseText;
