@@ -180,9 +180,9 @@
                 <!-- Simulator Info -->
                 <div class="bd-highlight flex-fill">
                     <div class="card border-primary h-100">
-                        <div class="card-header" style="padding-top:7px">
+                        <div class="card-header d-flex mb-3 align-items-end" style="margin-bottom:0px!important;padding:7px 0px 0px 0px;">
                             <!-- Simulator Nav Tabs -->
-                            <ul class="nav nav-tabs card-header-tabs" id="set-tabs">
+                              <ul class="nav nav-tabs card-header-tabs mr-auto p-2" style="margin:0px;margin-left:29px;padding:0px!important" id="set-tabs">
                                 <li class="nav-item">
                                     <a href="#console" class="nav-link active" id="console-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Console</a>
                                 </li>
@@ -192,9 +192,12 @@
                                 <li class="nav-item">
                                     <a href="#help" class="nav-link" id="help-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Help</a>
                                 </li>
-                                <li class="nav-item-clear-console">
-                                    <span class="nav-link btn-success" id="console-clear" onclick="clear_console();">clear log</span>
-                                </li>
+                              </ul>
+
+                              <div class="p-2">
+                                <button class="nav-item-clear-console btn btn-success" id="console-clear" onclick="clear_console();">
+                                    <span>Clear Console</span>
+                                </button>
                                 <script>
                                   let clear_console = () => {
                                     const console = document.querySelector("#console");
@@ -217,7 +220,7 @@
                                     });
                                   });
                                 </script>
-                            </ul>
+                              </div>
                         </div>
                         <div class="card-body" style="padding:0.1rem">
                             <div class="tab-content overflow-auto" id="view-tab-content">
@@ -786,7 +789,6 @@
                                     </div>
                                 </div>
                             </div>
-                          
                         </div>
                     </div>
                 </div>
