@@ -15,3 +15,5 @@
         {x: 20, y: 20, w: 10, h: 10}
     ]
 }
+/* Modify the default code to be able to lift the red object.
+ Refer to 'Interactable Objects' under the help tab for more information. */
