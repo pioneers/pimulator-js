@@ -550,7 +550,7 @@ function log(text) {
     consoleLog.scrollTop = consoleLog.scrollHeight;
 }
 
-let clear_console = () => {
+function clearConsole(){
   const console = document.querySelector("#console");
   console.innerHTML = "";
 }
