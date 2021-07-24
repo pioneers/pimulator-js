@@ -340,7 +340,7 @@ function uploadObjects(){
         // Canvas not automatically cleared if simulation is idle
         if (mode === "idle") {
             clearCanvas();
-        }    
+        }
 
         // Send the new objects to the worker
         // This also redraws the field
@@ -358,11 +358,11 @@ function uploadObjects(){
             drawRobot(robot);
         }
         log("Field upload successful");
-        
+
         if (mode === "auto") {
             log("Autonomous simulation active: Field will update when next simulation starts")
         }
-    
+
         // Update global variable
         objectsCode = newObjCode;
         // Store in browser local storage for future visits
@@ -432,7 +432,7 @@ function start(auto=false) {
             } catch(err) {
                 log(err.toString());
             }
-    
+
             //  Collect the robot start position and direction
             let robotInfo = {
                 robotType: robotType,
@@ -548,4 +548,9 @@ function log(text) {
         consoleLog.innerHTML += time + text + "<br>";
     }
     consoleLog.scrollTop = consoleLog.scrollHeight;
+}
+
+let clear_console = () => {
+  const console = document.querySelector("#console");
+  console.innerHTML = "";
 }
