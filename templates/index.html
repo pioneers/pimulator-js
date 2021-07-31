@@ -890,21 +890,18 @@
                                 document.querySelector("#xpos").value = 70;
                                 document.querySelector("#ypos").value = 70;
                                 switchDirection(0);
-                                document.querySelector("#directionDropdownButton").innerHTML = 'Left <span class="caret"></span>';
                               } else if (x == 1){
                                 xhrPreset.open("GET","/static/field_worldtour_auto.json?t={{ cache_key }}");
                                 // Set starting position to the bottom of the World Tour entrance ramp
                                 document.querySelector("#xpos").value = 10;
                                 document.querySelector("#ypos").value = 88.5;
                                 switchDirection(180);
-                                document.querySelector("#directionDropdownButton").innerHTML = 'Right <span class="caret"></span>';
                               } else if (x == 2){
                                 xhrPreset.open("GET","/static/field.json?t={{ cache_key }}");
                                 // Set starting position for the default field
                                 document.querySelector("#xpos").value = 70;
                                 document.querySelector("#ypos").value = 70;
                                 switchDirection(0);
-                                document.querySelector("#directionDropdownButton").innerHTML = 'Left <span class="caret"></span>';
                               }
                               xhrPreset.onload = () => {
                                 objectsCode = xhrPreset.responseText;
