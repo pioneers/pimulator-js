@@ -337,15 +337,15 @@ function uploadObjects(){
 
         // Update variables for starting coordinates/direction
         // TODO: check that startingPositionData is defined, contains valid coordinates, etc.
-       xpos = objects.startingPositionData[0].x;
-       ypos = objects.startingPositionData[0].y;
-       if (objects.startingPositionData[0].dir == "up") {
+       xpos = objects.startingPositionData.x;
+       ypos = objects.startingPositionData.y;
+       if (objects.startingPositionData.dir == "up") {
             direction = 90;
-       } else if (objects.startingPositionData[0].dir == "down") {
+       } else if (objects.startingPositionData.dir == "down") {
             direction = 270;
-       } else if (objects.startingPositionData[0].dir == "right") {
+       } else if (objects.startingPositionData.dir == "right") {
             direction = 180;
-       } else if (objects.startingPositionData[0].dir == "left") {
+       } else if (objects.startingPositionData.dir == "left") {
             direction = 0;
        }
 
