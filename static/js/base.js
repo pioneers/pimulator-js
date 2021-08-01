@@ -4,7 +4,10 @@ worker.postMessage({cacheKey: cacheKey});
 var timer;
 var inputMode = "keyboard";
 var robotType = "medium";
-var direction = 0;
+// Starting coordinates and direction of robot
+var xpos = 70;
+var ypos = 70;
+var direction = 0; // in degrees: 0 (left), 90 (up), and 180 (right), or 270 (down)
 var codeUploaded = false;
 var pythonError = false;
 const scaleFactor = 3;
@@ -124,8 +127,8 @@ function drawRobot(robot) {
     ctx.translate(-centerX, -centerY);
 }
 drawRobot({
-    X: Number($("#xpos").val()),
-    Y: Number($("#ypos").val()),
+    X: xpos,
+    Y: ypos,
     dir: direction,
     robotType: robotType
 });
@@ -283,11 +286,6 @@ function switchRobotType(newRobotType) {
     robotType = newRobotType;
 }
 
-/* Switch robot starting direction (in degrees) between 0 (left), 90 (up), and 180 (right), and 270 (down) */
-function switchDirection(newDirection) {
-    direction = newDirection;
-}
-
 // In teleop mode, if the input is set to the keyboard, send keyCodes to the worker
 function down(e){
     if (mode === "teleop") {
@@ -337,6 +335,20 @@ function uploadObjects(){
         // This can raise an exception
         let objects = processObjectsCode(newObjCode);
 
+        // Update variables for starting coordinates/direction
+        // TODO: check that startingPositionData is defined, contains valid coordinates, etc.
+       xpos = objects.startingPositionData[0].x;
+       ypos = objects.startingPositionData[0].y;
+       if (objects.startingPositionData[0].dir == "up") {
+            direction = 90;
+       } else if (objects.startingPositionData[0].dir == "down") {
+            direction = 270;
+       } else if (objects.startingPositionData[0].dir == "right") {
+            direction = 180;
+       } else if (objects.startingPositionData[0].dir == "left") {
+            direction = 0;
+       }
+
         // Canvas not automatically cleared if simulation is idle
         if (mode === "idle") {
             clearCanvas();
@@ -350,8 +362,8 @@ function uploadObjects(){
         if (mode === "idle") {
             // Redraw robot
             let robot = {
-                X: Number($("#xpos").val()),
-                Y: Number($("#ypos").val()),
+                X: xpos,
+                Y: ypos,
                 dir: direction,
                 robotType: robotType
             };
@@ -436,8 +448,8 @@ function start(auto=false) {
             //  Collect the robot start position and direction
             let robotInfo = {
                 robotType: robotType,
-                xpos: $("#xpos").val(),
-                ypos: $("#ypos").val(),
+                xpos: xpos,
+                ypos: ypos,
                 dir: direction
             }
 
