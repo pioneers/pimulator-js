@@ -372,7 +372,8 @@
                                                 <div class="card-body">
                                                     <p>
                                                         The field consists of walls, ramps, interactable objects, and tape lines (to be used with line followers).
-                                                        If you wish to update any of the objects, you can update them by uploading your own code in the <b>Field</b> tab
+                                                        The field description also defines the starting position of the robot.
+                                                        You can update the field by uploading your own code in the <b>Field</b> tab
                                                         and pressing the 'Upload Field' button.
                                                     </p>
                                                     <p> <b> Walls: </b> </p>
@@ -408,7 +409,17 @@
                                                         Tape lines are listed under the key <code>tapeLinesData</code> and consist of 4 key-value pairs,
                                                         with keys <code>x1</code>, <code>y1</code>, <code>x2</code>, and <code>y2</code>.
                                                         The <code>x1</code> and <code>y1</code> coordinates correspond to one end, while the <code>x2</code>, <code>y2</code> coordinates
-                                                        correspond to the opposite end of the line. </p>
+                                                        correspond to the opposite end of the line.
+                                                    </p>
+                                                    <p><b> Starting Position: </b></p>
+                                                    <p>
+                                                        The robot's starting position is listed under the key <code>startingPositionData</code> and consists of 3
+                                                        key-value pairs, with keys <code>x</code>, <code>y</code>, and <code>dir</code>. The <code>x</code> and <code>y</code>
+                                                        values represent the starting position of the center of the robot, where the top left corner of the field is (0, 0).
+                                                        The <code>dir</code> value represents the direction the robot should initially face; possible values are the strings "up",
+                                                        "down", "right", or "left".
+                                                    </p>
+                                                    <br>
                                                     <p>
                                                         The field description follows the format of a JSON object.
                                                         For more information, you can look through the documentation of the JSON object format
