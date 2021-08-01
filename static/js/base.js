@@ -126,12 +126,6 @@ function drawRobot(robot) {
     ctx.rotate(-dir);
     ctx.translate(-centerX, -centerY);
 }
-drawRobot({
-    X: xpos,
-    Y: ypos,
-    dir: direction,
-    robotType: robotType
-});
 
 function drawObjs(objs, type) {
     /* Draw objects received from the worker. */
@@ -326,6 +320,22 @@ function processObjectsCode(codeString) {
     return objects;
 }
 
+// Update variables for starting coordinates/direction
+// TODO: check that startingPositionData is defined, contains valid coordinates, etc.
+function updateStartingPosition(objects) {
+    xpos = objects.startingPositionData.x;
+    ypos = objects.startingPositionData.y;
+    if (objects.startingPositionData.dir == "up") {
+         direction = 90;
+    } else if (objects.startingPositionData.dir == "down") {
+         direction = 270;
+    } else if (objects.startingPositionData.dir == "right") {
+         direction = 180;
+    } else if (objects.startingPositionData.dir == "left") {
+         direction = 0;
+    }
+}
+
 function uploadObjects(){
 
     try {
@@ -335,19 +345,7 @@ function uploadObjects(){
         // This can raise an exception
         let objects = processObjectsCode(newObjCode);
 
-        // Update variables for starting coordinates/direction
-        // TODO: check that startingPositionData is defined, contains valid coordinates, etc.
-       xpos = objects.startingPositionData.x;
-       ypos = objects.startingPositionData.y;
-       if (objects.startingPositionData.dir == "up") {
-            direction = 90;
-       } else if (objects.startingPositionData.dir == "down") {
-            direction = 270;
-       } else if (objects.startingPositionData.dir == "right") {
-            direction = 180;
-       } else if (objects.startingPositionData.dir == "left") {
-            direction = 0;
-       }
+        updateStartingPosition(objects);
 
         // Canvas not automatically cleared if simulation is idle
         if (mode === "idle") {
@@ -389,6 +387,7 @@ function uploadObjectsOnce() {
     if (objectsCode !== null) {
         try {
             let objects = processObjectsCode(objectsCode);
+            updateStartingPosition(objects);
             worker.postMessage({objects:objects});
         } catch(err) {
             log(err.toString());
@@ -398,6 +397,12 @@ function uploadObjectsOnce() {
     }
 }
 uploadObjectsOnce();
+drawRobot({
+    X: xpos,
+    Y: ypos,
+    dir: direction,
+    robotType: robotType
+});
 
 function update(robot, objects) {
     /*
