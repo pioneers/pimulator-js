@@ -180,9 +180,9 @@
                 <!-- Simulator Info -->
                 <div class="bd-highlight flex-fill">
                     <div class="card border-primary h-100">
-                        <div class="card-header" style="padding-top:7px">
+                        <div class="card-header d-flex align-items-end" style="margin-bottom:0px;padding:0px!important;">
                             <!-- Simulator Nav Tabs -->
-                            <ul class="nav nav-tabs card-header-tabs" id="set-tabs">
+                              <ul class="nav nav-tabs card-header-tabs mr-auto p-2" style="margin:0px;margin-left:29px;padding-bottom:0px!important;padding-top: 13px!important;" id="set-tabs">
                                 <li class="nav-item">
                                     <a href="#console" class="nav-link active" id="console-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Console</a>
                                 </li>
@@ -192,12 +192,35 @@
                                 <li class="nav-item">
                                     <a href="#help" class="nav-link" id="help-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Help</a>
                                 </li>
-                            </ul>
+                              </ul>
+
+                              <div class="p-2">
+                                <button class="nav-item-clear-console btn btn-success" id="console-clear" onclick="clearConsole();">
+                                    <span>Clear Console</span>
+                                </button>
+                                <script>
+                                  let nav_item = document.querySelectorAll('#set-tabs .nav-item');
+                                  let clear_btn = document.getElementById("console-clear");
+
+                                  nav_item.forEach((li) => {
+                                    li.addEventListener('click', (e) => {
+                                      let a = li.firstElementChild;
+                                      setTimeout(() => {
+                                        if(a.id == 'console-tab' && a.getAttribute("aria-selected") == "true") {
+                                          clear_btn.style.display = "block";
+                                        } else {
+                                          clear_btn.style.display = "none";
+                                        }
+                                      }, 50);
+                                    });
+                                  });
+                                </script>
+                              </div>
                         </div>
                         <div class="card-body" style="padding:0.1rem">
                             <div class="tab-content overflow-auto" id="view-tab-content">
                                 <!-- Console -->
-                                <pre class="tab-pane fade show active" id="console" role="tabpanel" aria-labelledby="console-tab" style="overflow:scroll;height:520px;margin-bottom:0px;padding-left:0.5rem;padding-top:0.4rem" ></pre>
+                                <pre class="tab-pane fade show active" id="console" role="tabpanel" aria-labelledby="console-tab" style="overflow:scroll;height:510px;margin-bottom:0px;padding-left:0.5rem;padding-top:0.4rem" ></pre>
 
                                 <!-- Settings -->
                                 <div class="tab-pane fade p-3" id="settings" role="tabpanel" aria-labelledby="settings-tab" style="margin-bottom:5px;padding-top:0.4rem">
@@ -271,9 +294,9 @@
                                     <p><b> Starting position refers to the center of the robot, where the top left corner of the field is (0, 0).</b></p>
                                     <p><div class="dropdown">
                                         <label for="xpos">Starting X:</label>
-                                        <input type="number" step="0.001" id="xpos" name="xpos" value=70.0 style="width: 60px;">
+                                        <input type="number" step="0.001" id="xpos" name="xpos" value=70.0 style="width:60px;">
                                         <label for="ypos">Y:</label>
-                                        <input type="number" step="0.001" id="ypos" name="ypos" value=70.0 style="width: 60px;">
+                                        <input type="number" step="0.001" id="ypos" name="ypos" value=70.0 style="width:60px;">
                                         <button class="btn btn-primary dropdown-toggle" type="button" id="directionDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             Direction <span class="caret"></span>
                                         </button>
@@ -293,7 +316,7 @@
                                 </div>
 
                                 <!-- Help -->
-                                <div class="tab-pane fade" id="help" role="tabpanel" aria-labelledby="settings-tab" style="height:520px;margin-bottom:0px">
+                                <div class="tab-pane fade" id="help" role="tabpanel" aria-labelledby="settings-tab" style="height:510px;margin-bottom:0px">
                                     <div class="accordion" id="help-accordion">
                                         <!-- Help: General -->
                                         <div class="card">
@@ -619,7 +642,7 @@
                                                         <ul>
                                                             <li><code>device_id</code>: Pass in "koala_bear"</li>
                                                             <li><code>param</code>: Use "velocity_a" to set the velocity of the right motor and "velocity_b" for the left motor. </li>
-                                                            <li><code>value</code>: Pass in a <code>float</code> value in the range [-1,1], 
+                                                            <li><code>value</code>: Pass in a <code>float</code> value in the range [-1,1],
                                                                 where a larger magnitude corresponds to a higher velocity in either direction.
                                                             </li>
                                                         </ul>
@@ -644,7 +667,7 @@
                                                         <b>Parameters:</b>
                                                         <ul>
                                                             <li><code>device_id</code>: Pass in "koala_bear"</li>
-                                                            <li><code>param</code>: Use "invert_a" and "invert_b" to invert the direction of rotation for the left and right motors respectively. 
+                                                            <li><code>param</code>: Use "invert_a" and "invert_b" to invert the direction of rotation for the left and right motors respectively.
                                                                 Note that due to its orientation, the left motor will send the robot backwards by default.
                                                             </li>
                                                             <li><code>value</code>: Pass in a <code>boolean</code> value. True means inverted, False means not inverted. </li>
@@ -874,7 +897,7 @@
                             </div>
                         </div>
                         <div class="tab-pane fade " id="code-mirror-js" role="tabpanel" aria-labelledby="code-tab-js">
-                          <div class="bg-light" style="padding: 1em">
+                          <div class="bg-light" style="padding:1em">
 
                          Field presets:
 
@@ -987,7 +1010,7 @@
 
                         <!-- Sensor Readings -->
                         <div class="tab-pane fade" id="sensor-menu" role="tabpanel" aria-labelledby="sensor-menu">
-                            <div class="container pt-3" style="padding-left: 25%; padding-right:25%">
+                            <div class="container pt-3" style="padding-left:25%;padding-right:25%">
                                 <div class="row">
                                     <div class="col">
                                         <p class="text-left"> <b> Line Follower: </b> </p>
