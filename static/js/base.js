@@ -39,7 +39,13 @@ function onmessage(e) {
         log(text);
     }
     if (e.data.objs !== undefined) {
-        drawObjs(e.data.objs, e.data.type);
+        drawObjs(e.data.objs, e.data.type); //Draws obstalcles on window load
+        drawRobot({
+            X: Number($("#xpos").val()),
+            Y: Number($("#ypos").val()),
+            dir: direction,
+            robotType: robotType
+        });
     }
 }
 worker.onmessage = onmessage;
@@ -123,12 +129,6 @@ function drawRobot(robot) {
     ctx.rotate(-dir);
     ctx.translate(-centerX, -centerY);
 }
-drawRobot({
-    X: Number($("#xpos").val()),
-    Y: Number($("#ypos").val()),
-    dir: direction,
-    robotType: robotType
-});
 
 function drawObjs(objs, type) {
     /* Draw objects received from the worker. */
