@@ -337,7 +337,7 @@ function updateStartingPosition(objects) {
     } else if (objects.startPosition.dir == "left") {
          direction = 0;
     } else {
-        log('" ' + objects.startPosition.dir + '" is not a valid starting direction');
+        log('"' + objects.startPosition.dir + '" is not a valid starting direction');
     }
 }
 
