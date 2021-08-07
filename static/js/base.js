@@ -322,13 +322,17 @@ function processObjectsCode(codeString) {
 
 // Update variables for starting coordinates/direction
 function updateStartingPosition(objects) {
-    if (objects.startPosition.x !== undefined && objects.startPosition.y !== undefined && objects.startPosition.dir !== undefined) {
+    if (objects.startPosition.x !== undefined && objects.startPosition.y !== undefined) {
         xpos = objects.startPosition.x;
         ypos = objects.startPosition.y;
         if (xpos < 0 || 144 < xpos || ypos < 0 || 144 < ypos) {
             log("(" + xpos + ", " + ypos + ") are not valid starting coordinates");
         }
+    } else {
+        log("The field description does not correctly define starting coordinates");
+    }
 
+    if (objects.startPosition.dir !== undefined) {
         if (objects.startPosition.dir == "up") {
             direction = 90;
         } else if (objects.startPosition.dir == "down") {
@@ -341,7 +345,7 @@ function updateStartingPosition(objects) {
             log('"' + objects.startPosition.dir + '" is not a valid starting direction');
         }
     } else {
-        log("The field description does not correctly define a starting position");
+        log("The field description does not correctly define a starting direction");
     }
 }
 
