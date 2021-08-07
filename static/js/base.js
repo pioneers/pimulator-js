@@ -38,8 +38,9 @@ function onmessage(e) {
         let text = e.data.log;
         log(text);
     }
-    if (e.data.objs !== undefined) {
-        drawObjs(e.data.objs, e.data.type); //Draws obstalcles on window load
+    if (e.data.objs !== undefined) { //checks if objs have been rendered on canvas
+        drawObjs(e.data.objs, e.data.type); //Draws obstacles on window load
+        //Draws robot on window load
         drawRobot({
             X: Number($("#xpos").val()),
             Y: Number($("#ypos").val()),
@@ -48,7 +49,9 @@ function onmessage(e) {
         });
     }
 }
+
 worker.onmessage = onmessage;
+
 
 function drawRobot(robot) {
     // Update text
