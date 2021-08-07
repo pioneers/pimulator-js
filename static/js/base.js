@@ -321,10 +321,13 @@ function processObjectsCode(codeString) {
 }
 
 // Update variables for starting coordinates/direction
-// TODO: check that startPosition is defined, contains valid coordinates, etc.
 function updateStartingPosition(objects) {
     xpos = objects.startPosition.x;
     ypos = objects.startPosition.y;
+    if (xpos < 0 || 144 < xpos || ypos < 0 || 144 < ypos) {
+        log("(" + xpos + ", " + ypos + ") are not valid starting coordinates");
+    }
+
     if (objects.startPosition.dir == "up") {
          direction = 90;
     } else if (objects.startPosition.dir == "down") {
@@ -333,6 +336,8 @@ function updateStartingPosition(objects) {
          direction = 180;
     } else if (objects.startPosition.dir == "left") {
          direction = 0;
+    } else {
+        log('" ' + objects.startPosition.dir + '" is not a valid starting direction');
     }
 }
 
