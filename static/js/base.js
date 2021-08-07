@@ -321,17 +321,17 @@ function processObjectsCode(codeString) {
 }
 
 // Update variables for starting coordinates/direction
-// TODO: check that startingPositionData is defined, contains valid coordinates, etc.
+// TODO: check that startPosition is defined, contains valid coordinates, etc.
 function updateStartingPosition(objects) {
-    xpos = objects.startingPositionData.x;
-    ypos = objects.startingPositionData.y;
-    if (objects.startingPositionData.dir == "up") {
+    xpos = objects.startPosition.x;
+    ypos = objects.startPosition.y;
+    if (objects.startPosition.dir == "up") {
          direction = 90;
-    } else if (objects.startingPositionData.dir == "down") {
+    } else if (objects.startPosition.dir == "down") {
          direction = 270;
-    } else if (objects.startingPositionData.dir == "right") {
+    } else if (objects.startPosition.dir == "right") {
          direction = 180;
-    } else if (objects.startingPositionData.dir == "left") {
+    } else if (objects.startPosition.dir == "left") {
          direction = 0;
     }
 }

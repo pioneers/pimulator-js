@@ -1,5 +1,5 @@
 {
-    startingPositionData: {x: 70, y: 70, dir: "left"},
+    startPosition: {x: 70, y: 70, dir: "left"},
     wallsData: [
         {x: 0, y: 0, w: 144, h: 2},
         {x: 0, y: 0, w: 2, h: 144},
