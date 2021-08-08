@@ -15,7 +15,7 @@ function toggle() {
     let consoleLog = document.getElementById("console")
     let field = document.getElementById("field")
     let summaryElements = document.getElementsByTagName("summary")
-    let fieldPresets = document.getElementsByClassName('bg-light')
+    let fieldPresets = document.getElementsByClassName('field-presets-cont')
 
     let colorDefault = "#000000"
     let backgroundColorDefault = "#ffffff"
@@ -27,7 +27,7 @@ function toggle() {
     let linkDarkColor = "#009688"
     let linkColor = "#007bff"
     let buttonDarkBackground = "#757575"
-    let buttonBackground = "#007bff"
+    let buttonBackground = "#007bff!important"
 
     // If theme is default light/dark, switch to default dark/light
     // Otherwise, keep the existing theme
@@ -44,6 +44,7 @@ function toggle() {
             footerElements[h].style.backgroundColor = backgroundColorDark
         }
         for (var h = 0; h < fieldPresets.length; h++){
+            fieldPresets[h].classList.remove("bg-light");
             fieldPresets[h].style.backgroundColor = backgroundColorDark
         }
         for (var h = 0; h < tableElements.length; h++){
@@ -74,6 +75,7 @@ function toggle() {
             footerElements[h].style.backgroundColor = backgroundColorDefault
         }
         for (var h = 0; h < fieldPresets.length; h++){
+            fieldPresets[h].classList.add("bg-light");
         }
         for (var h = 0; h < tableElements.length; h++){
             tableElements[h].style.color = colorDefault
