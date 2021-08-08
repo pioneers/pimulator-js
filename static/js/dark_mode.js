@@ -16,6 +16,7 @@ function toggle() {
     let field = document.getElementById("field")
     let summaryElements = document.getElementsByTagName("summary")
     let fieldPresets = document.getElementsByClassName('field-presets-cont')
+    let modal =  document.getElementsByClassName('modal-content')
 
     let colorDefault = "#000000"
     let backgroundColorDefault = "#ffffff"
@@ -47,6 +48,9 @@ function toggle() {
             fieldPresets[h].classList.remove("bg-light");
             fieldPresets[h].style.backgroundColor = backgroundColorDark
         }
+        for(var h = 0; h < modal.length; h++){
+            modal[h].style.backgroundColor = backgroundColorDark
+        }
         for (var h = 0; h < tableElements.length; h++){
             tableElements[h].style.color = colorDark
         }
@@ -76,6 +80,9 @@ function toggle() {
         }
         for (var h = 0; h < fieldPresets.length; h++){
             fieldPresets[h].classList.add("bg-light");
+        }
+        for(var h = 0; h < modal.length; h++){
+            modal[h].style.backgroundColor = backgroundColorDefault
         }
         for (var h = 0; h < tableElements.length; h++){
             tableElements[h].style.color = colorDefault
