@@ -498,6 +498,7 @@ function stop() {
     worker.postMessage({cacheKey: cacheKey});
     worker.postMessage({code:code});
     mode = "idle";
+    clearInterval(timer);
     resetSimButtons()
 };
 
