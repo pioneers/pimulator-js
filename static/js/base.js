@@ -15,7 +15,7 @@ const ctx = canvas.getContext('2d');
  * where DD and MM do not have leading zeros.
  * Must be updated upon each push to the webapp.
  */
-const lastUpdate = "27-4-2021"
+const lastUpdate = "8-8-2021"
 
 // Handle messages from worker
 function onmessage(e) {
