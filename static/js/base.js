@@ -38,11 +38,20 @@ function onmessage(e) {
         let text = e.data.log;
         log(text);
     }
-    if (e.data.objs !== undefined) {
-        drawObjs(e.data.objs, e.data.type);
+    if (e.data.objs !== undefined) { //checks if objs have been rendered on canvas
+        drawObjs(e.data.objs, e.data.type); //Draws obstacles on window load
+        //Draws robot on window load
+        drawRobot({
+            X: Number($("#xpos").val()),
+            Y: Number($("#ypos").val()),
+            dir: direction,
+            robotType: robotType
+        });
     }
 }
+
 worker.onmessage = onmessage;
+
 
 function drawRobot(robot) {
     // Update text
@@ -123,12 +132,6 @@ function drawRobot(robot) {
     ctx.rotate(-dir);
     ctx.translate(-centerX, -centerY);
 }
-drawRobot({
-    X: Number($("#xpos").val()),
-    Y: Number($("#ypos").val()),
-    dir: direction,
-    robotType: robotType
-});
 
 function drawObjs(objs, type) {
     /* Draw objects received from the worker. */
