@@ -18,7 +18,7 @@ const ctx = canvas.getContext('2d');
  * where DD and MM do not have leading zeros.
  * Must be updated upon each push to the webapp.
  */
-const lastUpdate = "27-4-2021"
+const lastUpdate = "8-8-2021"
 
 // Handle messages from worker
 function onmessage(e) {
@@ -41,11 +41,20 @@ function onmessage(e) {
         let text = e.data.log;
         log(text);
     }
-    if (e.data.objs !== undefined) {
-        drawObjs(e.data.objs, e.data.type);
+    if (e.data.objs !== undefined) { //checks if objs have been rendered on canvas
+        drawObjs(e.data.objs, e.data.type); //Draws obstacles on window load
+        //Draws robot on window load
+        drawRobot({
+            X: Number($("#xpos").val()),
+            Y: Number($("#ypos").val()),
+            dir: direction,
+            robotType: robotType
+        });
     }
 }
+
 worker.onmessage = onmessage;
+
 
 function drawRobot(robot) {
     // Update text
@@ -525,6 +534,7 @@ function stop() {
     worker.postMessage({cacheKey: cacheKey});
     worker.postMessage({code:code});
     mode = "idle";
+    clearInterval(timer);
     resetSimButtons()
 };
 

@@ -1,5 +1,10 @@
 # Pimulator Release Notes
 
+## July 31, 2021
+#### New
+- Button added to clear console
+- Default field (four tapelines, interactable object) added as a pre-set option
+
 ## April 26, 2021
 #### New
 - Ramps added as a field element
