@@ -15,7 +15,7 @@ const ctx = canvas.getContext('2d');
  * where DD and MM do not have leading zeros.
  * Must be updated upon each push to the webapp.
  */
-const lastUpdate = "27-4-2021"
+const lastUpdate = "8-8-2021"
 
 // Handle messages from worker
 function onmessage(e) {
@@ -38,11 +38,20 @@ function onmessage(e) {
         let text = e.data.log;
         log(text);
     }
-    if (e.data.objs !== undefined) {
-        drawObjs(e.data.objs, e.data.type);
+    if (e.data.objs !== undefined) { //checks if objs have been rendered on canvas
+        drawObjs(e.data.objs, e.data.type); //Draws obstacles on window load
+        //Draws robot on window load
+        drawRobot({
+            X: Number($("#xpos").val()),
+            Y: Number($("#ypos").val()),
+            dir: direction,
+            robotType: robotType
+        });
     }
 }
+
 worker.onmessage = onmessage;
+
 
 function drawRobot(robot) {
     // Update text
@@ -123,12 +132,6 @@ function drawRobot(robot) {
     ctx.rotate(-dir);
     ctx.translate(-centerX, -centerY);
 }
-drawRobot({
-    X: Number($("#xpos").val()),
-    Y: Number($("#ypos").val()),
-    dir: direction,
-    robotType: robotType
-});
 
 function drawObjs(objs, type) {
     /* Draw objects received from the worker. */
@@ -319,55 +322,66 @@ function uploadCode() {
     }
 }
 
-function uploadObjects(){
+function processObjectsCode(codeString) {
+    // Convert objects code (string) to JS object
+    // Warning: May raise an exception
+    let returnString = "return " + codeString;
+    let f = new Function(returnString);
+    let objects = f();
+    return objects;
+}
 
-    if (mode === "idle") {
-        clearCanvas();
-    }
+function uploadObjects(){
 
     try {
         newObjCode = cmObjects.getValue();
-        let returnString = "return " + newObjCode;
-        let f = new Function(returnString);
-        let objects = f();
+
+        // Convert code string to JS map
+        // This can raise an exception
+        let objects = processObjectsCode(newObjCode);
+
+        // Canvas not automatically cleared if simulation is idle
+        if (mode === "idle") {
+            clearCanvas();
+        }
+
+        // Send the new objects to the worker
+        // This also redraws the field
         worker.postMessage({objects:objects});
 
-        log("Field upload successful")
+        // Robot not automatically drawn if simulation is idle
+        if (mode === "idle") {
+            // Redraw robot
+            let robot = {
+                X: Number($("#xpos").val()),
+                Y: Number($("#ypos").val()),
+                dir: direction,
+                robotType: robotType
+            };
+            drawRobot(robot);
+        }
+        log("Field upload successful");
+
+        if (mode === "auto") {
+            log("Autonomous simulation active: Field will update when next simulation starts")
+        }
+
+        // Update global variable
+        objectsCode = newObjCode;
+        // Store in browser local storage for future visits
         localStorage.setItem("objectsCode", newObjCode);
     } catch(err) {
-        let returnString = "return " + objectsCode;
-        let f = new Function(returnString);
-        let objects = f();
-        worker.postMessage({objects:objects});
         log(err.toString());
     }
 
-    if (mode === "auto") {
-        log("Autonomous simulation active: Field will update when next simulation starts")
-    }
-    if (mode === "idle") {
-        // Redraw robot
-        let robot = {
-            X: Number($("#xpos").val()),
-            Y: Number($("#ypos").val()),
-            dir: direction,
-            robotType: robotType
-        };
-        drawRobot(robot);
-    }
 }
 
 function uploadObjectsOnce() {
     if (objectsCode !== null) {
         try {
-            let returnString = "return " + objectsCode;
-            let f = new Function(returnString);
-            let objects = f();
+            let objects = processObjectsCode(objectsCode);
             worker.postMessage({objects:objects});
         } catch(err) {
-            let f = new Function(returnString);
-            let objects = f();
-            worker.postMessage({objects:objects});
             log(err.toString());
         }
     } else {
@@ -416,14 +430,9 @@ function start(auto=false) {
         if (codeUploaded) {
             // Send the list of objects
             try {
-                let returnString = "return " + objectsCode;
-                let f = new Function(returnString);
-                let objects = f();
+                let objects = processObjectsCode(objectsCode);
                 worker.postMessage({objects:objects});
             } catch(err) {
-                let f = new Function(returnString);
-                let objects = f();
-                worker.postMessage({objects:objects});
                 log(err.toString());
             }
 
@@ -489,6 +498,7 @@ function stop() {
     worker.postMessage({cacheKey: cacheKey});
     worker.postMessage({code:code});
     mode = "idle";
+    clearInterval(timer);
     resetSimButtons()
 };
 
@@ -542,4 +552,9 @@ function log(text) {
         consoleLog.innerHTML += time + text + "<br>";
     }
     consoleLog.scrollTop = consoleLog.scrollHeight;
+}
+
+function clearConsole(){
+  const console = document.querySelector("#console");
+  console.innerHTML = "";
 }

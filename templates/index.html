@@ -45,40 +45,7 @@
   </head>
 
   <body>
-    <!-- Release Note Popup -->
-    <div class="modal" tabindex="-1" role="dialog" id="release-note">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-              <h5 class="modal-title">April 26, 2021 Updates</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-              </button>
-          </div>
-          <div class="modal-body">
-            <ul>
-                <li>Ramps added as a field element</li>
-                <li>Pre-set fields can be selected</li>
-                <ul>
-                  <li>The autonomous section of the Spring 2021 field has been added</li>
-                </ul>
-                <li>Updates will now come with Release Notes</li>
-          </div>
-          <div class="modal-footer">
-              <a href="https://github.com/pioneers/pimulator-js/blob/master/releasenotes.md" type="button" class="btn btn-primary" target="_blank">Release Notes</a>
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <script>
-        $(document).ready(function(){
-          if (localStorage.getItem("lastUpdate") !== lastUpdate) {
-            localStorage.setItem("lastUpdate", lastUpdate);
-            $("#release-note").modal('show');
-          }
-        });
-    </script>
+
     <!-- Header Navigation Bar -->
     <nav class="navbar navbar-expand-lg">
         <span class="navbar-brand mb-0 h1">
@@ -92,45 +59,13 @@
             <div class="navbar-nav">
                 <a class="nav-item nav-link" href="https://github.com/pioneers/runtime/wiki/Student-API" target="_blank">Robot API</a>
                 <a class="nav-item nav-link" href="https://github.com/pioneers/pimulator-js/blob/master/releasenotes.md" target="_blank">Release Notes</a>
+                <a class="nav-item nav-link" href="https://forms.gle/i4q48q7fxBxRxDSb6" target="_blank">Bug Reports/Feature Requests</a>
             </div>
         </div>
     </nav>
 
     <!-- Body of Content -->
     <div class="container">
-
-        <!-- Alert -->
-        <div class="row">
-            <div class="alert alert-danger alert-dismissible fade show w-100 align-middle" role="alert">
-                <div class="d-inline-flex mr-auto">
-                    <p style="margin-bottom:0px!important">
-                        <b>IMPORTANT: </b> As of 4/10/2021, the robot API used by the simulator has been updated.
-                        See the Robot API link above for the current API. <br>
-                        <b>Your existing simulator code will no longer work.</b>
-                        For help getting started with the new API, view our starter code
-                        <a href="https://raw.githubusercontent.com/pioneers/pimulator-js/master/static/student_code_file.py" target="_blank">here</a>.
-                    </p>
-                </div>
-                <div class="d-inline-flex">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true" class="align-middle">&times;</span>
-                    </button>
-                </div>
-            </div>
-            <div class="alert alert-warning alert-dismissible fade show w-100 align-middle" role="alert">
-                <div class="d-inline-flex mr-auto">
-                    <p style="margin-bottom:0px!important">
-                        <b>WARNING: </b> The Gamepad Class cannot be used for the Spring 2021 Robotics Competition.
-                        Only the Keyboard Class can be used.
-                    </p>
-                </div>
-                <div class="d-inline-flex">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            </div>
-        </div>
 
         <!-- Row 1: Field & Simulator Info -->
         <div class="row">
@@ -180,9 +115,9 @@
                 <!-- Simulator Info -->
                 <div class="bd-highlight flex-fill">
                     <div class="card border-primary h-100">
-                        <div class="card-header" style="padding-top:7px">
+                        <div class="card-header d-flex align-items-end" style="margin-bottom:0px;padding:0px!important;">
                             <!-- Simulator Nav Tabs -->
-                            <ul class="nav nav-tabs card-header-tabs" id="set-tabs">
+                              <ul class="nav nav-tabs card-header-tabs mr-auto p-2" style="margin:0px;margin-left:29px;padding-bottom:0px!important;padding-top: 13px!important;" id="set-tabs">
                                 <li class="nav-item">
                                     <a href="#console" class="nav-link active" id="console-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Console</a>
                                 </li>
@@ -192,12 +127,35 @@
                                 <li class="nav-item">
                                     <a href="#help" class="nav-link" id="help-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true">Help</a>
                                 </li>
-                            </ul>
+                              </ul>
+
+                              <div class="p-2">
+                                <button class="nav-item-clear-console btn btn-success" id="console-clear" onclick="clearConsole();">
+                                    <span>Clear Console</span>
+                                </button>
+                                <script>
+                                  let nav_item = document.querySelectorAll('#set-tabs .nav-item');
+                                  let clear_btn = document.getElementById("console-clear");
+
+                                  nav_item.forEach((li) => {
+                                    li.addEventListener('click', (e) => {
+                                      let a = li.firstElementChild;
+                                      setTimeout(() => {
+                                        if(a.id == 'console-tab' && a.getAttribute("aria-selected") == "true") {
+                                          clear_btn.style.display = "block";
+                                        } else {
+                                          clear_btn.style.display = "none";
+                                        }
+                                      }, 50);
+                                    });
+                                  });
+                                </script>
+                              </div>
                         </div>
                         <div class="card-body" style="padding:0.1rem">
                             <div class="tab-content overflow-auto" id="view-tab-content">
                                 <!-- Console -->
-                                <pre class="tab-pane fade show active" id="console" role="tabpanel" aria-labelledby="console-tab" style="overflow:scroll;height:520px;margin-bottom:0px;padding-left:0.5rem;padding-top:0.4rem" ></pre>
+                                <pre class="tab-pane fade show active" id="console" role="tabpanel" aria-labelledby="console-tab" style="overflow:scroll;height:510px;margin-bottom:0px;padding-left:0.5rem;padding-top:0.4rem" ></pre>
 
                                 <!-- Settings -->
                                 <div class="tab-pane fade p-3" id="settings" role="tabpanel" aria-labelledby="settings-tab" style="margin-bottom:5px;padding-top:0.4rem">
@@ -271,9 +229,9 @@
                                     <p><b> Starting position refers to the center of the robot, where the top left corner of the field is (0, 0).</b></p>
                                     <p><div class="dropdown">
                                         <label for="xpos">Starting X:</label>
-                                        <input type="number" step="0.001" id="xpos" name="xpos" value=70.0 style="width: 60px;">
+                                        <input type="number" step="0.001" id="xpos" name="xpos" value=70.0 style="width:60px;">
                                         <label for="ypos">Y:</label>
-                                        <input type="number" step="0.001" id="ypos" name="ypos" value=70.0 style="width: 60px;">
+                                        <input type="number" step="0.001" id="ypos" name="ypos" value=70.0 style="width:60px;">
                                         <button class="btn btn-primary dropdown-toggle" type="button" id="directionDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             Direction <span class="caret"></span>
                                         </button>
@@ -293,7 +251,7 @@
                                 </div>
 
                                 <!-- Help -->
-                                <div class="tab-pane fade" id="help" role="tabpanel" aria-labelledby="settings-tab" style="height:520px;margin-bottom:0px">
+                                <div class="tab-pane fade" id="help" role="tabpanel" aria-labelledby="settings-tab" style="height:510px;margin-bottom:0px">
                                     <div class="accordion" id="help-accordion">
                                         <!-- Help: General -->
                                         <div class="card">
@@ -619,7 +577,7 @@
                                                         <ul>
                                                             <li><code>device_id</code>: Pass in "koala_bear"</li>
                                                             <li><code>param</code>: Use "velocity_a" to set the velocity of the right motor and "velocity_b" for the left motor. </li>
-                                                            <li><code>value</code>: Pass in a <code>float</code> value in the range [-1,1], 
+                                                            <li><code>value</code>: Pass in a <code>float</code> value in the range [-1,1],
                                                                 where a larger magnitude corresponds to a higher velocity in either direction.
                                                             </li>
                                                         </ul>
@@ -644,7 +602,7 @@
                                                         <b>Parameters:</b>
                                                         <ul>
                                                             <li><code>device_id</code>: Pass in "koala_bear"</li>
-                                                            <li><code>param</code>: Use "invert_a" and "invert_b" to invert the direction of rotation for the left and right motors respectively. 
+                                                            <li><code>param</code>: Use "invert_a" and "invert_b" to invert the direction of rotation for the left and right motors respectively.
                                                                 Note that due to its orientation, the left motor will send the robot backwards by default.
                                                             </li>
                                                             <li><code>value</code>: Pass in a <code>boolean</code> value. True means inverted, False means not inverted. </li>
@@ -740,21 +698,6 @@
                                                     <p>
                                                         To drop an object the robot is carrying, use <code>Robot.drop()</code>. After an object is dropped, it will stay in the same place you dropped it, unless you pick it up again.
                                                     </p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Help: Debug Tab -->
-                                        <div class="card">
-                                            <div class="card-header" id="help-debug-heading">
-                                                <details class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#help-debug" aria-expanded="true" aria-controls="help-debug">
-                                                    <summary>Feedback/Bug Reports</summary>
-                                                </details>
-                                            </div>
-                                            <div id="help-debug" class="collapse" aria-labelledby="help-debug">
-                                                <div class="card-body">
-                                                    If you encountered a bug that you feel requires attention from staff, please submit a report at this link:
-                                                    <a href="https://forms.gle/i4q48q7fxBxRxDSb6" target="_blank"> Submit a Bug Report </a>
                                                 </div>
                                             </div>
                                         </div>
@@ -874,12 +817,13 @@
                             </div>
                         </div>
                         <div class="tab-pane fade " id="code-mirror-js" role="tabpanel" aria-labelledby="code-tab-js">
-                          <div class="bg-light" style="padding: 1em">
+                          <div class="bg-light field-presets-cont" style="padding:1em">
 
                          Field presets:
 
                           <button type="button" id="preset" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="uploadPreset(0)">Empty</button>
                           <button type="button" id="preset1" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="uploadPreset(1)">World Tour (Auto)</button>
+                          <button type="button" id="preset2" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="uploadPreset(2)">Default</button>
                           <script>
                             function uploadPreset(x) {
                               var xhrPreset=new XMLHttpRequest();
@@ -887,6 +831,8 @@
                                 xhrPreset.open("GET","/static/field_empty.json?t={{ cache_key }}");
                               } else if (x == 1){
                                 xhrPreset.open("GET","/static/field_worldtour_auto.json?t={{ cache_key }}");
+                              } else if (x == 2){
+                                xhrPreset.open("GET","/static/field.json?t={{ cache_key }}");
                               }
                               xhrPreset.onload = () => {
                                 objectsCode = xhrPreset.responseText;
@@ -984,7 +930,7 @@
 
                         <!-- Sensor Readings -->
                         <div class="tab-pane fade" id="sensor-menu" role="tabpanel" aria-labelledby="sensor-menu">
-                            <div class="container pt-3" style="padding-left: 25%; padding-right:25%">
+                            <div class="container pt-3" style="padding-left:25%;padding-right:25%">
                                 <div class="row">
                                     <div class="col">
                                         <p class="text-left"> <b> Line Follower: </b> </p>
@@ -1029,5 +975,5 @@
     <script src="https://cdn.jsdelivr.net/gh/fcmam5/nightly.js@v1.0/dist/nightly.min.js"></script>
     <script src="/static/js/dark_mode.js"></script>
   </body>
-
+  
 </html>

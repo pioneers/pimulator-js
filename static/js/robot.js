@@ -415,6 +415,7 @@ class RobotClass {
             dir = (this.dir + theta*180/Math.PI) % 360;
         }
 
+        // Apply effect of ramp
         let onRamp = this.checkRamp();
         let offsetConst = 0.015;
         if (onRamp != null) {
