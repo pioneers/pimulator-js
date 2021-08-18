@@ -45,40 +45,7 @@
   </head>
 
   <body>
-    <!-- Release Note Popup -->
-    <div class="modal" tabindex="-1" role="dialog" id="release-note">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-              <h5 class="modal-title">April 26, 2021 Updates</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-              </button>
-          </div>
-          <div class="modal-body">
-            <ul>
-                <li>Ramps added as a field element</li>
-                <li>Pre-set fields can be selected</li>
-                <ul>
-                  <li>The autonomous section of the Spring 2021 field has been added</li>
-                </ul>
-                <li>Updates will now come with Release Notes</li>
-          </div>
-          <div class="modal-footer">
-              <a href="https://github.com/pioneers/pimulator-js/blob/master/releasenotes.md" type="button" class="btn btn-primary" target="_blank">Release Notes</a>
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <script>
-        $(document).ready(function(){
-          if (localStorage.getItem("lastUpdate") !== lastUpdate) {
-            localStorage.setItem("lastUpdate", lastUpdate);
-            $("#release-note").modal('show');
-          }
-        });
-    </script>
+
     <!-- Header Navigation Bar -->
     <nav class="navbar navbar-expand-lg">
         <span class="navbar-brand mb-0 h1">
@@ -99,39 +66,6 @@
 
     <!-- Body of Content -->
     <div class="container">
-
-        <!-- Alert -->
-        <div class="row">
-            <div class="alert alert-danger alert-dismissible fade show w-100 align-middle" role="alert">
-                <div class="d-inline-flex mr-auto">
-                    <p style="margin-bottom:0px!important">
-                        <b>IMPORTANT: </b> As of 4/10/2021, the robot API used by the simulator has been updated.
-                        See the Robot API link above for the current API. <br>
-                        <b>Your existing simulator code will no longer work.</b>
-                        For help getting started with the new API, view our starter code
-                        <a href="https://raw.githubusercontent.com/pioneers/pimulator-js/master/static/student_code_file.py" target="_blank">here</a>.
-                    </p>
-                </div>
-                <div class="d-inline-flex">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true" class="align-middle">&times;</span>
-                    </button>
-                </div>
-            </div>
-            <div class="alert alert-warning alert-dismissible fade show w-100 align-middle" role="alert">
-                <div class="d-inline-flex mr-auto">
-                    <p style="margin-bottom:0px!important">
-                        <b>WARNING: </b> The Gamepad Class cannot be used for the Spring 2021 Robotics Competition.
-                        Only the Keyboard Class can be used.
-                    </p>
-                </div>
-                <div class="d-inline-flex">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            </div>
-        </div>
 
         <!-- Row 1: Field & Simulator Info -->
         <div class="row">
