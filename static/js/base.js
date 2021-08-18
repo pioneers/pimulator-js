@@ -45,8 +45,8 @@ function onmessage(e) {
         drawObjs(e.data.objs, e.data.type); //Draws obstacles on window load
         //Draws robot on window load
         drawRobot({
-            X: Number($("#xpos").val()),
-            Y: Number($("#ypos").val()),
+            X: xpos,
+            Y: ypos,
             dir: direction,
             robotType: robotType
         });
@@ -463,6 +463,7 @@ function start(auto=false) {
     }
     else {
         clearInterval(timer);
+        clearCanvas();
         if (codeUploaded) {
             // Send the list of objects
             try {
