@@ -1,5 +1,10 @@
 # Pimulator Release Notes
 
+## August 28, 2021
+#### Changes
+- Bug fixes for autonomous timer and dark mode
+- Added tooltips for robot options and info on robot speeds and sizes
+
 ## July 31, 2021
 #### New
 - Button added to clear console
