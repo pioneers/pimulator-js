@@ -45,40 +45,7 @@
   </head>
 
   <body>
-    <!-- Release Note Popup -->
-    <div class="modal" tabindex="-1" role="dialog" id="release-note">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-              <h5 class="modal-title">April 26, 2021 Updates</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-              </button>
-          </div>
-          <div class="modal-body">
-            <ul>
-                <li>Ramps added as a field element</li>
-                <li>Pre-set fields can be selected</li>
-                <ul>
-                  <li>The autonomous section of the Spring 2021 field has been added</li>
-                </ul>
-                <li>Updates will now come with Release Notes</li>
-          </div>
-          <div class="modal-footer">
-              <a href="https://github.com/pioneers/pimulator-js/blob/master/releasenotes.md" type="button" class="btn btn-primary" target="_blank">Release Notes</a>
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <script>
-        $(document).ready(function(){
-          if (localStorage.getItem("lastUpdate") !== lastUpdate) {
-            localStorage.setItem("lastUpdate", lastUpdate);
-            $("#release-note").modal('show');
-          }
-        });
-    </script>
+
     <!-- Header Navigation Bar -->
     <nav class="navbar navbar-expand-lg">
         <span class="navbar-brand mb-0 h1">
@@ -99,39 +66,6 @@
 
     <!-- Body of Content -->
     <div class="container">
-
-        <!-- Alert -->
-        <div class="row">
-            <div class="alert alert-danger alert-dismissible fade show w-100 align-middle" role="alert">
-                <div class="d-inline-flex mr-auto">
-                    <p style="margin-bottom:0px!important">
-                        <b>IMPORTANT: </b> As of 4/10/2021, the robot API used by the simulator has been updated.
-                        See the Robot API link above for the current API. <br>
-                        <b>Your existing simulator code will no longer work.</b>
-                        For help getting started with the new API, view our starter code
-                        <a href="https://raw.githubusercontent.com/pioneers/pimulator-js/master/static/student_code_file.py" target="_blank">here</a>.
-                    </p>
-                </div>
-                <div class="d-inline-flex">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true" class="align-middle">&times;</span>
-                    </button>
-                </div>
-            </div>
-            <div class="alert alert-warning alert-dismissible fade show w-100 align-middle" role="alert">
-                <div class="d-inline-flex mr-auto">
-                    <p style="margin-bottom:0px!important">
-                        <b>WARNING: </b> The Gamepad Class cannot be used for the Spring 2021 Robotics Competition.
-                        Only the Keyboard Class can be used.
-                    </p>
-                </div>
-                <div class="d-inline-flex">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            </div>
-        </div>
 
         <!-- Row 1: Field & Simulator Info -->
         <div class="row">
@@ -292,23 +226,6 @@
                                     </p>
 
                                     <h4>Robot</h4>
-                                    <p><b> Starting position refers to the center of the robot, where the top left corner of the field is (0, 0).</b></p>
-                                    <p><div class="dropdown">
-                                        <label for="xpos">Starting X:</label>
-                                        <input type="number" step="0.001" id="xpos" name="xpos" value=70.0 style="width:60px;">
-                                        <label for="ypos">Y:</label>
-                                        <input type="number" step="0.001" id="ypos" name="ypos" value=70.0 style="width:60px;">
-                                        <button class="btn btn-primary dropdown-toggle" type="button" id="directionDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            Direction <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="directionDropdownButton">
-                                            <li><a class="dropdown-item" href="#" onclick="switchDirection(0)">Left</a></li>
-                                            <li><a class="dropdown-item" href="#" onclick="switchDirection(90)">Up</a></li>
-                                            <li><a class="dropdown-item" href="#" onclick="switchDirection(180)">Right</a></li>
-                                            <li><a class="dropdown-item" href="#" onclick="switchDirection(270)">Down</a></li>
-                                        </ul>
-                                    </div></p>
-
                                     <p id="input-mode">Robot Type:
                                         <button type="button" id="light-btn" class="btn btn-primary" data-toggle="tooltip" data-placement="bottom" title="Light" data-toggle="button" aria-pressed="false" onclick="switchRobotType('light')">Swift</button>
                                         <button type="button" id="medium-btn" class="btn btn-primary" data-toggle="tooltip" data-placement="bottom" title="Medium" data-toggle="button" aria-pressed="true" onclick="switchRobotType('medium')">Spry</button>
@@ -396,7 +313,8 @@
                                                 <div class="card-body">
                                                     <p>
                                                         The field consists of walls, ramps, interactable objects, and tape lines (to be used with line followers).
-                                                        If you wish to update any of the objects, you can update them by uploading your own code in the <b>Field</b> tab
+                                                        The field description also defines the starting position of the robot.
+                                                        You can update the field by uploading your own code in the <b>Field</b> tab
                                                         and pressing the 'Upload Field' button.
                                                     </p>
                                                     <p> <b> Walls: </b> </p>
@@ -432,7 +350,22 @@
                                                         Tape lines are listed under the key <code>tapeLinesData</code> and consist of 4 key-value pairs,
                                                         with keys <code>x1</code>, <code>y1</code>, <code>x2</code>, and <code>y2</code>.
                                                         The <code>x1</code> and <code>y1</code> coordinates correspond to one end, while the <code>x2</code>, <code>y2</code> coordinates
-                                                        correspond to the opposite end of the line. </p>
+                                                        correspond to the opposite end of the line.
+                                                    </p>
+                                                    <p><b> Starting Position: </b></p>
+                                                    <p>
+                                                        The robot's starting position is defined under the key <code>startPosition</code> and consists of 3
+                                                        key-value pairs, with keys <code>x</code>, <code>y</code>, and <code>dir</code>. The <code>x</code> and <code>y</code>
+                                                        values represent the starting coordinates of the center of the robot, where the top left corner of the field is (0, 0) and
+                                                        the bottom right corner is (144, 144).
+                                                        The <code>dir</code> value represents the direction the robot should initially face; possible values are the strings "up",
+                                                        "down", "right", or "left".
+                                                    </p>
+                                                    <p>
+                                                        Unlike with other field objects, it is an error to list multiple starting positions. The starting position must be defined
+                                                        exactly once.
+                                                    </p>
+                                                    <br>
                                                     <p>
                                                         The field description follows the format of a JSON object.
                                                         For more information, you can look through the documentation of the JSON object format
@@ -926,7 +859,7 @@
                             </div>
                         </div>
                         <div class="tab-pane fade " id="code-mirror-js" role="tabpanel" aria-labelledby="code-tab-js">
-                          <div class="bg-light" style="padding:1em">
+                          <div class="bg-light field-presets-cont" style="padding:1em">
 
                          Field presets:
 
@@ -1084,5 +1017,5 @@
     <script src="https://cdn.jsdelivr.net/gh/fcmam5/nightly.js@v1.0/dist/nightly.min.js"></script>
     <script src="/static/js/dark_mode.js"></script>
   </body>
-
+  
 </html>

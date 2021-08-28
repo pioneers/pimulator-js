@@ -1,4 +1,5 @@
 {
+    startPosition: {x: 10, y: 88.5, dir: "right"},
     tapeLinesData: [
         {x1: 5, y1: 88.5, x2: 55, y2: 88.5, color: "yellow"},
         {x1: 55, y1: 88.5, x2: 61, y2: 84.5, color: "yellow"},
