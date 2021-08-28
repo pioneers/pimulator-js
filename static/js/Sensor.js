@@ -10,7 +10,7 @@ class LineFollower{
      var frontCenter = [(this.robot.topL[0] + this.robot.topR[0]) / 2, (this.robot.topL[1] + this.robot.topR[1]) / 2]
      var sensorsY = [frontCenter[1] - 3*Math.cos(this.robot.dir/180*Math.PI), frontCenter[1], frontCenter[1] + 3*Math.cos(this.robot.dir/180*Math.PI)]
      var sensorsX = [frontCenter[0] - 3*Math.sin(-this.robot.dir/180*Math.PI), frontCenter[0], frontCenter[0] + 3*Math.sin(-this.robot.dir/180*Math.PI)]
-    
+
      const maxReading = 1.2 // Max sensor reading, before clipping to 1
      var tapeLines = this.robot.simulator.tapeLines
      let total = []
@@ -67,9 +67,12 @@ class LineFollower{
        }
        total.push(Math.max.apply(null, totalLine))
      }
-     this.left = total[2]
-     this.center = total[1]
-     this.right = total[0]
+     this.left = addRandomness(total[2])
+     this.center = addRandomness(total[1])
+     this.right = addRandomness(total[0])
+   }
+   addRandomness(item) {
+     return Math.min(1,(Math.random()*(1.1 - 0.9) + 0.9) * item);
    }
 }
 class TapeLine{
