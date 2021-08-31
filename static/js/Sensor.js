@@ -67,12 +67,13 @@ class LineFollower{
        }
        total.push(Math.max.apply(null, totalLine))
      }
-     this.left = addRandomness(total[2])
-     this.center = addRandomness(total[1])
-     this.right = addRandomness(total[0])
+     this.left = this.addRandomness(total[2])
+     this.center = this.addRandomness(total[1])
+     this.right = this.addRandomness(total[0])
    }
-   addRandomness(item) {
-     return Math.min(1,(Math.random()*(1.1 - 0.9) + 0.9) * item);
+   addRandomness(value) {
+     var rand = document.getElementById("amountRand").value;
+     return Math.min(1, (Math.random()*(rand) + (1 - rand / 2)) * value);
    }
 }
 class TapeLine{
