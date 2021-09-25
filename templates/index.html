@@ -235,9 +235,8 @@
                                     <h4>Sensors</h4>
                                     <p> Use this slider to set the amount of randomness you want to have in your sensor readings, as a value between 0 and 1. </p>
                                     <p><b>Randomness</b></p>
-                                    <input style="width:300px" type="range" type="custom-range" min="0" max="1" step="0.01" id="sensorRandRange" oninput="amountRand.value=sensorRandRange.value">
-                                    <input id="amountRand" type="number" value="0.5" min="0" max="1" step="0.01" oninput="sensorRandRange.value=amountRand.value" />
-
+                                    <input style="width:300px" type="range" type="custom-range" min="0" max="1" value="0" step="0.01" id="sensorRandRange" oninput="amountRand.value=sensorRandRange.value">
+                                    <input id="amountRand" type="number" value="0" min="0" max="1" step="0.01" oninput="sensorRandRange.value=amountRand.value" />
 
                                 </div>
 

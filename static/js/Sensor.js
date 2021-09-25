@@ -4,6 +4,8 @@ class LineFollower{
         this.left = 0;
         this.center = 0;
         this.right = 0;
+        this.degRand = robot.sensorRand;
+        this.seed = Math.random();
     }
 
     update(){
@@ -67,13 +69,27 @@ class LineFollower{
             }
             total.push(Math.max.apply(null, totalLine))
         }
-        this.left = this.addRandomness(total[2])
-        this.center = this.addRandomness(total[1])
-        this.right = this.addRandomness(total[0])
+        this.left = this.addRandomness(total[2]);
+        this.center = this.addRandomness(total[1]);
+        this.right = this.addRandomness(total[0]);
     }
     addRandomness(value) {
-        var rand = document.getElementById("amountRand").value;
-        return Math.min(1, (Math.random()*(rand) + (1 - rand / 2)) * value);
+        let uniqueSeed = this.seed * Math.pow(this.robot.topL[0], 3) * Math.pow(this.robot.topL[1], 5);
+        let result = this.pseudoRand(uniqueSeed) * (this.degRand) * 0.2 + (1 - (this.degRand * 0.2) / 2) * value;
+        return Math.min(1, result);
+    }
+
+    /* This function takes in a seed and returns a pseudorandom number based off the seed
+    (will return same number given same seed)
+    Adapted from https://timemox.com/en/tricks/generate-random-number-using-seed*/
+    pseudoRand(seed) {
+        var rand;
+        seed = (seed * 9301 + 49297) % 233280;
+        var rnd = seed / 233280;
+        var disp = Math.abs(Math.sin(seed));
+        rnd = (rnd + disp) - Math.floor(rnd + disp);
+        rand = Math.floor(rnd * 2);
+        return rand;
     }
 }
 

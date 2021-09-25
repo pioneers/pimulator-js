@@ -478,7 +478,8 @@ function start(auto=false) {
                 robotType: robotType,
                 xpos: xpos,
                 ypos: ypos,
-                dir: direction
+                dir: direction,
+                sensorRand: parseFloat(document.getElementById("amountRand").value)
             }
 
             // Start the simulation

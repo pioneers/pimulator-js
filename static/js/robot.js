@@ -126,6 +126,7 @@ class RobotClass {
         // All asychronous functions currently running
         this.runningCoroutines = new Set();
 
+        this.sensorRand = robotInfo.sensorRand;
         // Ensure we don't hit sync errors when updating our values
         this.simulator = simulator;
         this.lineFollower = new LineFollower(this);
