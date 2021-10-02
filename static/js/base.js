@@ -41,15 +41,15 @@ function onmessage(e) {
         let text = e.data.log;
         log(text);
     }
-    if (e.data.objs !== undefined) { //checks if objs have been rendered on canvas
-        drawObjs(e.data.objs, e.data.type); //Draws obstacles on window load
-        //Draws robot on window load
-        drawRobot({
+    if (e.data.objs !== undefined) { // Draw just objects
+        //Draw robot and obstacles on window load
+        robot = {
             X: xpos,
             Y: ypos,
             dir: direction,
             robotType: robotType
-        });
+        };
+        update(robot, e.data.objs)
     }
 }
 
@@ -463,7 +463,6 @@ function start(auto=false) {
     }
     else {
         clearInterval(timer);
-        clearCanvas();
         if (codeUploaded) {
             // Send the list of objects
             try {
