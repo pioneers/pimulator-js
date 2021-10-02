@@ -1,4 +1,14 @@
-/* Rebind console messages. */
+/***********************************************************************
+ * The Worker Thread.
+ * 
+ * Handles Robot calculations and interactions. 
+ * 
+ * Interacts with the Main Thread, base.js, to run the Simulator.
+ **********************************************************************/
+
+/**
+ * Rebinds Console functions for custom logging.
+ */
 var console=(function(oldCons){
     return {
         log: function(text){
@@ -19,25 +29,33 @@ var console=(function(oldCons){
     };
 }(console));
 
-// Query string used when creating the worker, including the ampersand separator
+// Query string used when creating the worker, including the & separator
 var queryString = location.search;
 
+// Import Scripts from other JS files
 importScripts("https://cdn.jsdelivr.net/pyodide/v0.16.1/full/pyodide.js");
 importScripts("./GamepadClass.js" + queryString);
 importScripts("./Sensor.js" + queryString);
 importScripts("./FieldObj.js" + queryString);
 importScripts("./keyboard.js" + queryString);
 
+// Code uploaded to the simulator
 var code = "";
+
+// The local environment
 var env = {};
+
 languagePluginLoader.then(() => function () {});
 
+// Screen Dimensions
 const SCREENHEIGHT = 48;
 const SCREENWIDTH = 48;
 
+/**
+ * MODEL for the simulator, a Robot.
+ * Stores robot data and handles position calculations and Runtime API calls.
+ */
 class RobotClass {
-    /*The MODEL for this simulator. Stores robot data and handles position
-       calculations & Runtime API calls """*/
     tickRate = 50;              // in ms
     width = 26.7;               // width of robot, inches
     height = 20;                // height or robot, inches
@@ -59,7 +77,7 @@ class RobotClass {
         this.Wr = 0.0;            // requested angular velocity of r wheel, radians/s
         this.ltheta = 0.0;        // angular position of l wheel, degrees
         this.rtheta = 0.0;        // angular position of r wheel, degrees
-        this.dir = robotInfo.dir; // Direction of the robot facing, degrees
+        this.dir = robotInfo.dir; // direction of the robot facing, degrees
         this.currentLv = 0;       // current velocity of left wheel, in inches/s, in [-maxVel, maxVel]
         this.currentRv = 0;       // current velocity of right wheel, in inches/s, in [-maxVel, maxVel]
         this.requestedLv = 0;     // requested velocity of left wheel, in [-1, 1], uninverted, where 1 corresponds to maxVel
@@ -96,7 +114,7 @@ class RobotClass {
         }
 
         // Max speed is 0.628 m/s = 24.72 in/s and max acceleration is 0.55 m/s^2 = 21.65 in/s^2
-        // Refresh rate = 0.05/s
+        // Refresh rate is 0.05/s
         // Max speed is 1.236 in/tick and max acceleration is 0.05413 in/tick^2
         this.accel = (8 - robotTypeNum) / 5 * 0.05413; // Larger robots accelerate more slowly
         this.maxVel = robotTypeNum / 5 * 1.236;        // Larger robots have a higher top speed
@@ -105,21 +123,17 @@ class RobotClass {
         this.X = this.getValidXPosition(robotInfo.xpos, robotInfo.dir); // current X position of the center of the robot
         this.Y = this.getValidYPosition(robotInfo.ypos, robotInfo.dir); // current Y position of the center of the robot
 
-        // Set robot corner positions
-        // Corners are relative to the robot facing up
-        //coordinates for top right corner of robot
+        // Set robot corner positions (relative to the robot facing up)
+        // top right
         this.topR[0] = this.X - this.height/2;
         this.topR[1] = this.Y - this.width/2;
-
-        //coordinates for top left corner of robot
+        // top left
         this.topL[0] = this.X - this.height/2;
         this.topL[1] = this.Y + this.width/2;
-
-        //coordinates for bottom right corner
+        // bottom right
         this.botR[0] = this.X + this.height/2;
         this.botR[1] = this.Y - this.width/2;
-
-        //coordinates for bottom left corner
+        // bottom left
         this.botL[0] = this.X + this.height/2;
         this.botL[1] = this.Y + this.width/2;
 
@@ -133,6 +147,10 @@ class RobotClass {
         this.attachedObj = null;
     }
 
+    /**
+     * Checks if the Robot is on a ramp
+     * @returns the Ramp the Robot is on, if it is on one
+     */
     checkRamp() {
         let cornersX = [this.topL[0], this.topR[0], this.botR[0], this.botL[0]];
         let cornersY = [this.topL[1], this.topR[1], this.botR[1], this.botL[1]];
@@ -147,9 +165,14 @@ class RobotClass {
         }
         return null;
     }
-    /** Validate the input starting X coordinate of the robot
-    *   pos is the value we want to set the coordinate to */
-   getValidXPosition(pos, dir) {
+
+   /**
+    * Validate the desired starting x-coordinate position
+    * @param {Number} pos - x-coordinate to set position to
+    * @param {Number} dir - the direction the Robot is facing
+    * @returns the position of the starting x-coordinate
+    */
+    getValidXPosition(pos, dir) {
         // Check is pos is a number or not
         let posNum = Number(pos);
         if (isNaN(posNum)) {
@@ -166,8 +189,12 @@ class RobotClass {
         return posNum
     }
 
-    /** Validate the input starting Y coordinate of the robot
-    *   pos is the value we want to set the coordinate to */
+    /**
+     * Validate the desired starting y-coordinate position
+     * @param {Number} pos - y-coordinate to set position to
+     * @param {Number} dir - the direction the Robot is facing
+     * @returns the position of the starting y-coordinate
+     */
     getValidYPosition(pos, dir) {
         // Check is pos is a number or not
         let posNum = Number(pos);
@@ -185,14 +212,18 @@ class RobotClass {
         return posNum
     }
 
+    /**
+     * Tests whether the Robot is intersecting the given object using the normals
+     * of the robot as reference axes
+     * @param {Map} obj - a map corresponding to the corners of an object
+     * @param {Map} corners - a map of the Robot's corners
+     * @returns a boolean corresponding to whether the object and the robot
+     * intersect via both normals
+     */
     intersectRobotRef(obj, corners) {
-        /* Using the normals of the robot as reference axes,
-        returns true if the projections of the object and the robot intersect
-        via both normals. */
-
         // coordinates of the k_i vectors
-        let k1x = obj.botL[0] - corners.botL[0]; //x of the vector from botL of robot to botL of obstacle
-        let k1y = obj.botL[1] - corners.botL[1]; //figure it out from here...
+        let k1x = obj.botL[0] - corners.botL[0]; // x of the vector from botL of robot to botL of obstacle
+        let k1y = obj.botL[1] - corners.botL[1];
         let k2x = obj.topL[0] - corners.botL[0];
         let k2y = obj.topL[1] - corners.botL[1];
         let k3x = obj.topR[0] - corners.botL[0];
@@ -255,14 +286,18 @@ class RobotClass {
         return ref1inter && ref2inter;
     }
 
+    /**
+     * Tests whether the Robot is intersecting the given object using the normals
+     * of the object as reference axes
+     * @param {Map} obj - a map corresponding to the corners of an object
+     * @param {Map} corners - a map of the Robot's corners
+     * @returns a boolean corresponding to whether the object and the robot
+     * intersect via both normals
+     */
     intersectObjRef(obj, corners) {
-        /* Using the normals of the object as reference axes,
-        returns true if the projections of the object and the robot intersect
-        via both normals. */
-
         // coordinates of the k_i vectors
         let k1x = corners.botL[0] - obj.botL[0]; //x of the vector from botL of obj to botL of robot
-        let k1y = corners.botL[1] - obj.botL[1]; //figure it out from here...
+        let k1y = corners.botL[1] - obj.botL[1];
         let k2x = corners.topL[0] - obj.botL[0];
         let k2y = corners.topL[1] - obj.botL[1];
         let k3x = corners.topR[0] - obj.botL[0];
@@ -325,6 +360,13 @@ class RobotClass {
         return ref1inter && ref2inter;
     }
 
+    /**
+     * Tests whether the Robot is intersecting the given object
+     * @param {Map} obj - a map corresponding to the corners of an object
+     * @param {Map} corners - a map of the Robot's corners
+     * @returns a boolean corresponding to whether the object and the robot
+     * intersect via all four normals
+     */
     intersectOne(obj, corners) {
         /* Returns true if object and robot intersect,
         this means that their projections intersect via all
@@ -333,6 +375,7 @@ class RobotClass {
         return this.intersectRobotRef(obj, corners) && this.intersectObjRef(obj, corners);
     }
 
+    // Maximum of 4 inputs
     findMax(k1, k2, k3, k4) {
         let max = k1;
         if (k2 > max) {
@@ -347,6 +390,7 @@ class RobotClass {
         return max;
     }
 
+    // Minimum of 4 inputs
     findMin(k1, k2, k3, k4) {
         let min = k1;
         if (k2 < min) {
@@ -361,11 +405,12 @@ class RobotClass {
         return min;
     }
 
+    /**
+     * Updates position of the Robot using differential drive equations.
+     * Derived with reference to:
+     * https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf
+     */
     updatePosition() {
-        /* Updates position of the  Robot using differential drive equations
-        Derived with reference to:
-        https://chess.eecs.berkeley.edu/eecs149/documentation/differentialDrive.pdf*/
-
         let radian = Math.PI*this.dir/180;
         let dx;
         let dy;
@@ -515,6 +560,14 @@ class RobotClass {
         })
     }
 
+    /**
+     * Gets the new coordinates of the interacting object according to the current
+     * state of the robot.
+     * @param {FieldObj} obstacle - an interactable object
+     * @param {Robot} robot - the robot
+     * @param {Number} dir - direction of the robot
+     * @returns a map containing the updated corners of the interactable object
+     */
     updateInteractableObjs(obstacle, robot, dir) {
         let dict = {topR: Array(2), topL: Array(2), botL: Array(2), botR: Array(2)};
 
@@ -535,6 +588,11 @@ class RobotClass {
         return dict;
     }
 
+    /**
+     * Sets the position and direction of the object attached to the robot.
+     * @param {Map} newCorners - a map containing the new corners for the object
+     *                              attached to the robot
+     */
     setAttachedObj(newCorners) {
         this.attachedObj.botL[0] = newCorners.botL[0];
         this.attachedObj.botL[1] = newCorners.botL[1];
@@ -551,36 +609,40 @@ class RobotClass {
         this.attachedObj.setDirection(this.dir);
     }
 
+    /**
+     * Gets the new corners for the robot according to given coordinates.
+     * Does not check if new position is valid (must check after)
+     * @param {Number} newX - the projected new x-coordinate
+     * @param {Number} newY - the projected new y-coordinate
+     * @param {Number} dir - the direction of the robot
+     * @returns a map of the prospective corners of the robot
+     */
     updateCorners(newX, newY, dir) {
-        /* Returns dictionary of prospective corners of the robot after prompted
-        movement. Changes the actual corners only after verifiying that the
-        robot won't crash */
-
         let dDir = dir * Math.PI / 180;
         let sin = Math.sin(dDir);
         let cos = Math.cos(dDir);
 
         let dict = {topR: Array(2), topL: Array(2), botL: Array(2), botR: Array(2)};
-        //top right corner
+        // top right
         dict.topR[0] = newX - (this.height/2) * cos + (this.width/2) * sin;
         dict.topR[1] = newY - (this.height/2) * sin - (this.width/2) * cos;
-
-        //top left corner
+        // top left
         dict.topL[0] = newX - (this.height/2) * cos - (this.width/2) * sin;
         dict.topL[1] = newY - (this.height/2) * sin + (this.width/2) * cos;
-
-        //bottom left corner
+        // bottom left
         dict.botL[0] = newX + (this.height/2) * cos - (this.width/2) * sin
         dict.botL[1] = newY + (this.height/2) * sin + (this.width/2) * cos;
-
-        //bottom right corner
+        // bottom right
         dict.botR[0] = newX + (this.height/2) * cos + (this.width/2) * sin;
         dict.botR[1] = newY + (this.height/2) * sin - (this.width/2) * cos;
 
         return dict;
     }
 
-    /* Fake Robot API function. If Robot has no attached object, pick up a nearby object */
+    /**
+     * Picks up a nearby object if possible.
+     * Not an official Robot API function.
+     */
     pick_up() {
         if (this.attachedObj) {
             return
@@ -595,14 +657,21 @@ class RobotClass {
         }
     }
 
+    /**
+     * Drops an attached object.
+     * Not an official Robot API function.
+     */
     drop() {
         if (this.attachedObj) {
             this.attachedObj.release();
             this.attachedObj = null;
         }
-        return;
     }
 
+    /**
+     * Finds an interactable object near enough to interact with.
+     * @returns an interactable object to pick up if close enough
+     */
     findInteractableObj() {
         if (this.simulator.interactableObjs.length == 0) {
             return null;
@@ -630,10 +699,14 @@ class RobotClass {
         return null;
     }
 
+    /**
+     * Sets a value on a device.
+     * A Runtime API method.
+     * @param {String} device - the device ID
+     * @param {String} param - the parameter on the device
+     * @param {Float} value - the value to set, bounded by [-1, 1]
+     */
     set_value(device, param, value) {
-        /* Runtime API method for updating L/R motor speed. Takes device ID,
-           param, and value (speeds are bounded by [-1,1]). */
-
         if (typeof(param) !== "string") {
             console.log("ERROR: get_value() parameter must be a string")
             return
@@ -667,12 +740,15 @@ class RobotClass {
         }
     }
 
+    /**
+     * Gets a value from a device.
+     * Supports reading line followers (left, right, center: [0,1]),
+     * front and back limit switched, and KoalaBear velocity and invert.
+     * @param {String} device - the device ID
+     * @param {String} param - the parameter on the device
+     * @returns the value specified by the device and parameter
+     */
     get_value(device, param) {
-        /* Runtime API method for getting sensor values.
-           Supports reading left, center and right line followers
-           in a range of [0,1].
-           Supports reading front and rear limit switches.
-           Supports reading KoalaBear velocity and invert parameters. */
         if (device === "limit_switch") {
             if (param === "switch0") {
                 return this.limitSwitch.switch0;
@@ -703,9 +779,11 @@ class RobotClass {
         console.log("ERROR: Cannot find device name: " + device);
     }
 
+    /**
+     * Puts the robot to sleep for a specified amount of time.
+     * @param {Number} duration - length of sleep in seconds.
+     */
     sleep(duration) {
-        /* Autonomous code pauses execution for <duration> seconds
-        */
         let ms = duration*1000;
         let start = new Date().getTime();
         let cur = start;
@@ -726,10 +804,18 @@ class RobotClass {
         }
     }
 
+    /**
+     * Print the state of the robot in the form: 'x = _, y = _, theta = _'
+     */
     printState() {
         console.log(`x = ${this.X.toFixed(2)}, y = ${this.Y.toFixed(2)}, theta = ${this.dir.toFixed(2)}`);
     }
 
+    /**
+     * Runs a "coroutine" (a series of actions that proceed independently
+     * of the main loop of code).
+     * @param {Function} fn - the function to run
+     */
     run(fn) {
         /*
         Starts a "coroutine", i.e. a series of actions that proceed
@@ -741,10 +827,14 @@ class RobotClass {
         this.runningCoroutines.add(fn)
         fn()
     }
+
+    /**
+     * Checks whether the given function is running.
+     * @param {Function} fn - the function to check
+     * @returns a boolean that tells whether fn is already running as a coroutine.
+     */
     is_running(fn) {
-        /* Returns True if the given `fn` is already running as a coroutine.
-        See: Robot.run
-        TODO: Fully implement */
+        //TODO: Fully implement
         if (!(typeof fn === "function")) {
             throw new Error("First argument to Robot.is_running must be a function");
         }
@@ -755,14 +845,13 @@ class RobotClass {
 /*********************** KEYBOARD INPUT GAMEPAD FUNCTIONS ***********************/
 
 /**
- * Event listeners for key presses
+ * Event listener for a key press, that is, listening for when a key is being pressed.
+ * @param {KeyCode} keyCode - the code of the key being pressed
  */
 function onPress(keyCode) {
-    /* Handling the events associated with pressing a key. Keyboard inputs are inputted as
-       KEYCODE. */
     simulator.keyboard.press(keyCode);
 
-    if (keyCode === 87) { // w
+    if (keyCode === 87) {        // w
         simulator.gamepad.joystick_left_y = 1;
     } else if (keyCode === 65) { // a
         simulator.gamepad.joystick_left_x = -1;
@@ -781,6 +870,10 @@ function onPress(keyCode) {
     }
 }
 
+/**
+ * Event listener for a key press, that is, listening for when a key is released.
+ * @param {KeyCode} keyCode - the code of the key being released
+ */
 function onRelease(keyCode) {
     simulator.keyboard.release(keyCode);
 
@@ -806,7 +899,7 @@ function onRelease(keyCode) {
 /*********************** GAMEPAD INPUT GAMEPAD FUNCTIONS ***********************/
 
 /**
- * A mapPIng from the button names of the controller to the button names
+ * A mapping from the button names of the controller to the button names
  * in the PIE Robot API.
  */
 const padMap = {
@@ -834,6 +927,7 @@ const padMap = {
 
 /**
  * Sets a button in the robot API to a pressed state i.e. true
+ * @param {String} button - the name of the button being pressed
  */
 function onPressGamepad(button) {
     if (padMap[button] === "button_a") {
@@ -873,6 +967,7 @@ function onPressGamepad(button) {
 
 /**
  * Sets a button in the robot API to a released state i.e. false
+ * @param {String} button - the name of the button being released
  */
 function onReleaseGamepad(button) {
     if (padMap[button] === "button_a") {
@@ -911,7 +1006,9 @@ function onReleaseGamepad(button) {
 }
 
 /**
- * Sets the value of the axis according to joystick movement
+ * Sets the value of the axis according to joystick movement.
+ * @param {Integer} axis - the axis being moved. Can take on values {0, 1, 2, 3}
+ * @param {Float} value - the new joystick value
  */
 function moveGamepad(axis, value) {
     if (axis === 0) { // left joystick horizontal axis
@@ -926,7 +1023,8 @@ function moveGamepad(axis, value) {
 }
 
 /**
- * Resets the value of the axis back to the center
+ * Resets the value of the axis back to the center.
+ * @param {Integer} axis - the axis being moved. Can take on values {0, 1, 2, 3}
  */
 function stopGamepad(axis) {
     if (axis === 0) { // left joystick horizontal axis
@@ -940,13 +1038,17 @@ function stopGamepad(axis) {
     }
 }
 
-//#######################################
-
+/*******************************************************************************
+ * The Simulator Class.
+ * 
+ * Deals with the inputted code and runs the simulation.
+ ******************************************************************************/
 class Simulator{
+
+    /**
+     * Initializes a new Simulator
+     */
     constructor() {
-        /*
-        Initialize new Simulator
-        */
         this.robot = null;
         this.mode = "idle";
         this.gamepad = new GamepadClass();
@@ -958,12 +1060,18 @@ class Simulator{
         this.ramps = [];
     }
 
+    /**
+     * Defines the objects for a simulator according to the given code.
+     * @param {Map} objects - a map of object names to a list of that type of object.
+     *                          (object name) -> (object type) -> (object data list)
+     *                          tapeLines -> TapeLines
+     *                          obstacles -> Walls & InteractableObjs
+     *                          interactableObjs -> InteractableObjs
+     *                              Note: InteractableObjs will have 2 references
+     *                                  1 in obstacles, 1 in interactableObjs
+     *                          ramps -> Ramps
+     */
     defineObjs(objects) {
-        /** tapeLines contains TapeLines.
-         *  obstacles contains Walls and InteractableObjs.
-         *  interactableObjs contains InteractableObjs.
-         *  interactableObjs have two references to them.
-        */
         this.tapeLines = [];
         this.obstacles = [];
         this.interactableObjs = [];
@@ -987,6 +1095,7 @@ class Simulator{
                 this.obstacles.push(newInteractableObj);
             }
         }
+
         if (objects.rampsData !== undefined) {
             for (let rampObj of objects.rampsData) {
                 let newRamp = new Ramp(rampObj.x, rampObj.y, rampObj.w, rampObj. h, rampObj.highSide, rampObj.incline, rampObj.color);
@@ -1002,19 +1111,22 @@ class Simulator{
         }
     }
 
+    /**
+     * Draws the objects by sending a message to the main thread to draw the objects.
+     * Send ramps, tape lines, and obstacles to be drawn.
+     */
     drawObjs() {
         postMessage({objs: this.ramps, type: "ramp"});
         postMessage({objs: this.tapeLines, type: "tapeLine"});
         postMessage({objs: this.obstacles, type: "obstacle"});
     }
 
+    /**
+     * Loads the student code for the current Simulator
+     */
     loadStudentCode(){
-        /*
-        Load the student code to the current Simulator instance
-        */
-
-        //# Store the local environment into dictionary
-        //# Ensure the global Robot reflects the same robot Simulator is using
+        // Store the local environment into dictionary
+        // Ensure the global Robot reflects the same robot Simulator is using
         env['Robot'] = this.robot;
         env['Gamepad'] = this.gamepad;
         env['Keyboard'] = this.keyboard;
@@ -1027,31 +1139,35 @@ class Simulator{
 
         env = pyodide.pyimport("env");
 
-        //# Eventually need to gracefully handle failures here
+        // Eventually need to gracefully handle failures here
         this.autonomous_setup = env['autonomous_setup'];
         this.autonomous_main = env['autonomous_main'];
         this.teleop_setup = env['teleop_setup'];
         this.teleop_main = env['teleop_main'];
-        // ensure_is_function("teleop_setup", this.teleop_setup)
-        // ensure_is_function("teleop_main", this.teleop_main)
     }
 
+    /**
+     * Executes one cycle of the robot.
+     * @param {Function} func - a 0-argument function to continually run
+     */
     loopContent(func) {
-        /* Execute one cycle of the robot.
-        */
         func();
         simulator.robot.updatePosition();
     }
 
+    /**
+     * Execute the robot at specified frequency. 
+     * @param {Integer} period - the period (ms) to run func in
+     * @param {Function} func - the function to execute each loop.
+     *     May take only TIMEOUT_VALUE seconds to finish execution
+     */
     consistentLoop(period, func){
-        /* Execute the robot at specificed frequency.
-        period (int): the period in ms to run func in
-        func (function): the function to execute each loop
-        func may take only TIMEOUT_VALUE seconds to finish execution
-        */
         this.interval = setInterval(this.loopContent, period, func);
     }
 
+    /**
+     * Stops the simulation.
+     */
     stop() {
         if (this.mode !== "idle") {
             this.mode = "idle";
@@ -1062,10 +1178,11 @@ class Simulator{
         });
     }
 
+    /**
+     * Simulates the execution of robot code for teleop mode.
+     * @param {Map} robotInfo - a map containing initial robot info
+     */
     simulateTeleop(robotInfo) {
-        /* Simulate execution of the robot code.
-        Run setup once before continuously looPIng main. */
-
         this.mode = "teleop"
         postMessage({
             mode: this.mode
@@ -1076,6 +1193,10 @@ class Simulator{
         this.consistentLoop(this.robot.tickRate, this.teleop_main);
     }
 
+    /**
+     * Simulates the execution of robot code for autonomous mode.
+     * @param {Map} robotInfo - a map containing initial robot info
+     */
     simulateAuto(robotInfo) {
         this.mode = "auto";
         postMessage({
@@ -1090,13 +1211,21 @@ class Simulator{
     }
 }
 
+// The intial instance of a Simulator
 var simulator = new Simulator();
 
+/**
+ * Handles messages from the Main Thread (base.js)
+ * @param {*} e - an object that contains data, which is a map
+ *                  of various things that the Worker thread needs
+ *                  to run a simulation.
+ */
 this.onmessage = function(e) {
     // Code upload
     if (e.data.code !== undefined){
         code = e.data.code;
     }
+    
     // Give simulator the list of objects
     if (e.data.objects !== undefined) {
         simulator.defineObjs(e.data.objects);

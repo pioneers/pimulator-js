@@ -1,26 +1,65 @@
-var mode = "idle"; // or auto or teleop
-var worker = new Worker("static/js/robot.js?t=" + cacheKey);
-worker.postMessage({cacheKey: cacheKey});
-var timer;
-var inputMode = "keyboard";
-var robotType = "medium";
-// Starting coordinates and direction of robot
-var xpos = 70;
-var ypos = 70;
-var direction = 0; // in degrees: 0 (left), 90 (up), and 180 (right), or 270 (down)
-var codeUploaded = false;
-var pythonError = false;
-const scaleFactor = 3;
-const canvas = document.getElementById('fieldCanvas');
-const ctx = canvas.getContext('2d');
+/***********************************************************************
+ * The Main Thread.
+ * 
+ * Handles webpage updates, such as the Canvas (used for the Simulator)
+ * and the Console. 
+ * 
+ * Interacts with the Worker Thread, robot.js, to run the Simulator.
+ **********************************************************************/
 
-/* The date of the last update in the format DD-MM-YYYY
+/**
+ * The date of the last update in the format DD-MM-YYYY
  * where DD and MM do not have leading zeros.
  * Must be updated upon each push to the webapp.
  */
 const lastUpdate = "8-8-2021"
 
-// Handle messages from worker
+// Current mode of the Simulator. Possible modes: {idle, auto, teleop}
+var mode = "idle";
+
+// The worker thread.
+var worker = new Worker("static/js/robot.js?t=" + cacheKey);
+worker.postMessage({cacheKey: cacheKey});
+
+// The timer for Autonomous Mode Simulation.
+var timer;
+
+// The current input mode. Possible inputs: {keyboard, gamepad}
+var inputMode = "keyboard";
+
+// The current robot type. Possible types: {light, medium, heavy}
+var robotType = "medium";
+
+// The Robot's starting coordinates on the Canvas.
+var xpos = 70;
+var ypos = 70;
+
+/**
+ * The Robot's starting direction, measured in degrees:
+ *                 90 [Up]
+ * 
+ *       0 [Left]            180 [Right]
+ * 
+ *                270 [Down]
+ */
+var direction = 0;
+
+// Scale factor for Robot sizing.
+const scaleFactor = 3;
+
+// Canvas for the Field and Robot.
+const canvas = document.getElementById('fieldCanvas');
+const ctx = canvas.getContext('2d');
+
+var codeUploaded = false;
+var pythonError = false;
+
+/**
+ * Handles messages from the Worker Thread (robot.js).
+ * @param {*} e - an object that contains data, which is a map
+ *                  of various things that the Main thread needs
+ *                  to maintain and display a correct simulation.
+ */
 function onmessage(e) {
     if (e.data.robot !== undefined && e.data.objects !== undefined) {
         update(e.data.robot, e.data.objects);
@@ -41,9 +80,9 @@ function onmessage(e) {
         let text = e.data.log;
         log(text);
     }
-    if (e.data.objs !== undefined) { //checks if objs have been rendered on canvas
-        drawObjs(e.data.objs, e.data.type); //Draws obstacles on window load
-        //Draws robot on window load
+    if (e.data.objs !== undefined) { // if objs have been rendered on canvas
+        // Draws Objects & Robot on window load
+        drawObjs(e.data.objs, e.data.type);
         drawRobot({
             X: xpos,
             Y: ypos,
@@ -53,9 +92,11 @@ function onmessage(e) {
     }
 }
 
-worker.onmessage = onmessage;
-
-
+/**
+ * Draws the Robot on the canvas.
+ * @param {Map} robot - A simplified version of a Robot, containing only
+ *                      the necessary fields for displaying on the Canvas.
+ */
 function drawRobot(robot) {
     // Update text
     document.getElementById("demo").innerHTML = "x: " + robot.X.toFixed(2) + ", y: " + robot.Y.toFixed(2);
@@ -66,11 +107,13 @@ function drawRobot(robot) {
     const dir = robot.dir/180*Math.PI;  // Convert to Radians
 
     if (!robot.robotType) {
-        robot.robotType = "medium";
+        robot.robotType = "medium"; // Default Robot Type is Medium
     }
+
+    // Set Robot Width and Height (in inches) based on Type.
     if (robot.robotType == "light") {
-        robotWidth = 14.18;      // Robot width, inches
-        robotHeight = 12.5;      // Robot height, inches
+        robotWidth = 14.18;
+        robotHeight = 12.5;
     }
     else if (robot.robotType == "medium") {
         robotWidth = 19.3;
@@ -81,7 +124,7 @@ function drawRobot(robot) {
         robotHeight = 14.06;
     }
 
-    // coordinates of center of front side of robot (for drawing sensors)
+    // Coordinates of center of front side of robot (for drawing sensors)
     const scaledTopRX = (robot.X - robotHeight/2) * scaleFactor;
     const scaledTopRY = (robot.Y - robotWidth/2) * scaleFactor;
     const scaledTopLX = (robot.X - robotHeight/2) * scaleFactor;
@@ -89,23 +132,23 @@ function drawRobot(robot) {
     const frontCenterX = (scaledTopLX + scaledTopRX) / 2;
     const frontCenterY = (scaledTopLY + scaledTopRY) / 2;
 
-    // Draw Rectangle
-    ctx.lineWidth = 2;
-    const topLeftCornerX = centerX - (robotHeight * scaleFactor) / 2;
-    const topLeftCornerY = centerY - (robotWidth * scaleFactor) / 2;
-
     // Translate to and rotate about the center of the robot
     ctx.translate(centerX, centerY);
     ctx.rotate(dir);
     ctx.translate(-centerX, -centerY);
 
+    // Draw Rectangle (Robot outline)
+    ctx.lineWidth = 2;
+    const topLeftCornerX = centerX - (robotHeight * scaleFactor) / 2;
+    const topLeftCornerY = centerY - (robotWidth * scaleFactor) / 2;
     ctx.beginPath();
     ctx.rect(topLeftCornerX, topLeftCornerY, robotHeight * scaleFactor, robotWidth * scaleFactor);
     ctx.closePath();
     ctx.strokeStyle = 'navy';
     ctx.lineWidth = 2;
     ctx.stroke();
-    // Draw Circles
+
+    // Draw Circles (Line followers)
     ctx.beginPath();
     ctx.moveTo(frontCenterX, frontCenterY);
     ctx.arc(frontCenterX, frontCenterY, 2, 0, 2 * Math.PI);
@@ -118,7 +161,8 @@ function drawRobot(robot) {
     ctx.stroke();
     ctx.fillStyle = 'red';
     ctx.fill();
-    // Draw Triangle
+
+    // Draw Triangle (Front indicator)
     ctx.beginPath();
     ctx.moveTo(frontCenterX + 6, frontCenterY);
     ctx.lineTo(frontCenterX + 11, frontCenterY + 3);
@@ -136,9 +180,13 @@ function drawRobot(robot) {
     ctx.translate(-centerX, -centerY);
 }
 
+/**
+ * Draws objects on the canvas. 
+ * @param {List} objs - A list of objects to the drawn. Each object is a map
+ *                      containing its location.
+ * @param {String} type - The type of object being drawn.
+ */
 function drawObjs(objs, type) {
-    /* Draw objects received from the worker. */
-
     if (type === "obstacle") {
         for (let i = 0; i < objs.length; i++) {
             ctx.beginPath();
@@ -161,21 +209,20 @@ function drawObjs(objs, type) {
             );
             ctx.stroke();
         }
-    }
-    else if (type === "ramp") {
+    } else if (type === "ramp") {
         ctx.lineWidth = 2;
         for (let i = 0; i < objs.length; i++) {
             if (objs[i].highSide == "up" || objs[i].highSide == "down") {
-                // defining the y coordinates for start and end points of an up arrow
+                // y-coordinates for start and end points of an up arrow
                 let startY = .3 * objs[i].h + objs[i].topL[1];
                 let endY = .7 * objs[i].h + objs[i].topL[1];
-                // defining starting coordinate for dashed line for up ramp
+                // starting coordinate for dashed line for up ramp
                 let dashedStart = [scaleFactor * objs[i].topL[0], scaleFactor * objs[i].topL[1]];
-                // flipping the start and end if it's a down arrow
+                // flip the start and end if down arrow
                 if (objs[i].highSide == "down") {
                     startY = .7 * objs[i].h + objs[i].topL[1];
                     endY = .3 * objs[i].h + objs[i].topL[1];
-                    // setting starting coordinate for dashed line for down ramp
+                    // starting coordinate for dashed line for down ramp
                     dashedStart = [scaleFactor * objs[i].botL[0], scaleFactor * objs[i].botL[1]];
                 }
                 drawArrows(
@@ -195,16 +242,16 @@ function drawObjs(objs, type) {
                 ctx.stroke();
                 ctx.setLineDash([]);
             } else if (objs[i].highSide == "left" || objs[i].highSide == "right") {
-                // defining the y coordinates for start and end points of a left arrow
+                // y-coordinates for start and end points of a left arrow
                 let startX = .3 * objs[i].w + objs[i].topL[0];
                 let endX = .7 * objs[i].w + objs[i].topL[0];
-                // defining starting coordinate for dashed line for left ramp
+                // starting coordinate for dashed line for left ramp
                 let dashedStart = [scaleFactor * objs[i].topL[0], scaleFactor * objs[i].topL[1]];
-                // flipping the start and end if it's a right arrow
+                // flip the start and end if right arrow
                 if (objs[i].highSide == "right") {
                     startX = .7 * objs[i].w + objs[i].topL[0];
                     endX = .3 * objs[i].w + objs[i].topL[0];
-                    // setting starting coordinate for dashed line for right ramp
+                    // starting coordinate for dashed line for right ramp
                     dashedStart = [scaleFactor * objs[i].topR[0], scaleFactor * objs[i].topR[1]];
                 }
                 drawArrows(
@@ -228,6 +275,16 @@ function drawObjs(objs, type) {
     }
 }
 
+/**
+ * Draws the Arrows on a Ramp field object.
+ * @param {String} cardinalDir - the cardinal direction of the arrow. Vertical or Horizontal.
+ * @param {Float} startX - the starting x-coordinate
+ * @param {Float} startY - the starting y-coordinate
+ * @param {Float} endX - the ending x-coordinate
+ * @param {Float} endY - the ending y-coordinate
+ * @param {Float} space - the spacing to create a dashed line
+ * @param {String} color - the color of the arrow
+ */
 function drawArrows(cardinalDir, startX, startY, endX, endY, space, color) {
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -271,25 +328,39 @@ function drawArrows(cardinalDir, startX, startY, endX, endY, space, color) {
     }
 }
 
+/**
+ * Clear the entire canvas.
+ */
 function clearCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-/* Switch input mode between 'keyboard' and 'gamepad' */
+/**
+ * Switch the input mode used by the simulator.
+ * @param {String} newInputMode - the new desired input mode. Must be one of:
+ *                                  {keyboard, gamepad}
+ */
 function switchInput(newInputMode) {
-    // Toggle previously activated button off (or retoggle currently activated button on)
+    // Toggle the previously activated button off (or retoggle currently activated button on)
     $("#" + inputMode + "-btn").button('toggle');
     inputMode = newInputMode;
 }
 
-/* Switch robot type between 'light', 'medium', and 'heavy' */
+/**
+ * Switch the robot type used in the simulator.
+ * @param {String} newRobotType - the new desired robot type. Must be one of:
+ *                                  {light, medium, heavy}
+ */
 function switchRobotType(newRobotType) {
-    // Toggle previously activated button off (or retoggle currently activated button on)
     $("#" + robotType + "-btn").button('toggle');
     robotType = newRobotType;
 }
 
-// In teleop mode, if the input is set to the keyboard, send keyCodes to the worker
+/**
+ * Sends a message that a key is being pressed down if the simulator is in
+ * teleop mode and the input mode is the keyboard.
+ * @param {keypress} e - a keypress event from pressing a key on a keyboard
+ */
 function down(e){
     if (mode === "teleop") {
         if (inputMode === "keyboard") {
@@ -297,6 +368,12 @@ function down(e){
         }
     }
 }
+
+/**
+ * Sends a message that a key is done being pressed if the simulator is in
+ * teleop mode and the input mode is the keyboard.
+ * @param {keypress} e - a keypress event from pressing a key on a keyboard
+ */
 function up(e){
     if (mode === "teleop") {
         if (inputMode === "keyboard") {
@@ -304,10 +381,10 @@ function up(e){
         }
     }
 }
-document.addEventListener('keydown', down);
-document.addEventListener('keyup', up);
 
-// "Upload Code" button sends code to the worker
+/**
+ * Sends code to the Worker thread (robot.js).
+ */
 function uploadCode() {
     code = cm.getValue();
     localStorage.setItem("code", code);
@@ -320,8 +397,12 @@ function uploadCode() {
     }
 }
 
+/**
+ * Converts the objects code into a JS Object.
+ * @param {String} codeString - objects code
+ * @returns objects code as a JavaScript object
+ */
 function processObjectsCode(codeString) {
-    // Convert objects code (string) to JS object
     // Warning: May raise an exception
     let returnString = "return " + codeString;
     let f = new Function(returnString);
@@ -329,7 +410,11 @@ function processObjectsCode(codeString) {
     return objects;
 }
 
-// Update variables for starting coordinates/direction
+/**
+ * Checks and sets a starting position (coordinates/direction) for the robot.
+ * @param {Map} objects - a map containing numerous objects, including
+ *                          the robot (specifically, a starting position)
+ */
 function updateStartingPosition(objects) {
     if (objects.startPosition.x !== undefined && objects.startPosition.y !== undefined) {
         xpos = objects.startPosition.x;
@@ -358,13 +443,14 @@ function updateStartingPosition(objects) {
     }
 }
 
+/**
+ * Retrieve all objects from code and send to the Worker thread.
+ */
 function uploadObjects(){
 
     try {
         newObjCode = cmObjects.getValue();
 
-        // Convert code string to JS map
-        // This can raise an exception
         let objects = processObjectsCode(newObjCode);
 
         updateStartingPosition(objects);
@@ -405,6 +491,9 @@ function uploadObjects(){
 
 }
 
+/**
+ * Initial upload of objects upon page load.
+ */
 function uploadObjectsOnce() {
     if (objectsCode !== null) {
         try {
@@ -418,20 +507,13 @@ function uploadObjectsOnce() {
         setTimeout(uploadObjectsOnce, 100);
     }
 }
-uploadObjectsOnce();
-drawRobot({
-    X: xpos,
-    Y: ypos,
-    dir: direction,
-    robotType: robotType
-});
 
+/**
+ * Updates the field canvas by drawing the objects and robots at updated positions.
+ * @param {Map} robot - a map corresponding to a Robot at a new desired position
+ * @param {Map} objects - a map containing different object types for the field
+ */
 function update(robot, objects) {
-    /*
-    Update the state (position and direction) of the center of the robot.
-    Input position is in inches. scaleFactor convers inches -> pixels.
-    Example of state: {x:72, y:72, dir:0}
-    */
     clearCanvas();
 
     drawObjs(objects.tapeLines, "tapeLine");
@@ -441,27 +523,34 @@ function update(robot, objects) {
     drawRobot(robot);
 }
 
+/**
+ * Updates sensor display values.
+ * @param {Map} sensorValues - a map containing new values for Left, Center, and Right sensors
+ */
 function updateSensors(sensorValues) {
     document.getElementById("left-sensor").innerText = "Left: " + sensorValues.leftSensor.toFixed(3);
     document.getElementById("center-sensor").innerText = "Center: " + sensorValues.centerSensor.toFixed(3);
     document.getElementById("right-sensor").innerText = "Right: " + sensorValues.rightSensor.toFixed(3);
 }
 
+/**
+ * Updates switch display values.
+ * @param {Map} switchValues - a map containing new values for Front and Back switches
+ */
 function updateSwitches(switchValues) {
     let booleans = {true: "True", false: "False"}
     document.getElementById("front-switch").innerText = "Front: " + booleans[switchValues.frontSwitch];
     document.getElementById("back-switch").innerText = "Back: " + booleans[switchValues.backSwitch];
 }
 
+/**
+ * Start the Robot/Worker thread for teleop or autonomous mode
+ * @param {Boolean} auto - indicator for autonomous mode
+ */
 function start(auto=false) {
-    /*
-    Start the robot thread
-    Return if started robot thread
-    */
     if (mode !== "idle") {
-        return;
-    }
-    else {
+        return; // Return if robot thread already started
+    } else {
         clearInterval(timer);
         clearCanvas();
         if (codeUploaded) {
@@ -482,7 +571,7 @@ function start(auto=false) {
             }
 
             // Start the simulation
-            if (auto === false) {
+            if (auto === false) { //TODO: do if (auto) instead
                 $("#teleop-btn").removeClass("btn-outline-primary").addClass("btn-primary")
                 worker.postMessage({start:true, mode:"teleop", robotInfo:robotInfo})
             } else if (auto === true) {
@@ -492,8 +581,7 @@ function start(auto=false) {
             document.getElementById("stop-btn").disabled = false;
             document.getElementById("teleop-btn").disabled = true;
             document.getElementById("autonomous-btn").disabled = true;
-        }
-        else {
+        } else {
             if (auto === false) {
                 $("#teleop-btn").button('toggle')
             } else if (auto === true) {
@@ -504,7 +592,12 @@ function start(auto=false) {
     }
 };
 
+/**
+ * Runs the Autonomous Timer during Autonomous Mode simulation.
+ * Set at 30s, the duration of Autonomous Mode.
+ */
 function runAutoTimer() {
+    //TODO: custom autonomous mode timer?
     var startTime = new Date().getTime();
     document.getElementById("timer").innerText = "Time Left: 30s";
 
@@ -524,10 +617,10 @@ function runAutoTimer() {
     }, 1000);
 }
 
+/**
+ * Terminates the current Robot/Worker thread and creates a new one.
+ */
 function stop() {
-    /*
-    Stop the robot thread
-    */
     log("Simulation stopped. Reloading resources...");
     worker.terminate();
     worker = new Worker("static/js/robot.js?t=" + cacheKey);
@@ -539,11 +632,10 @@ function stop() {
     resetSimButtons()
 };
 
+/**
+ * Resets Simulation buttons (UI) when a simulation ends (either naturally or by force).
+ */
 function resetSimButtons() {
-    /*
-        Reset UI elements when autonomous ends by force (Stop) or naturally (30s).
-        Resets the simulation buttons.
-    */
     document.getElementById("stop-btn").disabled = true;
     document.getElementById("teleop-btn").disabled = false;
     document.getElementById("autonomous-btn").disabled = false;
@@ -555,11 +647,17 @@ function resetSimButtons() {
     }
 }
 
+/**
+ * Clears the Console.
+ */
 function clearConsole(){
     document.getElementById("console").innerText = ""
 }
-clearConsole()
 
+/**
+ * Logs and displays the given text in the Console.
+ * @param {String} text - the message to be displayed
+ */
 function log(text) {
     // TODO: Filter out unwanted messages in a smarter way
     const array = ['pyodide.py', '<eval>', 'pyodide/_base.py', 'eval(compile(', 'File "<exec>", line 4, in'];
@@ -591,7 +689,19 @@ function log(text) {
     consoleLog.scrollTop = consoleLog.scrollHeight;
 }
 
-function clearConsole(){
-  const console = document.querySelector("#console");
-  console.innerHTML = "";
-}
+// Set connection between Main thread and Worker thread
+worker.onmessage = onmessage;
+
+// Add keyboard event listeners to document
+document.addEventListener('keydown', down);
+document.addEventListener('keyup', up);
+
+// Handle Initial Page Load
+uploadObjectsOnce();
+drawRobot({
+    X: xpos,
+    Y: ypos,
+    dir: direction,
+    robotType: robotType
+});
+clearConsole()
