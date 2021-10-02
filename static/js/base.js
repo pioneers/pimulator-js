@@ -331,6 +331,14 @@ function processObjectsCode(codeString) {
 
 // Update variables for starting coordinates/direction
 function updateStartingPosition(objects) {
+    if (objects.startPosition === undefined) {
+        objects.startPosition = {
+            x: 70,
+            y: 70,
+            dir:0
+        }
+        log("The robot starting position has not been provided. The default position (x: 70, y:70, dir: 0) was used.")
+    }
     if (objects.startPosition.x !== undefined && objects.startPosition.y !== undefined) {
         xpos = objects.startPosition.x;
         ypos = objects.startPosition.y;
