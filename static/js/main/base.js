@@ -18,7 +18,7 @@ const lastUpdate = "8-8-2021"
 var mode = "idle";
 
 // The worker thread.
-var worker = new Worker("static/js/robot.js?t=" + cacheKey);
+var worker = new Worker("static/js/worker/robot.js?t=" + cacheKey);
 worker.postMessage({cacheKey: cacheKey});
 
 // The timer for Autonomous Mode Simulation.
@@ -411,11 +411,11 @@ function processObjectsCode(codeString) {
 }
 
 /**
- * Checks and sets a starting position (coordinates/direction) for the robot.
+ * Checks and sets the starting position (coordinates/direction) for the robot.
  * @param {Map} objects - a map containing numerous objects, including
  *                          the robot (specifically, a starting position)
  */
-function updateStartingPosition(objects) {
+function setRobotStartingPosition(objects) {
     if (objects.startPosition.x !== undefined && objects.startPosition.y !== undefined) {
         xpos = objects.startPosition.x;
         ypos = objects.startPosition.y;
@@ -453,7 +453,7 @@ function uploadObjects(){
 
         let objects = processObjectsCode(newObjCode);
 
-        updateStartingPosition(objects);
+        setRobotStartingPosition(objects);
 
         // Canvas not automatically cleared if simulation is idle
         if (mode === "idle") {
@@ -498,7 +498,7 @@ function uploadObjectsOnce() {
     if (objectsCode !== null) {
         try {
             let objects = processObjectsCode(objectsCode);
-            updateStartingPosition(objects);
+            setRobotStartingPosition(objects);
             worker.postMessage({objects:objects});
         } catch(err) {
             log(err.toString());
@@ -623,7 +623,7 @@ function runAutoTimer() {
 function stop() {
     log("Simulation stopped. Reloading resources...");
     worker.terminate();
-    worker = new Worker("static/js/robot.js?t=" + cacheKey);
+    worker = new Worker("static/js/worker/robot.js?t=" + cacheKey);
     worker.onmessage = onmessage;
     worker.postMessage({cacheKey: cacheKey});
     worker.postMessage({code:code});

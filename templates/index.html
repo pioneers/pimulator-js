@@ -30,7 +30,7 @@
         <script>var cacheKey = "{{ cache_key }}";</script>
 
         <!-- Disables scrolling with arrow keys and spacebar -->
-        <script src="/static/js/disable_scrolling.js?t={{ cache_key }}"></script>
+        <script src="/static/js/main/disable_scrolling.js?t={{ cache_key }}"></script>
         <link rel="icon" href="https://staff.pierobotics.org/wiki/w/images/thumb/0/0a/Sprocket.png/800px-Sprocket.png" width="16" height="16">
 
         <style>
@@ -790,18 +790,18 @@
                         <!-- CodeMirror -->
                         <div class="tab-pane fade show active" id="code-mirror" role="tabpanel" aria-labelledby="home-tab">
                             <!-- Create a simple CodeMirror instance -->
-                            <script src="/static/js/codemirror.js?t={{ cache_key }}"></script>
+                            <script src="/static/js/main/codemirror/codemirror.js?t={{ cache_key }}"></script>
                             <link rel="stylesheet" href="/static/css/codemirror.css?t={{ cache_key }}">
-                            <script src="/static/js/python.js?t={{ cache_key }}"></script>
-                            <script src="/static/js/comment.js"></script>
-                            <script src="/static/js/autorefresh.js"></script>
+                            <script src="/static/js/main/codemirror/python.js?t={{ cache_key }}"></script>
+                            <script src="/static/js/main/codemirror/comment.js"></script>
+                            <script src="/static/js/main/codemirror/autorefresh.js"></script>
                             <link rel="stylesheet" href="/static/css/cobalt.css">
                             <link rel="stylesheet" href="/static/css/monokai.css">
                             <link rel="stylesheet" href="/static/css/solarized.css">
                             <link rel="stylesheet" href="/static/css/yeti.css">
                             <link rel="stylesheet" href="/static/css/blackboard.css">
                             <link rel="stylesheet" href="/static/css/midnight.css">
-                            <script src="/static/js/sublime.js"></script>
+                            <script src="/static/js/main/codemirror/sublime.js"></script>
 
                             <div class="container" id="cmblock" style="padding-left:0px;padding-right:0px">
                                 <script>
@@ -900,7 +900,7 @@
 
                             <!-- CodeMirror for Field -->
                             <div class="container" id="cmblock-js" style="padding-left:0px;padding-right:0px">
-                                <script src="/static/js/javascript.js"></script>
+                                <script src="/static/js/main/codemirror/javascript.js"></script>
 
                                 <script>
                                     var cmObjects = CodeMirror(document.getElementById("cmblock-js"), { //place the codemirror inside the div container
@@ -1020,13 +1020,13 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/static/js/joypad.js?t={{ cache_key }}"></script>
-    <script src="/static/js/gamepad.js?t={{ cache_key }}"></script>
-    <script src="/static/js/base.js?t={{ cache_key }}"></script>
+    <script src="/static/js/main/joypad.js?t={{ cache_key }}"></script>
+    <script src="/static/js/main/gamepad.js?t={{ cache_key }}"></script>
+    <script src="/static/js/main/base.js?t={{ cache_key }}"></script>
 
     <!-- Dark mode: this should be at the bottom so all elements get switched. -->
     <script src="https://cdn.jsdelivr.net/gh/fcmam5/nightly.js@v1.0/dist/nightly.min.js"></script>
-    <script src="/static/js/dark_mode.js"></script>
+    <script src="/static/js/main/dark_mode.js"></script>
   </body>
   
 </html>
