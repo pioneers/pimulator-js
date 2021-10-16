@@ -89,6 +89,7 @@ function onmessage(e) {
             dir: direction,
             robotType: robotType
         });
+        update(robot, e.data.objs)
     }
 }
 
@@ -416,6 +417,14 @@ function processObjectsCode(codeString) {
  *                          the robot (specifically, a starting position)
  */
 function setRobotStartingPosition(objects) {
+    if (objects.startPosition === undefined) {
+        objects.startPosition = {
+            x: 70,
+            y: 70,
+            dir:0
+        }
+        log("The robot starting position has not been provided. The default position (x: 70, y:70, dir: 0) was used.")
+    }
     if (objects.startPosition.x !== undefined && objects.startPosition.y !== undefined) {
         xpos = objects.startPosition.x;
         ypos = objects.startPosition.y;
@@ -552,7 +561,6 @@ function start(auto=false) {
         return; // Return if robot thread already started
     } else {
         clearInterval(timer);
-        clearCanvas();
         if (codeUploaded) {
             // Send the list of objects
             try {

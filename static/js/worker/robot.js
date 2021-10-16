@@ -1116,9 +1116,16 @@ class Simulator{
      * Send ramps, tape lines, and obstacles to be drawn.
      */
     drawObjs() {
-        postMessage({objs: this.ramps, type: "ramp"});
-        postMessage({objs: this.tapeLines, type: "tapeLine"});
-        postMessage({objs: this.obstacles, type: "obstacle"});
+        let objects = {
+            ramps: this.ramps,
+            tapeLines: this.tapeLines,
+            obstacles: this.obstacles
+        }
+        postMessage({objs: objects})
+
+        // postMessage({objs: this.ramps, type: "ramp"});
+        // postMessage({objs: this.tapeLines, type: "tapeLine"});
+        // postMessage({objs: this.obstacles, type: "obstacle"});
     }
 
     /**
