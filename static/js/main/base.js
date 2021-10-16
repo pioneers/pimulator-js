@@ -82,13 +82,12 @@ function onmessage(e) {
     }
     if (e.data.objs !== undefined) { // if objs have been rendered on canvas
         // Draws Objects & Robot on window load
-        drawObjs(e.data.objs, e.data.type);
-        drawRobot({
+        robot = {
             X: xpos,
             Y: ypos,
             dir: direction,
             robotType: robotType
-        });
+        };
         update(robot, e.data.objs)
     }
 }
