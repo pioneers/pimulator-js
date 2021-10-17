@@ -38,7 +38,6 @@ importScripts("./GamepadClass.js" + queryString);
 importScripts("./Sensor.js" + queryString);
 importScripts("./FieldObj.js" + queryString);
 importScripts("./keyboard.js" + queryString);
-importScripts("./jsonfn.js" + queryString);
 
 // Following two vars must be declared before pyodide loads for pyodide to import them
 // Code uploaded to the simulator
@@ -54,7 +53,7 @@ const maxThreads = 3;
 const subworkers = [];
 const subworkerRunning = [];
 for (let i = 0; i < maxThreads; i++) {
-    let newSubworker = new Worker("./run_thread.js" + queryString);
+    let newSubworker = new Worker("../subworker/run_thread.js" + queryString);
     newSubworker.subworkerIdx = i;
     newSubworker.onmessage = function (e) {
         // Handle run thread function calls
