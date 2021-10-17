@@ -27,10 +27,33 @@ importScripts("./GamepadClass.js" + queryString);
 importScripts("./Sensor.js" + queryString);
 importScripts("./FieldObj.js" + queryString);
 importScripts("./keyboard.js" + queryString);
+importScripts("./jsonfn.js" + queryString);
 
+// Following two vars must be declared before pyodide loads for pyodide to import them
 var code = "";
 var env = {};
 languagePluginLoader.then(() => function () {});
+
+// Create a pool of subworkers
+const maxThreads = 3;
+const subworkers = [];
+const subworkerRunning = [];
+for (let i = 0; i < maxThreads; i++) {
+    let newSubworker = new Worker("./run_thread.js" + queryString);
+    newSubworker.subworkerIdx = i;
+    newSubworker.onmessage = function (e) {
+        // Handle run thread function calls
+        if (e.data.objClass !== undefined && e.data.fnName !== undefined) {
+            simulator.runSubworkerFn(e.data.objClass, e.data.fnName, e.data.args);
+        }
+        if (e.data.done === true) {
+            // Maybe not useful because if they run out of threads they can't really wait for one to free up
+            subworkerRunning[this.subworkerIdx] == false; // TODO: Check if this sets the right index back to false
+        }
+    }
+    subworkers.push(newSubworker);
+    subworkerRunning.push(false);
+}
 
 const SCREENHEIGHT = 48;
 const SCREENWIDTH = 48;
@@ -712,7 +735,6 @@ class RobotClass {
         let tick = start;
         this.updatePosition();
 
-        let numUpdates = 1;
         while (cur < start + ms) {
             cur = new Date().getTime();
             if (cur > this.simStartTime + 30*1000) {
@@ -721,7 +743,6 @@ class RobotClass {
             if (cur - tick >= this.tickRate) {
                 this.updatePosition();
                 tick = tick + this.tickRate;
-                numUpdates++;
             }
         }
     }
@@ -730,7 +751,7 @@ class RobotClass {
         console.log(`x = ${this.X.toFixed(2)}, y = ${this.Y.toFixed(2)}, theta = ${this.dir.toFixed(2)}`);
     }
 
-    run(fn) {
+    run(fn, ...args) {
         /*
         Starts a "coroutine", i.e. a series of actions that proceed
         independently of the main loop of code.
@@ -738,9 +759,34 @@ class RobotClass {
         if (!(typeof fn === "function")) {
             throw new Error("First argument to Robot.run must be a function");
         }
-        this.runningCoroutines.add(fn)
-        fn()
+        // Stringify function object from Pyodide, e.g. <function foo at 0x9b4d78>
+        let pyodideFnString = String(fn);
+
+        // Get function name from stringified function object
+        let fnName = pyodideFnString.split("<function ")[1].split(" at")[0];
+
+        /**
+         * Current idea: pass full student code to worker, execute code, and
+         * then execute the named function from Python. Performance seems like a problem
+         * due to pyodide loading time for each worker (probably need pre-loaded worker pool).
+         * 
+         * Another problem: how do gets work if the main worker is sleeping (busy waiting)?
+         * May need to stop supporting Robot.sleep() in the setup function
+         */
+
+        // Get first available worker and tell it to run function
+        let workerIdx = subworkerRunning.findIndex(elem => elem == false);
+        if (workerIdx == -1) {
+            console.log("Could not run function " + fnName + ", thread limit " + String(maxThreads));
+        }
+        let subworker = subworkers[workerIdx];
+        subworkerRunning[workerIdx] = true;
+        subworker.postMessage({fnName: fnName, args:args, code:code});
+        
+        // this.runningCoroutines.add(fn)
+        // fn()
     }
+
     is_running(fn) {
         /* Returns True if the given `fn` is already running as a coroutine.
         See: Robot.run
@@ -1041,6 +1087,26 @@ class Simulator{
         this.teleop_main = env['teleop_main'];
         // ensure_is_function("teleop_setup", this.teleop_setup)
         // ensure_is_function("teleop_main", this.teleop_main)
+    }
+
+    runSubworkerFn(objClass, fnName, args) {
+        console.log("Running " + fnName + " in " + objClass);
+        /* Run function in specified object. Function call comes from subworker. */
+        let result;
+        switch (objClass) {
+            case "Robot":
+                result = this.robot[fnName](...args);
+                break;
+            case "Gamepad":
+                result = this.gamepad[fnName](...args);
+                break;
+            case "Keyboard":
+                result = this.keyboard[fnName](...args);
+                break;
+        }
+        if (fnName == "get_value") {
+            // TODO: send result back to subworker (probably need to be passed subworker number)
+        }
     }
 
     loopContent(func) {
