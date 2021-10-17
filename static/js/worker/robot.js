@@ -805,7 +805,7 @@ class RobotClass {
      * @param {Number} duration - length of sleep in seconds.
      */
     sleep(duration) {
-        console.log("ERROR: Main thread cannot sleep in simulator");
+        console.log("ERROR: Main thread cannot sleep in simulator. Refer to robot API.");
     }
 
     /**
