@@ -805,22 +805,7 @@ class RobotClass {
      * @param {Number} duration - length of sleep in seconds.
      */
     sleep(duration) {
-        let ms = duration*1000;
-        let start = new Date().getTime();
-        let cur = start;
-        let tick = start;
-        this.updatePosition();
-
-        while (cur < start + ms) {
-            cur = new Date().getTime();
-            if (cur > this.simStartTime + 30*1000) {
-                return;
-            }
-            if (cur - tick >= this.tickRate) {
-                this.updatePosition();
-                tick = tick + this.tickRate;
-            }
-        }
+        console.log("ERROR: Main thread cannot sleep in simulator");
     }
 
     /**
@@ -861,7 +846,7 @@ class RobotClass {
         // Get first available worker and tell it to run function
         let workerIdx = subworkerRunning.findIndex(elem => elem == false);
         if (workerIdx == -1) {
-            console.log("Could not run function " + fnName + ", thread limit " + String(maxThreads));
+            console.log("ERROR: Could not run function " + fnName + ", thread limit " + String(maxThreads));
         }
         let subworker = subworkers[workerIdx];
         subworkerRunning[workerIdx] = true;
