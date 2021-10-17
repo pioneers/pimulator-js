@@ -69,7 +69,6 @@ class KeyboardDummy {
 function run(fnName, args, codeArg) {
     // Run all the student code to populate namespace
     code = codeArg;
-    console.log(code);
     env['Robot'] = new RobotClassDummy();
     env['Gamepad'] = new GamepadClassDummy();
     env['Keyboard'] = new KeyboardDummy();
@@ -82,10 +81,7 @@ function run(fnName, args, codeArg) {
     env = pyodide.pyimport("env");
 
     // Run the function
-    console.log(env)
-    console.log(env['autonomous_setup']);
     fn = env[fnName];
-    console.log(fn)
     fn(...args);
 
     // Tell the main worker this thread is done
@@ -97,5 +93,3 @@ this.onmessage = function(e) {
         run(e.data.fnName, e.data.args, e.data.code);
     }
 }
-
-console.log("run_thread worker")

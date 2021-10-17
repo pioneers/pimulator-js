@@ -39,15 +39,6 @@ importScripts("./Sensor.js" + queryString);
 importScripts("./FieldObj.js" + queryString);
 importScripts("./keyboard.js" + queryString);
 
-// Following two vars must be declared before pyodide loads for pyodide to import them
-// Code uploaded to the simulator
-var code = "";
-
-// The local environment
-var env = {};
-
-languagePluginLoader.then(() => function () {});
-
 // Create a pool of subworkers
 const maxThreads = 3;
 const subworkers = [];
@@ -68,6 +59,14 @@ for (let i = 0; i < maxThreads; i++) {
     subworkers.push(newSubworker);
     subworkerRunning.push(false);
 }
+
+// Following two vars must be declared before pyodide loads for pyodide to import them
+// Code uploaded to the simulator
+var code = "";
+// The local environment
+var env = {};
+
+languagePluginLoader.then(() => function () {});
 
 // Screen Dimensions
 const SCREENHEIGHT = 48;
