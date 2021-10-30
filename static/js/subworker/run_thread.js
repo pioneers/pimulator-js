@@ -1,4 +1,19 @@
-// TODO: Rebind console.log
+/***********************************************************************
+ * Subworker Thread.
+ * 
+ * Runs a function called using Robot.run(). 
+ * 
+ * Spawned by the Worker Thread, robot.js, which contains simulation state.
+ **********************************************************************/
+
+/**
+ * Rebinds Console functions for custom logging.
+ */
+console.log = function(text) {
+    postMessage({
+        log: text
+    })
+}
 
 importScripts("https://cdn.jsdelivr.net/pyodide/v0.16.1/full/pyodide.js");
 // Following two vars must be declared before pyodide loads for pyodide to import them
@@ -72,7 +87,6 @@ function get_value_shared(objClass, args) {
     let sab = new Int32Array(new SharedArrayBuffer(8)); // 8 bytes, need to cast to use Atomics.wait
     postMessage({objClass:objClass, fnName:"get_value", args:args, sab:sab});
     Atomics.wait(sab, 0, 0);
-    console.log(sab[1])
     return sab[1];
 }
 

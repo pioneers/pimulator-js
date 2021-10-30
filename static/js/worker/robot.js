@@ -55,6 +55,9 @@ for (let i = 0; i < maxThreads; i++) {
             // Maybe not useful because if they run out of threads they can't really wait for one to free up
             subworkerRunning[this.subworkerIdx] == false; // TODO: Check if this sets the right index back to false
         }
+        if (e.data.log !== undefined) {
+            console.log(e.data.log);
+        }
     }
     subworkers.push(newSubworker);
     subworkerRunning.push(false);
@@ -1189,7 +1192,6 @@ class Simulator{
      * @param {Array} args - arguments to the method call
      */
     runSubworkerFn(objClass, fnName, args, sab) {
-        console.log("Running " + fnName + " in " + objClass); // TODO: delete this
         let result;
         switch (objClass) {
             case "Robot":
@@ -1204,7 +1206,6 @@ class Simulator{
         }
         if (fnName === "get_value") {
             // TODO: send result back to subworker (probably need to be passed subworker number)
-            console.log(sab)
             if (sab === undefined) {
                 return
             }
