@@ -48,12 +48,13 @@ for (let i = 0; i < maxThreads; i++) {
     newSubworker.subworkerIdx = i;
     newSubworker.onmessage = function (e) {
         // Handle run thread function calls
-        if (e.data.objClass !== undefined && e.data.fnName !== undefined) {
-            simulator.runSubworkerFn(e.data.objClass, e.data.fnName, e.data.args, e.data.sab);
+        if (e.data.objClass !== undefined && e.data.methodName !== undefined) {
+            simulator.runSubworkerFn(e.data.objClass, e.data.methodName, e.data.args, e.data.sab);
         }
         if (e.data.done === true) {
             // Maybe not useful because if they run out of threads they can't really wait for one to free up
-            subworkerRunning[this.subworkerIdx] = false; // TODO: Check if this sets the right index back to false
+            subworkerRunning[this.subworkerIdx] = false; // this refers to subworker with this function
+            simulator.robot.fnDone(this.fnName); // Remove from set of running coroutings
         }
         if (e.data.log !== undefined) {
             console.log(e.data.log);
@@ -808,7 +809,7 @@ class RobotClass {
      * @param {Number} duration - length of sleep in seconds.
      */
     sleep(duration) {
-        console.log("ERROR: Main thread cannot sleep in simulator. Refer to robot API.");
+        console.log("ERROR: Main thread cannot sleep in simulator. Please use Robot.run().");
     }
 
     /**
@@ -831,11 +832,7 @@ class RobotClass {
         if (!(typeof fn === "function")) {
             throw new Error("First argument to Robot.run must be a function");
         }
-        // Stringify function object from Pyodide, e.g. <function foo at 0x9b4d78>
-        let pyodideFnString = String(fn);
-
-        // Get function name from stringified function object
-        let fnName = pyodideFnString.split("<function ")[1].split(" at")[0];
+        let fnName = pyodideFnName(fn);
 
         /**
          * Current idea: pass full student code to worker, execute code, and
@@ -852,11 +849,11 @@ class RobotClass {
             console.log("ERROR: Could not run function " + fnName + ", thread limit " + String(maxThreads));
         }
         let subworker = subworkers[workerIdx];
+        subworker.fnName = fnName;
         subworkerRunning[workerIdx] = true;
         subworker.postMessage({fnName: fnName, args:args, code:code});
-        
-        // this.runningCoroutines.add(fn)
-        // fn()
+
+        this.runningCoroutines.add(fnName)
     }
 
     /**
@@ -869,8 +866,30 @@ class RobotClass {
         if (!(typeof fn === "function")) {
             throw new Error("First argument to Robot.is_running must be a function");
         }
-        return this.runningCoroutines.has(fn)
+        let fnName = pyodideFnName(fn);
+        return this.runningCoroutines.has(fnName)
     }
+
+    /**
+     * Marks that a function has finished running.
+     * @param {String} fnName - the name of the function that has finished
+     */
+    fnDone(fnName) {
+        this.runningCoroutines.delete(fnName)
+    }
+}
+
+/**
+ * Gets the function name .
+ * @param {Function} fnName - function object from Pyodide, e.g. <function foo at 0x9b4d78>
+ * @returns String name of the function, e.g. "foo".
+ */
+function pyodideFnName(fn) {
+    // Stringify function object, e.g. "<function foo at 0x9b4d78>"
+    let pyodideFnString = String(fn);
+    // Get function name from stringified function object
+    let fnName = pyodideFnString.split("<function ")[1].split(" at")[0];
+    return fnName;
 }
 
 /*********************** KEYBOARD INPUT GAMEPAD FUNCTIONS ***********************/
@@ -1188,23 +1207,23 @@ class Simulator{
      * Run function in specified object. Function call comes from subworker.
      * @param {String} objClass - the type of object the subworker is calling 
      *                              a method of ("Robot", "Gamepad", "Keyboard")
-     * @param {String} fnName - the name of the method being called
+     * @param {String} methodName - the name of the method being called
      * @param {Array} args - arguments to the method call
      */
-    runSubworkerFn(objClass, fnName, args, sab) {
+    runSubworkerFn(objClass, methodName, args, sab) {
         let result;
         switch (objClass) {
             case "Robot":
-                result = this.robot[fnName](...args);
+                result = this.robot[methodName](...args);
                 break;
             case "Gamepad":
-                result = this.gamepad[fnName](...args);
+                result = this.gamepad[methodName](...args);
                 break;
             case "Keyboard":
-                result = this.keyboard[fnName](...args);
+                result = this.keyboard[methodName](...args);
                 break;
         }
-        if (fnName === "get_value") {
+        if (methodName === "get_value") {
             // Send result back to subworker (probably need to be passed subworker number)
             if (sab === undefined) {
                 return

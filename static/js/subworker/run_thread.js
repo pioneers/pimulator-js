@@ -24,16 +24,9 @@ languagePluginLoader.then(() => function () {});
 class RobotClassDummy {
     constructor() {
         /* Define dummy versions of robot API functions (except sleep() and get_value()) */
-        // let fns = ["pick_up", "drop", "set_value"];
-        // for (let fn of fns) {
-        //     let callFnString = "this." + fn + " = function (...args)";
-        //     callFnString += "{this.call_fn(" + fn + ", ...args)}";
-        //     eval(callFnString);
-        // }
-
-        this.set_value = function (...args) { this.call_fn("set_value", args) };
-        this.pick_up   = function (...args) { this.call_fn("pick_up"  , args) };
-        this.drop      = function (...args) { this.call_fn("drop"     , args) };
+        this.set_value = function (...args) { this.call_method("set_value", args) };
+        this.pick_up   = function (...args) { this.call_method("pick_up"  , args) };
+        this.drop      = function (...args) { this.call_method("drop"     , args) };
     }
 
     get_value(...args) {
@@ -41,10 +34,10 @@ class RobotClassDummy {
         return get_value_shared("Robot", args);
     }
 
-    call_fn(fnName, args) {
-        /* Run real version of function fnName in main thread */
+    call_method(methodName, args) {
+        /* Run real version of function methodName in main thread */
         let objClass = "Robot";
-        postMessage({objClass:objClass, fnName:fnName, args:args});
+        postMessage({objClass:objClass, methodName:methodName, args:args});
     }
     
     sleep(duration) {
@@ -85,7 +78,7 @@ function get_value_shared(objClass, args) {
     // Request value from main worker, and wait for response
     // https://stackoverflow.com/questions/10590213/synchronously-wait-for-message-in-web-worker
     let sab = new Int32Array(new SharedArrayBuffer(8)); // 8 bytes, need to cast to use Atomics.wait
-    postMessage({objClass:objClass, fnName:"get_value", args:args, sab:sab});
+    postMessage({objClass:objClass, methodName:"get_value", args:args, sab:sab});
     Atomics.wait(sab, 0, 0);
     return sab[1];
 }

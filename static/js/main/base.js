@@ -666,6 +666,13 @@ function clearConsole(){
  * @param {String} text - the message to be displayed
  */
 function log(text) {
+    // Just return if not convertible to string
+    try {
+        text = String(text);
+    } catch (err) {
+        return
+    }
+
     // TODO: Filter out unwanted messages in a smarter way
     const array = ['pyodide.py', '<eval>', 'pyodide/_base.py', 'eval(compile(', 'File "<exec>", line 4, in'];
     for (string of array){
