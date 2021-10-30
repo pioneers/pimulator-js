@@ -49,7 +49,7 @@ for (let i = 0; i < maxThreads; i++) {
     newSubworker.onmessage = function (e) {
         // Handle run thread function calls
         if (e.data.objClass !== undefined && e.data.fnName !== undefined) {
-            simulator.runSubworkerFn(e.data.objClass, e.data.fnName, e.data.args);
+            simulator.runSubworkerFn(e.data.objClass, e.data.fnName, e.data.args, e.data.sab);
         }
         if (e.data.done === true) {
             // Maybe not useful because if they run out of threads they can't really wait for one to free up
@@ -1188,7 +1188,7 @@ class Simulator{
      * @param {String} fnName - the name of the method being called
      * @param {Array} args - arguments to the method call
      */
-    runSubworkerFn(objClass, fnName, args) {
+    runSubworkerFn(objClass, fnName, args, sab) {
         console.log("Running " + fnName + " in " + objClass); // TODO: delete this
         let result;
         switch (objClass) {
@@ -1202,8 +1202,17 @@ class Simulator{
                 result = this.keyboard[fnName](...args);
                 break;
         }
-        if (fnName == "get_value") {
+        if (fnName === "get_value") {
             // TODO: send result back to subworker (probably need to be passed subworker number)
+            console.log(sab)
+            if (sab === undefined) {
+                return
+            }
+            // Set return value of get_value
+            Atomics.store(sab, 1, result);
+            // Indicate response, need separate response in case ret val is 0
+            Atomics.store(sab, 0, 1);
+            Atomics.notify(sab, 0, 1);
         }
     }
 

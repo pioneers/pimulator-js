@@ -23,9 +23,7 @@ class RobotClassDummy {
 
     get_value(...args) {
         /** Get device/param value from main worker */
-        // TODO: request value from main worker, and wait for response
-        // https://stackoverflow.com/questions/10590213/synchronously-wait-for-message-in-web-worker
-        return
+        return get_value_shared("Robot", args);
     }
 
     call_fn(fnName, args) {
@@ -55,14 +53,27 @@ class RobotClassDummy {
 
 class GamepadClassDummy {
     get_value(...args) {
-        // TODO: Do same as get_value above
+        // Same as other get_value functions
+        return get_value_shared("Gamepad", args);
     }
 }
 
 class KeyboardDummy {
     get_value(...args) {
-        // TODO: Do same as get_value above
+        // Same as other get_value functions
+        return get_value_shared("Keyboard", args);
     }
+}
+
+function get_value_shared(objClass, args) {
+    /** Get device/param value from main worker */
+    // Request value from main worker, and wait for response
+    // https://stackoverflow.com/questions/10590213/synchronously-wait-for-message-in-web-worker
+    let sab = new Int32Array(new SharedArrayBuffer(8)); // 8 bytes, need to cast to use Atomics.wait
+    postMessage({objClass:objClass, fnName:"get_value", args:args, sab:sab});
+    Atomics.wait(sab, 0, 0);
+    console.log(sab[1])
+    return sab[1];
 }
 
 /** Run student code function. */
