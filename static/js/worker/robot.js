@@ -41,8 +41,8 @@ importScripts("./keyboard.js" + queryString);
 
 // Create a pool of subworkers
 const maxThreads = 3;
-const subworkers = [];
-const subworkerRunning = [];
+const subworkers = []; // Contains Worker objects
+const subworkerRunning = []; // Contains booleans indicating whether subworker is running a student code fn
 for (let i = 0; i < maxThreads; i++) {
     let newSubworker = new Worker("../subworker/run_thread.js" + queryString);
     newSubworker.subworkerIdx = i;
@@ -805,7 +805,7 @@ class RobotClass {
     }
 
     /**
-     * Puts the robot to sleep for a specified amount of time.
+     * (UNSUPPORTED) Puts the robot to sleep for a specified amount of time.
      * @param {Number} duration - length of sleep in seconds.
      */
     sleep(duration) {

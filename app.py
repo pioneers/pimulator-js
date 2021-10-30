@@ -3,9 +3,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello_world(name=None):
-    template = render_template('index.html', cache_key='deadbeef', prod=False)
-    resp = make_response(template)
-    return resp
+    return render_template('index.html', cache_key='deadbeef', prod=False)
 
 @app.after_request
 def add_header(resp):

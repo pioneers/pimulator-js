@@ -29,17 +29,30 @@ class RobotClassDummy {
         this.drop      = function (...args) { this.call_method("drop"     , args) };
     }
 
+    /**
+     * Gets a value from a device.
+     * See class RobotClass for details.
+     * @param ...args - arguments to RobotClass.get_value()
+     * @returns value returned by RobotClass.get_value()
+     */
     get_value(...args) {
-        /** Get device/param value from main worker */
         return get_value_shared("Robot", args);
     }
 
+    /**
+     * Run real version of method methodName in main thread.
+     * @param {String} methodName - name of robot API method to call. Must have no return value.
+     * @param ...args - arguments to robot API method
+     */
     call_method(methodName, args) {
-        /* Run real version of function methodName in main thread */
         let objClass = "Robot";
         postMessage({objClass:objClass, methodName:methodName, args:args});
     }
     
+    /**
+     * Puts the robot to sleep for a specified amount of time.
+     * @param {Number} duration - length of sleep in seconds.
+     */
     sleep(duration) {
         /* Autonomous code pauses execution for <duration> seconds */
         let ms = duration*1000;
@@ -60,21 +73,36 @@ class RobotClassDummy {
 }
 
 class GamepadClassDummy {
+    /**
+     * Gets a value from a device.
+     * See class GamepadClass for details.
+     * @param ...args - arguments to GamepadClass.get_value()
+     * @returns value returned by GamepadClass.get_value()
+     */
     get_value(...args) {
-        // Same as other get_value functions
         return get_value_shared("Gamepad", args);
     }
 }
 
 class KeyboardDummy {
+    /**
+     * Gets a value from a device.
+     * See class Keyboard for details.
+     * @param ...args - arguments to Keyboard.get_value()
+     * @returns value returned by Keyboard.get_value()
+     */
     get_value(...args) {
-        // Same as other get_value functions
         return get_value_shared("Keyboard", args);
     }
 }
 
+/**
+ * Gets a value from a device from main worker
+ * @param {String} objClass - robot API object name. Robot, Gamepad, or Keyboard.
+ * @param {Array} args - arguments to robot API method
+ * @returns value returned by Keyboard.get_value()
+ */
 function get_value_shared(objClass, args) {
-    /** Get device/param value from main worker */
     // Request value from main worker, and wait for response
     // https://stackoverflow.com/questions/10590213/synchronously-wait-for-message-in-web-worker
     let sab = new Int32Array(new SharedArrayBuffer(8)); // 8 bytes, need to cast to use Atomics.wait
@@ -83,8 +111,13 @@ function get_value_shared(objClass, args) {
     return sab[1];
 }
 
-/** Run student code function. */
-function run(fnName, args, codeArg) {
+/**
+ * Run student code function.
+ * @param {String} fnName - student code function Name
+ * @param {Array} args - arguments to function
+ * @param {String} codeArg - full student code
+ */
+ function run(fnName, args, codeArg) {
     // Run all the student code to populate namespace
     code = codeArg;
     env['Robot'] = new RobotClassDummy();
