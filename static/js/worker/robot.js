@@ -53,7 +53,7 @@ for (let i = 0; i < maxThreads; i++) {
         }
         if (e.data.done === true) {
             // Maybe not useful because if they run out of threads they can't really wait for one to free up
-            subworkerRunning[this.subworkerIdx] == false; // TODO: Check if this sets the right index back to false
+            subworkerRunning[this.subworkerIdx] = false; // TODO: Check if this sets the right index back to false
         }
         if (e.data.log !== undefined) {
             console.log(e.data.log);
@@ -1205,7 +1205,7 @@ class Simulator{
                 break;
         }
         if (fnName === "get_value") {
-            // TODO: send result back to subworker (probably need to be passed subworker number)
+            // Send result back to subworker (probably need to be passed subworker number)
             if (sab === undefined) {
                 return
             }
