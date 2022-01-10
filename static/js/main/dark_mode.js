@@ -56,7 +56,17 @@ function toggle() {
         for (var h = 0; h < summaryElements.length; h++){
             summaryElements[h].style.color = linkDarkColor
         }
-
+        document.getElementById(robotType + "-btn").style.backgroundColor = "#404040"; // robotType to dark gray
+        document.getElementById(inputMode + "-btn").style.backgroundColor = "#404040"; // inputMode to dark gray
+        document.getElementById("dark-toggle").style.backgroundColor = "#404040";
+        if (!(mode === "idle")) {
+            if (mode === "auto") {
+                document.getElementById("autonomous-btn").style.backgroundColor = "#404040";
+            } else {
+                document.getElementById("teleop-btn").style.backgroundColor = "#404040";
+            }
+        }
+        
         consoleLog.style.color = colorDark
         field.style.backgroundColor = fieldColorDark
 

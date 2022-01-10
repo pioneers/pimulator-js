@@ -228,18 +228,18 @@
                                     <p></p>
                                     <p id="input-mode">
                                         Mode:
-                                            <button type="button" id="dark-toggle" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="toggle()">Dark Mode</button>
+                                            <button type="button" id="dark-toggle" class="btn btn-primary" data-toggle="button" aria-pressed="false" onclick="toggle()">Dark Mode</button>
                                     </p>
 
                                     <!-- Robot Settings -->
                                     <h4>Robot</h4>
-                                    <p id="input-mode">Robot Type:
+                                    <div id="input-mode">Robot Type:
                                         <div class="btn-group" role="group" aria-label="Basic example">
                                             <button type="button" id="light-btn" class="btn btn-primary" data-toggle="tooltip" data-placement="bottom" title="Light" data-toggle="button" aria-pressed="false" onclick="switchRobotType('light')">Swift</button>
                                             <button type="button" id="medium-btn" class="btn btn-primary" data-toggle="tooltip" data-placement="bottom" title="Medium" data-toggle="button" aria-pressed="true" onclick="switchRobotType('medium')">Spry</button>
                                             <button type="button" id="heavy-btn" class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Heavy" data-toggle="button" aria-pressed="false" onclick="switchRobotType('heavy')">Sturdy</button>
                                         </div>
-                                    </p>
+                                    </div>
                                     <script>
                                         $("#medium-btn").button('toggle');
                                     </script>
@@ -878,9 +878,17 @@
                             <div class="bg-light field-presets-cont" style="padding:1em">
                                 Field presets:
 
-                                <button type="button" id="preset" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="uploadPreset(0)">Empty</button>
-                                <button type="button" id="preset1" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="uploadPreset(1)">World Tour (Auto)</button>
-                                <button type="button" id="preset2" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="uploadPreset(2)">Default</button>
+                                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                    <label class="btn btn-primary">
+                                        <input type="radio" name="options" id="preset" onclick="uploadPreset(0)"> Empty
+                                    </label>
+                                    <label class="btn btn-primary">
+                                        <input type="radio" name="options" id="preset1" onclick="uploadPreset(1)"> World Tour (Auto)
+                                    </label>
+                                    <label class="btn btn-primary">
+                                        <input type="radio" name="options" id="preset3" onclick="uploadPreset(2)" checked> Default
+                                    </label>
+                                </div>
                                 <script>
                                     function uploadPreset(x) {
                                         var xhrPreset=new XMLHttpRequest();

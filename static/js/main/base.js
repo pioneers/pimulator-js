@@ -343,7 +343,14 @@ function clearCanvas() {
 function switchInput(newInputMode) {
     // Toggle the previously activated button off (or retoggle currently activated button on)
     $("#" + inputMode + "-btn").button('toggle');
+    if (darkToggle) {
+        // change button background colors
+        // old one -> light again
+        document.getElementById(inputMode + "-btn").style.backgroundColor = "#757575";
+        document.getElementById(newInputMode + "-btn").style.backgroundColor = "#404040";
+    }
     inputMode = newInputMode;
+
 }
 
 /**
@@ -355,6 +362,10 @@ function switchRobotType(newRobotType) {
     if (!(robotType === newRobotType)) {
         $("#" + robotType + "-btn").button('toggle');
         $("#" + newRobotType + "-btn").button('toggle');
+        if (darkToggle) {
+            document.getElementById(robotType + "-btn").style.backgroundColor = "#757575"; // old one to light gray
+            document.getElementById(newRobotType + "-btn").style.backgroundColor = "#404040"; // new one to dark gray
+        }
         robotType = newRobotType;
     }
 }
