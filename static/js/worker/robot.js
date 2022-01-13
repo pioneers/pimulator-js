@@ -1098,7 +1098,7 @@ class Simulator{
 
         if (objects.rampsData !== undefined) {
             for (let rampObj of objects.rampsData) {
-                let newRamp = new Ramp(rampObj.x, rampObj.y, rampObj.w, rampObj. h, rampObj.highSide, rampObj.incline, rampObj.color);
+                let newRamp = new Ramp(rampObj.x, rampObj.y, rampObj.w, rampObj.h, rampObj.highSide, rampObj.incline, rampObj.color);
                 this.ramps.push(newRamp);
                 if (newRamp.highSide == "up" || newRamp.highSide == "down") {
                     this.obstacles.push(new Wall(newRamp.topL[0]-1, newRamp.topL[1], 1, newRamp.h, 0, newRamp.color));
@@ -1107,6 +1107,26 @@ class Simulator{
                     this.obstacles.push(new Wall(newRamp.topL[0], newRamp.topL[1]-1, newRamp.w, 1, 0, newRamp.color));
                     this.obstacles.push(new Wall(newRamp.botL[0], newRamp.botL[1], newRamp.w, 1, 0, newRamp.color));
                 }
+            }
+        }
+
+        if (objects.campsitesData !== undefined) {
+            for (let campsiteObj of objects.campsitesData) {
+                let newCampsite = new Campsite(campsiteObj.x, campsiteObj.y, campsiteObj.w, campsiteObj.h, campsiteObj.color);
+                this.campsites.push(newCampsite);
+                this.obstacles.push(new Wall())
+
+                // ctx.moveTo(objs[i].topL[0], objs[i].topL[1]);
+                // ctx.lineTo(objs[i].topR[0], objs[i].topR[0]);
+
+                // ctx.moveTo(objs[i].topL[0], objs[i].topL[1] + scaleFactor * (objs[i].w / 3.0));
+                // ctx.lineTo(objs[i].topR[0], objs[i].topL[1] + scaleFactor * (objs[i].w / 3.0));
+
+                // ctx.moveTo(objs[i].topL[0], objs[i].topL[1] + 2 * scaleFactor * (objs[i].w / 3.0));
+                // ctx.lineTo(objs[i].topR[0], objs[i].topL[1] + 2 * scaleFactor * (objs[i].w / 3.0));
+
+                // ctx.moveTo(objs[i].botL[0], objs[i].botL[1]);
+                // ctx.lineTo(objs[i].botR[0], objs[i].botR[0]);
             }
         }
     }

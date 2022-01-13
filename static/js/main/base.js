@@ -272,6 +272,23 @@ function drawObjs(objs, type) {
                 ctx.setLineDash([]);
             }
         }
+    } else if (type === "campsite") {
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = objs[i].color;
+        ctx.beginPath();
+        ctx.moveTo(objs[i].topL[0], objs[i].topL[1]);
+        ctx.lineTo(objs[i].topR[0], objs[i].topR[0]);
+
+        ctx.moveTo(objs[i].topL[0], objs[i].topL[1] + scaleFactor * (objs[i].w / 3.0));
+        ctx.lineTo(objs[i].topR[0], objs[i].topL[1] + scaleFactor * (objs[i].w / 3.0));
+
+        ctx.moveTo(objs[i].topL[0], objs[i].topL[1] + 2 * scaleFactor * (objs[i].w / 3.0));
+        ctx.lineTo(objs[i].topR[0], objs[i].topL[1] + 2 * scaleFactor * (objs[i].w / 3.0));
+
+        ctx.moveTo(objs[i].botL[0], objs[i].botL[1]);
+        ctx.lineTo(objs[i].botR[0], objs[i].botR[0]);
+
+        ctx.stroke();
     }
 }
 
@@ -527,6 +544,7 @@ function update(robot, objects) {
     drawObjs(objects.tapeLines, "tapeLine");
     drawObjs(objects.obstacles, "obstacle");
     drawObjs(objects.ramps, "ramp");
+    drawObjs(objects.campsites, "campsite");
 
     drawRobot(robot);
 }

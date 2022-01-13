@@ -68,3 +68,9 @@ class Ramp extends FieldObj {
         this.incline = incline;
     }
 }
+
+class Campsite extends FieldObj {
+    constructor(x, y, w = 20, y = 9, color = "tan") {
+        super(x, y, w, h, color);
+    }
+}
