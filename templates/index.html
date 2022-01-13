@@ -182,20 +182,6 @@
                                                 <li><a class="dropdown-item" href="#" onclick="changeTheme(5)">Yeti</a></li>
                                             </ul>
                                         <script>
-                                            /**
-                                            *  Change dropdown text to selected item.
-                                            *  Applies to all dropdowns of this type on the page.
-                                            **/
-                                            $( document ).ready(function() {
-                                                $('.dropdown').each(function (key, dropdown) {
-                                                    var $dropdown = $(dropdown);
-                                                    $dropdown.find('.dropdown-menu a').on('click', function () {
-                                                        $dropdown.find('button').text($(this).text()).append(' <span class="caret"></span>');
-                                                    });
-                                                });
-                                            });
-                                        </script>
-                                        <script>
                                             function changeTheme(theme,save=true) {
                                                 if (save === true){
                                                     localStorage.setItem("theme", theme);
@@ -230,7 +216,36 @@
                                         Mode:
                                             <button type="button" id="dark-toggle" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="toggle()">Dark Mode</button>
                                     </p>
+                                    <div class="dropdown">
+                                        Max <code>Robot.run()</code> threads:
+                                        <button class="btn btn-primary dropdown-toggle" type="button" id="threadDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            1 <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="threadDropdownButton" id="threadDropdownList">
+                                        </ul>
+                                    </div>
+                                    <script>
+                                        let $dropdown = $("#threadDropdownList");
+                                        for (let i=0; i<=8; i++){
+                                            $dropdown.append($('<li><a class="dropdown-item" href="#" onclick="setNumThreads('+i+')">'+i+'</a></li>'));
+                                        }
+                                    </script>
 
+                                    <script>
+                                        /**
+                                        *  Change dropdown text to selected item.
+                                        *  Applies to all dropdowns of this type on the page.
+                                        **/
+                                        $( document ).ready(function() {
+                                            $('.dropdown').each(function (key, dropdown) {
+                                                var $dropdown = $(dropdown);
+                                                $dropdown.find('.dropdown-menu a').on('click', function () {
+                                                    $dropdown.find('button').text($(this).text()).append(' <span class="caret"></span>');
+                                                });
+                                            });
+                                        });
+                                    </script>
+                                    
                                     <!-- Robot Settings -->
                                     <h4>Robot</h4>
                                     <p id="input-mode">Robot Type:

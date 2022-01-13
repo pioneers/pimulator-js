@@ -39,31 +39,6 @@ importScripts("./Sensor.js" + queryString);
 importScripts("./FieldObj.js" + queryString);
 importScripts("./keyboard.js" + queryString);
 
-// Create a pool of subworkers
-const maxThreads = 3;
-const subworkers = []; // Contains Worker objects
-const subworkerRunning = []; // Contains booleans indicating whether subworker is running a student code fn
-for (let i = 0; i < maxThreads; i++) {
-    let newSubworker = new Worker("../subworker/run_thread.js" + queryString);
-    newSubworker.subworkerIdx = i;
-    newSubworker.onmessage = function (e) {
-        // Handle run thread function calls
-        if (e.data.objClass !== undefined && e.data.methodName !== undefined) {
-            simulator.runSubworkerFn(e.data.objClass, e.data.methodName, e.data.args, e.data.sab);
-        }
-        if (e.data.done === true) {
-            // Maybe not useful because if they run out of threads they can't really wait for one to free up
-            subworkerRunning[this.subworkerIdx] = false; // this refers to subworker with this function
-            simulator.robot.fnDone(this.fnName); // Remove from set of running coroutings
-        }
-        if (e.data.log !== undefined) {
-            console.log(e.data.log);
-        }
-    }
-    subworkers.push(newSubworker);
-    subworkerRunning.push(false);
-}
-
 // Following two vars must be declared before pyodide loads for pyodide to import them
 // Code uploaded to the simulator
 var code = "";
@@ -844,13 +819,14 @@ class RobotClass {
          */
 
         // Get first available worker and tell it to run function
-        let workerIdx = subworkerRunning.findIndex(elem => elem == false);
+        let workerIdx = this.simulator.subworkerRunning.findIndex(elem => elem == false);
         if (workerIdx == -1) {
-            console.log("ERROR: Could not run function " + fnName + ", thread limit " + String(maxThreads));
+            console.log("ERROR: Could not run function " + fnName + ", thread limit " + String(this.simulator.numThreads));
+            return
         }
-        let subworker = subworkers[workerIdx];
+        let subworker = this.simulator.subworkers[workerIdx];
         subworker.fnName = fnName;
-        subworkerRunning[workerIdx] = true;
+        this.simulator.subworkerRunning[workerIdx] = true;
         subworker.postMessage({fnName: fnName, args:args, code:code});
 
         this.runningCoroutines.add(fnName)
@@ -862,7 +838,6 @@ class RobotClass {
      * @returns a boolean that tells whether fn is already running as a coroutine.
      */
     is_running(fn) {
-        //TODO: Fully implement
         if (!(typeof fn === "function")) {
             throw new Error("First argument to Robot.is_running must be a function");
         }
@@ -1108,6 +1083,11 @@ class Simulator{
         this.obstacles = [];
         this.interactableObjs = [];
         this.ramps = [];
+
+        // Subworker pool
+        this.numThreads = 1;
+        this.subworkers = []; // Contains Worker objects
+        this.subworkerRunning = []; // Contains booleans indicating whether subworker is running a student code fn
     }
 
     /**
@@ -1201,6 +1181,40 @@ class Simulator{
         this.autonomous_main = env['autonomous_main'];
         this.teleop_setup = env['teleop_setup'];
         this.teleop_main = env['teleop_main'];
+    }
+
+    /**
+     * Create subworker threads to run functions called with Robot.run() in parallel
+     * Should only be called once
+     * @param {Number} numThreads - the number of subworker threads to spawn
+     */
+    createSubworkers(numThreads) {
+        this.numThreads = numThreads;
+        if (this.subworkers.length != 0) {
+            console.log("ERROR: Subworkers have already been initialized");
+            return;
+        }
+
+        for (let i = 0; i < numThreads; i++) {
+            let newSubworker = new Worker("../subworker/run_thread.js" + queryString);
+            newSubworker.subworkerIdx = i;
+            newSubworker.onmessage = function (e) {
+                // Handle run thread function calls
+                if (e.data.objClass !== undefined && e.data.methodName !== undefined) {
+                    simulator.runSubworkerFn(e.data.objClass, e.data.methodName, e.data.args, e.data.sab);
+                }
+                if (e.data.done === true) {
+                    // Maybe not useful because if they run out of threads they can't really wait for one to free up
+                    simulator.subworkerRunning[this.subworkerIdx] = false; // this refers to subworker with this function
+                    simulator.robot.fnDone(this.fnName); // Remove from set of running coroutings
+                }
+                if (e.data.log !== undefined) {
+                    console.log(e.data.log);
+                }
+            }
+            this.subworkers.push(newSubworker);
+            this.subworkerRunning.push(false);
+        }
     }
 
     /**
@@ -1329,6 +1343,11 @@ this.onmessage = function(e) {
         if (simulator.mode == "teleop") {
             simulator.robot.attachedObj = null;
         }
+    }
+
+    // Give simulator the number of subworker threads
+    if (e.data.numThreads !== undefined) {
+        simulator.createSubworkers(e.data.numThreads);
     }
 
     if (e.data.start === true) {
