@@ -660,6 +660,11 @@ function resetSimButtons() {
     document.getElementById("stop-btn").disabled = true;
     document.getElementById("teleop-btn").disabled = false;
     document.getElementById("autonomous-btn").disabled = false;
+    if (mode === "auto") {
+        $("#autonomous-btn").button('toggle')
+    } else if (mode === "teleop") {  
+        $("#teleop-btn").button('toggle')
+    }
     if (document.getElementById("teleop-btn").classList.contains("btn-primary")) {
         $("#teleop-btn").removeClass("btn-primary").addClass("btn-outline-primary")
     }
