@@ -31,7 +31,7 @@
 
         <!-- Disables scrolling with arrow keys and spacebar -->
         <script src="/static/js/main/disable_scrolling.js?t={{ cache_key }}"></script>
-        <link rel="icon" href="https://staff.pierobotics.org/wiki/w/images/thumb/0/0a/Sprocket.png/800px-Sprocket.png" width="16" height="16">
+        <link rel="icon" href="/static/img/800px-Sprocket.png" width="16" height="16">
 
         <style>
             code {
@@ -49,7 +49,7 @@
     <!-- Header Navigation Bar -->
     <nav class="navbar navbar-expand-lg">
         <span class="navbar-brand mb-0 h1">
-            <img src="https://staff.pierobotics.org/wiki/w/images/thumb/0/0a/Sprocket.png/800px-Sprocket.png" width="30" height="30" class="d-inline-block align-top" alt="">
+            <img src="/static/img/800px-Sprocket.png" width="30" height="30" class="d-inline-block align-top" alt="">
             PiE Robotics Simulator
         </span>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -182,20 +182,6 @@
                                                 <li><a class="dropdown-item" href="#" onclick="changeTheme(5)">Yeti</a></li>
                                             </ul>
                                         <script>
-                                            /**
-                                            *  Change dropdown text to selected item.
-                                            *  Applies to all dropdowns of this type on the page.
-                                            **/
-                                            $( document ).ready(function() {
-                                                $('.dropdown').each(function (key, dropdown) {
-                                                    var $dropdown = $(dropdown);
-                                                    $dropdown.find('.dropdown-menu a').on('click', function () {
-                                                        $dropdown.find('button').text($(this).text()).append(' <span class="caret"></span>');
-                                                    });
-                                                });
-                                            });
-                                        </script>
-                                        <script>
                                             function changeTheme(theme,save=true) {
                                                 if (save === true){
                                                     localStorage.setItem("theme", theme);
@@ -225,11 +211,41 @@
                                             }
                                         </script>
                                     </div>
+                                    <p></p>
                                     <p id="input-mode">
                                         Mode:
                                             <button type="button" id="dark-toggle" class="btn btn-primary" data-toggle="button" aria-pressed="true" onclick="toggle()">Dark Mode</button>
                                     </p>
+                                    <div class="dropdown">
+                                        Max <code>Robot.run()</code> threads:
+                                        <button class="btn btn-primary dropdown-toggle" type="button" id="threadDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            1 <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="threadDropdownButton" id="threadDropdownList">
+                                        </ul>
+                                    </div>
+                                    <script>
+                                        let $dropdown = $("#threadDropdownList");
+                                        for (let i=0; i<=8; i++){
+                                            $dropdown.append($('<li><a class="dropdown-item" href="#" onclick="setNumThreads('+i+')">'+i+'</a></li>'));
+                                        }
+                                    </script>
 
+                                    <script>
+                                        /**
+                                        *  Change dropdown text to selected item.
+                                        *  Applies to all dropdowns of this type on the page.
+                                        **/
+                                        $( document ).ready(function() {
+                                            $('.dropdown').each(function (key, dropdown) {
+                                                var $dropdown = $(dropdown);
+                                                $dropdown.find('.dropdown-menu a').on('click', function () {
+                                                    $dropdown.find('button').text($(this).text()).append(' <span class="caret"></span>');
+                                                });
+                                            });
+                                        });
+                                    </script>
+                                    
                                     <!-- Robot Settings -->
                                     <h4>Robot</h4>
                                     <p id="input-mode">Robot Type:
@@ -267,6 +283,8 @@
                                                     <p>
                                                         If you're having trouble getting started, a code sample is available
                                                         <a href="https://raw.githubusercontent.com/pioneers/pimulator-js/master/static/student_code_file.py" target="_blank">here</a>.
+                                                        The Robot API is linked in the nav bar of this page. If you would like to make parallel calls to <code>Robot.run()</code>,
+                                                        make sure to adjust the number of available threads in the Settings tab.
                                                     </p>
                                                     <table class="table">
                                                         <thead>
@@ -512,7 +530,7 @@
                                                         Confirm that the controller has successfully been connected by checking the 'Gamepad' tab below.
                                                         The following are button mappings between a generic game controller and the Robot API:
                                                     </p>
-                                                    <img src="https://user-images.githubusercontent.com/580022/45268303-10a03e80-b4ce-11e8-883c-1f586566c040.png" alt="" class="img-thumbnail mb-3">
+                                                    <img src="/static/img/gamepad.png" alt="" class="img-thumbnail mb-3">
                                                     <table class="table">
                                                         <thead>
                                                             <tr>

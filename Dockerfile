@@ -24,6 +24,7 @@ MAINTAINER Charles Hong <charleshong@pioneers.berkeley.edu>
 # Create the expected file structure in the image
 COPY --from=renderer /simulator/rendered_index.html /usr/share/nginx/html/index.html
 COPY static /usr/share/nginx/html/static
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 # docker build -t webserver .
 # docker run -it --rm -d -p 8080:80 --name web webserver
