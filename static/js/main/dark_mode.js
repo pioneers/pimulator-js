@@ -1,7 +1,6 @@
 /**
  * Initialize Nightly and manually change the color of certain elements
  */
-var darkToggle = false;
 var nightly = new Nightly();
 function toggle() {
 
@@ -28,7 +27,7 @@ function toggle() {
     let linkColor = "#007bff"
     let buttonDarkBackground = "#757575"
     let buttonBackground = "#007bff!important"
-
+    let buttonDarkBackgroundPressed = "#404040"
     // If theme is default light/dark, switch to default dark/light
     // Otherwise, keep the existing theme
     let editorTheme = localStorage.getItem("theme")
@@ -55,6 +54,16 @@ function toggle() {
         }
         for (var h = 0; h < summaryElements.length; h++){
             summaryElements[h].style.color = linkDarkColor
+        }
+        document.getElementById(robotType + "-btn").style.backgroundColor = buttonDarkBackgroundPressed; // robotType to dark gray
+        document.getElementById(inputMode + "-btn").style.backgroundColor = buttonDarkBackgroundPressed; // inputMode to dark gray
+        document.getElementById("dark-toggle").style.backgroundColor = buttonDarkBackgroundPressed;
+        if (!(mode === "idle")) {
+            if (mode === "auto") {
+                document.getElementById("autonomous-btn").style.backgroundColor = buttonDarkBackgroundPressed;
+            } else {
+                document.getElementById("teleop-btn").style.backgroundColor = buttonDarkBackgroundPressed;
+            }
         }
 
         consoleLog.style.color = colorDark
