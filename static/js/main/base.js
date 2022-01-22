@@ -17,9 +17,13 @@ const lastUpdate = "8-8-2021"
 // Current mode of the Simulator. Possible modes: {idle, auto, teleop}
 var mode = "idle";
 
+// Current number of subworker threads for handling Robot.run() calls (user-configurable)
+var numThreads = 1;
+
 // The worker thread.
 var worker = new Worker("static/js/worker/robot.js?t=" + cacheKey);
 worker.postMessage({cacheKey: cacheKey});
+worker.postMessage({numThreads: numThreads});
 
 // The timer for Autonomous Mode Simulation.
 var timer;
@@ -371,6 +375,24 @@ function switchRobotType(newRobotType) {
 }
 
 /**
+ * Set the number of subworker threads used in the simulator.
+ * @param {Number} newNumThreads - the new desired number of threads, currently 0 to 8
+ */
+function setNumThreads(newNumThreads) {
+    localStorage.setItem("numThreads", newNumThreads);
+    numThreads = newNumThreads;
+    // Terminate existing worker+subworkers and create new ones (with new number of subworkers)
+    log("Number of Robot.run() threads set to: " + newNumThreads);
+    stop();
+}
+let storedNumThreads = localStorage.getItem("numThreads");
+if (storedNumThreads !== null) {
+    // Manually set thread num dropdown to value saved in local storage
+    $("#threadDropdownButton").html(storedNumThreads + ' <span class="caret"></span>');
+    setNumThreads(storedNumThreads);
+}
+
+/**
  * Sends a message that a key is being pressed down if the simulator is in
  * teleop mode and the input mode is the keyboard.
  * @param {keypress} e - a keypress event from pressing a key on a keyboard
@@ -583,7 +605,9 @@ function start(auto=false) {
                 log(err.toString());
             }
 
-            //  Collect the robot start position and direction
+            // Collect info needed to start simulation
+            let messageMode;
+            // Collect the robot start position and direction
             let robotInfo = {
                 robotType: robotType,
                 xpos: xpos,
@@ -652,7 +676,8 @@ function stop() {
     worker = new Worker("static/js/worker/robot.js?t=" + cacheKey);
     worker.onmessage = onmessage;
     worker.postMessage({cacheKey: cacheKey});
-    worker.postMessage({code:code});
+    worker.postMessage({code: code});
+    worker.postMessage({numThreads: numThreads});
     mode = "idle";
     clearInterval(timer);
     resetSimButtons()
@@ -689,6 +714,13 @@ function clearConsole(){
  * @param {String} text - the message to be displayed
  */
 function log(text) {
+    // Just return if not convertible to string
+    try {
+        text = String(text);
+    } catch (err) {
+        return
+    }
+
     // TODO: Filter out unwanted messages in a smarter way
     const array = ['pyodide.py', '<eval>', 'pyodide/_base.py', 'eval(compile(', 'File "<exec>", line 4, in'];
     for (string of array){
