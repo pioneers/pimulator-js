@@ -363,7 +363,7 @@ function switchInput(newInputMode) {
  *                                  {light, medium, heavy}
  */
 function switchRobotType(newRobotType) {
-    if (!(robotType === newRobotType)) {
+    if (robotType !== newRobotType) {
         $("#" + robotType + "-btn").button('toggle');
         $("#" + newRobotType + "-btn").button('toggle');
         if (darkToggle) {
