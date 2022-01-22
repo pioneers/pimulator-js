@@ -1,9 +1,9 @@
 /***********************************************************************
  * The Main Thread.
- * 
+ *
  * Handles webpage updates, such as the Canvas (used for the Simulator)
- * and the Console. 
- * 
+ * and the Console.
+ *
  * Interacts with the Worker Thread, robot.js, to run the Simulator.
  **********************************************************************/
 
@@ -37,9 +37,9 @@ var ypos = 70;
 /**
  * The Robot's starting direction, measured in degrees:
  *                 90 [Up]
- * 
+ *
  *       0 [Left]            180 [Right]
- * 
+ *
  *                270 [Down]
  */
 var direction = 0;
@@ -181,7 +181,7 @@ function drawRobot(robot) {
 }
 
 /**
- * Draws objects on the canvas. 
+ * Draws objects on the canvas.
  * @param {List} objs - A list of objects to the drawn. Each object is a map
  *                      containing its location.
  * @param {String} type - The type of object being drawn.
@@ -590,23 +590,28 @@ function start(auto=false) {
                 ypos: ypos,
                 dir: direction
             }
-
             // Start the simulation
             if (auto === false) { //TODO: do if (auto) instead
-                $("#teleop-btn").removeClass("btn-outline-primary").addClass("btn-primary")
-                worker.postMessage({start:true, mode:"teleop", robotInfo:robotInfo})
+                $("#teleop-btn").removeClass("btn-outline-primary").addClass("btn-primary");
+                if (darkToggle) {
+                  document.getElementById("teleop-btn").style.backgroundColor = "#404040";
+                }
+                worker.postMessage({start:true, mode:"teleop", robotInfo:robotInfo});
             } else if (auto === true) {
-                $("#autonomous-btn").removeClass("btn-outline-primary").addClass("btn-primary")
-                worker.postMessage({start:true, mode:"auto", robotInfo:robotInfo})
+                $("#autonomous-btn").removeClass("btn-outline-primary").addClass("btn-primary");
+                if (darkToggle) {
+                    document.getElementById("autonomous-btn").style.backgroundColor = "#404040";
+                }
+                worker.postMessage({start:true, mode:"auto", robotInfo:robotInfo});
             }
             document.getElementById("stop-btn").disabled = false;
             document.getElementById("teleop-btn").disabled = true;
             document.getElementById("autonomous-btn").disabled = true;
         } else {
             if (auto === false) {
-                $("#teleop-btn").button('toggle')
+                $("#teleop-btn").button('toggle');
             } else if (auto === true) {
-                $("#autonomous-btn").button('toggle')
+                $("#autonomous-btn").button('toggle');
             }
             log("Please upload code first");
         }
@@ -660,10 +665,9 @@ function resetSimButtons() {
     document.getElementById("stop-btn").disabled = true;
     document.getElementById("teleop-btn").disabled = false;
     document.getElementById("autonomous-btn").disabled = false;
-    if (mode === "auto") {
-        $("#autonomous-btn").button('toggle')
-    } else if (mode === "teleop") {  
-        $("#teleop-btn").button('toggle')
+    if (darkToggle) {
+        document.getElementById("autonomous-btn").style.backgroundColor = "#757575";
+        document.getElementById("teleop-btn").style.backgroundColor = "#757575";
     }
     if (document.getElementById("teleop-btn").classList.contains("btn-primary")) {
         $("#teleop-btn").removeClass("btn-primary").addClass("btn-outline-primary")
