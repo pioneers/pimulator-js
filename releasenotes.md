@@ -1,5 +1,27 @@
 # Pimulator Release Notes
 
+## January 22, 2022
+#### Changes
+- UI bug fixes for button colors darkening when selected (in light and dark modes)
+- Robot.run() parallel threading enabled
+    - number of threads adjustable using dropdown in settings tab
+    - more information about Robot.run() threads can be found in the Robot API
+
+## January 12, 2022
+#### Changes
+- UI bug fixes for help tab accordion
+
+## October 2, 2021
+#### Changes
+- Fixed order of field/robot drawing so robot is above field lines
+- Made starting position adjustable in field code
+- Provided default starting position for robot
+
+## August 28, 2021
+#### Changes
+- Bug fixes for autonomous timer and dark mode
+- Added tooltips for robot options and info on robot speeds and sizes
+
 ## July 31, 2021
 #### New
 - Button added to clear console
