@@ -1,7 +1,6 @@
 /**
  * Initialize Nightly and manually change the color of certain elements
  */
-var darkToggle = false;
 var nightly = new Nightly();
 function toggle() {
 

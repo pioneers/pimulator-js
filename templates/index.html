@@ -900,10 +900,10 @@
                                         <input type="radio" name="options" id="preset" onclick="uploadPreset(0)"> Empty
                                     </label>
                                     <label class="btn btn-primary">
-                                        <input type="radio" name="options" id="preset1" onclick="uploadPreset(1)"> World Tour (Auto)
+                                        <input type="radio" name="options" id="preset3" onclick="uploadPreset(1)" checked> Default
                                     </label>
                                     <label class="btn btn-primary">
-                                        <input type="radio" name="options" id="preset3" onclick="uploadPreset(2)" checked> Default
+                                        <input type="radio" name="options" id="preset1" onclick="uploadPreset(2)"> World Tour (Auto)
                                     </label>
                                 </div>
                                 <script>
@@ -912,9 +912,9 @@
                                         if (x == 0) {
                                             xhrPreset.open("GET","/static/fields/field_empty.json?t={{ cache_key }}");
                                         } else if (x == 1){
-                                            xhrPreset.open("GET","/static/fields/field_worldtour_auto.json?t={{ cache_key }}");
-                                        } else if (x == 2){
                                             xhrPreset.open("GET","/static/fields/field.json?t={{ cache_key }}");
+                                        } else if (x == 2){
+                                            xhrPreset.open("GET","/static/fields/field_worldtour_auto.json?t={{ cache_key }}");
                                         }
                                         xhrPreset.onload = () => {
                                             objectsCode = xhrPreset.responseText;

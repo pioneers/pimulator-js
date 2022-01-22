@@ -20,11 +20,6 @@ var mode = "idle";
 // Current number of subworker threads for handling Robot.run() calls (user-configurable)
 var numThreads = 1;
 
-// The worker thread.
-var worker = new Worker("static/js/worker/robot.js?t=" + cacheKey);
-worker.postMessage({cacheKey: cacheKey});
-worker.postMessage({numThreads: numThreads});
-
 // The timer for Autonomous Mode Simulation.
 var timer;
 
@@ -57,6 +52,14 @@ const ctx = canvas.getContext('2d');
 
 var codeUploaded = false;
 var pythonError = false;
+
+// Also referenced in dark_mode.js
+var darkToggle = false;
+
+// The worker thread.
+var worker = new Worker("static/js/worker/robot.js?t=" + cacheKey);
+worker.postMessage({cacheKey: cacheKey});
+worker.postMessage({numThreads: numThreads});
 
 /**
  * Handles messages from the Worker Thread (robot.js).
