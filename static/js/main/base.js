@@ -596,14 +596,19 @@ function start(auto=false) {
                 if (darkToggle) {
                   document.getElementById("teleop-btn").style.backgroundColor = "#404040";
                 }
-                worker.postMessage({start:true, mode:"teleop", robotInfo:robotInfo});
+                messageMode = "teleop";
             } else if (auto === true) {
                 $("#autonomous-btn").removeClass("btn-outline-primary").addClass("btn-primary");
                 if (darkToggle) {
                     document.getElementById("autonomous-btn").style.backgroundColor = "#404040";
                 }
-                worker.postMessage({start:true, mode:"auto", robotInfo:robotInfo});
+                messageMode = "auto";
             }
+            worker.postMessage({
+                start:true,
+                mode:messageMode,
+                robotInfo:robotInfo
+            })
             document.getElementById("stop-btn").disabled = false;
             document.getElementById("teleop-btn").disabled = true;
             document.getElementById("autonomous-btn").disabled = true;
