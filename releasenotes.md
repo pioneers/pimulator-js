@@ -1,6 +1,6 @@
 # Pimulator Release Notes
 
-## January 19, 2022
+## January 22, 2022
 #### Changes
 - UI bug fixes for button colors darkening when selected (in light and dark modes)
 - Robot.run() parallel threading enabled
