@@ -12,7 +12,7 @@
  * where DD and MM do not have leading zeros.
  * Must be updated upon each push to the webapp.
  */
-const lastUpdate = "8-8-2021"
+const lastUpdate = "22-1-2022"
 
 // Current mode of the Simulator. Possible modes: {idle, auto, teleop}
 var mode = "idle";
