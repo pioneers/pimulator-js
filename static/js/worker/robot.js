@@ -39,9 +39,9 @@ importScripts("./Sensor.js" + queryString);
 importScripts("./FieldObj.js" + queryString);
 importScripts("./keyboard.js" + queryString);
 
+// Following two vars must be declared before pyodide loads for pyodide to import them
 // Code uploaded to the simulator
 var code = "";
-
 // The local environment
 var env = {};
 
@@ -780,28 +780,11 @@ class RobotClass {
     }
 
     /**
-     * Puts the robot to sleep for a specified amount of time.
+     * (UNSUPPORTED) Puts the robot to sleep for a specified amount of time.
      * @param {Number} duration - length of sleep in seconds.
      */
     sleep(duration) {
-        let ms = duration*1000;
-        let start = new Date().getTime();
-        let cur = start;
-        let tick = start;
-        this.updatePosition();
-
-        let numUpdates = 1;
-        while (cur < start + ms) {
-            cur = new Date().getTime();
-            if (cur > this.simStartTime + 30*1000) {
-                return;
-            }
-            if (cur - tick >= this.tickRate) {
-                this.updatePosition();
-                tick = tick + this.tickRate;
-                numUpdates++;
-            }
-        }
+        console.log("ERROR: Main thread cannot sleep in simulator. Please use Robot.run().");
     }
 
     /**
@@ -816,7 +799,7 @@ class RobotClass {
      * of the main loop of code).
      * @param {Function} fn - the function to run
      */
-    run(fn) {
+    run(fn, ...args) {
         /*
         Starts a "coroutine", i.e. a series of actions that proceed
         independently of the main loop of code.
@@ -824,8 +807,29 @@ class RobotClass {
         if (!(typeof fn === "function")) {
             throw new Error("First argument to Robot.run must be a function");
         }
-        this.runningCoroutines.add(fn)
-        fn()
+        let fnName = pyodideFnName(fn);
+
+        /**
+         * Current idea: pass full student code to worker, execute code, and
+         * then execute the named function from Python. Performance seems like a problem
+         * due to pyodide loading time for each worker (probably need pre-loaded worker pool).
+         * 
+         * Another problem: how do gets work if the main worker is sleeping (busy waiting)?
+         * May need to stop supporting Robot.sleep() in the setup function
+         */
+
+        // Get first available worker and tell it to run function
+        let workerIdx = this.simulator.subworkerRunning.findIndex(elem => elem == false);
+        if (workerIdx == -1) {
+            console.log("ERROR: Could not run function " + fnName + ", thread limit " + String(this.simulator.numThreads));
+            return
+        }
+        let subworker = this.simulator.subworkers[workerIdx];
+        subworker.fnName = fnName;
+        this.simulator.subworkerRunning[workerIdx] = true;
+        subworker.postMessage({fnName: fnName, args:args, code:code});
+
+        this.runningCoroutines.add(fnName)
     }
 
     /**
@@ -834,12 +838,33 @@ class RobotClass {
      * @returns a boolean that tells whether fn is already running as a coroutine.
      */
     is_running(fn) {
-        //TODO: Fully implement
         if (!(typeof fn === "function")) {
             throw new Error("First argument to Robot.is_running must be a function");
         }
-        return this.runningCoroutines.has(fn)
+        let fnName = pyodideFnName(fn);
+        return this.runningCoroutines.has(fnName)
     }
+
+    /**
+     * Marks that a function has finished running.
+     * @param {String} fnName - the name of the function that has finished
+     */
+    fnDone(fnName) {
+        this.runningCoroutines.delete(fnName)
+    }
+}
+
+/**
+ * Gets the function name .
+ * @param {Function} fnName - function object from Pyodide, e.g. <function foo at 0x9b4d78>
+ * @returns String name of the function, e.g. "foo".
+ */
+function pyodideFnName(fn) {
+    // Stringify function object, e.g. "<function foo at 0x9b4d78>"
+    let pyodideFnString = String(fn);
+    // Get function name from stringified function object
+    let fnName = pyodideFnString.split("<function ")[1].split(" at")[0];
+    return fnName;
 }
 
 /*********************** KEYBOARD INPUT GAMEPAD FUNCTIONS ***********************/
@@ -1058,6 +1083,11 @@ class Simulator{
         this.obstacles = [];
         this.interactableObjs = [];
         this.ramps = [];
+
+        // Subworker pool
+        this.numThreads = 1;
+        this.subworkers = []; // Contains Worker objects
+        this.subworkerRunning = []; // Contains booleans indicating whether subworker is running a student code fn
     }
 
     /**
@@ -1154,6 +1184,73 @@ class Simulator{
     }
 
     /**
+     * Create subworker threads to run functions called with Robot.run() in parallel
+     * Should only be called once
+     * @param {Number} numThreads - the number of subworker threads to spawn
+     */
+    createSubworkers(numThreads) {
+        this.numThreads = numThreads;
+        if (this.subworkers.length != 0) {
+            console.log("ERROR: Subworkers have already been initialized");
+            return;
+        }
+
+        for (let i = 0; i < numThreads; i++) {
+            let newSubworker = new Worker("../subworker/run_thread.js" + queryString);
+            newSubworker.subworkerIdx = i;
+            newSubworker.onmessage = function (e) {
+                // Handle run thread function calls
+                if (e.data.objClass !== undefined && e.data.methodName !== undefined) {
+                    simulator.runSubworkerFn(e.data.objClass, e.data.methodName, e.data.args, e.data.sab);
+                }
+                if (e.data.done === true) {
+                    // Maybe not useful because if they run out of threads they can't really wait for one to free up
+                    simulator.subworkerRunning[this.subworkerIdx] = false; // this refers to subworker with this function
+                    simulator.robot.fnDone(this.fnName); // Remove from set of running coroutings
+                }
+                if (e.data.log !== undefined) {
+                    console.log(e.data.log);
+                }
+            }
+            this.subworkers.push(newSubworker);
+            this.subworkerRunning.push(false);
+        }
+    }
+
+    /**
+     * Run function in specified object. Function call comes from subworker.
+     * @param {String} objClass - the type of object the subworker is calling 
+     *                              a method of ("Robot", "Gamepad", "Keyboard")
+     * @param {String} methodName - the name of the method being called
+     * @param {Array} args - arguments to the method call
+     */
+    runSubworkerFn(objClass, methodName, args, sab) {
+        let result;
+        switch (objClass) {
+            case "Robot":
+                result = this.robot[methodName](...args);
+                break;
+            case "Gamepad":
+                result = this.gamepad[methodName](...args);
+                break;
+            case "Keyboard":
+                result = this.keyboard[methodName](...args);
+                break;
+        }
+        if (methodName === "get_value") {
+            // Send result back to subworker (probably need to be passed subworker number)
+            if (sab === undefined) {
+                return
+            }
+            // Set return value of get_value
+            Atomics.store(sab, 1, result);
+            // Indicate response, need separate response in case ret val is 0
+            Atomics.store(sab, 0, 1);
+            Atomics.notify(sab, 0, 1);
+        }
+    }
+
+    /**
      * Executes one cycle of the robot.
      * @param {Function} func - a 0-argument function to continually run
      */
@@ -1246,6 +1343,11 @@ this.onmessage = function(e) {
         if (simulator.mode == "teleop") {
             simulator.robot.attachedObj = null;
         }
+    }
+
+    // Give simulator the number of subworker threads
+    if (e.data.numThreads !== undefined) {
+        simulator.createSubworkers(e.data.numThreads);
     }
 
     if (e.data.start === true) {
