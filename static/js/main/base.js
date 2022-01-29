@@ -1,9 +1,9 @@
 /***********************************************************************
  * The Main Thread.
- * 
+ *
  * Handles webpage updates, such as the Canvas (used for the Simulator)
- * and the Console. 
- * 
+ * and the Console.
+ *
  * Interacts with the Worker Thread, robot.js, to run the Simulator.
  **********************************************************************/
 
@@ -12,14 +12,13 @@
  * where DD and MM do not have leading zeros.
  * Must be updated upon each push to the webapp.
  */
-const lastUpdate = "8-8-2021"
+const lastUpdate = "22-1-2022"
 
 // Current mode of the Simulator. Possible modes: {idle, auto, teleop}
 var mode = "idle";
 
-// The worker thread.
-var worker = new Worker("static/js/worker/robot.js?t=" + cacheKey);
-worker.postMessage({cacheKey: cacheKey});
+// Current number of subworker threads for handling Robot.run() calls (user-configurable)
+var numThreads = 1;
 
 // The timer for Autonomous Mode Simulation.
 var timer;
@@ -37,9 +36,9 @@ var ypos = 70;
 /**
  * The Robot's starting direction, measured in degrees:
  *                 90 [Up]
- * 
+ *
  *       0 [Left]            180 [Right]
- * 
+ *
  *                270 [Down]
  */
 var direction = 0;
@@ -53,6 +52,14 @@ const ctx = canvas.getContext('2d');
 
 var codeUploaded = false;
 var pythonError = false;
+
+// Also referenced in dark_mode.js
+var darkToggle = false;
+
+// The worker thread.
+var worker = new Worker("static/js/worker/robot.js?t=" + cacheKey);
+worker.postMessage({cacheKey: cacheKey});
+worker.postMessage({numThreads: numThreads});
 
 /**
  * Handles messages from the Worker Thread (robot.js).
@@ -181,7 +188,7 @@ function drawRobot(robot) {
 }
 
 /**
- * Draws objects on the canvas. 
+ * Draws objects on the canvas.
  * @param {List} objs - A list of objects to the drawn. Each object is a map
  *                      containing its location.
  * @param {String} type - The type of object being drawn.
@@ -365,7 +372,14 @@ function clearCanvas() {
 function switchInput(newInputMode) {
     // Toggle the previously activated button off (or retoggle currently activated button on)
     $("#" + inputMode + "-btn").button('toggle');
+    if (darkToggle) {
+        // change button background colors
+        // old one -> light again
+        document.getElementById(inputMode + "-btn").style.backgroundColor = "#757575";
+        document.getElementById(newInputMode + "-btn").style.backgroundColor = "#404040";
+    }
     inputMode = newInputMode;
+
 }
 
 /**
@@ -374,8 +388,33 @@ function switchInput(newInputMode) {
  *                                  {light, medium, heavy}
  */
 function switchRobotType(newRobotType) {
-    $("#" + robotType + "-btn").button('toggle');
-    robotType = newRobotType;
+    if (robotType !== newRobotType) {
+        $("#" + robotType + "-btn").button('toggle');
+        $("#" + newRobotType + "-btn").button('toggle');
+        if (darkToggle) {
+            document.getElementById(robotType + "-btn").style.backgroundColor = "#757575"; // old one to light gray
+            document.getElementById(newRobotType + "-btn").style.backgroundColor = "#404040"; // new one to dark gray
+        }
+        robotType = newRobotType;
+    }
+}
+
+/**
+ * Set the number of subworker threads used in the simulator.
+ * @param {Number} newNumThreads - the new desired number of threads, currently 0 to 8
+ */
+function setNumThreads(newNumThreads) {
+    localStorage.setItem("numThreads", newNumThreads);
+    numThreads = newNumThreads;
+    // Terminate existing worker+subworkers and create new ones (with new number of subworkers)
+    log("Number of Robot.run() threads set to: " + newNumThreads);
+    stop();
+}
+let storedNumThreads = localStorage.getItem("numThreads");
+if (storedNumThreads !== null) {
+    // Manually set thread num dropdown to value saved in local storage
+    $("#threadDropdownButton").html(storedNumThreads + ' <span class="caret"></span>');
+    setNumThreads(storedNumThreads);
 }
 
 /**
@@ -592,30 +631,42 @@ function start(auto=false) {
                 log(err.toString());
             }
 
-            //  Collect the robot start position and direction
+            // Collect info needed to start simulation
+            let messageMode;
+            // Collect the robot start position and direction
             let robotInfo = {
                 robotType: robotType,
                 xpos: xpos,
                 ypos: ypos,
                 dir: direction
             }
-
             // Start the simulation
             if (auto === false) { //TODO: do if (auto) instead
-                $("#teleop-btn").removeClass("btn-outline-primary").addClass("btn-primary")
-                worker.postMessage({start:true, mode:"teleop", robotInfo:robotInfo})
+                $("#teleop-btn").removeClass("btn-outline-primary").addClass("btn-primary");
+                if (darkToggle) {
+                  document.getElementById("teleop-btn").style.backgroundColor = "#404040";
+                }
+                messageMode = "teleop";
             } else if (auto === true) {
-                $("#autonomous-btn").removeClass("btn-outline-primary").addClass("btn-primary")
-                worker.postMessage({start:true, mode:"auto", robotInfo:robotInfo})
+                $("#autonomous-btn").removeClass("btn-outline-primary").addClass("btn-primary");
+                if (darkToggle) {
+                    document.getElementById("autonomous-btn").style.backgroundColor = "#404040";
+                }
+                messageMode = "auto";
             }
+            worker.postMessage({
+                start:true,
+                mode:messageMode,
+                robotInfo:robotInfo
+            })
             document.getElementById("stop-btn").disabled = false;
             document.getElementById("teleop-btn").disabled = true;
             document.getElementById("autonomous-btn").disabled = true;
         } else {
             if (auto === false) {
-                $("#teleop-btn").button('toggle')
+                $("#teleop-btn").button('toggle');
             } else if (auto === true) {
-                $("#autonomous-btn").button('toggle')
+                $("#autonomous-btn").button('toggle');
             }
             log("Please upload code first");
         }
@@ -656,7 +707,8 @@ function stop() {
     worker = new Worker("static/js/worker/robot.js?t=" + cacheKey);
     worker.onmessage = onmessage;
     worker.postMessage({cacheKey: cacheKey});
-    worker.postMessage({code:code});
+    worker.postMessage({code: code});
+    worker.postMessage({numThreads: numThreads});
     mode = "idle";
     clearInterval(timer);
     resetSimButtons()
@@ -669,6 +721,10 @@ function resetSimButtons() {
     document.getElementById("stop-btn").disabled = true;
     document.getElementById("teleop-btn").disabled = false;
     document.getElementById("autonomous-btn").disabled = false;
+    if (darkToggle) {
+        document.getElementById("autonomous-btn").style.backgroundColor = "#757575";
+        document.getElementById("teleop-btn").style.backgroundColor = "#757575";
+    }
     if (document.getElementById("teleop-btn").classList.contains("btn-primary")) {
         $("#teleop-btn").removeClass("btn-primary").addClass("btn-outline-primary")
     }
@@ -689,6 +745,13 @@ function clearConsole(){
  * @param {String} text - the message to be displayed
  */
 function log(text) {
+    // Just return if not convertible to string
+    try {
+        text = String(text);
+    } catch (err) {
+        return
+    }
+
     // TODO: Filter out unwanted messages in a smarter way
     const array = ['pyodide.py', '<eval>', 'pyodide/_base.py', 'eval(compile(', 'File "<exec>", line 4, in'];
     for (string of array){
