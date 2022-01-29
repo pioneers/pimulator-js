@@ -277,18 +277,23 @@ function drawObjs(objs, type) {
         ctx.strokeStyle = objs[i].color;
         ctx.beginPath();
         ctx.moveTo(objs[i].topL[0], objs[i].topL[1]);
-        ctx.lineTo(objs[i].topR[0], objs[i].topR[0]);
+        ctx.lineTo(objs[i].topR[0], objs[i].topR[1]);
 
-        ctx.moveTo(objs[i].topL[0], objs[i].topL[1] + scaleFactor * (objs[i].w / 3.0));
-        ctx.lineTo(objs[i].topR[0], objs[i].topL[1] + scaleFactor * (objs[i].w / 3.0));
+        ctx.moveTo(objs[i].topL[0] + scaleFactor * (objs[i].w / 3.0), objs[i].topL[1]);
+        ctx.lineTo(objs[i].topR[0] + scaleFactor * (objs[i].w / 3.0), objs[i].topL[1]);
 
-        ctx.moveTo(objs[i].topL[0], objs[i].topL[1] + 2 * scaleFactor * (objs[i].w / 3.0));
-        ctx.lineTo(objs[i].topR[0], objs[i].topL[1] + 2 * scaleFactor * (objs[i].w / 3.0));
+        ctx.moveTo(objs[i].topL[0] + 2 * scaleFactor * (objs[i].w / 3.0), objs[i].topL[1]);
+        ctx.lineTo(objs[i].topR[0] + 2 * scaleFactor * (objs[i].w / 3.0), objs[i].topL[1]);
 
         ctx.moveTo(objs[i].botL[0], objs[i].botL[1]);
         ctx.lineTo(objs[i].botR[0], objs[i].botR[0]);
 
         ctx.stroke();
+
+        ctx.beginPath();
+        ctx.rect(objs[i].topL[0] + scaleFacor * 4, objs[i].topL[1], objs[i].width - 8 * scaleFactor, objs[i].height);
+        ctx.fillStyle = objs[i].color;
+        ctx.fill();
     }
 }
 
