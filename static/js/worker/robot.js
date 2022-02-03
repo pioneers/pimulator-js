@@ -1081,6 +1081,7 @@ class Simulator{
         this.current = [];
         this.tapeLines = [];
         this.obstacles = [];
+        this.campsites = [];
         this.interactableObjs = [];
         this.ramps = [];
 
@@ -1106,6 +1107,7 @@ class Simulator{
         this.obstacles = [];
         this.interactableObjs = [];
         this.ramps = [];
+        this.campsites = [];
 
         if (objects.tapeLinesData !== undefined) {
             for (let newLine of objects.tapeLinesData) {
@@ -1144,12 +1146,11 @@ class Simulator{
             for (let campsiteObj of objects.campsitesData) {
                 let newCampsite = new Campsite(campsiteObj.x, campsiteObj.y, campsiteObj.w, campsiteObj.h, campsiteObj.color);
                 this.campsites.push(newCampsite);
-                this.obstacles.push(new Wall(newCampsite.topL[0] + 4 * scaleFactor, newCampsite.topL[1], newCampsite.w - 8 * scalefactor, newCampsite.h, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1], newCampsite.w, 2, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + scaleFactor * (objs[i].w / 3.0), newCampsite.w, 2, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + 2 * scaleFactor * (objs[i].w / 3.0), newCampsite.w, 2, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.botL[0], newCampsite.botL[1], newCampsite.w, 2, newCampsite.color));
-
+                this.obstacles.push(new Wall(newCampsite.topL[0] + 4, newCampsite.topL[1], newCampsite.w - 8, newCampsite.h, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1], newCampsite.w, 1, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + (newCampsite.h / 3.0), newCampsite.w, 1, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + 2 * (newCampsite.h / 3.0), newCampsite.w, 1, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.botL[0], newCampsite.botL[1], newCampsite.w, 1, 0, newCampsite.color));
                 // ctx.moveTo(objs[i].topL[0], objs[i].topL[1]);
                 // ctx.lineTo(objs[i].topR[0], objs[i].topR[0]);
 
@@ -1173,7 +1174,8 @@ class Simulator{
         let objects = {
             ramps: this.ramps,
             tapeLines: this.tapeLines,
-            obstacles: this.obstacles
+            obstacles: this.obstacles,
+            campsites: this.campsites
         }
         postMessage({objs: objects})
 
