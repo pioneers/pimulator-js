@@ -38,8 +38,9 @@ class Wall extends FieldObj {
 }
 
 class InteractableObj extends FieldObj {
-    constructor(x, y, w, h, color = "red") {
+    constructor(x, y, w, h, shape, color="red") {
         super(x, y, w, h, color);
+        this.shape = shape;
         this.attached = false;
         this.direction = 0;
     }
@@ -58,6 +59,13 @@ class InteractableObj extends FieldObj {
 
     setDirection(dir) {
         this.direction = dir;
+    }
+}
+
+class InteractableCircle extends InteractableObj {
+    constructor(x, y, r, color="red") {
+        super(x+r/2, y+r/2, r, r, "circle", color);
+        this.r = r;
     }
 }
 
