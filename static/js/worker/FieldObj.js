@@ -64,7 +64,7 @@ class InteractableObj extends FieldObj {
 
 class InteractableCircle extends InteractableObj {
     constructor(x, y, r, color="red") {
-        super(x+r/2, y+r/2, r, r, "circle", color);
+        super(x, y, 2*r, 2*r, "circle", color);
         this.r = r;
     }
 }

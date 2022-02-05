@@ -158,11 +158,11 @@ function drawRobot(robot) {
     // Draw Circles (Line followers)
     ctx.beginPath();
     ctx.moveTo(frontCenterX, frontCenterY);
-    ctx.arc(frontCenterX, frontCenterY, 2, 0, 2 * Math.PI);
+    ctx.arc(frontCenterX, frontCenterY, 1, 0, 2 * Math.PI);
     ctx.moveTo(frontCenterX, frontCenterY-9);
-    ctx.arc(frontCenterX, frontCenterY-9, 2, 0, 2 * Math.PI);
+    ctx.arc(frontCenterX, frontCenterY-9, 1, 0, 2 * Math.PI);
     ctx.moveTo(frontCenterX, frontCenterY+9);
-    ctx.arc(frontCenterX, frontCenterY+9, 2, 0, 2 * Math.PI);
+    ctx.arc(frontCenterX, frontCenterY+9, 1, 0, 2 * Math.PI);
     ctx.closePath();
     ctx.strokeStyle = 'red';
     ctx.stroke();
@@ -196,13 +196,12 @@ function drawRobot(robot) {
 function drawObjs(objs, type) {
     if (type === "obstacle") {
         for (let i = 0; i < objs.length; i++) {
-            console.log(objs[i]);
             if (objs[i].shape == "circle") {
                 ctx.beginPath();
                 let r = objs[i].r;
-                let centerX = (objs[i].topL[0]+r/2)*scaleFactor;
-                let centerY = (objs[i].topL[1]+r/2)*scaleFactor;
-                ctx.arc(centerX, centerY, r*scaleFactor, 0, 2*Math.PI);
+                let centerX = (objs[i].topL[0]+objs[i].botR[0])/2;
+                let centerY = (objs[i].topL[1]+objs[i].botR[1])/2;
+                ctx.arc(centerX*scaleFactor, centerY*scaleFactor, r*scaleFactor, 0, 2*Math.PI);
                 ctx.fillStyle = objs[i].color;
                 ctx.fill();
             } else {
