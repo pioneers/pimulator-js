@@ -280,27 +280,52 @@ function drawObjs(objs, type) {
             }
         }
     } else if (type === "campsite") {
-        // ctx.lineWidth = 2;
-        // ctx.strokeStyle = objs[i].color;
-        // ctx.beginPath();
-        // ctx.moveTo(objs[i].topL[0], objs[i].topL[1]);
-        // ctx.lineTo(objs[i].topR[0], objs[i].topR[1]);
+        for (let i = 0; i < objs.length; i++) {
+            ctx.lineWidth = 0.5;
 
-        // ctx.moveTo(objs[i].topL[0] + scaleFactor * (objs[i].w / 3.0), objs[i].topL[1]);
-        // ctx.lineTo(objs[i].topR[0] + scaleFactor * (objs[i].w / 3.0), objs[i].topL[1]);
+            ctx.translate(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
+            ctx.rotate((objs[i].spinnerNum * 2.0 * Math.PI)/9.0);
+            ctx.translate(-scaleFactor * objs[i].centerX, -scaleFactor * objs[i].centerY);
 
-        // ctx.moveTo(objs[i].topL[0] + 2 * scaleFactor * (objs[i].w / 3.0), objs[i].topL[1]);
-        // ctx.lineTo(objs[i].topR[0] + 2 * scaleFactor * (objs[i].w / 3.0), objs[i].topL[1]);
+            
+            ctx.strokeStyle = "Blue";
+            ctx.fillStyle = "Blue";
+            ctx.beginPath();
+            ctx.moveTo(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
+            ctx.arc(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY, scaleFactor * 5, (4.0 * Math.PI)/3.0, (2.0 * Math.PI));
+            ctx.lineTo(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
+            ctx.fill();
+            ctx.stroke();
 
-        // ctx.moveTo(objs[i].botL[0], objs[i].botL[1]);
-        // ctx.lineTo(objs[i].botR[0], objs[i].botR[0]);
+            ctx.strokeStyle = "Yellow";
+            ctx.fillStyle = "Yellow";
+            ctx.beginPath();
+            ctx.moveTo(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
+            ctx.arc(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY, scaleFactor * 5, (2.0 * Math.PI), (2.0 * Math.PI)/3.0);
+            ctx.lineTo(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
+            ctx.fill();
+            ctx.stroke();
 
-        // ctx.stroke();
+            ctx.strokeStyle = "DimGray";
+            ctx.fillStyle = "DimGray";
+            ctx.beginPath();
+            ctx.moveTo(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
+            ctx.arc(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY, scaleFactor * 5, (2.0 * Math.PI)/3.0, (4.0 * Math.PI)/3.0);
+            ctx.lineTo(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
+            ctx.fill();
+            ctx.stroke();
 
-        // ctx.beginPath();
-        // ctx.rect(objs[i].topL[0] + scaleFacor * 4, objs[i].topL[1], objs[i].width - 8 * scaleFactor, objs[i].height);
-        // ctx.fillStyle = objs[i].color;
-        // ctx.fill();
+            ctx.translate(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
+            ctx.rotate(-(objs[i].spinnerNum * 2.0 * Math.PI)/9.0);
+            ctx.translate(-scaleFactor * objs[i].centerX, -scaleFactor * objs[i].centerY);
+
+            ctx.strokeStyle = "Black";
+            ctx.fillStyle = "Black";
+            ctx.beginPath();
+            ctx.rect(scaleFactor * (objs[i].centerX - 5.5), scaleFactor * objs[i].centerY, 1, 0.5);
+            ctx.fill();
+            ctx.stroke();
+        }
     }
 }
 

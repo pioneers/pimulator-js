@@ -549,7 +549,8 @@ class RobotClass {
         let objects = {
             tapeLines: this.simulator.tapeLines,
             obstacles: this.simulator.obstacles,
-            ramps: this.simulator.ramps
+            ramps: this.simulator.ramps,
+            campsites: this.simulator.campsites
         }
 
         postMessage({
@@ -639,6 +640,14 @@ class RobotClass {
         return dict;
     }
 
+    spinDish() {
+        let campsite = this.findCampsite();
+        if (campsite) {
+            campsite.spin();
+        }
+    }
+
+
     /**
      * Picks up a nearby object if possible.
      * Not an official Robot API function.
@@ -694,6 +703,33 @@ class RobotClass {
             let inter = this.intersectOne(obstacle, collidableRegion);
             if (inter) {
               return obstacle;
+            }
+        }
+        return null;
+    }
+
+    findCampsite() {
+        if (this.simulator.campsites.length == 0) {
+            return null;
+        }
+
+        const width = 5;
+        const height = 5;
+        const b = (this.width - width) / 2;
+        let collidableRegion = {topR: Array(2), topL: Array(2), botL: Array(2), botR: Array(2)};
+        collidableRegion.botL[0] = this.topL[0] + b * Math.cos((90.0 - this.dir) * Math.PI / 180);
+        collidableRegion.botL[1] = this.topL[1] - b * Math.sin((90.0 - this.dir) * Math.PI / 180);
+        collidableRegion.topL[0] = collidableRegion.botL[0] - height * Math.cos(this.dir * Math.PI / 180);
+        collidableRegion.topL[1] = collidableRegion.botL[1] - height * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.topR[0] = collidableRegion.topL[0] + width * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.topR[1] = collidableRegion.topL[1] - width * Math.cos(this.dir * Math.PI / 180);
+        collidableRegion.botR[0] = collidableRegion.botL[0] + width * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.botR[1] = collidableRegion.botL[1] - width * Math.cos(this.dir * Math.PI / 180);
+
+        for (let campsite of this.simulator.campsites) {
+            let inter = this.intersectOne(campsite, collidableRegion);
+            if (inter) {
+              return campsite;
             }
         }
         return null;
@@ -1151,17 +1187,6 @@ class Simulator{
                 this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + (newCampsite.h / 3.0), newCampsite.w, 1, 0, newCampsite.color));
                 this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + 2 * (newCampsite.h / 3.0), newCampsite.w, 1, 0, newCampsite.color));
                 this.obstacles.push(new Wall(newCampsite.botL[0], newCampsite.botL[1], newCampsite.w, 1, 0, newCampsite.color));
-                // ctx.moveTo(objs[i].topL[0], objs[i].topL[1]);
-                // ctx.lineTo(objs[i].topR[0], objs[i].topR[0]);
-
-                // ctx.moveTo(objs[i].topL[0], objs[i].topL[1] + scaleFactor * (objs[i].w / 3.0));
-                // ctx.lineTo(objs[i].topR[0], objs[i].topL[1] + scaleFactor * (objs[i].w / 3.0));
-
-                // ctx.moveTo(objs[i].topL[0], objs[i].topL[1] + 2 * scaleFactor * (objs[i].w / 3.0));
-                // ctx.lineTo(objs[i].topR[0], objs[i].topL[1] + 2 * scaleFactor * (objs[i].w / 3.0));
-
-                // ctx.moveTo(objs[i].botL[0], objs[i].botL[1]);
-                // ctx.lineTo(objs[i].botR[0], objs[i].botR[0]);
             }
         }
     }
