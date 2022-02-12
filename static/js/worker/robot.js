@@ -1127,7 +1127,8 @@ class Simulator{
 
                 let newInteractableObj;
                 if (shape === "circle") {
-                    newInteractableObj = new InteractableCircle(x, y, interactableObj.r, color);
+                    let r = interactableObj.r;
+                    newInteractableObj = new InteractableCircle(x, y, r, color);
                 } else {
                     newInteractableObj = new InteractableObj(x, y, interactableObj.w, interactableObj.h, "rectangle", color);
                 }
