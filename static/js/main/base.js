@@ -203,15 +203,23 @@ function drawObjs(objs, type) {
                 let centerY = (objs[i].topL[1]+objs[i].botR[1])/2;
                 ctx.arc(centerX*scaleFactor, centerY*scaleFactor, r*scaleFactor, 0, 2*Math.PI);
                 ctx.fillStyle = objs[i].color;
-                ctx.fill();
+                ctx.fill(); // Fill circle
+                ctx.strokeStyle = "black";
+                ctx.lineWidth = 1;
+                ctx.stroke(); // Draw circle border
+
             } else {
                 ctx.beginPath();
                 ctx.moveTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
                 ctx.lineTo(objs[i].topR[0]*scaleFactor, objs[i].topR[1]*scaleFactor);
                 ctx.lineTo(objs[i].botR[0]*scaleFactor, objs[i].botR[1]*scaleFactor);
                 ctx.lineTo(objs[i].botL[0]*scaleFactor, objs[i].botL[1]*scaleFactor);
+                ctx.lineTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
                 ctx.fillStyle = objs[i].color;
-                ctx.fill();
+                ctx.fill(); // Fill rectangle
+                ctx.strokeStyle = "black";
+                ctx.lineWidth = 1;
+                ctx.stroke(); // Draw rectangle border
             }
         }
     } else if (type === "tapeLine") {
