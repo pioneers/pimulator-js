@@ -72,21 +72,13 @@ class Ramp extends FieldObj {
 class Campsite extends FieldObj {
     constructor(x, y, w = 20, h = 9, color = "tan") {
         super(x, y, w, h, color);
-        this.possSpinner = {0: "neutral", 1: "neutral", 2: "neutral", 3: "Gold 3", 4: "Gold 2", 5: "Gold 1", 6: "Blue 1", 7: "Blue 2", 8: "Blue 3"};
-        this.spinnerNum = 0;
+        this.possSpinner = {0: "neutral", 1: "neutral", 2: "neutral", 3: "gold 3", 4: "gold 2", 5: "gold 1", 6: "blue 1", 7: "blue 2", 8: "blue 3"};
+        this.spinnerNum = 1;
         this.centerX = x + (w / 2);
         this.centerY = y + (h / 2);
     }
 
     spin() {
         this.spinnerNum = (this.spinnerNum + 1) % 9;
-    }
-
-    spinnerVal() {
-        return this.possSpinner[this.spinnerNum];
-    }
-
-    spinnerNums() {
-        return this.spinnerNum;
     }
 }

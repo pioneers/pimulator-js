@@ -647,6 +647,13 @@ class RobotClass {
         }
     }
 
+    spinVal() {
+        let campsite = this.findCampsite();
+        if (campsite) {
+            return campsite.possSpinner[campsite.spinnerNum];
+        }
+    }
+
 
     /**
      * Picks up a nearby object if possible.
