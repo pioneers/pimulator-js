@@ -61,7 +61,7 @@ class RobotClass {
     height = 20;                // height or robot, inches
     wheelWidth = 20;            // wheelbase width, inches
     wRadius = 2;                // radius of a wheel, inches
-    MaxX = 144;                 // maximum X value, inches, field is 12'x12'
+    MaxX = 192;                 // maximum X value, inches, field is 12'x12'
     MaxY = 144;                 // maximum Y value, inches, field is 12'x12'
     neg = -1;                   // negate left motor calculation
     startXDefault = 70.0;
