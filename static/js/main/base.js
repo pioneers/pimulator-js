@@ -201,6 +201,7 @@ function drawObjs(objs, type) {
             ctx.lineTo(objs[i].topR[0]*scaleFactor, objs[i].topR[1]*scaleFactor);
             ctx.lineTo(objs[i].botR[0]*scaleFactor, objs[i].botR[1]*scaleFactor);
             ctx.lineTo(objs[i].botL[0]*scaleFactor, objs[i].botL[1]*scaleFactor);
+            ctx.lineTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
             ctx.fillStyle = objs[i].color;
             ctx.fill();
         }
@@ -325,6 +326,39 @@ function drawObjs(objs, type) {
             ctx.rect(scaleFactor * (objs[i].centerX - 5.5), scaleFactor * objs[i].centerY, 1, 0.5);
             ctx.fill();
             ctx.stroke();
+        }
+    } else if (type === "receiver") {
+        ctx.lineWidth = 2;
+        for (let i = 0; i < objs.length; i++) {
+            //draw platform
+            ctx.beginPath();
+            ctx.moveTo(objs[i].pTopL[0]*scaleFactor, objs[i].pTopL[1]*scaleFactor);
+            ctx.lineTo(objs[i].pTopR[0]*scaleFactor, objs[i].pTopR[1]*scaleFactor);
+            ctx.lineTo(objs[i].pBotR[0]*scaleFactor, objs[i].pBotR[1]*scaleFactor);
+            ctx.lineTo(objs[i].pBotL[0]*scaleFactor, objs[i].pBotL[1]*scaleFactor);
+            ctx.lineTo(objs[i].pTopL[0]*scaleFactor, objs[i].pTopL[1]*scaleFactor);
+            ctx.fillStyle = "black";
+            ctx.fill();
+
+            //draw box
+            ctx.beginPath();
+            ctx.moveTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
+            ctx.lineTo(objs[i].topR[0]*scaleFactor, objs[i].topR[1]*scaleFactor);
+            ctx.lineTo(objs[i].botR[0]*scaleFactor, objs[i].botR[1]*scaleFactor);
+            ctx.lineTo(objs[i].botL[0]*scaleFactor, objs[i].botL[1]*scaleFactor);
+            ctx.lineTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
+            ctx.fillStyle = objs[i].color;
+            ctx.fill();
+
+            //draw button part
+            ctx.beginPath();
+            ctx.moveTo(objs[i].bTopL[0]*scaleFactor, objs[i].bTopL[1]*scaleFactor);
+            ctx.lineTo(objs[i].bTopR[0]*scaleFactor, objs[i].bTopR[1]*scaleFactor);
+            ctx.lineTo(objs[i].bBotR[0]*scaleFactor, objs[i].bBotR[1]*scaleFactor);
+            ctx.lineTo(objs[i].bBotL[0]*scaleFactor, objs[i].bBotL[1]*scaleFactor);
+            ctx.lineTo(objs[i].bTopL[0]*scaleFactor, objs[i].bTopL[1]*scaleFactor);
+            ctx.fillStyle = objs[i].buttonColor;
+            ctx.fill();
         }
     }
 }

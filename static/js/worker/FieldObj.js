@@ -90,3 +90,143 @@ class Campsite extends FieldObj {
         return this.spinnerNum;
     }
 }
+
+class Button extends FieldObj {
+    //button coordinates
+    bTopL = Array(2);
+    bTopR = Array(2);
+    bBotL = Array(2);
+    bBotR = Array(2);
+
+    constructor(x, y, w, h, color, buttonColor, buttonLocation = "left") {
+        super(x, y, w, h, color);
+        this.numTimesPressed = 0;
+        this.buttonColor = buttonColor;
+        this.buttonLocation = buttonLocation; // must be in {"left", "right", "top", "bottom"} relative to normal x-y coordinates
+
+        if (this.buttonLocation === "left") {
+            this.bTopR[0] = this.topL[0]
+            this.bTopR[1] = (3*this.topL[1]+this.botL[1])/4
+
+            this.bBotR[0] = this.botL[0]
+            this.bBotR[1] = (this.topL[1]+3*this.botL[1])/4
+
+            this.bBotL[0] = this.botL[0]-1
+            this.bBotL[1] = (this.topL[1]+3*this.botL[1])/4
+
+            this.bTopL[0] = this.topL[0]-1
+            this.bTopL[1] = (3*this.topL[1]+this.botL[1])/4
+        } else if (this.buttonLocation === "right") {
+            this.bTopL[0] = this.topR[0]
+            this.bTopL[1] = (3*this.topR[1]+this.botR[1])/4
+
+            this.bBotL[0] = this.botR[0]
+            this.bBotL[1] = (this.topR[1]+3*this.botR[1])/4
+
+            this.bBotR[0] = this.botR[0]+1
+            this.bBotR[1] = (this.topR[1]+3*this.botR[1])/4
+
+            this.bTopR[0] = this.topR[0]+1
+            this.bTopR[1] = (3*this.topR[1]+this.botR[1])/4
+        } else if (this.buttonLocation === "top") {
+            this.bBotL[0] = (3*this.topL[0]+this.topR[0])/4
+            this.bBotL[1] = this.topL[1]
+
+            this.bBotR[0] = (this.topL[0]+3*this.topR[0])/4
+            this.bBotR[1] = this.topR[1]
+
+            this.bTopR[0] = (this.topL[0]+3*this.topR[0])/4
+            this.bTopR[1] = this.topR[1]-1
+
+            this.bTopL[0] = (3*this.topL[0]+this.topR[0])/4
+            this.bTopL[1] = this.topL[1]-1
+        } else { // down
+            this.bTopL[0] = (3*this.botL[0]+this.botR[0])/4
+            this.bTopL[1] = this.botL[1]
+
+            this.bTopR[0] = (this.botL[0]+3*this.botR[0])/4
+            this.bTopR[1] = this.botR[1]
+
+            this.bBotR[0] = (this.botL[0]+3*this.botR[0])/4
+            this.bBotR[1] = this.botR[1]+1
+
+            this.bBotL[0] = (3*this.botL[0]+this.botR[0])/4
+            this.bBotL[1] = this.botL[1]-1
+        }
+    }
+
+    press() {
+        this.numTimesPressed += 1;
+    }
+
+    getCount() {
+        return this.numTimesPressed;
+    }
+}
+
+class Receiver extends Button {
+    //platform coordinates
+    pTopL = Array(2);
+    pTopR = Array(2);
+    pBotL = Array(2);
+    pBotR = Array(2);
+
+    constructor(x, y, w = 4, h = 4, color = "gray", buttonColor = "green", buttonLocation, limit = 1) {
+        super(x, y, w, h, color, buttonColor, buttonLocation);
+        this.limit = limit;
+
+        if (this.buttonLocation === "left") {
+            this.pTopL[0] = this.botL[0] - this.w
+            this.pTopL[1] = this.botL[1]
+
+            this.pTopR[0] = this.botR[0]
+            this.pTopR[1] = this.botR[1]
+
+            this.pBotR[0] = this.botR[0]
+            this.pBotR[1] = this.botR[1] + 2*this.h
+
+            this.pBotL[0] = this.botL[0] - this.w
+            this.pBotL[1] = this.botL[1] + 2*this.h
+        } else if (this.buttonLocation === "right") {
+            this.pBotL[0] = this.topL[0]
+            this.pBotL[1] = this.topL[1]
+
+            this.pBotR[0] = this.topR[0] + this.w
+            this.pBotR[1] = this.topR[1]
+
+            this.pTopR[0] = this.topR[0] + this.w
+            this.pTopR[1] = this.topR[1] - 2*this.h
+
+            this.pTopL[0] = this.topL[0]
+            this.pTopL[1] = this.topL[1] + 2*this.h
+        } else if (this.buttonLocation === "top") {
+            this.pTopR[0] = this.topL[0]
+            this.pTopR[1] = this.topL[1] - this.h
+
+            this.pBotR[0] = this.botL[0]
+            this.pBotR[1] = this.botL[1]
+
+            this.pBotL[0] = this.botL[0] - 2*this.w
+            this.pBotL[1] = this.botL[1]
+
+            this.pTopL[0] = this.topL[0] - 2*this.w
+            this.pTopL[1] = this.topL[1] - this.h
+        } else { // down
+            this.pTopL[0] = this.topR[0]
+            this.pTopL[1] = this.topR[1]
+
+            this.pBotL[0] = this.botR[0]
+            this.pBotL[1] = this.botR[1] + this.h
+
+            this.pBotR[0] = this.botR[0] + 2*this.w
+            this.pBotR[1] = this.botR[1] + this.h
+
+            this.pTopR[0] = this.topR[0] + 2*this.w
+            this.pTopR[1] = this.topR[1]
+        }
+    }
+
+    canDeployPioneer() {
+        return this.getCount() < this.limit;
+    }
+}
