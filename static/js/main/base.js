@@ -158,11 +158,11 @@ function drawRobot(robot) {
     // Draw Circles (Line followers)
     ctx.beginPath();
     ctx.moveTo(frontCenterX, frontCenterY);
-    ctx.arc(frontCenterX, frontCenterY, 2, 0, 2 * Math.PI);
+    ctx.arc(frontCenterX, frontCenterY, 1, 0, 2 * Math.PI);
     ctx.moveTo(frontCenterX, frontCenterY-9);
-    ctx.arc(frontCenterX, frontCenterY-9, 2, 0, 2 * Math.PI);
+    ctx.arc(frontCenterX, frontCenterY-9, 1, 0, 2 * Math.PI);
     ctx.moveTo(frontCenterX, frontCenterY+9);
-    ctx.arc(frontCenterX, frontCenterY+9, 2, 0, 2 * Math.PI);
+    ctx.arc(frontCenterX, frontCenterY+9, 1, 0, 2 * Math.PI);
     ctx.closePath();
     ctx.strokeStyle = 'red';
     ctx.stroke();
@@ -196,13 +196,31 @@ function drawRobot(robot) {
 function drawObjs(objs, type) {
     if (type === "obstacle") {
         for (let i = 0; i < objs.length; i++) {
-            ctx.beginPath();
-            ctx.moveTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
-            ctx.lineTo(objs[i].topR[0]*scaleFactor, objs[i].topR[1]*scaleFactor);
-            ctx.lineTo(objs[i].botR[0]*scaleFactor, objs[i].botR[1]*scaleFactor);
-            ctx.lineTo(objs[i].botL[0]*scaleFactor, objs[i].botL[1]*scaleFactor);
-            ctx.fillStyle = objs[i].color;
-            ctx.fill();
+            if (objs[i].shape == "circle") {
+                ctx.beginPath();
+                let r = objs[i].r;
+                let centerX = (objs[i].topL[0]+objs[i].botR[0])/2;
+                let centerY = (objs[i].topL[1]+objs[i].botR[1])/2;
+                ctx.arc(centerX*scaleFactor, centerY*scaleFactor, r*scaleFactor, 0, 2*Math.PI);
+                ctx.fillStyle = objs[i].color;
+                ctx.fill(); // Fill circle
+                ctx.strokeStyle = "black";
+                ctx.lineWidth = 1;
+                ctx.stroke(); // Draw circle border
+
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
+                ctx.lineTo(objs[i].topR[0]*scaleFactor, objs[i].topR[1]*scaleFactor);
+                ctx.lineTo(objs[i].botR[0]*scaleFactor, objs[i].botR[1]*scaleFactor);
+                ctx.lineTo(objs[i].botL[0]*scaleFactor, objs[i].botL[1]*scaleFactor);
+                ctx.lineTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
+                ctx.fillStyle = objs[i].color;
+                ctx.fill(); // Fill rectangle
+                ctx.strokeStyle = "black";
+                ctx.lineWidth = 1;
+                ctx.stroke(); // Draw rectangle border
+            }
         }
     } else if (type === "tapeLine") {
         ctx.lineWidth = 5;
