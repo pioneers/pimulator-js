@@ -23,10 +23,10 @@ class FieldObj {
 }
 
 class Wall extends FieldObj {
-    constructor(x, y, w, h, rotate = 0, color = "black") {
+    constructor(x, y, w, h, rotate=0, color="black") {
         super(x, y, w, h, color)
-        rotate = 360-rotate
-        rotate = rotate * Math.PI/180
+        rotate = 360-rotate;
+        rotate = rotate * Math.PI/180;
         this.topR[0] = x + w*Math.cos(rotate);
         this.topR[1] = y + w*Math.sin(rotate);
         this.botL[0] = x + -h*Math.sin(rotate);
@@ -84,5 +84,19 @@ class Ramp extends FieldObj {
         super(x, y, w, h, color);
         this.highSide = highSide;
         this.incline = incline;
+    }
+}
+
+class Campsite extends FieldObj {
+    constructor(x, y, w = 20, h = 9, color = "tan") {
+        super(x, y, w, h, color);
+        this.possSpinner = {0: "neutral", 1: "neutral", 2: "neutral", 3: "gold 3", 4: "gold 2", 5: "gold 1", 6: "blue 1", 7: "blue 2", 8: "blue 3"};
+        this.spinnerNum = 1;
+        this.centerX = x + (w / 2);
+        this.centerY = y + (h / 2);
+    }
+
+    spin() {
+        this.spinnerNum = (this.spinnerNum + 1) % 9;
     }
 }
