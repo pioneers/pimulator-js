@@ -171,7 +171,7 @@ class Receiver extends Button {
     pBotL = Array(2);
     pBotR = Array(2);
 
-    constructor(x, y, w = 4, h = 4, color = "gray", buttonColor = "green", buttonLocation, limit = 1) {
+    constructor(x, y, w = 4, h = 4, color = "gray", buttonColor = "green", buttonLocation = "left", limit = 1) {
         super(x, y, w, h, color, buttonColor, buttonLocation);
         this.limit = limit;
 
