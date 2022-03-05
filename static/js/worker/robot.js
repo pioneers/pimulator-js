@@ -158,7 +158,7 @@ class RobotClass {
             for (let r = 0; r < cornersX.length; r++) {
                 if (cornersX[r] < this.simulator.ramps[i].topR[0] && cornersX[r] > this.simulator.ramps[i].topL[0]) {
                     if (cornersY[r] > this.simulator.ramps[i].topL[1] && cornersY[r] < this.simulator.ramps[i].botL[1]) {
-                        return this.simulator.ramps[i]
+                        return this.simulator.ramps[i];
                     }
                 }
             }
@@ -550,7 +550,7 @@ class RobotClass {
             tapeLines: this.simulator.tapeLines,
             obstacles: this.simulator.obstacles,
             ramps: this.simulator.ramps,
-            refineries: this.simulator.refineries
+            refineries: this.simulator.refineries,
             campsites: this.simulator.campsites
         }
 
@@ -718,8 +718,6 @@ class RobotClass {
 
     findRefinery() {
         if (this.simulator.refineries.length == 0) {
-    findCampsite() {
-        if (this.simulator.campsites.length == 0) {
             return null;
         }
 
@@ -752,6 +750,29 @@ class RobotClass {
 
             if (inter) {
               return obstacle;
+            }
+        }
+        return null;
+    }
+
+    findCampsite() {
+        if (this.simulator.campsites.length == 0) {
+            return null;
+        }
+
+        const width = 5;
+        const height = 5;
+        const b = (this.width - width) / 2;
+        let collidableRegion = {topR: Array(2), topL: Array(2), botL: Array(2), botR: Array(2)};
+        collidableRegion.botL[0] = this.topL[0] + b * Math.cos((90.0 - this.dir) * Math.PI / 180);
+        collidableRegion.botL[1] = this.topL[1] - b * Math.sin((90.0 - this.dir) * Math.PI / 180);
+        collidableRegion.topL[0] = collidableRegion.botL[0] - height * Math.cos(this.dir * Math.PI / 180);
+        collidableRegion.topL[1] = collidableRegion.botL[1] - height * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.topR[0] = collidableRegion.topL[0] + width * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.topR[1] = collidableRegion.topL[1] - width * Math.cos(this.dir * Math.PI / 180);
+        collidableRegion.botR[0] = collidableRegion.botL[0] + width * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.botR[1] = collidableRegion.botL[1] - width * Math.cos(this.dir * Math.PI / 180);
+
         for (let campsite of this.simulator.campsites) {
             let inter = this.intersectOne(campsite, collidableRegion);
             if (inter) {
@@ -804,47 +825,6 @@ class RobotClass {
             return refinery.numOre();
         }
         return null;
-    }
-
-    /**
-     * Sets a value on a device.
-     * A Runtime API method.
-     * @param {String} device - the device ID
-     * @param {String} param - the parameter on the device
-     * @param {Float} value - the value to set, bounded by [-1, 1]
-     */
-    set_value(device, param, value) {
-        if (typeof(param) !== "string") {
-            console.log("ERROR: get_value() parameter must be a string")
-            return
-        }
-        if (param.includes("velocity") && value > 1.0 || value < -1.0){
-            console.log("ERROR: Speed cannot be greater than 1.0 or less than -1.0.");
-            return
-        }
-        if (param.includes("invert") && typeof(value) !== "boolean") {
-            console.log('ERROR: "invert" functions take in a boolean value')
-            return
-        }
-        if (device === "koala_bear") {
-            if (param === "velocity_b") {
-                this.requestedLv = value;
-            } else if (param === "velocity_a") {
-                this.requestedRv = value;
-            } else if (param === "invert_b") {
-                this.invertL = value;
-            } else if (param === "invert_a") {
-                this.invertR = value;
-            } else if (param === "duty_cycle") {
-                console.log('ERROR: Param name: "duty_cycle" no longer supported. See Robot API.');
-            } else {
-                console.log('ERROR: Param name: "' + param + '" invalid or not supported');
-            }
-        } else if (device === "left_motor" || device === "right_motor") {
-            console.log('ERROR: "' + device + '" no longer supported. See Robot API.');
-        } else {
-            console.log("ERROR: Cannot find device name: " + device);
-        }
     }
 
     /**
@@ -1270,6 +1250,9 @@ class Simulator{
                 // BASE.JS: draw stuff to mark highSide
                 // debug findRefinery
                 // write function for dropping off stone/ore, have stone pop out other end?
+            }
+        }
+        
         if (objects.campsitesData !== undefined) {
             for (let campsiteObj of objects.campsitesData) {
                 let newCampsite = new Campsite(campsiteObj.x, campsiteObj.y, campsiteObj.w, campsiteObj.h, campsiteObj.color);
@@ -1305,7 +1288,7 @@ class Simulator{
     /**
      * Loads the student code for the current Simulator
      */
-    loadStudentCode(){
+     loadStudentCode(){
         // Store the local environment into dictionary
         // Ensure the global Robot reflects the same robot Simulator is using
         env['Robot'] = this.robot;
