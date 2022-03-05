@@ -1120,7 +1120,18 @@ class Simulator{
         }
         if (objects.interactableData !== undefined) {
             for (let interactableObj of objects.interactableData) {
-                let newInteractableObj = new InteractableObj(interactableObj.x, interactableObj.y, interactableObj.w, interactableObj.h, interactableObj.color);
+                let x = interactableObj.x;
+                let y = interactableObj.y;
+                let shape = interactableObj.shape;
+                let color = interactableObj.color;
+
+                let newInteractableObj;
+                if (shape === "circle") {
+                    let r = interactableObj.r;
+                    newInteractableObj = new InteractableCircle(x, y, r, color);
+                } else {
+                    newInteractableObj = new InteractableObj(x, y, interactableObj.w, interactableObj.h, "rectangle", color);
+                }
                 this.interactableObjs.push(newInteractableObj);
                 this.obstacles.push(newInteractableObj);
             }
