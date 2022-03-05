@@ -530,7 +530,7 @@ function setRobotStartingPosition(objects) {
     if (objects.startPosition.x !== undefined && objects.startPosition.y !== undefined) {
         xpos = objects.startPosition.x;
         ypos = objects.startPosition.y;
-        if (xpos < 0 || 144 < xpos || ypos < 0 || 144 < ypos) {
+        if (xpos < 0 || 192 < xpos || ypos < 0 || 144 < ypos) {
             log("(" + xpos + ", " + ypos + ") are not valid starting coordinates");
         }
     } else {
