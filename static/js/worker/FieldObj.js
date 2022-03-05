@@ -38,8 +38,9 @@ class Wall extends FieldObj {
 }
 
 class InteractableObj extends FieldObj {
-    constructor(x, y, w, h, color = "red") {
+    constructor(x, y, w, h, shape, color="red") {
         super(x, y, w, h, color);
+        this.shape = shape;
         this.attached = false;
         this.direction = 0;
     }
@@ -58,6 +59,23 @@ class InteractableObj extends FieldObj {
 
     setDirection(dir) {
         this.direction = dir;
+    }
+}
+
+class InteractableCircle extends InteractableObj {
+    /**
+     * Defines a circular object that can be picked up.
+     * @param x - x coordinate of center of circle
+     * @param y - y coordinate of center of circle
+     * @param r - radius of circle
+     * @param color - color of circle
+     * @returns value returned by RobotClass.get_value()
+     */
+    constructor(x, y, r, color="red") {
+        // Subtract from x and y, so we can use logic for rectangle
+        // but define circle using x and y as center
+        super(x-r, y-r, 2*r, 2*r, "circle", color);
+        this.r = r;
     }
 }
 
