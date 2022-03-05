@@ -549,7 +549,8 @@ class RobotClass {
         let objects = {
             tapeLines: this.simulator.tapeLines,
             obstacles: this.simulator.obstacles,
-            ramps: this.simulator.ramps
+            ramps: this.simulator.ramps,
+            refineries: this.simulator.refineries
         }
 
         postMessage({
@@ -695,6 +696,92 @@ class RobotClass {
             if (inter) {
               return obstacle;
             }
+        }
+        return null;
+    }
+
+    findRefinery() {
+        if (this.simulator.refineries.length == 0) {
+            return null;
+        }
+
+        const width = 5;
+        const height = 5;
+        const b = (this.width - width) / 2;
+        let collidableRegion = {topR: Array(2), topL: Array(2), botL: Array(2), botR: Array(2)};
+        collidableRegion.botL[0] = this.topL[0] + b * Math.cos((90.0 - this.dir) * Math.PI / 180);
+        collidableRegion.botL[1] = this.topL[1] - b * Math.sin((90.0 - this.dir) * Math.PI / 180);
+        collidableRegion.topL[0] = collidableRegion.botL[0] - height * Math.cos(this.dir * Math.PI / 180);
+        collidableRegion.topL[1] = collidableRegion.botL[1] - height * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.topR[0] = collidableRegion.topL[0] + width * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.topR[1] = collidableRegion.topL[1] - width * Math.cos(this.dir * Math.PI / 180);
+        collidableRegion.botR[0] = collidableRegion.botL[0] + width * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.botR[1] = collidableRegion.botL[1] - width * Math.cos(this.dir * Math.PI / 180);
+
+        for (let obstacle of this.simulator.refineries) {
+            let obstacle_top = obstacle;
+            if (obstacle.highSide === "left") {
+                obstacle_top = new Wall(obstacle.topL[0], obstacle.topL[1], 5, obstacle.h, obstacle.color);
+            } else if (obstacle.highSide === "right") {
+                obstacle_top = new Wall(obstacle.topR[0] - 5, obstacle.topR[1], 5, obstacle.h, obstacle.color);
+            } else if (obstacle.highSide === "up") {
+                obstacle_top = new Wall(obstacle.topL[0], obstacle.topL[1], obstacle.w, 5, obstacle.color);
+            } else if (obstacle.highSide === "down") {
+                obstacle_top = new Wall(obstacle.botL[0], obstacle.botL[1] - 5, obstacle.w, 5, obstacle.color);
+            }
+
+            let inter = this.intersectOne(obstacle_top, collidableRegion);
+
+            if (inter) {
+              return obstacle;
+            }
+        }
+        return null;
+    }
+
+    refine() {
+        let refinery = this.findRefinery();
+        if (this.attachedObj && refinery) {
+            if (this.attachedObj.r == 1.5) { // is an ore
+                let index = this.simulator.interactableObjs.indexOf(this.attachedObj);
+                if (index > -1) { 
+                    this.simulator.interactableObjs.splice(index, 1);
+                }
+                index = this.simulator.obstacles.indexOf(this.attachedObj);
+                if (index > -1) { 
+                    this.simulator.obstacles.splice(index, 1);
+                }
+                refinery.addOre();
+                this.attachedObj.release();
+                this.attachedObj = null;
+                // have the obj disappear and be added to the refinery
+            } else if (this.attachedObj.r == 2.2) { // is a stone
+                // have the stone appear on the opposite side of the refinery
+                if (refinery.highSide === "left") {
+                    console.log("oi");
+                    console.log(this.attachedObj.x)
+                    this.attachedObj.x = 2.5 + refinery.topR[0];
+                    this.attachedObj.y = (refinery.topR[1] + refinery.botR[1]) / 2.0;
+                } else if (refinery.highSide === "right") {
+                    this.attachedObj.x = refinery.topL[0] - 2.5;
+                    this.attachedObj.y = (refinery.topL[1] + refinery.botL[1]) / 2.0;
+                } else if (refinery.highSide === "up") {
+                    this.attachedObj.x = (refinery.topL[0] + refinery.botL[0]) / 2.0;
+                    this.attachedObj.y = refinery.botL[1] + 2.5;
+                } else if (refinery.highSide === "down") {
+                    this.attachedObj.x = (refinery.topL[0] + refinery.topR[0]) / 2.0;
+                    this.attachedObj.y = refinery.topL[1] - 2.5;
+                }
+                this.attachedObj.release();
+                this.attachedObj = null;
+            }
+        }
+    }
+
+    num_ore() {
+        let refinery = this.findRefinery();
+        if (refinery) {
+            return refinery.numOre();
         }
         return null;
     }
@@ -1083,6 +1170,7 @@ class Simulator{
         this.obstacles = [];
         this.interactableObjs = [];
         this.ramps = [];
+        this.refineries = [];
 
         // Subworker pool
         this.numThreads = 1;
@@ -1106,6 +1194,7 @@ class Simulator{
         this.obstacles = [];
         this.interactableObjs = [];
         this.ramps = [];
+        this.refineries = [];
 
         if (objects.tapeLinesData !== undefined) {
             for (let newLine of objects.tapeLinesData) {
@@ -1150,6 +1239,17 @@ class Simulator{
                 }
             }
         }
+
+        if (objects.refineriesData !== undefined) {
+            for (let refinery of objects.refineriesData) {
+                let newRefinery = new Refinery(refinery.x, refinery.y, refinery.w, refinery.h, refinery.highSide, refinery.color);
+                this.refineries.push(newRefinery);
+                this.obstacles.push(new Wall(newRefinery.x, newRefinery.y, newRefinery.w, newRefinery.h, 0, newRefinery.color));
+                // BASE.JS: draw stuff to mark highSide
+                // debug findRefinery
+                // write function for dropping off stone/ore, have stone pop out other end?
+            }
+        }
     }
 
     /**
@@ -1160,7 +1260,8 @@ class Simulator{
         let objects = {
             ramps: this.ramps,
             tapeLines: this.tapeLines,
-            obstacles: this.obstacles
+            obstacles: this.obstacles,
+            refineries: this.refineries
         }
         postMessage({objs: objects})
 

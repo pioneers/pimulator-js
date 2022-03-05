@@ -86,3 +86,19 @@ class Ramp extends FieldObj {
         this.incline = incline;
     }
 }
+
+class Refinery extends FieldObj {
+    constructor(x, y, w = 15, h = 15, highSide = "left", color = "gray") {
+        super(x, y, w, h, color);
+        this.highSide = highSide;
+        this.ore = 0;
+    }
+
+    numOre() {
+        return this.ore;
+    }
+
+    addOre() {
+        this.ore += 1;
+    }
+}
