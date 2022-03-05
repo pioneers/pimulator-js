@@ -758,8 +758,6 @@ class RobotClass {
             } else if (this.attachedObj.r == 2.2) { // is a stone
                 // have the stone appear on the opposite side of the refinery
                 if (refinery.highSide === "left") {
-                    console.log("oi");
-                    console.log(this.attachedObj.x)
                     this.attachedObj.x = 2.5 + refinery.topR[0];
                     this.attachedObj.y = (refinery.topR[1] + refinery.botR[1]) / 2.0;
                 } else if (refinery.highSide === "right") {
