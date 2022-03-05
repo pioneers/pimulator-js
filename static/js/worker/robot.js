@@ -551,6 +551,7 @@ class RobotClass {
             obstacles: this.simulator.obstacles,
             ramps: this.simulator.ramps,
             refineries: this.simulator.refineries
+            campsites: this.simulator.campsites
         }
 
         postMessage({
@@ -640,6 +641,21 @@ class RobotClass {
         return dict;
     }
 
+    spinDish() {
+        let campsite = this.findCampsite();
+        if (campsite) {
+            campsite.spin();
+        }
+    }
+
+    spinVal() {
+        let campsite = this.findCampsite();
+        if (campsite) {
+            return campsite.possSpinner[campsite.spinnerNum];
+        }
+    }
+
+
     /**
      * Picks up a nearby object if possible.
      * Not an official Robot API function.
@@ -702,6 +718,8 @@ class RobotClass {
 
     findRefinery() {
         if (this.simulator.refineries.length == 0) {
+    findCampsite() {
+        if (this.simulator.campsites.length == 0) {
             return null;
         }
 
@@ -734,6 +752,10 @@ class RobotClass {
 
             if (inter) {
               return obstacle;
+        for (let campsite of this.simulator.campsites) {
+            let inter = this.intersectOne(campsite, collidableRegion);
+            if (inter) {
+              return campsite;
             }
         }
         return null;
@@ -1166,6 +1188,7 @@ class Simulator{
         this.current = [];
         this.tapeLines = [];
         this.obstacles = [];
+        this.campsites = [];
         this.interactableObjs = [];
         this.ramps = [];
         this.refineries = [];
@@ -1193,6 +1216,7 @@ class Simulator{
         this.interactableObjs = [];
         this.ramps = [];
         this.refineries = [];
+        this.campsites = [];
 
         if (objects.tapeLinesData !== undefined) {
             for (let newLine of objects.tapeLinesData) {
@@ -1226,7 +1250,7 @@ class Simulator{
 
         if (objects.rampsData !== undefined) {
             for (let rampObj of objects.rampsData) {
-                let newRamp = new Ramp(rampObj.x, rampObj.y, rampObj.w, rampObj. h, rampObj.highSide, rampObj.incline, rampObj.color);
+                let newRamp = new Ramp(rampObj.x, rampObj.y, rampObj.w, rampObj.h, rampObj.highSide, rampObj.incline, rampObj.color);
                 this.ramps.push(newRamp);
                 if (newRamp.highSide == "up" || newRamp.highSide == "down") {
                     this.obstacles.push(new Wall(newRamp.topL[0]-1, newRamp.topL[1], 1, newRamp.h, 0, newRamp.color));
@@ -1246,6 +1270,15 @@ class Simulator{
                 // BASE.JS: draw stuff to mark highSide
                 // debug findRefinery
                 // write function for dropping off stone/ore, have stone pop out other end?
+        if (objects.campsitesData !== undefined) {
+            for (let campsiteObj of objects.campsitesData) {
+                let newCampsite = new Campsite(campsiteObj.x, campsiteObj.y, campsiteObj.w, campsiteObj.h, campsiteObj.color);
+                this.campsites.push(newCampsite);
+                this.obstacles.push(new Wall(newCampsite.topL[0] + 4, newCampsite.topL[1], newCampsite.w - 8, newCampsite.h, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1], newCampsite.w, 1, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + (newCampsite.h / 3.0), newCampsite.w, 1, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + 2 * (newCampsite.h / 3.0), newCampsite.w, 1, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.botL[0], newCampsite.botL[1], newCampsite.w, 1, 0, newCampsite.color));
             }
         }
     }
@@ -1259,7 +1292,8 @@ class Simulator{
             ramps: this.ramps,
             tapeLines: this.tapeLines,
             obstacles: this.obstacles,
-            refineries: this.refineries
+            refineries: this.refineries,
+            campsites: this.campsites
         }
         postMessage({objs: objects})
 

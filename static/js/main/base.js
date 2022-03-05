@@ -1,9 +1,9 @@
 /***********************************************************************
  * The Main Thread.
- *
+ * 
  * Handles webpage updates, such as the Canvas (used for the Simulator)
- * and the Console.
- *
+ * and the Console. 
+ * 
  * Interacts with the Worker Thread, robot.js, to run the Simulator.
  **********************************************************************/
 
@@ -330,6 +330,51 @@ function drawObjs(objs, type) {
                     ctx.stroke();
                 }
             }
+    } else if (type === "campsite") {
+        for (let i = 0; i < objs.length; i++) {
+            ctx.lineWidth = 0.5;
+
+            ctx.translate(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
+            ctx.rotate(((objs[i].spinnerNum-1) * 2.0 * Math.PI)/9.0);
+            ctx.translate(-scaleFactor * objs[i].centerX, -scaleFactor * objs[i].centerY);
+
+            ctx.strokeStyle = "Blue";
+            ctx.fillStyle = "Blue";
+            ctx.beginPath();
+            ctx.moveTo(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
+            ctx.arc(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY, scaleFactor * 5, (4.0 * Math.PI)/3.0, (2.0 * Math.PI));
+            ctx.lineTo(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.strokeStyle = "Yellow";
+            ctx.fillStyle = "Yellow";
+            ctx.beginPath();
+            ctx.moveTo(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
+            ctx.arc(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY, scaleFactor * 5, (2.0 * Math.PI), (2.0 * Math.PI)/3.0);
+            ctx.lineTo(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.strokeStyle = "DimGray";
+            ctx.fillStyle = "DimGray";
+            ctx.beginPath();
+            ctx.moveTo(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
+            ctx.arc(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY, scaleFactor * 5, (2.0 * Math.PI)/3.0, (4.0 * Math.PI)/3.0);
+            ctx.lineTo(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.translate(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
+            ctx.rotate(-((objs[i].spinnerNum-1) * 2.0 * Math.PI)/9.0);
+            ctx.translate(-scaleFactor * objs[i].centerX, -scaleFactor * objs[i].centerY);
+
+            ctx.strokeStyle = "Black";
+            ctx.fillStyle = "Black";
+            ctx.beginPath();
+            ctx.rect(scaleFactor * (objs[i].centerX - 5.5), scaleFactor * objs[i].centerY, 1, 0.5);
+            ctx.fill();
+            ctx.stroke();        
         }
     }
 }
@@ -619,6 +664,7 @@ function update(robot, objects) {
     drawObjs(objects.obstacles, "obstacle");
     drawObjs(objects.ramps, "ramp");
     drawObjs(objects.refineries, "refinery");
+    drawObjs(objects.campsites, "campsite");
 
     drawRobot(robot);
 }
