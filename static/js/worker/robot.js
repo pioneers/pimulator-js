@@ -801,22 +801,39 @@ class RobotClass {
             } else if (this.attachedObj.r == 2.2) { // is a stone
                 // have the stone appear on the opposite side of the refinery
                 if (refinery.highSide === "left") {
-                    this.attachedObj.x = 2.5 + refinery.topR[0];
-                    this.attachedObj.y = (refinery.topR[1] + refinery.botR[1]) / 2.0;
+                    this.updateStone(this.attachedObj, 2.5 + refinery.topR[0], (refinery.topR[1] + refinery.botR[1]) / 2.0);
+                    // this.attachedObj.x = 2.5 + refinery.topR[0];
+                    // this.attachedObj.y = (refinery.topR[1] + refinery.botR[1]) / 2.0;
                 } else if (refinery.highSide === "right") {
-                    this.attachedObj.x = refinery.topL[0] - 2.5;
-                    this.attachedObj.y = (refinery.topL[1] + refinery.botL[1]) / 2.0;
+                    this.updateStone(this.attachedObj, refinery.topL[0] - 2.5, (refinery.topL[1] + refinery.botL[1]) / 2.0);
+                    // this.attachedObj.x = refinery.topL[0] - 2.5;
+                    // this.attachedObj.y = (refinery.topL[1] + refinery.botL[1]) / 2.0;
                 } else if (refinery.highSide === "up") {
-                    this.attachedObj.x = (refinery.topL[0] + refinery.botL[0]) / 2.0;
-                    this.attachedObj.y = refinery.botL[1] + 2.5;
+                    this.updateStone(this.attachedObj, (refinery.topL[0] + refinery.botL[0]) / 2.0, refinery.botL[1] + 2.5);
+                    // this.attachedObj.x = (refinery.topL[0] + refinery.botL[0]) / 2.0;
+                    // this.attachedObj.y = refinery.botL[1] + 2.5;
                 } else if (refinery.highSide === "down") {
-                    this.attachedObj.x = (refinery.topL[0] + refinery.topR[0]) / 2.0;
-                    this.attachedObj.y = refinery.topL[1] - 2.5;
+                    this.updateStone((refinery.topL[0] + refinery.topR[0]) / 2.0, refinery.topL[1] - 2.5)
+                    // this.attachedObj.x = (refinery.topL[0] + refinery.topR[0]) / 2.0;
+                    // this.attachedObj.y = refinery.topL[1] - 2.5;
                 }
                 this.attachedObj.release();
                 this.attachedObj = null;
             }
         }
+    }
+
+    updateStone(stone, x, y) {
+        stone.x = x;
+        stone.y = y;
+        this.topL[0] = x - r;
+        this.topL[1] = y - r;
+        this.topR[0] = x + r;
+        this.topR[1] = y - r;
+        this.botL[0] = x - r;
+        this.botL[1] = y + r;
+        this.botR[0] = x + r;
+        this.botR[1] = y - r;
     }
 
     num_ore() {
