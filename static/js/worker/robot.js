@@ -9,7 +9,7 @@
 /**
  * Rebinds Console functions for custom logging.
  */
-var console=(function(oldCons){
+ var console=(function(oldCons){
     return {
         log: function(text){
             oldCons.log(text);
@@ -84,6 +84,7 @@ class RobotClass {
         this.requestedRv = 0;     // requested velocity of right wheel, in [-1, 1], uninverted, where 1 corresponds to maxVel
         this.invertL = false;     // whether the left motor is inverted (false=default, true=inverted)
         this.invertR = false;     // whether the right motor is inverted (false=default, true=inverted)
+        this.holding = 0          // 0 for nothing, 1 for iron, 2 for stone
 
         // Set robot attributes based on type
         // Note: width and height values are replicated in base.js.
@@ -512,6 +513,7 @@ class RobotClass {
 
         // If no collision, update robot and attached object positional attributes
         if (!inter) {
+            // If inter a Quarry, do not move it (can be changed in the future) - robot cannot move a quarry
             this.X = X;
             this.Y = Y;
             this.ltheta = ltheta;
@@ -551,7 +553,8 @@ class RobotClass {
             obstacles: this.simulator.obstacles,
             ramps: this.simulator.ramps,
             refineries: this.simulator.refineries,
-            campsites: this.simulator.campsites
+            campsites: this.simulator.campsites,
+            quarries: this.simulator.quarries
         }
 
         postMessage({
@@ -666,11 +669,28 @@ class RobotClass {
         }
         let obstacle = this.findInteractableObj();
         if (obstacle) {
-            // Attach the object
+            /** 
+             * Attach the object - If Quarry or Refinery (Currenly, just the Quarry is implemented) do something else
+             * Quarry is randomized - equal chance of getting stone or iron
+            */
+           if (obstacle.irons !== undefined){
+               let full_list = obstacle.stones.concat(obstacle.irons);
+               let random = Math.floor(Math.random(0,1) * full_list.length); 
+               if (random != 0) {
+                   let curr_obj = full_list.splice(random, 1)[0];
+                   this.attachedObj = curr_obj;
+                   curr_obj.attach();
+                   curr_obj.setDirection(this.dir);
+                   
+               } else {
+                   return;
+               }
+
+           } else {
             this.attachedObj = obstacle;
             obstacle.attach();
             obstacle.setDirection(this.dir);
-
+           }
         }
     }
 
@@ -802,20 +822,12 @@ class RobotClass {
                 // have the stone appear on the opposite side of the refinery
                 if (refinery.highSide === "left") {
                     this.updateStone(this.attachedObj, 2.5 + refinery.topR[0], (refinery.topR[1] + refinery.botR[1]) / 2.0);
-                    // this.attachedObj.x = 2.5 + refinery.topR[0];
-                    // this.attachedObj.y = (refinery.topR[1] + refinery.botR[1]) / 2.0;
                 } else if (refinery.highSide === "right") {
                     this.updateStone(this.attachedObj, refinery.topL[0] - 2.5, (refinery.topL[1] + refinery.botL[1]) / 2.0);
-                    // this.attachedObj.x = refinery.topL[0] - 2.5;
-                    // this.attachedObj.y = (refinery.topL[1] + refinery.botL[1]) / 2.0;
                 } else if (refinery.highSide === "up") {
-                    this.updateStone(this.attachedObj, (refinery.topL[0] + refinery.botL[0]) / 2.0, refinery.botL[1] + 2.5);
-                    // this.attachedObj.x = (refinery.topL[0] + refinery.botL[0]) / 2.0;
-                    // this.attachedObj.y = refinery.botL[1] + 2.5;
+                    this.updateStone(this.attachedObj, (refinery.botL[0] + refinery.botR[0]) / 2.0, refinery.botL[1] + 2.5);
                 } else if (refinery.highSide === "down") {
-                    this.updateStone((refinery.topL[0] + refinery.topR[0]) / 2.0, refinery.topL[1] - 2.5)
-                    // this.attachedObj.x = (refinery.topL[0] + refinery.topR[0]) / 2.0;
-                    // this.attachedObj.y = refinery.topL[1] - 2.5;
+                    this.updateStone(this.attachedObj, (refinery.topL[0] + refinery.topR[0]) / 2.0, refinery.topL[1] - 2.5)
                 }
                 this.attachedObj.release();
                 this.attachedObj = null;
@@ -826,14 +838,14 @@ class RobotClass {
     updateStone(stone, x, y) {
         stone.x = x;
         stone.y = y;
-        this.topL[0] = x - r;
-        this.topL[1] = y - r;
-        this.topR[0] = x + r;
-        this.topR[1] = y - r;
-        this.botL[0] = x - r;
-        this.botL[1] = y + r;
-        this.botR[0] = x + r;
-        this.botR[1] = y - r;
+        stone.topL[0] = x - stone.r;
+        stone.topL[1] = y - stone.r;
+        stone.topR[0] = x + stone.r;
+        stone.topR[1] = y - stone.r;
+        stone.botL[0] = x - stone.r;
+        stone.botL[1] = y + stone.r;
+        stone.botR[0] = x + stone.r;
+        stone.botR[1] = y + stone.r;
     }
 
     num_ore() {
@@ -842,6 +854,47 @@ class RobotClass {
             return refinery.numOre();
         }
         return null;
+    }
+
+    /**
+     * Sets a value on a device.
+     * A Runtime API method.
+     * @param {String} device - the device ID
+     * @param {String} param - the parameter on the device
+     * @param {Float} value - the value to set, bounded by [-1, 1]
+     */
+    set_value(device, param, value) {
+        if (typeof(param) !== "string") {
+            console.log("ERROR: get_value() parameter must be a string")
+            return
+        }
+        if (param.includes("velocity") && value > 1.0 || value < -1.0){
+            console.log("ERROR: Speed cannot be greater than 1.0 or less than -1.0.");
+            return
+        }
+        if (param.includes("invert") && typeof(value) !== "boolean") {
+            console.log('ERROR: "invert" functions take in a boolean value')
+            return
+        }
+        if (device === "koala_bear") {
+            if (param === "velocity_b") {
+                this.requestedLv = value;
+            } else if (param === "velocity_a") {
+                this.requestedRv = value;
+            } else if (param === "invert_b") {
+                this.invertL = value;
+            } else if (param === "invert_a") {
+                this.invertR = value;
+            } else if (param === "duty_cycle") {
+                console.log('ERROR: Param name: "duty_cycle" no longer supported. See Robot API.');
+            } else {
+                console.log('ERROR: Param name: "' + param + '" invalid or not supported');
+            }
+        } else if (device === "left_motor" || device === "right_motor") {
+            console.log('ERROR: "' + device + '" no longer supported. See Robot API.');
+        } else {
+            console.log("ERROR: Cannot find device name: " + device);
+        }
     }
 
     /**
@@ -1189,6 +1242,7 @@ class Simulator{
         this.interactableObjs = [];
         this.ramps = [];
         this.refineries = [];
+        this.quarries = [];
 
         // Subworker pool
         this.numThreads = 1;
@@ -1206,6 +1260,7 @@ class Simulator{
      *                              Note: InteractableObjs will have 2 references
      *                                  1 in obstacles, 1 in interactableObjs
      *                          ramps -> Ramps
+     *                          quarry -> Quarry
      */
     defineObjs(objects) {
         this.tapeLines = [];
@@ -1214,6 +1269,7 @@ class Simulator{
         this.ramps = [];
         this.refineries = [];
         this.campsites = [];
+        this.quarries = [];
 
         if (objects.tapeLinesData !== undefined) {
             for (let newLine of objects.tapeLinesData) {
@@ -1228,18 +1284,7 @@ class Simulator{
         }
         if (objects.interactableData !== undefined) {
             for (let interactableObj of objects.interactableData) {
-                let x = interactableObj.x;
-                let y = interactableObj.y;
-                let shape = interactableObj.shape;
-                let color = interactableObj.color;
-
-                let newInteractableObj;
-                if (shape === "circle") {
-                    let r = interactableObj.r;
-                    newInteractableObj = new InteractableCircle(x, y, r, color);
-                } else {
-                    newInteractableObj = new InteractableObj(x, y, interactableObj.w, interactableObj.h, "rectangle", color);
-                }
+                let newInteractableObj = new InteractableObj(interactableObj.x, interactableObj.y, interactableObj.w, interactableObj.h, interactableObj.color);
                 this.interactableObjs.push(newInteractableObj);
                 this.obstacles.push(newInteractableObj);
             }
@@ -1274,18 +1319,31 @@ class Simulator{
             for (let campsiteObj of objects.campsitesData) {
                 let newCampsite = new Campsite(campsiteObj.x, campsiteObj.y, campsiteObj.w, campsiteObj.h, campsiteObj.color);
                 this.campsites.push(newCampsite);
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1], newCampsite.w, 0.5, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + (newCampsite.h / 3.0), newCampsite.w, 0.5, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + 2 * (newCampsite.h / 3.0), newCampsite.w, 0.5, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.botL[0], newCampsite.botL[1], newCampsite.w, 0.5, 0, newCampsite.color));
                 this.obstacles.push(new Wall(newCampsite.topL[0] + 4, newCampsite.topL[1], newCampsite.w - 8, newCampsite.h, 0, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1], newCampsite.w, 1, 0, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + (newCampsite.h / 3.0), newCampsite.w, 1, 0, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + 2 * (newCampsite.h / 3.0), newCampsite.w, 1, 0, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.botL[0], newCampsite.botL[1], newCampsite.w, 1, 0, newCampsite.color));
+            }
+        }
+        
+        if (objects.quarryData !== undefined) {
+            for (let quarryObj of objects.quarryData) {
+                let newQuarry = new Quarry(quarryObj.x, quarryObj.y, quarryObj.w, quarryObj.h, quarryObj.color, quarryObj.highSide);
+                let all_ores = newQuarry.irons.concat(newQuarry.stones);
+                for (let i = 0; i < all_ores.length; i ++) {
+                    simulator.interactableObjs.push(all_ores[i]);
+                } 
+                this.quarries.push(newQuarry);
+                this.obstacles.push(newQuarry);
+                this.interactableObjs.push(newQuarry);
             }
         }
     }
 
     /**
      * Draws the objects by sending a message to the main thread to draw the objects.
-     * Send ramps, tape lines, and obstacles to be drawn.
+     * Send ramps, tape lines, quarries, and obstacles to be drawn.
      */
     drawObjs() {
         let objects = {
@@ -1293,7 +1351,9 @@ class Simulator{
             tapeLines: this.tapeLines,
             obstacles: this.obstacles,
             refineries: this.refineries,
-            campsites: this.campsites
+            campsites: this.campsites,
+            quarries: this.quarries
+
         }
         postMessage({objs: objects})
 

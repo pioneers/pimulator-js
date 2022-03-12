@@ -38,9 +38,8 @@ class Wall extends FieldObj {
 }
 
 class InteractableObj extends FieldObj {
-    constructor(x, y, w, h, shape, color="red") {
+    constructor(x, y, w, h, color = "red") {
         super(x, y, w, h, color);
-        this.shape = shape;
         this.attached = false;
         this.direction = 0;
     }
@@ -62,23 +61,6 @@ class InteractableObj extends FieldObj {
     }
 }
 
-class InteractableCircle extends InteractableObj {
-    /**
-     * Defines a circular object that can be picked up.
-     * @param x - x coordinate of center of circle
-     * @param y - y coordinate of center of circle
-     * @param r - radius of circle
-     * @param color - color of circle
-     * @returns value returned by RobotClass.get_value()
-     */
-    constructor(x, y, r, color="red") {
-        // Subtract from x and y, so we can use logic for rectangle
-        // but define circle using x and y as center
-        super(x-r, y-r, 2*r, 2*r, "circle", color);
-        this.r = r;
-    }
-}
-
 class Ramp extends FieldObj {
     constructor(x, y, w, h, highSide = "up", incline = 15, color = "black") {
         super(x, y, w, h, color);
@@ -86,7 +68,6 @@ class Ramp extends FieldObj {
         this.incline = incline;
     }
 }
-
 
 class Refinery extends FieldObj {
     constructor(x, y, w = 15, h = 15, highSide = "left", color = "gray") {
@@ -102,6 +83,9 @@ class Refinery extends FieldObj {
     addOre() {
         this.ore += 1;
 
+    }
+}
+
 class Campsite extends FieldObj {
     constructor(x, y, w = 20, h = 9, color = "tan") {
         super(x, y, w, h, color);
@@ -114,4 +98,41 @@ class Campsite extends FieldObj {
     spin() {
         this.spinnerNum = (this.spinnerNum + 1) % 9;
     }
+}
+
+class Ore extends InteractableObj {
+    constructor(x, y, type = "stone", radius = 1.1) {
+        if (type === "stone") {
+            super(x, y ,2.2, 2.2,"gray");
+            this.type = "stone";
+            this.r = 1.1;
+        } else {
+            super(x, y, 1.5, 1.5, "blue");
+            this.type = "iron";
+            this.r = 0.75
+
+        }
+        this.shape == "circle";
+    }
+}
+
+// Ore counts are hardcoded to be 15 for stone, 5 for iron.
+class Quarry extends InteractableObj {
+    constructor (x, y , w, h, orientation = "down", color = 'blue') {
+        super (x, y, w, h, color);
+        this.orientation = orientation;
+        this.stones = [];
+        this.irons = [];
+        for (let i = 0; i < 15; i++) {
+            let rand_x = Math.random(0,1)* (this.topR[0] - this.topL[0] - 2); // Gets the distance it is from the left of the quarry
+            let rand_y = Math.random(0,1)* (this.botR[1] - this.topR[1] - 2);
+            this.stones.push(new Ore(rand_x, rand_y, "stone"));    
+          }
+        for (let k = 0; k < 5; k ++) {
+            let rand_x = Math.random(0,1)* (this.topR[0] - this.topL[0] - 2); // Gets the distance it is from the left of the quarry
+            let rand_y = Math.random(0,1)* (this.botR[1] - this.topR[1] - 2);
+            this.irons.push(new Ore(rand_x, rand_y, "iron"));
+        }
+    } 
+
 }
