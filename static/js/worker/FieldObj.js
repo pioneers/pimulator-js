@@ -86,13 +86,12 @@ class Ore extends InteractableObj {
 }
 
 // Ore counts are hardcoded to be 15 for stone, 5 for iron.
-class Quarry extends FieldObj {
+class Quarry extends InteractableObj {
     constructor (x, y , w, h, orientation = "down", color = 'blue') {
         super (x, y, w, h, color);
         this.orientation = orientation;
         this.stones = [];
         this.irons = [];
-        this.highside = this.highside
         for (let i = 0; i < 15; i++) {
             let rand_x = Math.random(0,1)* (this.topR[0] - this.topL[0] - 2); // Gets the distance it is from the left of the quarry
             let rand_y = Math.random(0,1)* (this.botR[1] - this.topR[1] - 2);

@@ -656,10 +656,24 @@ class RobotClass {
              * Attach the object - If Quarry or Refinery (Currenly, just the Quarry is implemented) do something else
              * Quarry is randomized - equal chance of getting stone or iron
             */
+           if (obstacle.irons !== undefined){
+               let full_list = obstacle.stones.concat(obstacle.irons);
+               let random = Math.floor(Math.random(0,1) * full_list.length); 
+               if (random != 0) {
+                   let curr_obj = full_list.splice(random, 1)[0];
+                   this.attachedObj = curr_obj;
+                   curr_obj.attach();
+                   curr_obj.setDirection(this.dir);
+                   
+               } else {
+                   return;
+               }
+
+           } else {
             this.attachedObj = obstacle;
             obstacle.attach();
             obstacle.setDirection(this.dir);
-
+           }
         }
     }
 
@@ -1151,8 +1165,13 @@ class Simulator{
         if (objects.quarryData !== undefined) {
             for (let quarryObj of objects.quarryData) {
                 let newQuarry = new Quarry(quarryObj.x, quarryObj.y, quarryObj.w, quarryObj.h, quarryObj.color, quarryObj.highSide);
+                let all_ores = newQuarry.irons.concat(newQuarry.stones);
+                for (let i = 0; i < all_ores.length; i ++) {
+                    simulator.interactableObjs.push(all_ores[i]);
+                } 
                 this.quarries.push(newQuarry);
                 this.obstacles.push(newQuarry);
+                this.interactableObjs.push(newQuarry);
             }
         }
     }
