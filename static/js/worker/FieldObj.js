@@ -101,6 +101,8 @@ class Refinery extends FieldObj {
 
     addOre() {
         this.ore += 1;
+    }
+}
 
 class Campsite extends FieldObj {
     constructor(x, y, w = 20, h = 9, color = "tan") {

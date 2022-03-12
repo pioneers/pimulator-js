@@ -326,10 +326,11 @@ function drawObjs(objs, type) {
                 for (let j = objs[i].topL[0] * scaleFactor; j <= objs[i].topR[0] * scaleFactor; j += (objs[i].w / 8.0) * scaleFactor) {
                     ctx.beginPath();
                     ctx.moveTo(j, objs[i].botL[1] * scaleFactor);
-                    ctx.lineTo(j, (objs[i].botL[1] + (objs[i].w / 6.0)) * scaleFactor);
+                    ctx.lineTo(j, (objs[i].botL[1] - (objs[i].w / 6.0)) * scaleFactor);
                     ctx.stroke();
                 }
             }
+        }
     } else if (type === "campsite") {
         for (let i = 0; i < objs.length; i++) {
             ctx.lineWidth = 0.5;

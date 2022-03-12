@@ -641,14 +641,14 @@ class RobotClass {
         return dict;
     }
 
-    spinDish() {
+    spin_dish() {
         let campsite = this.findCampsite();
         if (campsite) {
             campsite.spin();
         }
     }
 
-    spinVal() {
+    spin_val() {
         let campsite = this.findCampsite();
         if (campsite) {
             return campsite.possSpinner[campsite.spinnerNum];
@@ -737,13 +737,13 @@ class RobotClass {
         for (let obstacle of this.simulator.refineries) {
             let obstacle_top = obstacle;
             if (obstacle.highSide === "left") {
-                obstacle_top = new Wall(obstacle.topL[0], obstacle.topL[1], 5, obstacle.h, obstacle.color);
+                obstacle_top = new Wall(obstacle.topL[0], obstacle.topL[1], 5, obstacle.h, 0, obstacle.color);
             } else if (obstacle.highSide === "right") {
-                obstacle_top = new Wall(obstacle.topR[0] - 5, obstacle.topR[1], 5, obstacle.h, obstacle.color);
+                obstacle_top = new Wall(obstacle.topR[0] - 5, obstacle.topR[1], 5, obstacle.h, 0, obstacle.color);
             } else if (obstacle.highSide === "up") {
-                obstacle_top = new Wall(obstacle.topL[0], obstacle.topL[1], obstacle.w, 5, obstacle.color);
+                obstacle_top = new Wall(obstacle.topL[0], obstacle.topL[1], obstacle.w, 5, 0, obstacle.color);
             } else if (obstacle.highSide === "down") {
-                obstacle_top = new Wall(obstacle.botL[0], obstacle.botL[1] - 5, obstacle.w, 5, obstacle.color);
+                obstacle_top = new Wall(obstacle.botL[0], obstacle.botL[1] - 5, obstacle.w, 5, 0, obstacle.color);
             }
 
             let inter = this.intersectOne(obstacle_top, collidableRegion);
@@ -785,7 +785,7 @@ class RobotClass {
     refine() {
         let refinery = this.findRefinery();
         if (this.attachedObj && refinery) {
-            if (this.attachedObj.r == 1.5) { // is an ore
+            if (this.attachedObj.r == 0.75) { // is an ore
                 let index = this.simulator.interactableObjs.indexOf(this.attachedObj);
                 if (index > -1) { 
                     this.simulator.interactableObjs.splice(index, 1);
@@ -798,7 +798,7 @@ class RobotClass {
                 this.attachedObj.release();
                 this.attachedObj = null;
                 // have the obj disappear and be added to the refinery
-            } else if (this.attachedObj.r == 2.2) { // is a stone
+            } else if (this.attachedObj.r == 1.1) { // is a stone
                 // have the stone appear on the opposite side of the refinery
                 if (refinery.highSide === "left") {
                     this.updateStone(this.attachedObj, 2.5 + refinery.topR[0], (refinery.topR[1] + refinery.botR[1]) / 2.0);
@@ -809,11 +809,11 @@ class RobotClass {
                     // this.attachedObj.x = refinery.topL[0] - 2.5;
                     // this.attachedObj.y = (refinery.topL[1] + refinery.botL[1]) / 2.0;
                 } else if (refinery.highSide === "up") {
-                    this.updateStone(this.attachedObj, (refinery.topL[0] + refinery.botL[0]) / 2.0, refinery.botL[1] + 2.5);
+                    this.updateStone(this.attachedObj, (refinery.botL[0] + refinery.botR[0]) / 2.0, refinery.botL[1] + 2.5);
                     // this.attachedObj.x = (refinery.topL[0] + refinery.botL[0]) / 2.0;
                     // this.attachedObj.y = refinery.botL[1] + 2.5;
                 } else if (refinery.highSide === "down") {
-                    this.updateStone((refinery.topL[0] + refinery.topR[0]) / 2.0, refinery.topL[1] - 2.5)
+                    this.updateStone(this.attachedObj, (refinery.topL[0] + refinery.topR[0]) / 2.0, refinery.topL[1] - 2.5)
                     // this.attachedObj.x = (refinery.topL[0] + refinery.topR[0]) / 2.0;
                     // this.attachedObj.y = refinery.topL[1] - 2.5;
                 }
@@ -826,14 +826,14 @@ class RobotClass {
     updateStone(stone, x, y) {
         stone.x = x;
         stone.y = y;
-        this.topL[0] = x - r;
-        this.topL[1] = y - r;
-        this.topR[0] = x + r;
-        this.topR[1] = y - r;
-        this.botL[0] = x - r;
-        this.botL[1] = y + r;
-        this.botR[0] = x + r;
-        this.botR[1] = y - r;
+        stone.topL[0] = x - stone.r;
+        stone.topL[1] = y - stone.r;
+        stone.topR[0] = x + stone.r;
+        stone.topR[1] = y - stone.r;
+        stone.botL[0] = x - stone.r;
+        stone.botL[1] = y + stone.r;
+        stone.botR[0] = x + stone.r;
+        stone.botR[1] = y + stone.r;
     }
 
     num_ore() {
@@ -842,6 +842,47 @@ class RobotClass {
             return refinery.numOre();
         }
         return null;
+    }
+
+    /**
+     * Sets a value on a device.
+     * A Runtime API method.
+     * @param {String} device - the device ID
+     * @param {String} param - the parameter on the device
+     * @param {Float} value - the value to set, bounded by [-1, 1]
+     */
+     set_value(device, param, value) {
+        if (typeof(param) !== "string") {
+            console.log("ERROR: get_value() parameter must be a string")
+            return
+        }
+        if (param.includes("velocity") && value > 1.0 || value < -1.0){
+            console.log("ERROR: Speed cannot be greater than 1.0 or less than -1.0.");
+            return
+        }
+        if (param.includes("invert") && typeof(value) !== "boolean") {
+            console.log('ERROR: "invert" functions take in a boolean value')
+            return
+        }
+        if (device === "koala_bear") {
+            if (param === "velocity_b") {
+                this.requestedLv = value;
+            } else if (param === "velocity_a") {
+                this.requestedRv = value;
+            } else if (param === "invert_b") {
+                this.invertL = value;
+            } else if (param === "invert_a") {
+                this.invertR = value;
+            } else if (param === "duty_cycle") {
+                console.log('ERROR: Param name: "duty_cycle" no longer supported. See Robot API.');
+            } else {
+                console.log('ERROR: Param name: "' + param + '" invalid or not supported');
+            }
+        } else if (device === "left_motor" || device === "right_motor") {
+            console.log('ERROR: "' + device + '" no longer supported. See Robot API.');
+        } else {
+            console.log("ERROR: Cannot find device name: " + device);
+        }
     }
 
     /**
@@ -1274,11 +1315,11 @@ class Simulator{
             for (let campsiteObj of objects.campsitesData) {
                 let newCampsite = new Campsite(campsiteObj.x, campsiteObj.y, campsiteObj.w, campsiteObj.h, campsiteObj.color);
                 this.campsites.push(newCampsite);
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1], newCampsite.w, 0.5, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + (newCampsite.h / 3.0), newCampsite.w, 0.5, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + 2 * (newCampsite.h / 3.0), newCampsite.w, 0.5, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.botL[0], newCampsite.botL[1], newCampsite.w, 0.5, 0, newCampsite.color));
                 this.obstacles.push(new Wall(newCampsite.topL[0] + 4, newCampsite.topL[1], newCampsite.w - 8, newCampsite.h, 0, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1], newCampsite.w, 1, 0, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + (newCampsite.h / 3.0), newCampsite.w, 1, 0, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + 2 * (newCampsite.h / 3.0), newCampsite.w, 1, 0, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.botL[0], newCampsite.botL[1], newCampsite.w, 1, 0, newCampsite.color));
             }
         }
     }
