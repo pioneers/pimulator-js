@@ -242,18 +242,20 @@ function drawObjs(objs, type) {
             ctx.setLineDash([1,0])
             let all_ores = objs[i].stones.concat(objs[i].irons);
             for (let k = 0; k < all_ores.length; k ++) {
-                ctx.beginPath();
-                let r = all_ores[i].r;
-                ctx.arc((all_ores[k].x + objs[i].topL[0] + 1) *scaleFactor, (all_ores[k].y + objs[i].topL[1] + 1) *scaleFactor, r*scaleFactor, 0, 2*Math.PI);
-                ctx.lineWidth = 0.5;
-                ctx.strokeStyle = "black"; 
-                ctx.stroke(); // Draw circle border
-                if (all_ores[k].type == "stone") {
-                    ctx.fillStyle = "gray";
-                    ctx.fill(); // Fill circle
-                } else {
-                    ctx.fillStyle = "yellow";
-                    ctx.fill(); // Fill circle
+                if (all_ores[k].attached == false) {
+                    ctx.beginPath();
+                    let r = all_ores[i].r;
+                    ctx.arc((all_ores[k].x + objs[i].topL[0] + 1) *scaleFactor, (all_ores[k].y + objs[i].topL[1] + 1) *scaleFactor, r*scaleFactor, 0, 2*Math.PI);
+                    ctx.lineWidth = 0.5;
+                    ctx.strokeStyle = "black"; 
+                    ctx.stroke(); // Draw circle border
+                    if (all_ores[k].type == "stone") {
+                        ctx.fillStyle = "gray";
+                        ctx.fill(); // Fill circle
+                    } else {
+                        ctx.fillStyle = "yellow";
+                        ctx.fill(); // Fill circle
+                    }
                 }
             }
         }

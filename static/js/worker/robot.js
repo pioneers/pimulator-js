@@ -552,11 +552,8 @@ class RobotClass {
             tapeLines: this.simulator.tapeLines,
             obstacles: this.simulator.obstacles,
             ramps: this.simulator.ramps,
-<<<<<<< HEAD
-            quarries: this.simulator.quarries
-=======
+            quarries: this.simulator.quarries,
             campsites: this.simulator.campsites
->>>>>>> 249885d310ae498dc998c7dc7a28e29088b3e633
         }
 
         postMessage({
@@ -1198,11 +1195,8 @@ class Simulator{
         this.obstacles = [];
         this.interactableObjs = [];
         this.ramps = [];
-<<<<<<< HEAD
         this.quarries = [];
-=======
         this.campsites = [];
->>>>>>> 249885d310ae498dc998c7dc7a28e29088b3e633
 
         if (objects.tapeLinesData !== undefined) {
             for (let newLine of objects.tapeLinesData) {
@@ -1236,7 +1230,6 @@ class Simulator{
                 }
             }
         }
-<<<<<<< HEAD
         if (objects.quarryData !== undefined) {
             for (let quarryObj of objects.quarryData) {
                 let newQuarry = new Quarry(quarryObj.x, quarryObj.y, quarryObj.w, quarryObj.h, quarryObj.color, quarryObj.highSide);
@@ -1247,7 +1240,6 @@ class Simulator{
                 this.quarries.push(newQuarry);
                 this.obstacles.push(newQuarry);
                 this.interactableObjs.push(newQuarry);
-=======
 
         if (objects.campsitesData !== undefined) {
             for (let campsiteObj of objects.campsitesData) {
@@ -1258,7 +1250,6 @@ class Simulator{
                 this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + (newCampsite.h / 3.0), newCampsite.w, 1, 0, newCampsite.color));
                 this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + 2 * (newCampsite.h / 3.0), newCampsite.w, 1, 0, newCampsite.color));
                 this.obstacles.push(new Wall(newCampsite.botL[0], newCampsite.botL[1], newCampsite.w, 1, 0, newCampsite.color));
->>>>>>> 249885d310ae498dc998c7dc7a28e29088b3e633
             }
         }
     }
@@ -1272,13 +1263,8 @@ class Simulator{
             ramps: this.ramps,
             tapeLines: this.tapeLines,
             obstacles: this.obstacles,
-<<<<<<< HEAD
             quarries: this.quarries,
-            
-
-=======
             campsites: this.campsites
->>>>>>> 249885d310ae498dc998c7dc7a28e29088b3e633
         }
         postMessage({objs: objects})
 
