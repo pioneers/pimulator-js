@@ -673,8 +673,8 @@ class RobotClass {
              * Attach the object - If Quarry or Refinery (Currenly, just the Quarry is implemented) do something else
              * Quarry is randomized - equal chance of getting stone or iron
             */
-           if (obstacle.irons !== undefined){
-               let full_list = obstacle.stones.concat(obstacle.irons);
+           if (obstacle.ores !== undefined){
+               let full_list = obstacle.stones.concat(obstacle.ores);
                let random = Math.floor(Math.random(0,1) * full_list.length); 
                if (random != 0) {
                    let curr_obj = full_list.splice(random, 1)[0];
@@ -804,8 +804,9 @@ class RobotClass {
 
     refine() {
         let refinery = this.findRefinery();
+        //console.log(refinery);
         if (this.attachedObj && refinery) {
-            if (this.attachedObj.r == 1.5) { // is an ore
+            if (this.attachedObj.r == 0.75) { // is an ore
                 let index = this.simulator.interactableObjs.indexOf(this.attachedObj);
                 if (index > -1) { 
                     this.simulator.interactableObjs.splice(index, 1);
@@ -818,7 +819,7 @@ class RobotClass {
                 this.attachedObj.release();
                 this.attachedObj = null;
                 // have the obj disappear and be added to the refinery
-            } else if (this.attachedObj.r == 2.2) { // is a stone
+            } else if (this.attachedObj.r == 1.1) { // is a stone
                 // have the stone appear on the opposite side of the refinery
                 if (refinery.highSide === "left") {
                     this.updateStone(this.attachedObj, 2.5 + refinery.topR[0], (refinery.topR[1] + refinery.botR[1]) / 2.0);
@@ -1284,7 +1285,18 @@ class Simulator{
         }
         if (objects.interactableData !== undefined) {
             for (let interactableObj of objects.interactableData) {
-                let newInteractableObj = new InteractableObj(interactableObj.x, interactableObj.y, interactableObj.w, interactableObj.h, interactableObj.color);
+                let x = interactableObj.x;
+                let y = interactableObj.y;
+                let shape = interactableObj.shape;
+                let color = interactableObj.color;
+
+                let newInteractableObj;
+                if (shape === "circle") {
+                    let r = interactableObj.r;
+                    newInteractableObj = new InteractableCircle(x, y, r, color);
+                } else {
+                    newInteractableObj = new InteractableObj(x, y, interactableObj.w, interactableObj.h, "rectangle", color);
+                }
                 this.interactableObjs.push(newInteractableObj);
                 this.obstacles.push(newInteractableObj);
             }
@@ -1327,16 +1339,14 @@ class Simulator{
             }
         }
         
-        if (objects.quarryData !== undefined) {
-            for (let quarryObj of objects.quarryData) {
+        if (objects.quarriesData !== undefined) {
+            for (let quarryObj of objects.quarriesData) {
                 let newQuarry = new Quarry(quarryObj.x, quarryObj.y, quarryObj.w, quarryObj.h, quarryObj.color, quarryObj.highSide);
-                let all_ores = newQuarry.irons.concat(newQuarry.stones);
+                let all_ores = newQuarry.ores.concat(newQuarry.stones);
                 for (let i = 0; i < all_ores.length; i ++) {
                     simulator.interactableObjs.push(all_ores[i]);
                 } 
                 this.quarries.push(newQuarry);
-                this.obstacles.push(newQuarry);
-                this.interactableObjs.push(newQuarry);
             }
         }
     }

@@ -38,8 +38,9 @@ class Wall extends FieldObj {
 }
 
 class InteractableObj extends FieldObj {
-    constructor(x, y, w, h, color = "red") {
+    constructor(x, y, w, h, shape, color="red") {
         super(x, y, w, h, color);
+        this.shape = shape;
         this.attached = false;
         this.direction = 0;
     }
@@ -100,38 +101,54 @@ class Campsite extends FieldObj {
     }
 }
 
-class Ore extends InteractableObj {
-    constructor(x, y, type = "stone", radius = 1.1) {
-        if (type === "stone") {
-            super(x, y ,2.2, 2.2,"gray");
-            this.type = "stone";
-            this.r = 1.1;
-        } else {
-            super(x, y, 1.5, 1.5, "blue");
-            this.type = "iron";
-            this.r = 0.75
 
-        }
-        this.shape == "circle";
+class InteractableCircle extends InteractableObj {
+    /**
+     * Defines a circular object that can be picked up.
+     * @param x - x coordinate of center of circle
+     * @param y - y coordinate of center of circle
+     * @param r - radius of circle
+     * @param color - color of circle
+     * @returns value returned by RobotClass.get_value()
+     */
+    constructor(x, y, r, color="red") {
+        // Subtract from x and y, so we can use logic for rectangle
+        // but define circle using x and y as center
+        super(x-r, y-r, 2*r, 2*r, "circle", color);
+        this.r = r;
     }
 }
 
-// Ore counts are hardcoded to be 15 for stone, 5 for iron.
-class Quarry extends InteractableObj {
-    constructor (x, y , w, h, orientation = "down", color = 'blue') {
+class Resource extends InteractableCircle {
+    constructor(x, y, type = "stone") {
+        if (type === "stone") {
+            console.log("got a stone");
+            super(x, y, 1.1, "gray");
+            this.type = "stone";
+        } else {
+            console.log("got an ore");
+            super(x, y, 0.75, "gold");
+            this.type = "ore";
+        }
+    }
+}
+
+// Resource counts are hardcoded to be 15 for stone, 5 for ore.
+class Quarry extends FieldObj {
+    constructor (x, y , w=14.5, h=18, orientation = "down", color = 'blue') {
         super (x, y, w, h, color);
         this.orientation = orientation;
         this.stones = [];
-        this.irons = [];
+        this.ores = [];
         for (let i = 0; i < 15; i++) {
-            let rand_x = Math.random(0,1)* (this.topR[0] - this.topL[0] - 2); // Gets the distance it is from the left of the quarry
-            let rand_y = Math.random(0,1)* (this.botR[1] - this.topR[1] - 2);
-            this.stones.push(new Ore(rand_x, rand_y, "stone"));    
-          }
+            let rand_x = 2 + Math.random(0,1) * (this.topR[0] - this.topL[0] - 3); // Gets the distance it is from the left of the quarry
+            let rand_y = 2 + Math.random(0,1) * (this.botR[1] - this.topR[1] - 3);
+            this.stones.push(new Resource(rand_x, rand_y, "stone"));    
+        }
         for (let k = 0; k < 5; k ++) {
-            let rand_x = Math.random(0,1)* (this.topR[0] - this.topL[0] - 2); // Gets the distance it is from the left of the quarry
-            let rand_y = Math.random(0,1)* (this.botR[1] - this.topR[1] - 2);
-            this.irons.push(new Ore(rand_x, rand_y, "iron"));
+            let rand_x = 2 + Math.random(0,1) * (this.topR[0] - this.topL[0] - 3); // Gets the distance it is from the left of the quarry
+            let rand_y = 2 + Math.random(0,1) * (this.botR[1] - this.topR[1] - 3);
+            this.ores.push(new Resource(rand_x, rand_y, "ore"));
         }
     } 
 
