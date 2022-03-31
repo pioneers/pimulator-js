@@ -1252,6 +1252,8 @@ class Simulator{
                 this.obstacles.push(new Wall(newCampsite.botL[0], newCampsite.botL[1], newCampsite.w, 1, 0, newCampsite.color));
             }
         }
+        }
+        }
     }
 
     /**
