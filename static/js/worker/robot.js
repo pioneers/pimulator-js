@@ -61,7 +61,7 @@ class RobotClass {
     height = 20;                // height or robot, inches
     wheelWidth = 20;            // wheelbase width, inches
     wRadius = 2;                // radius of a wheel, inches
-    MaxX = 144;                 // maximum X value, inches, field is 12'x12'
+    MaxX = 192;                 // maximum X value, inches, field is 12'x12'
     MaxY = 144;                 // maximum Y value, inches, field is 12'x12'
     neg = -1;                   // negate left motor calculation
     startXDefault = 70.0;
@@ -552,7 +552,11 @@ class RobotClass {
             tapeLines: this.simulator.tapeLines,
             obstacles: this.simulator.obstacles,
             ramps: this.simulator.ramps,
+<<<<<<< HEAD
             quarries: this.simulator.quarries
+=======
+            campsites: this.simulator.campsites
+>>>>>>> 249885d310ae498dc998c7dc7a28e29088b3e633
         }
 
         postMessage({
@@ -641,6 +645,21 @@ class RobotClass {
 
         return dict;
     }
+
+    spinDish() {
+        let campsite = this.findCampsite();
+        if (campsite) {
+            campsite.spin();
+        }
+    }
+
+    spinVal() {
+        let campsite = this.findCampsite();
+        if (campsite) {
+            return campsite.possSpinner[campsite.spinnerNum];
+        }
+    }
+
 
     /**
      * Picks up a nearby object if possible.
@@ -736,6 +755,33 @@ class RobotClass {
             let inter = this.intersectOne(obstacle, collidableRegion);
             if (inter) {
               return obstacle;
+            }
+        }
+        return null;
+    }
+
+    findCampsite() {
+        if (this.simulator.campsites.length == 0) {
+            return null;
+        }
+
+        const width = 5;
+        const height = 5;
+        const b = (this.width - width) / 2;
+        let collidableRegion = {topR: Array(2), topL: Array(2), botL: Array(2), botR: Array(2)};
+        collidableRegion.botL[0] = this.topL[0] + b * Math.cos((90.0 - this.dir) * Math.PI / 180);
+        collidableRegion.botL[1] = this.topL[1] - b * Math.sin((90.0 - this.dir) * Math.PI / 180);
+        collidableRegion.topL[0] = collidableRegion.botL[0] - height * Math.cos(this.dir * Math.PI / 180);
+        collidableRegion.topL[1] = collidableRegion.botL[1] - height * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.topR[0] = collidableRegion.topL[0] + width * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.topR[1] = collidableRegion.topL[1] - width * Math.cos(this.dir * Math.PI / 180);
+        collidableRegion.botR[0] = collidableRegion.botL[0] + width * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.botR[1] = collidableRegion.botL[1] - width * Math.cos(this.dir * Math.PI / 180);
+
+        for (let campsite of this.simulator.campsites) {
+            let inter = this.intersectOne(campsite, collidableRegion);
+            if (inter) {
+              return campsite;
             }
         }
         return null;
@@ -1123,6 +1169,7 @@ class Simulator{
         this.current = [];
         this.tapeLines = [];
         this.obstacles = [];
+        this.campsites = [];
         this.interactableObjs = [];
         this.ramps = [];
         this.quarries = [];
@@ -1151,7 +1198,11 @@ class Simulator{
         this.obstacles = [];
         this.interactableObjs = [];
         this.ramps = [];
+<<<<<<< HEAD
         this.quarries = [];
+=======
+        this.campsites = [];
+>>>>>>> 249885d310ae498dc998c7dc7a28e29088b3e633
 
         if (objects.tapeLinesData !== undefined) {
             for (let newLine of objects.tapeLinesData) {
@@ -1174,7 +1225,7 @@ class Simulator{
 
         if (objects.rampsData !== undefined) {
             for (let rampObj of objects.rampsData) {
-                let newRamp = new Ramp(rampObj.x, rampObj.y, rampObj.w, rampObj. h, rampObj.highSide, rampObj.incline, rampObj.color);
+                let newRamp = new Ramp(rampObj.x, rampObj.y, rampObj.w, rampObj.h, rampObj.highSide, rampObj.incline, rampObj.color);
                 this.ramps.push(newRamp);
                 if (newRamp.highSide == "up" || newRamp.highSide == "down") {
                     this.obstacles.push(new Wall(newRamp.topL[0]-1, newRamp.topL[1], 1, newRamp.h, 0, newRamp.color));
@@ -1185,6 +1236,7 @@ class Simulator{
                 }
             }
         }
+<<<<<<< HEAD
         if (objects.quarryData !== undefined) {
             for (let quarryObj of objects.quarryData) {
                 let newQuarry = new Quarry(quarryObj.x, quarryObj.y, quarryObj.w, quarryObj.h, quarryObj.color, quarryObj.highSide);
@@ -1195,6 +1247,18 @@ class Simulator{
                 this.quarries.push(newQuarry);
                 this.obstacles.push(newQuarry);
                 this.interactableObjs.push(newQuarry);
+=======
+
+        if (objects.campsitesData !== undefined) {
+            for (let campsiteObj of objects.campsitesData) {
+                let newCampsite = new Campsite(campsiteObj.x, campsiteObj.y, campsiteObj.w, campsiteObj.h, campsiteObj.color);
+                this.campsites.push(newCampsite);
+                this.obstacles.push(new Wall(newCampsite.topL[0] + 4, newCampsite.topL[1], newCampsite.w - 8, newCampsite.h, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1], newCampsite.w, 1, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + (newCampsite.h / 3.0), newCampsite.w, 1, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + 2 * (newCampsite.h / 3.0), newCampsite.w, 1, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.botL[0], newCampsite.botL[1], newCampsite.w, 1, 0, newCampsite.color));
+>>>>>>> 249885d310ae498dc998c7dc7a28e29088b3e633
             }
         }
     }
@@ -1208,9 +1272,13 @@ class Simulator{
             ramps: this.ramps,
             tapeLines: this.tapeLines,
             obstacles: this.obstacles,
+<<<<<<< HEAD
             quarries: this.quarries,
             
 
+=======
+            campsites: this.campsites
+>>>>>>> 249885d310ae498dc998c7dc7a28e29088b3e633
         }
         postMessage({objs: objects})
 
