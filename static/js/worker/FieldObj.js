@@ -76,12 +76,12 @@ class Ore extends InteractableObj {
             this.type = "stone";
             this.r = 1.1;
         } else {
-            super(x, y, 1.5, 1.5, "blue");
+            super(x, y, 1.5, 1.5, "yellow");
             this.type = "iron";
             this.r = 0.75
-
         }
         this.shape == "circle";
+        this.is_ore = true;
     }
 }
 

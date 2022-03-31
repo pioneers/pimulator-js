@@ -654,17 +654,39 @@ class RobotClass {
         if (obstacle) {
             /** 
              * Attach the object - If Quarry or Refinery (Currenly, just the Quarry is implemented) do something else
-             * Quarry is randomized - equal chance of getting stone or iron
+             * Quarry is randomized - equal chance of getting stone or iron for now
+             * For quarries, you attach to one of the irons or stones inside the quarry, not the actual quarry object itself
             */
-           if (obstacle.irons !== undefined){
+           if (obstacle.irons !== undefined || obstacle.stones !== undefined){
+               console.warn(obstacle)
+               console.warn("last")
                let full_list = obstacle.stones.concat(obstacle.irons);
-               let random = Math.floor(Math.random(0,1) * full_list.length); 
-               if (random != 0) {
-                   let curr_obj = full_list.splice(random, 1)[0];
-                   this.attachedObj = curr_obj;
-                   curr_obj.attach();
-                   curr_obj.setDirection(this.dir);
-                   
+               let choice = Math.round(Math.random(0,1) + 0.25);
+               let random = Math.ceil(Math.random(0,1) * full_list.length); 
+               console.warn(full_list);
+               if (random > 0) {
+                if (choice === 0){
+                    if (obstacle.irons.length != 0) {
+                        let random_iron = Math.floor(Math.random() * obstacle.irons.length)
+                        var iron_selected = obstacle.irons.splice(random_iron, 1)[0];
+                        this.attachedObj = iron_selected;
+                        iron_selected.attach();
+                        iron_selected.setDirection(this.dir);
+                        console.warn(this);
+                        this.simulator.obstacles.push(iron_selected);
+                    }
+                } 
+                else if (choice === 1) {
+                 if (obstacle.stones.length != 0) {
+                     let random_stone = Math.floor(Math.random() * obstacle.stones.length)
+                     var stone_selected = obstacle.stones.splice(random_stone, 1)[0];
+                     this.attachedObj = stone_selected;
+                     stone_selected.attach();
+                     stone_selected.setDirection(this.dir);
+                     console.warn(this);
+                     this.simulator.obstacles.push(stone_selected);
+                 }
+                }
                } else {
                    return;
                }
@@ -1105,6 +1127,7 @@ class Simulator{
         this.ramps = [];
         this.quarries = [];
 
+
         // Subworker pool
         this.numThreads = 1;
         this.subworkers = []; // Contains Worker objects
@@ -1185,7 +1208,8 @@ class Simulator{
             ramps: this.ramps,
             tapeLines: this.tapeLines,
             obstacles: this.obstacles,
-            quarries: this.quarries
+            quarries: this.quarries,
+            
 
         }
         postMessage({objs: objects})

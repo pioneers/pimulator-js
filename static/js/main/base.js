@@ -245,7 +245,7 @@ function drawObjs(objs, type) {
                 ctx.beginPath();
                 let r = all_ores[i].r;
                 ctx.arc((all_ores[k].x + objs[i].topL[0] + 1) *scaleFactor, (all_ores[k].y + objs[i].topL[1] + 1) *scaleFactor, r*scaleFactor, 0, 2*Math.PI);
-                ctx.lineWidth = 1;
+                ctx.lineWidth = 0.5;
                 ctx.strokeStyle = "black"; 
                 ctx.stroke(); // Draw circle border
                 if (all_ores[k].type == "stone") {
@@ -264,7 +264,23 @@ function drawObjs(objs, type) {
             if (objs[i].irons != undefined) {
                 continue;
             }
-            if (objs[i].shape == "circle") {
+            if (objs[i].is_ore === true) {
+                ctx.beginPath();
+                let r = objs[i].r;
+                ctx.arc((objs[i].x + objs[i].topL[0] + 1) *scaleFactor, (objs[i].y + objs[i].topL[1] + 1) *scaleFactor, r*scaleFactor, 0, 2*Math.PI);
+                ctx.lineWidth = 0.5;
+                ctx.strokeStyle = "black"; 
+                ctx.stroke(); // Draw circle border
+                if (objs[i].type == "stone") {
+                    ctx.fillStyle = "gray";
+                    ctx.fill(); // Fill circle
+                } else {
+                    ctx.fillStyle = "yellow";
+                    ctx.fill(); // Fill circle
+                }
+
+            }
+            if (objs[i].shape == "circle" && objs[i].is_ore != true) {
                 ctx.beginPath();
                 let r = objs[i].r;
                 let centerX = (objs[i].topL[0]+objs[i].botR[0])/2;
