@@ -280,7 +280,7 @@ function drawObjs(objs, type) {
     else if (type === "obstacle") {
         for (let i = 0; i < objs.length; i++) { 
             // at the moment, kind of hardcoded - might have to fix this in the future!
-            if (objs[i].irons != undefined) {
+            if (objs[i].irons != undefined) {  // checking if objs[i] is a quarry
                 continue;
             }
             if (objs[i].shape == "circle") {
