@@ -195,30 +195,40 @@ function drawRobot(robot) {
  */
 function drawObjs(objs, type) {
     if (type === "quarry") {
-        ctx.lineWidth = 2;
-        for (let i = 0; i < objs.length; i ++) {
+        for (let i = 0; i < objs.length; i++) {
+            ctx.lineWidth = 2;
             obj_botL = [objs[i].botL[0] * scaleFactor, objs[i].botL[1] * scaleFactor];
             obj_botR = [objs[i].botR[0] * scaleFactor, objs[i].botR[1] * scaleFactor];
             obj_topL = [objs[i].topL[0] * scaleFactor, objs[i].topL[1] * scaleFactor];
             obj_topR = [objs[i].topR[0] * scaleFactor, objs[i].topR[1] * scaleFactor];
             ctx.beginPath();
-            if (objs[i].orientation === 'right') {
-                ctx.moveTo(obj_botL[0], obj_botL[1]);
-                ctx.lineTo(obj_botR[0], obj_botR[1]);
-                ctx.lineTo(obj_topR[0], obj_topR[1]);
-                ctx.lineTo(obj_topL[1], obj_topL[1]);
-                ctx.stroke();
-                ctx.setLineDash([5, 3]);
-                ctx.lineTo(obj_botL[0], obj_botL[1]);
-            }
-            else if (objs[i].orientation === "left") {
+            ctx.strokeStyle = objs[i].color;
+            ctx.setLineDash([]);
+            ctx.globalAlpha = 1;
+            if (objs[i].orientation === "right") {
                 ctx.moveTo(obj_botR[0], obj_botR[1]);
                 ctx.lineTo(obj_botL[0], obj_botL[1]);
                 ctx.lineTo(obj_topL[0], obj_topL[1]);
-                ctx.lineTo(obj_topR[1], obj_topR[1]);
+                ctx.lineTo(obj_topR[0], obj_topR[1]);
                 ctx.stroke();
+                ctx.strokeStyle = objs[i].color;
+                ctx.beginPath();
                 ctx.setLineDash([5, 3]);
+                ctx.moveTo(obj_topR[0], obj_topR[1]);
                 ctx.lineTo(obj_botR[0], obj_botR[1]);
+                ctx.stroke();
+            }
+            else if (objs[i].orientation === "left") {
+                ctx.moveTo(obj_botL[0], obj_botL[1]);
+                ctx.lineTo(obj_botR[0], obj_botR[1]);
+                ctx.lineTo(obj_topR[0], obj_topR[1]);
+                ctx.lineTo(obj_topL[0], obj_topL[1]);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.setLineDash([5, 3]);
+                ctx.moveTo(obj_topL[0], obj_topL[1]);
+                ctx.lineTo(obj_botL[0], obj_botL[1]);
+                ctx.stroke();
             }
             else if (objs[i].orientation === "down") {
                 ctx.moveTo(obj_botR[0], obj_botR[1]);
@@ -226,29 +236,33 @@ function drawObjs(objs, type) {
                 ctx.lineTo(obj_topL[0], obj_topL[1]);
                 ctx.lineTo(obj_botL[0], obj_botL[1]);
                 ctx.stroke();
+                ctx.beginPath();
                 ctx.setLineDash([5, 3]);
+                ctx.moveTo(obj_botL[0], obj_botL[1]);
                 ctx.lineTo(obj_botR[0], obj_botR[1]);
+                ctx.stroke();
             }
             else if (objs[i].orientation === "up"){
                 ctx.moveTo(obj_topR[0], obj_topR[1]);
                 ctx.lineTo(obj_botR[0], obj_botR[1]);
                 ctx.lineTo(obj_botL[0], obj_botL[1]);
-                ctx.lineTo(obj_topL[1], obj_topL[1]);
+                ctx.lineTo(obj_topL[0], obj_topL[1]);
                 ctx.stroke();
+                ctx.beginPath();
                 ctx.setLineDash([5, 3]);
+                ctx.moveTo(obj_topL[0], obj_topL[1]);
                 ctx.lineTo(obj_topR[0], obj_topR[1]);
+                ctx.stroke();
             }
-            ctx.stroke();
-            ctx.setLineDash([1,0])
+            
+            ctx.setLineDash([]);
             let all_ores = objs[i].stones.concat(objs[i].irons);
-            for (let k = 0; k < all_ores.length; k ++) {
+            for (let k = 0; k < all_ores.length; k++) {
                 if (all_ores[k].attached == false) {
                     ctx.beginPath();
-                    let r = all_ores[i].r;
-                    ctx.arc((all_ores[k].x + objs[i].topL[0] + 1) *scaleFactor, (all_ores[k].y + objs[i].topL[1] + 1) *scaleFactor, r*scaleFactor, 0, 2*Math.PI);
+                    let r = all_ores[k].r;
+                    ctx.arc((all_ores[k].x + objs[i].topL[0] + 1) * scaleFactor, (all_ores[k].y + objs[i].topL[1] + 1) * scaleFactor, r * scaleFactor, 0, 2 * Math.PI);
                     ctx.lineWidth = 0.5;
-                    ctx.strokeStyle = "black"; 
-                    ctx.stroke(); // Draw circle border
                     if (all_ores[k].type == "stone") {
                         ctx.fillStyle = "gray";
                         ctx.fill(); // Fill circle
@@ -256,33 +270,20 @@ function drawObjs(objs, type) {
                         ctx.fillStyle = "yellow";
                         ctx.fill(); // Fill circle
                     }
+                    ctx.strokeStyle = "black"; 
+                    ctx.stroke(); // Draw circle border
+                    ctx.strokeStyle = objs[i].color; 
                 }
             }
         }
     }
     else if (type === "obstacle") {
-        for (let i = 0; i < objs.length; i++) {
+        for (let i = 0; i < objs.length; i++) { 
             // at the moment, kind of hardcoded - might have to fix this in the future!
             if (objs[i].irons != undefined) {
                 continue;
             }
-            if (objs[i].is_ore === true) {
-                ctx.beginPath();
-                let r = objs[i].r;
-                ctx.arc((objs[i].x + objs[i].topL[0] + 1) *scaleFactor, (objs[i].y + objs[i].topL[1] + 1) *scaleFactor, r*scaleFactor, 0, 2*Math.PI);
-                ctx.lineWidth = 0.5;
-                ctx.strokeStyle = "black"; 
-                ctx.stroke(); // Draw circle border
-                if (objs[i].type == "stone") {
-                    ctx.fillStyle = "gray";
-                    ctx.fill(); // Fill circle
-                } else {
-                    ctx.fillStyle = "yellow";
-                    ctx.fill(); // Fill circle
-                }
-
-            }
-            if (objs[i].shape == "circle" && objs[i].is_ore != true) {
+            if (objs[i].shape == "circle") {
                 ctx.beginPath();
                 let r = objs[i].r;
                 let centerX = (objs[i].topL[0]+objs[i].botR[0])/2;
@@ -291,7 +292,7 @@ function drawObjs(objs, type) {
                 ctx.fillStyle = objs[i].color;
                 ctx.fill(); // Fill circle
                 ctx.strokeStyle = "black";
-                ctx.lineWidth = 1;
+                ctx.lineWidth = 0.5;
                 ctx.stroke(); // Draw circle border
 
             } else {
@@ -385,7 +386,7 @@ function drawObjs(objs, type) {
         }
     } else if (type === "campsite") {
         for (let i = 0; i < objs.length; i++) {
-            ctx.lineWidth = 0.5;
+            ctx.lineWidth = 0.2;
 
             ctx.translate(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
             ctx.rotate(((objs[i].spinnerNum-1) * 2.0 * Math.PI)/9.0);
@@ -713,7 +714,7 @@ function uploadObjectsOnce() {
 function update(robot, objects) {
     clearCanvas();
 
-    drawObjs(objects.quarries, "quarry")
+    drawObjs(objects.quarries, "quarry");
     drawObjs(objects.tapeLines, "tapeLine");
     drawObjs(objects.obstacles, "obstacle");
     drawObjs(objects.ramps, "ramp");

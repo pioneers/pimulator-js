@@ -643,14 +643,14 @@ class RobotClass {
         return dict;
     }
 
-    spinDish() {
+    spin_dish() {
         let campsite = this.findCampsite();
         if (campsite) {
             campsite.spin();
         }
     }
 
-    spinVal() {
+    spin_val() {
         let campsite = this.findCampsite();
         if (campsite) {
             return campsite.possSpinner[campsite.spinnerNum];
@@ -673,45 +673,38 @@ class RobotClass {
              * Quarry is randomized - equal chance of getting stone or iron for now
              * For quarries, you attach to one of the irons or stones inside the quarry, not the actual quarry object itself
             */
-           if (obstacle.irons !== undefined || obstacle.stones !== undefined){
-               console.warn(obstacle)
-               console.warn("last")
-               let full_list = obstacle.stones.concat(obstacle.irons);
-               let choice = Math.round(Math.random(0,1) + 0.25);
-               let random = Math.ceil(Math.random(0,1) * full_list.length); 
-               console.warn(full_list);
-               if (random > 0) {
-                if (choice === 0){
-                    if (obstacle.irons.length != 0) {
-                        let random_iron = Math.floor(Math.random() * obstacle.irons.length)
-                        var iron_selected = obstacle.irons.splice(random_iron, 1)[0];
-                        this.attachedObj = iron_selected;
-                        iron_selected.attach();
-                        iron_selected.setDirection(this.dir);
-                        console.warn(this);
-                        this.simulator.obstacles.push(iron_selected);
+            if (obstacle.irons !== undefined || obstacle.stones !== undefined) {
+                let full_list = obstacle.stones.concat(obstacle.irons);
+                let choice = Math.round(Math.random(0,1) + 0.25);
+                let random = Math.ceil(Math.random(0,1) * full_list.length);
+                if (random > 0) {
+                    if (choice === 0) {
+                        if (obstacle.irons.length != 0) {
+                            let random_iron = Math.floor(Math.random() * obstacle.irons.length)
+                            var iron_selected = obstacle.irons.splice(random_iron, 1)[0];
+                            this.attachedObj = iron_selected;
+                            iron_selected.attach();
+                            iron_selected.setDirection(this.dir);
+                            this.simulator.obstacles.push(iron_selected);
+                        }
+                    } else if (choice === 1) {
+                        if (obstacle.stones.length != 0) {
+                            let random_stone = Math.floor(Math.random() * obstacle.stones.length)
+                            var stone_selected = obstacle.stones.splice(random_stone, 1)[0];
+                            this.attachedObj = stone_selected;
+                            stone_selected.attach();
+                            stone_selected.setDirection(this.dir);
+                            this.simulator.obstacles.push(stone_selected);
+                        }
                     }
-                } 
-                else if (choice === 1) {
-                 if (obstacle.stones.length != 0) {
-                     let random_stone = Math.floor(Math.random() * obstacle.stones.length)
-                     var stone_selected = obstacle.stones.splice(random_stone, 1)[0];
-                     this.attachedObj = stone_selected;
-                     stone_selected.attach();
-                     stone_selected.setDirection(this.dir);
-                     console.warn(this);
-                     this.simulator.obstacles.push(stone_selected);
-                 }
+                } else {
+                    return;
                 }
-               } else {
-                   return;
-               }
-
-           } else {
-            this.attachedObj = obstacle;
-            obstacle.attach();
-            obstacle.setDirection(this.dir);
-           }
+            } else {
+                this.attachedObj = obstacle;
+                obstacle.attach();
+                obstacle.setDirection(this.dir);
+            }
         }
     }
 
@@ -1209,6 +1202,7 @@ class Simulator{
                 this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, newWall.rotate, newWall.color));
             }
         }
+
         if (objects.interactableData !== undefined) {
             for (let interactableObj of objects.interactableData) {
                 let newInteractableObj = new InteractableObj(interactableObj.x, interactableObj.y, interactableObj.w, interactableObj.h, interactableObj.color);
@@ -1230,29 +1224,30 @@ class Simulator{
                 }
             }
         }
+
         if (objects.quarryData !== undefined) {
             for (let quarryObj of objects.quarryData) {
-                let newQuarry = new Quarry(quarryObj.x, quarryObj.y, quarryObj.w, quarryObj.h, quarryObj.color, quarryObj.highSide);
+                let newQuarry = new Quarry(quarryObj.x, quarryObj.y, quarryObj.w, quarryObj.h, quarryObj.orientation, quarryObj.color);
                 let all_ores = newQuarry.irons.concat(newQuarry.stones);
                 for (let i = 0; i < all_ores.length; i ++) {
-                    simulator.interactableObjs.push(all_ores[i]);
-                } 
+                    this.interactableObjs.push(all_ores[i]);
+                }
                 this.quarries.push(newQuarry);
                 this.obstacles.push(newQuarry);
                 this.interactableObjs.push(newQuarry);
+            }
+        }
 
         if (objects.campsitesData !== undefined) {
             for (let campsiteObj of objects.campsitesData) {
                 let newCampsite = new Campsite(campsiteObj.x, campsiteObj.y, campsiteObj.w, campsiteObj.h, campsiteObj.color);
                 this.campsites.push(newCampsite);
                 this.obstacles.push(new Wall(newCampsite.topL[0] + 4, newCampsite.topL[1], newCampsite.w - 8, newCampsite.h, 0, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1], newCampsite.w, 1, 0, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + (newCampsite.h / 3.0), newCampsite.w, 1, 0, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + 2 * (newCampsite.h / 3.0), newCampsite.w, 1, 0, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.botL[0], newCampsite.botL[1], newCampsite.w, 1, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1], newCampsite.w, 0.5, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + (newCampsite.h / 3.0), newCampsite.w, 0.5, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + 2 * (newCampsite.h / 3.0), newCampsite.w, 0.5, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.botL[0], newCampsite.botL[1], newCampsite.w, 0.5, 0, newCampsite.color));
             }
-        }
-        }
         }
     }
 
