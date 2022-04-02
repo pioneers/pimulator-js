@@ -645,6 +645,7 @@ function update(robot, objects) {
     clearCanvas();
 
     drawObjs(objects.tapeLines, "tapeLine");
+    drawObjs(objects.receivers, "receiver")
     drawObjs(objects.obstacles, "obstacle");
     drawObjs(objects.ramps, "ramp");
     drawObjs(objects.campsites, "campsite");
