@@ -159,7 +159,7 @@ class RobotClass {
             for (let r = 0; r < cornersX.length; r++) {
                 if (cornersX[r] < this.simulator.ramps[i].topR[0] && cornersX[r] > this.simulator.ramps[i].topL[0]) {
                     if (cornersY[r] > this.simulator.ramps[i].topL[1] && cornersY[r] < this.simulator.ramps[i].botL[1]) {
-                        return this.simulator.ramps[i]
+                        return this.simulator.ramps[i];
                     }
                 }
             }
@@ -552,6 +552,7 @@ class RobotClass {
             tapeLines: this.simulator.tapeLines,
             obstacles: this.simulator.obstacles,
             ramps: this.simulator.ramps,
+            refineries: this.simulator.refineries,
             quarries: this.simulator.quarries,
             campsites: this.simulator.campsites
         }
@@ -586,7 +587,6 @@ class RobotClass {
             dict.topR[1] = dict.topL[1] - obstacle.w * Math.cos(dir * Math.PI / 180);
             dict.botR[0] = dict.botL[0] + obstacle.w * Math.sin(dir * Math.PI / 180);
             dict.botR[1] = dict.botL[1] - obstacle.w * Math.cos(dir * Math.PI / 180);
-            //obstacle.setDirection(this.dir);
         }
 
         return dict;
@@ -750,6 +750,45 @@ class RobotClass {
         return null;
     }
 
+    findRefinery() {
+        if (this.simulator.refineries.length == 0) {
+            return null;
+        }
+
+        const width = 5;
+        const height = 5;
+        const b = (this.width - width) / 2;
+        let collidableRegion = {topR: Array(2), topL: Array(2), botL: Array(2), botR: Array(2)};
+        collidableRegion.botL[0] = this.topL[0] + b * Math.cos((90.0 - this.dir) * Math.PI / 180);
+        collidableRegion.botL[1] = this.topL[1] - b * Math.sin((90.0 - this.dir) * Math.PI / 180);
+        collidableRegion.topL[0] = collidableRegion.botL[0] - height * Math.cos(this.dir * Math.PI / 180);
+        collidableRegion.topL[1] = collidableRegion.botL[1] - height * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.topR[0] = collidableRegion.topL[0] + width * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.topR[1] = collidableRegion.topL[1] - width * Math.cos(this.dir * Math.PI / 180);
+        collidableRegion.botR[0] = collidableRegion.botL[0] + width * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.botR[1] = collidableRegion.botL[1] - width * Math.cos(this.dir * Math.PI / 180);
+
+        for (let obstacle of this.simulator.refineries) {
+            let obstacle_top = obstacle;
+            if (obstacle.highSide === "left") {
+                obstacle_top = new Wall(obstacle.topL[0], obstacle.topL[1], 5, obstacle.h, 0, obstacle.color);
+            } else if (obstacle.highSide === "right") {
+                obstacle_top = new Wall(obstacle.topR[0] - 5, obstacle.topR[1], 5, obstacle.h, 0, obstacle.color);
+            } else if (obstacle.highSide === "up") {
+                obstacle_top = new Wall(obstacle.topL[0], obstacle.topL[1], obstacle.w, 5, 0, obstacle.color);
+            } else if (obstacle.highSide === "down") {
+                obstacle_top = new Wall(obstacle.botL[0], obstacle.botL[1] - 5, obstacle.w, 5, 0, obstacle.color);
+            }
+
+            let inter = this.intersectOne(obstacle_top, collidableRegion);
+
+            if (inter) {
+              return obstacle;
+            }
+        }
+        return null;
+    }
+
     findCampsite() {
         if (this.simulator.campsites.length == 0) {
             return null;
@@ -777,6 +816,60 @@ class RobotClass {
         return null;
     }
 
+    refine() {
+        let refinery = this.findRefinery();
+        if (this.attachedObj && refinery) {
+            if (this.attachedObj.r == 0.75) { // is an ore
+                let index = this.simulator.interactableObjs.indexOf(this.attachedObj);
+                if (index > -1) { 
+                    this.simulator.interactableObjs.splice(index, 1);
+                }
+                index = this.simulator.obstacles.indexOf(this.attachedObj);
+                if (index > -1) { 
+                    this.simulator.obstacles.splice(index, 1);
+                }
+                refinery.addOre();
+                this.attachedObj.release();
+                this.attachedObj = null;
+                // have the obj disappear and be added to the refinery
+            } else if (this.attachedObj.r == 1.1) { // is a stone
+                // have the stone appear on the opposite side of the refinery
+                if (refinery.highSide === "left") {
+                    this.updateStone(this.attachedObj, 2.5 + refinery.topR[0], (refinery.topR[1] + refinery.botR[1]) / 2.0);
+                } else if (refinery.highSide === "right") {
+                    this.updateStone(this.attachedObj, refinery.topL[0] - 2.5, (refinery.topL[1] + refinery.botL[1]) / 2.0);
+                } else if (refinery.highSide === "up") {
+                    this.updateStone(this.attachedObj, (refinery.botL[0] + refinery.botR[0]) / 2.0, refinery.botL[1] + 2.5);
+                } else if (refinery.highSide === "down") {
+                    this.updateStone(this.attachedObj, (refinery.topL[0] + refinery.topR[0]) / 2.0, refinery.topL[1] - 2.5)
+                }
+                this.attachedObj.release();
+                this.attachedObj = null;
+            }
+        }
+    }
+
+    updateStone(stone, x, y) {
+        stone.x = x;
+        stone.y = y;
+        stone.topL[0] = x - stone.r;
+        stone.topL[1] = y - stone.r;
+        stone.topR[0] = x + stone.r;
+        stone.topR[1] = y - stone.r;
+        stone.botL[0] = x - stone.r;
+        stone.botL[1] = y + stone.r;
+        stone.botR[0] = x + stone.r;
+        stone.botR[1] = y + stone.r;
+    }
+
+    num_ore() {
+        let refinery = this.findRefinery();
+        if (refinery) {
+            return refinery.numOre();
+        }
+        return null;
+    }
+
     /**
      * Sets a value on a device.
      * A Runtime API method.
@@ -784,7 +877,7 @@ class RobotClass {
      * @param {String} param - the parameter on the device
      * @param {Float} value - the value to set, bounded by [-1, 1]
      */
-    set_value(device, param, value) {
+     set_value(device, param, value) {
         if (typeof(param) !== "string") {
             console.log("ERROR: get_value() parameter must be a string")
             return
@@ -1162,6 +1255,7 @@ class Simulator{
         this.campsites = [];
         this.interactableObjs = [];
         this.ramps = [];
+        this.refineries = [];
         this.quarries = [];
 
 
@@ -1188,6 +1282,7 @@ class Simulator{
         this.obstacles = [];
         this.interactableObjs = [];
         this.ramps = [];
+        this.refineries = [];
         this.quarries = [];
         this.campsites = [];
 
@@ -1236,6 +1331,14 @@ class Simulator{
             }
         }
 
+        if (objects.refineriesData !== undefined) {
+            for (let refinery of objects.refineriesData) {
+                let newRefinery = new Refinery(refinery.x, refinery.y, refinery.w, refinery.h, refinery.highSide, refinery.color);
+                this.refineries.push(newRefinery);
+                this.obstacles.push(new Wall(newRefinery.x, newRefinery.y, newRefinery.w, newRefinery.h, 0, newRefinery.color));
+            }
+        }
+        
         if (objects.quarryData !== undefined) {
             for (let quarryObj of objects.quarryData) {
                 let newQuarry = new Quarry(quarryObj.x, quarryObj.y, quarryObj.w, quarryObj.h, quarryObj.orientation, quarryObj.color);
@@ -1271,20 +1374,17 @@ class Simulator{
             ramps: this.ramps,
             tapeLines: this.tapeLines,
             obstacles: this.obstacles,
+            refineries: this.refineries,
             quarries: this.quarries,
             campsites: this.campsites
         }
         postMessage({objs: objects})
-
-        // postMessage({objs: this.ramps, type: "ramp"});
-        // postMessage({objs: this.tapeLines, type: "tapeLine"});
-        // postMessage({objs: this.obstacles, type: "obstacle"});
     }
 
     /**
      * Loads the student code for the current Simulator
      */
-    loadStudentCode(){
+     loadStudentCode(){
         // Store the local environment into dictionary
         // Ensure the global Robot reflects the same robot Simulator is using
         env['Robot'] = this.robot;

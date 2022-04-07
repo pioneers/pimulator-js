@@ -384,6 +384,41 @@ function drawObjs(objs, type) {
                 ctx.setLineDash([]);
             }
         }
+    } else if (type === "refinery") {
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < objs.length; i++) {
+            ctx.strokeStyle = "black";
+            // Dividing by 8 & 6 throughout to draw the little black lines
+            if (objs[i].highSide === "left") {
+                for (let j = objs[i].topL[1] * scaleFactor; j <= objs[i].botL[1] * scaleFactor; j += (objs[i].h / 8.0) * scaleFactor) { 
+                    ctx.beginPath();
+                    ctx.moveTo(objs[i].topL[0] * scaleFactor, j);
+                    ctx.lineTo((objs[i].topL[0] + (objs[i].w / 6.0)) * scaleFactor, j);
+                    ctx.stroke();
+                }
+            } else if (objs[i].highSide === "right") {
+                for (let j = objs[i].topL[1] * scaleFactor; j <= objs[i].botL[1] * scaleFactor; j += (objs[i].h / 8.0) * scaleFactor) {
+                    ctx.beginPath();
+                    ctx.moveTo((objs[i].topR[0] - (objs[i].w / 6.0)) * scaleFactor, j);
+                    ctx.lineTo(objs[i].topR[0] * scaleFactor, j);
+                    ctx.stroke();
+                }
+            } else if (objs[i].highSide === "up") {
+                for (let j = objs[i].topL[0] * scaleFactor; j <= objs[i].topR[0]  * scaleFactor; j += (objs[i].w / 8.0) * scaleFactor) {
+                    ctx.beginPath();
+                    ctx.moveTo(j, objs[i].topL[1] * scaleFactor);
+                    ctx.lineTo(j, (objs[i].topL[1] + (objs[i].w / 6.0)) * scaleFactor);
+                    ctx.stroke();
+                }
+            } else if (objs[i].highSide === "down") {
+                for (let j = objs[i].topL[0] * scaleFactor; j <= objs[i].topR[0] * scaleFactor; j += (objs[i].w / 8.0) * scaleFactor) {
+                    ctx.beginPath();
+                    ctx.moveTo(j, objs[i].botL[1] * scaleFactor);
+                    ctx.lineTo(j, (objs[i].botL[1] - (objs[i].w / 6.0)) * scaleFactor);
+                    ctx.stroke();
+                }
+            }
+        }
     } else if (type === "campsite") {
         for (let i = 0; i < objs.length; i++) {
             ctx.lineWidth = 0.2;
@@ -718,6 +753,7 @@ function update(robot, objects) {
     drawObjs(objects.tapeLines, "tapeLine");
     drawObjs(objects.obstacles, "obstacle");
     drawObjs(objects.ramps, "ramp");
+    drawObjs(objects.refineries, "refinery");
     drawObjs(objects.campsites, "campsite");
 
     drawRobot(robot);
