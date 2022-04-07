@@ -388,8 +388,9 @@ function drawObjs(objs, type) {
         ctx.lineWidth = 0.5;
         for (let i = 0; i < objs.length; i++) {
             ctx.strokeStyle = "black";
+            // Dividing by 8 & 6 throughout to draw the little black lines
             if (objs[i].highSide === "left") {
-                for (let j = objs[i].topL[1] * scaleFactor; j <= objs[i].botL[1] * scaleFactor; j += (objs[i].h / 8.0) * scaleFactor) {
+                for (let j = objs[i].topL[1] * scaleFactor; j <= objs[i].botL[1] * scaleFactor; j += (objs[i].h / 8.0) * scaleFactor) { 
                     ctx.beginPath();
                     ctx.moveTo(objs[i].topL[0] * scaleFactor, j);
                     ctx.lineTo((objs[i].topL[0] + (objs[i].w / 6.0)) * scaleFactor, j);

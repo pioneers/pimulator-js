@@ -587,7 +587,6 @@ class RobotClass {
             dict.topR[1] = dict.topL[1] - obstacle.w * Math.cos(dir * Math.PI / 180);
             dict.botR[0] = dict.botL[0] + obstacle.w * Math.sin(dir * Math.PI / 180);
             dict.botR[1] = dict.botL[1] - obstacle.w * Math.cos(dir * Math.PI / 180);
-            //obstacle.setDirection(this.dir);
         }
 
         return dict;
@@ -837,20 +836,12 @@ class RobotClass {
                 // have the stone appear on the opposite side of the refinery
                 if (refinery.highSide === "left") {
                     this.updateStone(this.attachedObj, 2.5 + refinery.topR[0], (refinery.topR[1] + refinery.botR[1]) / 2.0);
-                    // this.attachedObj.x = 2.5 + refinery.topR[0];
-                    // this.attachedObj.y = (refinery.topR[1] + refinery.botR[1]) / 2.0;
                 } else if (refinery.highSide === "right") {
                     this.updateStone(this.attachedObj, refinery.topL[0] - 2.5, (refinery.topL[1] + refinery.botL[1]) / 2.0);
-                    // this.attachedObj.x = refinery.topL[0] - 2.5;
-                    // this.attachedObj.y = (refinery.topL[1] + refinery.botL[1]) / 2.0;
                 } else if (refinery.highSide === "up") {
                     this.updateStone(this.attachedObj, (refinery.botL[0] + refinery.botR[0]) / 2.0, refinery.botL[1] + 2.5);
-                    // this.attachedObj.x = (refinery.topL[0] + refinery.botL[0]) / 2.0;
-                    // this.attachedObj.y = refinery.botL[1] + 2.5;
                 } else if (refinery.highSide === "down") {
                     this.updateStone(this.attachedObj, (refinery.topL[0] + refinery.topR[0]) / 2.0, refinery.topL[1] - 2.5)
-                    // this.attachedObj.x = (refinery.topL[0] + refinery.topR[0]) / 2.0;
-                    // this.attachedObj.y = refinery.topL[1] - 2.5;
                 }
                 this.attachedObj.release();
                 this.attachedObj = null;
@@ -1391,10 +1382,6 @@ class Simulator{
             campsites: this.campsites
         }
         postMessage({objs: objects})
-
-        // postMessage({objs: this.ramps, type: "ramp"});
-        // postMessage({objs: this.tapeLines, type: "tapeLine"});
-        // postMessage({objs: this.obstacles, type: "obstacle"});
     }
 
     /**
