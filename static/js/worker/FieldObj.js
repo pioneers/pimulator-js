@@ -38,7 +38,7 @@ class Wall extends FieldObj {
 }
 
 class InteractableObj extends FieldObj {
-    constructor(x, y, w, h, shape, color="red") {
+    constructor(x, y, w, h, shape, color = "red") {
         super(x, y, w, h, color);
         this.shape = shape;
         this.attached = false;
@@ -74,8 +74,9 @@ class InteractableCircle extends InteractableObj {
     constructor(x, y, r, color="red") {
         // Subtract from x and y, so we can use logic for rectangle
         // but define circle using x and y as center
-        super(x-r, y-r, 2*r, 2*r, "circle", color);
-        this.r = r;
+        super(x-r, y-r, 2.0*r, 2.0*r, "circle", color);
+        this.r = 1.0 * r;
+
     }
 }
 
@@ -85,6 +86,40 @@ class Ramp extends FieldObj {
         this.highSide = highSide;
         this.incline = incline;
     }
+}
+
+class Ore extends InteractableCircle {
+    constructor(x, y, type = "stone", radius = 1.1) {
+        if (type === "stone") {
+            super(x, y, 1.1, "gray");
+            this.type = "stone";
+        } else {
+            super(x, y, 0.75, "yellow");
+            this.type = "iron";
+        }
+        this.is_ore = true;
+    }
+}
+
+// Ore counts are hardcoded to be 15 for stone, 5 for iron.
+class Quarry extends InteractableObj {
+    constructor (x, y , w, h, orientation="down", color ='blue') {
+        super(x, y, w, h, color);
+        this.color = color;
+        this.orientation = orientation;
+        this.stones = [];
+        this.irons = [];
+        for (let i = 0; i < 15; i++) {
+            let rand_x = 2 + Math.random(0,1) * (this.topR[0] - this.topL[0] - 3); // Gets the distance it is from the left of the quarry
+            let rand_y = 2 + Math.random(0,1) * (this.botR[1] - this.topR[1] - 3);
+            this.stones.push(new Ore(rand_x, rand_y, "stone", 1.1));
+          }
+        for (let k = 0; k < 5; k ++) {
+            let rand_x = 2 + Math.random(0,1) * (this.topR[0] - this.topL[0] - 3); // Gets the distance it is from the left of the quarry
+            let rand_y = 2 + Math.random(0,1) * (this.botR[1] - this.topR[1] - 3);
+            this.irons.push(new Ore(rand_x, rand_y, "iron", 0.75));
+        }
+    } 
 }
 
 class Campsite extends FieldObj {
