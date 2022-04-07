@@ -1336,9 +1336,6 @@ class Simulator{
                 let newRefinery = new Refinery(refinery.x, refinery.y, refinery.w, refinery.h, refinery.highSide, refinery.color);
                 this.refineries.push(newRefinery);
                 this.obstacles.push(new Wall(newRefinery.x, newRefinery.y, newRefinery.w, newRefinery.h, 0, newRefinery.color));
-                // BASE.JS: draw stuff to mark highSide
-                // debug findRefinery
-                // write function for dropping off stone/ore, have stone pop out other end?
             }
         }
         
