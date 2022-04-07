@@ -38,8 +38,9 @@ class Wall extends FieldObj {
 }
 
 class InteractableObj extends FieldObj {
-    constructor(x, y, w, h, color = "red") {
+    constructor(x, y, w, h, shape, color = "red") {
         super(x, y, w, h, color);
+        this.shape = shape;
         this.attached = false;
         this.direction = 0;
     }
@@ -61,33 +62,29 @@ class InteractableObj extends FieldObj {
     }
 }
 
+class InteractableCircle extends InteractableObj {
+    /**
+     * Defines a circular object that can be picked up.
+     * @param x - x coordinate of center of circle
+     * @param y - y coordinate of center of circle
+     * @param r - radius of circle
+     * @param color - color of circle
+     * @returns value returned by RobotClass.get_value()
+     */
+    constructor(x, y, r, color="red") {
+        // Subtract from x and y, so we can use logic for rectangle
+        // but define circle using x and y as center
+        super(x-r, y-r, 2.0*r, 2.0*r, "circle", color);
+        this.r = 1.0 * r;
+
+    }
+}
+
 class Ramp extends FieldObj {
     constructor(x, y, w, h, highSide = "up", incline = 15, color = "black") {
         super(x, y, w, h, color);
         this.highSide = highSide;
         this.incline = incline;
-    }
-}
-
-class Campsite extends FieldObj {
-    constructor(x, y, w = 20, h = 9, color = "tan") {
-        super(x, y, w, h, color);
-        this.possSpinner = {0: "neutral", 1: "neutral", 2: "neutral", 3: "Gold 3", 4: "Gold 2", 5: "Gold 1", 6: "Blue 1", 7: "Blue 2", 8: "Blue 3"};
-        this.spinnerNum = 0;
-        this.centerX = x + (w / 2);
-        this.centerY = y + (h / 2);
-    }
-
-    spin() {
-        this.spinnerNum = (this.spinnerNum + 1) % 9;
-    }
-
-    spinnerVal() {
-        return this.possSpinner[this.spinnerNum];
-    }
-
-    spinnerNums() {
-        return this.spinnerNum;
     }
 }
 
@@ -228,5 +225,52 @@ class Receiver extends Button {
 
     canDeployPioneer() {
         return this.getCount() < this.limit;
+    }
+}
+class Ore extends InteractableCircle {
+    constructor(x, y, type = "stone", radius = 1.1) {
+        if (type === "stone") {
+            super(x, y, 1.1, "gray");
+            this.type = "stone";
+        } else {
+            super(x, y, 0.75, "yellow");
+            this.type = "iron";
+        }
+        this.is_ore = true;
+    }
+}
+
+// Ore counts are hardcoded to be 15 for stone, 5 for iron.
+class Quarry extends InteractableObj {
+    constructor (x, y , w, h, orientation="down", color ='blue') {
+        super(x, y, w, h, color);
+        this.color = color;
+        this.orientation = orientation;
+        this.stones = [];
+        this.irons = [];
+        for (let i = 0; i < 15; i++) {
+            let rand_x = 2 + Math.random(0,1) * (this.topR[0] - this.topL[0] - 3); // Gets the distance it is from the left of the quarry
+            let rand_y = 2 + Math.random(0,1) * (this.botR[1] - this.topR[1] - 3);
+            this.stones.push(new Ore(rand_x, rand_y, "stone", 1.1));
+          }
+        for (let k = 0; k < 5; k ++) {
+            let rand_x = 2 + Math.random(0,1) * (this.topR[0] - this.topL[0] - 3); // Gets the distance it is from the left of the quarry
+            let rand_y = 2 + Math.random(0,1) * (this.botR[1] - this.topR[1] - 3);
+            this.irons.push(new Ore(rand_x, rand_y, "iron", 0.75));
+        }
+    } 
+}
+
+class Campsite extends FieldObj {
+    constructor(x, y, w = 20, h = 9, color = "tan") {
+        super(x, y, w, h, color);
+        this.possSpinner = {0: "neutral", 1: "neutral", 2: "neutral", 3: "gold 3", 4: "gold 2", 5: "gold 1", 6: "blue 1", 7: "blue 2", 8: "blue 3"};
+        this.spinnerNum = 1;
+        this.centerX = x + (w / 2);
+        this.centerY = y + (h / 2);
+    }
+
+    spin() {
+        this.spinnerNum = (this.spinnerNum + 1) % 9;
     }
 }
