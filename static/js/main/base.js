@@ -158,11 +158,11 @@ function drawRobot(robot) {
     // Draw Circles (Line followers)
     ctx.beginPath();
     ctx.moveTo(frontCenterX, frontCenterY);
-    ctx.arc(frontCenterX, frontCenterY, 2, 0, 2 * Math.PI);
+    ctx.arc(frontCenterX, frontCenterY, 1, 0, 2 * Math.PI);
     ctx.moveTo(frontCenterX, frontCenterY-9);
-    ctx.arc(frontCenterX, frontCenterY-9, 2, 0, 2 * Math.PI);
+    ctx.arc(frontCenterX, frontCenterY-9, 1, 0, 2 * Math.PI);
     ctx.moveTo(frontCenterX, frontCenterY+9);
-    ctx.arc(frontCenterX, frontCenterY+9, 2, 0, 2 * Math.PI);
+    ctx.arc(frontCenterX, frontCenterY+9, 1, 0, 2 * Math.PI);
     ctx.closePath();
     ctx.strokeStyle = 'red';
     ctx.stroke();
@@ -194,9 +194,15 @@ function drawRobot(robot) {
  * @param {String} type - The type of object being drawn.
  */
 function drawObjs(objs, type) {
-    if (type === "obstacle") {
+    if (type === "quarry") {
         for (let i = 0; i < objs.length; i++) {
+            ctx.lineWidth = 2;
+            obj_botL = [objs[i].botL[0] * scaleFactor, objs[i].botL[1] * scaleFactor];
+            obj_botR = [objs[i].botR[0] * scaleFactor, objs[i].botR[1] * scaleFactor];
+            obj_topL = [objs[i].topL[0] * scaleFactor, objs[i].topL[1] * scaleFactor];
+            obj_topR = [objs[i].topR[0] * scaleFactor, objs[i].topR[1] * scaleFactor];
             ctx.beginPath();
+<<<<<<< HEAD
             ctx.moveTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
             ctx.lineTo(objs[i].topR[0]*scaleFactor, objs[i].topR[1]*scaleFactor);
             ctx.lineTo(objs[i].botR[0]*scaleFactor, objs[i].botR[1]*scaleFactor);
@@ -204,6 +210,114 @@ function drawObjs(objs, type) {
             ctx.lineTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
             ctx.fillStyle = objs[i].color;
             ctx.fill();
+=======
+            ctx.strokeStyle = objs[i].color;
+            ctx.setLineDash([]);
+            ctx.globalAlpha = 1;
+            if (objs[i].orientation === "right") {
+                ctx.moveTo(obj_botR[0], obj_botR[1]);
+                ctx.lineTo(obj_botL[0], obj_botL[1]);
+                ctx.lineTo(obj_topL[0], obj_topL[1]);
+                ctx.lineTo(obj_topR[0], obj_topR[1]);
+                ctx.stroke();
+                ctx.strokeStyle = objs[i].color;
+                ctx.beginPath();
+                ctx.setLineDash([5, 3]);
+                ctx.moveTo(obj_topR[0], obj_topR[1]);
+                ctx.lineTo(obj_botR[0], obj_botR[1]);
+                ctx.stroke();
+            }
+            else if (objs[i].orientation === "left") {
+                ctx.moveTo(obj_botL[0], obj_botL[1]);
+                ctx.lineTo(obj_botR[0], obj_botR[1]);
+                ctx.lineTo(obj_topR[0], obj_topR[1]);
+                ctx.lineTo(obj_topL[0], obj_topL[1]);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.setLineDash([5, 3]);
+                ctx.moveTo(obj_topL[0], obj_topL[1]);
+                ctx.lineTo(obj_botL[0], obj_botL[1]);
+                ctx.stroke();
+            }
+            else if (objs[i].orientation === "down") {
+                ctx.moveTo(obj_botR[0], obj_botR[1]);
+                ctx.lineTo(obj_topR[0], obj_topR[1]);
+                ctx.lineTo(obj_topL[0], obj_topL[1]);
+                ctx.lineTo(obj_botL[0], obj_botL[1]);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.setLineDash([5, 3]);
+                ctx.moveTo(obj_botL[0], obj_botL[1]);
+                ctx.lineTo(obj_botR[0], obj_botR[1]);
+                ctx.stroke();
+            }
+            else if (objs[i].orientation === "up"){
+                ctx.moveTo(obj_topR[0], obj_topR[1]);
+                ctx.lineTo(obj_botR[0], obj_botR[1]);
+                ctx.lineTo(obj_botL[0], obj_botL[1]);
+                ctx.lineTo(obj_topL[0], obj_topL[1]);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.setLineDash([5, 3]);
+                ctx.moveTo(obj_topL[0], obj_topL[1]);
+                ctx.lineTo(obj_topR[0], obj_topR[1]);
+                ctx.stroke();
+            }
+            
+            ctx.setLineDash([]);
+            let all_ores = objs[i].stones.concat(objs[i].irons);
+            for (let k = 0; k < all_ores.length; k++) {
+                if (all_ores[k].attached == false) {
+                    ctx.beginPath();
+                    let r = all_ores[k].r;
+                    ctx.arc((all_ores[k].x + objs[i].topL[0] + 1) * scaleFactor, (all_ores[k].y + objs[i].topL[1] + 1) * scaleFactor, r * scaleFactor, 0, 2 * Math.PI);
+                    ctx.lineWidth = 0.5;
+                    if (all_ores[k].type == "stone") {
+                        ctx.fillStyle = "gray";
+                        ctx.fill(); // Fill circle
+                    } else {
+                        ctx.fillStyle = "yellow";
+                        ctx.fill(); // Fill circle
+                    }
+                    ctx.strokeStyle = "black"; 
+                    ctx.stroke(); // Draw circle border
+                    ctx.strokeStyle = objs[i].color; 
+                }
+            }
+        }
+    }
+    else if (type === "obstacle") {
+        for (let i = 0; i < objs.length; i++) { 
+            // at the moment, kind of hardcoded - might have to fix this in the future!
+            if (objs[i].irons != undefined) {  // checking if objs[i] is a quarry
+                continue;
+            }
+            if (objs[i].shape == "circle") {
+                ctx.beginPath();
+                let r = objs[i].r;
+                let centerX = (objs[i].topL[0]+objs[i].botR[0])/2;
+                let centerY = (objs[i].topL[1]+objs[i].botR[1])/2;
+                ctx.arc(centerX*scaleFactor, centerY*scaleFactor, r*scaleFactor, 0, 2*Math.PI);
+                ctx.fillStyle = objs[i].color;
+                ctx.fill(); // Fill circle
+                ctx.strokeStyle = "black";
+                ctx.lineWidth = 0.5;
+                ctx.stroke(); // Draw circle border
+
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
+                ctx.lineTo(objs[i].topR[0]*scaleFactor, objs[i].topR[1]*scaleFactor);
+                ctx.lineTo(objs[i].botR[0]*scaleFactor, objs[i].botR[1]*scaleFactor);
+                ctx.lineTo(objs[i].botL[0]*scaleFactor, objs[i].botL[1]*scaleFactor);
+                ctx.lineTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
+                ctx.fillStyle = objs[i].color;
+                ctx.fill(); // Fill rectangle
+                ctx.strokeStyle = "black";
+                ctx.lineWidth = 1;
+                ctx.stroke(); // Draw rectangle border
+            }
+>>>>>>> 75123ba18cb7ed973f5a66e3ac255e81f247b49a
         }
     } else if (type === "tapeLine") {
         ctx.lineWidth = 5;
@@ -282,6 +396,7 @@ function drawObjs(objs, type) {
         }
     } else if (type === "campsite") {
         for (let i = 0; i < objs.length; i++) {
+<<<<<<< HEAD
             ctx.lineWidth = 0.5;
 
             ctx.translate(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
@@ -289,6 +404,14 @@ function drawObjs(objs, type) {
             ctx.translate(-scaleFactor * objs[i].centerX, -scaleFactor * objs[i].centerY);
 
             
+=======
+            ctx.lineWidth = 0.2;
+
+            ctx.translate(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
+            ctx.rotate(((objs[i].spinnerNum-1) * 2.0 * Math.PI)/9.0);
+            ctx.translate(-scaleFactor * objs[i].centerX, -scaleFactor * objs[i].centerY);
+
+>>>>>>> 75123ba18cb7ed973f5a66e3ac255e81f247b49a
             ctx.strokeStyle = "Blue";
             ctx.fillStyle = "Blue";
             ctx.beginPath();
@@ -317,7 +440,11 @@ function drawObjs(objs, type) {
             ctx.stroke();
 
             ctx.translate(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
+<<<<<<< HEAD
             ctx.rotate(-(objs[i].spinnerNum * 2.0 * Math.PI)/9.0);
+=======
+            ctx.rotate(-((objs[i].spinnerNum-1) * 2.0 * Math.PI)/9.0);
+>>>>>>> 75123ba18cb7ed973f5a66e3ac255e81f247b49a
             ctx.translate(-scaleFactor * objs[i].centerX, -scaleFactor * objs[i].centerY);
 
             ctx.strokeStyle = "Black";
@@ -325,6 +452,7 @@ function drawObjs(objs, type) {
             ctx.beginPath();
             ctx.rect(scaleFactor * (objs[i].centerX - 5.5), scaleFactor * objs[i].centerY, 1, 0.5);
             ctx.fill();
+<<<<<<< HEAD
             ctx.stroke();
         }
     } else if (type === "receiver") {
@@ -359,6 +487,9 @@ function drawObjs(objs, type) {
             ctx.lineTo(objs[i].bTopL[0]*scaleFactor, objs[i].bTopL[1]*scaleFactor);
             ctx.fillStyle = objs[i].buttonColor;
             ctx.fill();
+=======
+            ctx.stroke();        
+>>>>>>> 75123ba18cb7ed973f5a66e3ac255e81f247b49a
         }
     }
 }
@@ -547,7 +678,7 @@ function setRobotStartingPosition(objects) {
     if (objects.startPosition.x !== undefined && objects.startPosition.y !== undefined) {
         xpos = objects.startPosition.x;
         ypos = objects.startPosition.y;
-        if (xpos < 0 || 144 < xpos || ypos < 0 || 144 < ypos) {
+        if (xpos < 0 || 192 < xpos || ypos < 0 || 144 < ypos) {
             log("(" + xpos + ", " + ypos + ") are not valid starting coordinates");
         }
     } else {
@@ -644,6 +775,7 @@ function uploadObjectsOnce() {
 function update(robot, objects) {
     clearCanvas();
 
+    drawObjs(objects.quarries, "quarry");
     drawObjs(objects.tapeLines, "tapeLine");
     drawObjs(objects.receivers, "receiver")
     drawObjs(objects.obstacles, "obstacle");

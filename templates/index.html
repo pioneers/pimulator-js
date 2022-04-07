@@ -95,7 +95,7 @@
                         <div class="card-body text-center border-primary" id="field" style="padding:0px;height:432px">
                             <div class="d-inline-flex flex-row bd-highlight">
                                 <div class="bd-highlight" style="position: relative;">
-                                  <canvas id="fieldCanvas" width="432" height="432">
+                                  <canvas id="fieldCanvas" width="576" height="432">
                                   </canvas>
                                 </div>
                             </div>
@@ -368,12 +368,20 @@
                                                     The arrows on the ramp represent the direction of the force acting on your robot if your robot is on the ramp.
                                                     </p>
                                                     <p> <b> Interactable Objects:  </b> </p>
-                                                    <p>
-                                                    Interactable objects are listed under the key <code>interactableData</code> and consist of 4 key-value pairs,
-                                                    with keys <code>x</code>, <code>y</code>, <code>w</code>, <code>h</code>.
-                                                    The <code>x</code> and <code>y</code> values represent the top left corner of the interactable objects.
+                                                    <p> Interactable objects are listed under the key <code>interactableData</code>. Depending on the key <code>shape</code>, they can 
+                                                    form different shapes:</p>
+                                                    <ul>
+                                                        <li>
+                                                            <code>rectangle</code>: 4 key-value pairs, with keys <code>x</code>, <code>y</code>, <code>w</code>, <code>h</code>.
+                                                            The <code>x</code> and <code>y</code> values represent the top left corner of the rectangle.
+                                                        </li>
+                                                        <li>
+                                                            <code>circle</code>: 3 key-value pairs, with keys <code>x</code>, <code>y</code>, <code>r</code>.
+                                                            The <code>x</code> and <code>y</code> values represent the center of the circle.
+                                                        </li>
+                                                    </ul>
                                                     </p>
-                                                    <p> Note: Walls and interactable objects can only be oriented perpendicular to the field. </p>
+                                                    <p> Note: Walls and rectangular interactable objects can only be oriented perpendicular to the field. </p>
                                                     <p> <b> Tape Lines: </b></p>
                                                     <p>
                                                         Tape lines are listed under the key <code>tapeLinesData</code> and consist of 4 key-value pairs,

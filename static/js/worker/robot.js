@@ -9,7 +9,7 @@
 /**
  * Rebinds Console functions for custom logging.
  */
-var console=(function(oldCons){
+ var console=(function(oldCons){
     return {
         log: function(text){
             oldCons.log(text);
@@ -61,7 +61,7 @@ class RobotClass {
     height = 20;                // height or robot, inches
     wheelWidth = 20;            // wheelbase width, inches
     wRadius = 2;                // radius of a wheel, inches
-    MaxX = 144;                 // maximum X value, inches, field is 12'x12'
+    MaxX = 192;                 // maximum X value, inches, field is 12'x12'
     MaxY = 144;                 // maximum Y value, inches, field is 12'x12'
     neg = -1;                   // negate left motor calculation
     startXDefault = 70.0;
@@ -84,6 +84,7 @@ class RobotClass {
         this.requestedRv = 0;     // requested velocity of right wheel, in [-1, 1], uninverted, where 1 corresponds to maxVel
         this.invertL = false;     // whether the left motor is inverted (false=default, true=inverted)
         this.invertR = false;     // whether the right motor is inverted (false=default, true=inverted)
+        this.holding = 0          // 0 for nothing, 1 for iron, 2 for stone
 
         // Set robot attributes based on type
         // Note: width and height values are replicated in base.js.
@@ -512,6 +513,7 @@ class RobotClass {
 
         // If no collision, update robot and attached object positional attributes
         if (!inter) {
+            // If inter a Quarry, do not move it (can be changed in the future) - robot cannot move a quarry
             this.X = X;
             this.Y = Y;
             this.ltheta = ltheta;
@@ -550,8 +552,9 @@ class RobotClass {
             tapeLines: this.simulator.tapeLines,
             obstacles: this.simulator.obstacles,
             ramps: this.simulator.ramps,
-            campsites: this.simulator.campsites,
-            receivers: this.simulator.receivers
+            receivers: this.simulator.receivers,
+            quarries: this.simulator.quarries,
+            campsites: this.simulator.campsites
         }
 
         postMessage({
@@ -641,7 +644,7 @@ class RobotClass {
         return dict;
     }
 
-    spinDish() {
+    spin_dish() {
         let campsite = this.findCampsite();
         if (campsite) {
             campsite.spin();
@@ -666,6 +669,13 @@ class RobotClass {
             this.simulator.obstacles.push(newInteractableObj);
         }
     }
+    
+    spin_val() {
+        let campsite = this.findCampsite();
+        if (campsite) {
+            return campsite.possSpinner[campsite.spinnerNum];
+        }
+    }
 
 
     /**
@@ -678,11 +688,43 @@ class RobotClass {
         }
         let obstacle = this.findInteractableObj();
         if (obstacle) {
-            // Attach the object
-            this.attachedObj = obstacle;
-            obstacle.attach();
-            obstacle.setDirection(this.dir);
-
+            /** 
+             * Attach the object - If Quarry or Refinery (Currenly, just the Quarry is implemented) do something else
+             * Quarry is randomized - equal chance of getting stone or iron for now
+             * For quarries, you attach to one of the irons or stones inside the quarry, not the actual quarry object itself
+            */
+            if (obstacle.irons !== undefined || obstacle.stones !== undefined) {
+                let full_list = obstacle.stones.concat(obstacle.irons);
+                let choice = Math.round(Math.random(0,1) + 0.25);
+                let random = Math.ceil(Math.random(0,1) * full_list.length);
+                if (random > 0) {
+                    if (choice === 0) {
+                        if (obstacle.irons.length != 0) {
+                            let random_iron = Math.floor(Math.random() * obstacle.irons.length)
+                            var iron_selected = obstacle.irons.splice(random_iron, 1)[0];
+                            this.attachedObj = iron_selected;
+                            iron_selected.attach();
+                            iron_selected.setDirection(this.dir);
+                            this.simulator.obstacles.push(iron_selected);
+                        }
+                    } else if (choice === 1) {
+                        if (obstacle.stones.length != 0) {
+                            let random_stone = Math.floor(Math.random() * obstacle.stones.length)
+                            var stone_selected = obstacle.stones.splice(random_stone, 1)[0];
+                            this.attachedObj = stone_selected;
+                            stone_selected.attach();
+                            stone_selected.setDirection(this.dir);
+                            this.simulator.obstacles.push(stone_selected);
+                        }
+                    }
+                } else {
+                    return;
+                }
+            } else {
+                this.attachedObj = obstacle;
+                obstacle.attach();
+                obstacle.setDirection(this.dir);
+            }
         }
     }
 
@@ -1168,6 +1210,8 @@ class Simulator{
         this.receivers = [];
         this.interactableObjs = [];
         this.ramps = [];
+        this.quarries = [];
+
 
         // Subworker pool
         this.numThreads = 1;
@@ -1185,6 +1229,7 @@ class Simulator{
      *                              Note: InteractableObjs will have 2 references
      *                                  1 in obstacles, 1 in interactableObjs
      *                          ramps -> Ramps
+     *                          quarry -> Quarry
      */
     defineObjs(objects) {
         this.tapeLines = [];
@@ -1193,6 +1238,7 @@ class Simulator{
         this.ramps = [];
         this.campsites = [];
         this.receivers = [];
+        this.quarries = [];
 
         if (objects.tapeLinesData !== undefined) {
             for (let newLine of objects.tapeLinesData) {
@@ -1205,9 +1251,21 @@ class Simulator{
                 this.obstacles.push(new Wall(newWall.x, newWall.y, newWall.w, newWall.h, newWall.rotate, newWall.color));
             }
         }
+
         if (objects.interactableData !== undefined) {
             for (let interactableObj of objects.interactableData) {
-                let newInteractableObj = new InteractableObj(interactableObj.x, interactableObj.y, interactableObj.w, interactableObj.h, interactableObj.color);
+                let x = interactableObj.x;
+                let y = interactableObj.y;
+                let shape = interactableObj.shape;
+                let color = interactableObj.color;
+
+                let newInteractableObj;
+                if (shape === "circle") {
+                    let r = interactableObj.r;
+                    newInteractableObj = new InteractableCircle(x, y, r, color);
+                } else {
+                    newInteractableObj = new InteractableObj(x, y, interactableObj.w, interactableObj.h, "rectangle", color);
+                }
                 this.interactableObjs.push(newInteractableObj);
             }
         }
@@ -1223,6 +1281,19 @@ class Simulator{
                     this.obstacles.push(new Wall(newRamp.topL[0], newRamp.topL[1]-1, newRamp.w, 1, 0, newRamp.color));
                     this.obstacles.push(new Wall(newRamp.botL[0], newRamp.botL[1], newRamp.w, 1, 0, newRamp.color));
                 }
+            }
+        }
+
+        if (objects.quarryData !== undefined) {
+            for (let quarryObj of objects.quarryData) {
+                let newQuarry = new Quarry(quarryObj.x, quarryObj.y, quarryObj.w, quarryObj.h, quarryObj.orientation, quarryObj.color);
+                let all_ores = newQuarry.irons.concat(newQuarry.stones);
+                for (let i = 0; i < all_ores.length; i ++) {
+                    this.interactableObjs.push(all_ores[i]);
+                }
+                this.quarries.push(newQuarry);
+                this.obstacles.push(newQuarry);
+                this.interactableObjs.push(newQuarry);
             }
         }
 
@@ -1249,7 +1320,7 @@ class Simulator{
 
     /**
      * Draws the objects by sending a message to the main thread to draw the objects.
-     * Send ramps, tape lines, and obstacles to be drawn.
+     * Send ramps, tape lines, quarries, and obstacles to be drawn.
      */
     drawObjs() {
         let objects = {
@@ -1257,7 +1328,8 @@ class Simulator{
             tapeLines: this.tapeLines,
             obstacles: this.obstacles,
             campsites: this.campsites,
-            receivers: this.receivers
+            receivers: this.receivers,
+            quarries: this.quarries
         }
         postMessage({objs: objects})
 
