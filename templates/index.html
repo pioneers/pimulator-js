@@ -354,6 +354,27 @@
                                                     <code>w</code> and <code>h</code> represent the width and height of the line respectively.
                                                     The <code>rotate</code> value is the angle the wall will be rotated counterclockwise around its top left corner in degrees.
                                                     </p>
+                                                    <p> <b> Quarries: </b> </p>
+                                                    <p>
+                                                    Quarries are listed under the key <code>quarryData</code> and consist of 5 key-value pairs, with keys <code>x</code>, <code>y</code>, 
+                                                    <code>w</code>, <code>h</code>, <code>orientation</code>. The <code>x</code> and <code>y</code> values represent the top left corner 
+                                                    of the quarry.  <code>w</code> and <code>h</code> represent the width and height of the quarry. <code>orientation</code> represents 
+                                                    the side of the quarry that you can pick up objects from; this side of the quarry is drawn with a dashed line. Use <code>Robot.pick_up()</code> 
+                                                    at the open side of the quarry to pick up a random stone or ore.
+                                                    </p>
+                                                    <p> <b> Campsites: </b> </p>
+                                                    <p>
+                                                    Campsites are listed under the key <code>campsitesData</code> and consist of 2 key-value pairs, with keys <code>x</code>, <code>y</code>. 
+                                                    The <code>x</code> and <code>y</code> values represent the top left corner of the campsite. To spin the campsite satellite dish, get close 
+                                                    to the campsite and use <code>Robot.spin_dish()</code>. To get the value of the satellite dish, get close to the campsite and use <code>Robot.spin_val()</code>. 
+                                                    </p>
+                                                    <p> <b> Refineries: </b> </p>
+                                                    <p>
+                                                    Refineries are listed under the key <code>refineriesData</code> and consist of 3 key-value pairs, with keys <code>x</code>, <code>y</code>, 
+                                                    <code>highSide</code>. The <code>highSide</code> key represents the side of the refinery you can put objects in. The <code>x</code> and <code>y</code> 
+                                                    values represent the top left corner of the refinery.  To put a stone or ore into the refinery,  get close to the <code>highSide</code> of the 
+                                                    refinery and use <code>Robot.refine()</code>.
+                                                    </p>
                                                     <p> <b> Ramps: </b> </p>
                                                     <p>
                                                     Ramps are listed under the key <code>rampsData</code> and consist of 6 key-value pairs,
