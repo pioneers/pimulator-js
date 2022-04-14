@@ -202,15 +202,6 @@ function drawObjs(objs, type) {
             obj_topL = [objs[i].topL[0] * scaleFactor, objs[i].topL[1] * scaleFactor];
             obj_topR = [objs[i].topR[0] * scaleFactor, objs[i].topR[1] * scaleFactor];
             ctx.beginPath();
-<<<<<<< HEAD
-            ctx.moveTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
-            ctx.lineTo(objs[i].topR[0]*scaleFactor, objs[i].topR[1]*scaleFactor);
-            ctx.lineTo(objs[i].botR[0]*scaleFactor, objs[i].botR[1]*scaleFactor);
-            ctx.lineTo(objs[i].botL[0]*scaleFactor, objs[i].botL[1]*scaleFactor);
-            ctx.lineTo(objs[i].topL[0]*scaleFactor, objs[i].topL[1]*scaleFactor);
-            ctx.fillStyle = objs[i].color;
-            ctx.fill();
-=======
             ctx.strokeStyle = objs[i].color;
             ctx.setLineDash([]);
             ctx.globalAlpha = 1;
@@ -317,7 +308,6 @@ function drawObjs(objs, type) {
                 ctx.lineWidth = 1;
                 ctx.stroke(); // Draw rectangle border
             }
->>>>>>> 75123ba18cb7ed973f5a66e3ac255e81f247b49a
         }
     } else if (type === "tapeLine") {
         ctx.lineWidth = 5;
@@ -396,22 +386,12 @@ function drawObjs(objs, type) {
         }
     } else if (type === "campsite") {
         for (let i = 0; i < objs.length; i++) {
-<<<<<<< HEAD
-            ctx.lineWidth = 0.5;
-
-            ctx.translate(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
-            ctx.rotate((objs[i].spinnerNum * 2.0 * Math.PI)/9.0);
-            ctx.translate(-scaleFactor * objs[i].centerX, -scaleFactor * objs[i].centerY);
-
-            
-=======
             ctx.lineWidth = 0.2;
 
             ctx.translate(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
             ctx.rotate(((objs[i].spinnerNum-1) * 2.0 * Math.PI)/9.0);
             ctx.translate(-scaleFactor * objs[i].centerX, -scaleFactor * objs[i].centerY);
 
->>>>>>> 75123ba18cb7ed973f5a66e3ac255e81f247b49a
             ctx.strokeStyle = "Blue";
             ctx.fillStyle = "Blue";
             ctx.beginPath();
@@ -440,11 +420,7 @@ function drawObjs(objs, type) {
             ctx.stroke();
 
             ctx.translate(scaleFactor * objs[i].centerX, scaleFactor * objs[i].centerY);
-<<<<<<< HEAD
-            ctx.rotate(-(objs[i].spinnerNum * 2.0 * Math.PI)/9.0);
-=======
             ctx.rotate(-((objs[i].spinnerNum-1) * 2.0 * Math.PI)/9.0);
->>>>>>> 75123ba18cb7ed973f5a66e3ac255e81f247b49a
             ctx.translate(-scaleFactor * objs[i].centerX, -scaleFactor * objs[i].centerY);
 
             ctx.strokeStyle = "Black";
@@ -452,7 +428,6 @@ function drawObjs(objs, type) {
             ctx.beginPath();
             ctx.rect(scaleFactor * (objs[i].centerX - 5.5), scaleFactor * objs[i].centerY, 1, 0.5);
             ctx.fill();
-<<<<<<< HEAD
             ctx.stroke();
         }
     } else if (type === "receiver") {
@@ -487,9 +462,6 @@ function drawObjs(objs, type) {
             ctx.lineTo(objs[i].bTopL[0]*scaleFactor, objs[i].bTopL[1]*scaleFactor);
             ctx.fillStyle = objs[i].buttonColor;
             ctx.fill();
-=======
-            ctx.stroke();        
->>>>>>> 75123ba18cb7ed973f5a66e3ac255e81f247b49a
         }
     }
 }

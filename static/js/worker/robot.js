@@ -651,19 +651,19 @@ class RobotClass {
         }
     }
 
-    pressReceiver() {
+    press_receiver() {
         let receiver = this.findReceiver();
         if (receiver && receiver.canDeployPioneer()) {
             receiver.press();
             let newInteractableObj;
             if (receiver.buttonLocation === "left") {
-                newInteractableObj = new InteractableObj(receiver.botL[0], receiver.botL[1], receiver.w, receiver.h, "yellow");
+                newInteractableObj = new InteractableObj(receiver.botL[0], receiver.botL[1]+receiver.h, receiver.w, receiver.h, "yellow");
             } else if (receiver.buttonLocation === "right") {
-                newInteractableObj = new InteractableObj(receiver.topL[0], receiver.topL[1]-receiver.h, receiver.w, receiver.h, "yellow");
+                newInteractableObj = new InteractableObj(receiver.topL[0], receiver.topL[1]-2*receiver.h, receiver.w, receiver.h, "yellow");
             } else if (receiver.buttonLocation === "top") {
-                newInteractableObj = new InteractableObj(receiver.topL[0]-receiver.w, receiver.topL[1], receiver.w, receiver.h, "yellow");
+                newInteractableObj = new InteractableObj(receiver.topL[0]-2*receiver.w, receiver.topL[1], receiver.w, receiver.h, "yellow");
             } else {
-                newInteractableObj = new InteractableObj(receiver.topR[0], receiver.topR[1], receiver.w, receiver.h, "yellow");
+                newInteractableObj = new InteractableObj(receiver.topR[0]+receiver.w, receiver.topR[1], receiver.w, receiver.h, "yellow");
             }
             this.simulator.interactableObjs.push(newInteractableObj);
             this.simulator.obstacles.push(newInteractableObj);

@@ -148,7 +148,7 @@ class Button extends FieldObj {
             this.bBotR[1] = this.botR[1]+1
 
             this.bBotL[0] = (3*this.botL[0]+this.botR[0])/4
-            this.bBotL[1] = this.botL[1]-1
+            this.bBotL[1] = this.botL[1]+1
         }
     }
 
@@ -195,7 +195,7 @@ class Receiver extends Button {
             this.pTopR[1] = this.topR[1] - 2*this.h
 
             this.pTopL[0] = this.topL[0]
-            this.pTopL[1] = this.topL[1] + 2*this.h
+            this.pTopL[1] = this.topL[1] - 2*this.h
         } else if (this.buttonLocation === "top") {
             this.pTopR[0] = this.topL[0]
             this.pTopR[1] = this.topL[1] - this.h
