@@ -1,0 +1,65 @@
+{
+    startPosition: {x: 16, y: 61, dir: "right"},
+    tapeLinesData: [
+        {x1: 96, y1: 6, x2: 96, y2: 53, color: "lightBlue"},
+        {x1: 96, y1: 91, x2: 96, y2: 138, color: "lightBlue"},
+        {x1: 14, y1: 61, x2: 24, y2: 61, color: "lightGreen"},
+        {x1: 14, y1: 83, x2: 24, y2: 83, color: "lightGreen"},
+        {x1: 178, y1: 61, x2: 168, y2: 61, color: "lightGreen"},
+        {x1: 178, y1: 83, x2: 168, y2: 83, color: "lightGreen"},
+        {x1: 52, y1: 17, x2: 52, y2: 27, color: "lightGreen"},
+        {x1: 52, y1: 127, x2: 52, y2: 117, color: "lightGreen"},
+        {x1: 140, y1: 17, x2: 140, y2: 27, color: "lightGreen"},
+        {x1: 140, y1: 127, x2: 140, y2: 117, color: "lightGreen"},
+        {x1: 35, y1: 43, x2: 35, y2: 57, color: "lightGreen"},
+        {x1: 35, y1: 101, x2: 35, y2: 87, color: "lightGreen"},
+        {x1: 157, y1: 43, x2: 157, y2: 57, color: "lightGreen"},
+        {x1: 157, y1: 101, x2: 157, y2: 87, color: "lightGreen"},
+        {x1: 24, y1: 61, x2: 35, y2: 57, color: "lightGreen"},
+        {x1: 24, y1: 83, x2: 35, y2: 87, color: "lightGreen"},
+        {x1: 52, y1: 27, x2: 35, y2: 43, color: "lightGreen"},
+        {x1: 52, y1: 117, x2: 35, y2: 101, color: "lightGreen"},
+        {x1: 140, y1: 27, x2: 157, y2: 43, color: "lightGreen"},
+        {x1: 140, y1: 117, x2: 157, y2: 101, color: "lightGreen"},
+        {x1: 157, y1: 57, x2: 168, y2: 61, color: "lightGreen"},
+        {x1: 157, y1: 87, x2: 168, y2: 83, color: "lightGreen"}
+    ],
+    interactableData: [
+        {x: 93, y: 71, w: 2, h: 2, color: "aqua"},
+        {x: 95, y: 71, w: 2, h: 2, color: "aqua"},
+        {x: 97, y: 71, w: 2, h: 2, color: "aqua"},
+        {x: 93, y: 69, w: 2, h: 2, color: "aqua"},
+        {x: 95, y: 69, w: 2, h: 2, color: "aqua"},
+        {x: 97, y: 69, w: 2, h: 2, color: "aqua"},
+        {x: 93, y: 73, w: 2, h: 2, color: "aqua"},
+        {x: 95, y: 73, w: 2, h: 2, color: "aqua"},
+        {x: 97, y: 73, w: 2, h: 2, color: "aqua"},
+        {x: 94, y: 70, w: 2, h: 2, color: "aqua"},
+        {x: 94, y: 72, w: 2, h: 2, color: "aqua"},
+        {x: 96, y: 70, w: 2, h: 2, color: "aqua"},
+        {x: 96, y: 72, w: 2, h: 2, color: "aqua"},
+        {x: 95, y: 71, w: 2, h: 2, color: "aqua"}
+    ],
+    wallsData: [
+        {x: 0, y: 0, w: 192, h: 2},
+        {x: 0, y: 0, w: 2, h: 144},
+        {x: 190, y: 0, w: 2, h: 144},
+        {x: 0, y: 142, w: 192, h: 2}
+    ],
+    quarryData: [
+        {x: 23, y: 126.5, w: 18, h: 14.5, orientation: "left"},
+        {x: 151, y: 3, w: 18, h: 14.5, orientation: "right"}
+    ],
+    campsitesData: [
+        {x: 46, y: 51},
+        {x: 46, y: 84},
+        {x: 126, y: 51},
+        {x: 126, y: 84},
+        {x: 86, y: 4},
+        {x: 86, y: 131}
+    ],
+    refineriesData: [
+        {x: 88.5, y: 51, highSide: "left"},
+        {x: 88.5, y: 78, highSide: "right"}
+    ]
+}
