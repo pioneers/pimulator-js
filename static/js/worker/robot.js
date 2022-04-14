@@ -841,8 +841,8 @@ class RobotClass {
             return null;
         }
 
-        const width = 5;
-        const height = 5;
+        const width = 10;
+        const height = 10;
         const b = (this.width - width) / 2;
         let collidableRegion = {topR: Array(2), topL: Array(2), botL: Array(2), botR: Array(2)};
         collidableRegion.botL[0] = this.topL[0] + b * Math.cos((90.0 - this.dir) * Math.PI / 180);
@@ -1363,6 +1363,7 @@ class Simulator{
                     newInteractableObj = new InteractableObj(x, y, interactableObj.w, interactableObj.h, "rectangle", color);
                 }
                 this.interactableObjs.push(newInteractableObj);
+                this.obstacles.push(newInteractableObj);
             }
         }
 
@@ -1406,10 +1407,10 @@ class Simulator{
                 let newCampsite = new Campsite(campsiteObj.x, campsiteObj.y, campsiteObj.w, campsiteObj.h, campsiteObj.color);
                 this.campsites.push(newCampsite);
                 this.obstacles.push(new Wall(newCampsite.topL[0] + 4, newCampsite.topL[1], newCampsite.w - 8, newCampsite.h, 0, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1], newCampsite.w, 1, 0, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + (newCampsite.h / 3.0), newCampsite.w, 1, 0, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + 2 * (newCampsite.h / 3.0), newCampsite.w, 1, 0, newCampsite.color));
-                this.obstacles.push(new Wall(newCampsite.botL[0], newCampsite.botL[1], newCampsite.w, 1, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1], newCampsite.w, 0.5, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + (newCampsite.h / 3.0), newCampsite.w, 0.5, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.topL[0], newCampsite.topL[1] + 2 * (newCampsite.h / 3.0), newCampsite.w, 0.5, 0, newCampsite.color));
+                this.obstacles.push(new Wall(newCampsite.botL[0], newCampsite.botL[1], newCampsite.w, 0.5, 0, newCampsite.color));
             }
         }
 
