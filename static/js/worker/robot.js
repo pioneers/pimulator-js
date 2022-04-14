@@ -552,6 +552,7 @@ class RobotClass {
             tapeLines: this.simulator.tapeLines,
             obstacles: this.simulator.obstacles,
             ramps: this.simulator.ramps,
+            receivers: this.simulator.receivers,
             refineries: this.simulator.refineries,
             quarries: this.simulator.quarries,
             campsites: this.simulator.campsites
@@ -650,6 +651,25 @@ class RobotClass {
         }
     }
 
+    press_receiver() {
+        let receiver = this.findReceiver();
+        if (receiver && receiver.canDeployPioneer()) {
+            receiver.press();
+            let newInteractableObj;
+            if (receiver.buttonLocation === "left") {
+                newInteractableObj = new InteractableObj(receiver.botL[0], receiver.botL[1]+receiver.h, receiver.w, receiver.h, "yellow");
+            } else if (receiver.buttonLocation === "right") {
+                newInteractableObj = new InteractableObj(receiver.topL[0], receiver.topL[1]-2*receiver.h, receiver.w, receiver.h, "yellow");
+            } else if (receiver.buttonLocation === "top") {
+                newInteractableObj = new InteractableObj(receiver.topL[0]-2*receiver.w, receiver.topL[1], receiver.w, receiver.h, "yellow");
+            } else {
+                newInteractableObj = new InteractableObj(receiver.topR[0]+receiver.w, receiver.topR[1], receiver.w, receiver.h, "yellow");
+            }
+            this.simulator.interactableObjs.push(newInteractableObj);
+            this.simulator.obstacles.push(newInteractableObj);
+        }
+    }
+    
     spin_val() {
         let campsite = this.findCampsite();
         if (campsite) {
@@ -816,6 +836,33 @@ class RobotClass {
         return null;
     }
 
+    findReceiver() {
+        if (this.simulator.receivers.length == 0) {
+            return null;
+        }
+
+        const width = 10;
+        const height = 10;
+        const b = (this.width - width) / 2;
+        let collidableRegion = {topR: Array(2), topL: Array(2), botL: Array(2), botR: Array(2)};
+        collidableRegion.botL[0] = this.topL[0] + b * Math.cos((90.0 - this.dir) * Math.PI / 180);
+        collidableRegion.botL[1] = this.topL[1] - b * Math.sin((90.0 - this.dir) * Math.PI / 180);
+        collidableRegion.topL[0] = collidableRegion.botL[0] - height * Math.cos(this.dir * Math.PI / 180);
+        collidableRegion.topL[1] = collidableRegion.botL[1] - height * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.topR[0] = collidableRegion.topL[0] + width * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.topR[1] = collidableRegion.topL[1] - width * Math.cos(this.dir * Math.PI / 180);
+        collidableRegion.botR[0] = collidableRegion.botL[0] + width * Math.sin(this.dir * Math.PI / 180);
+        collidableRegion.botR[1] = collidableRegion.botL[1] - width * Math.cos(this.dir * Math.PI / 180);
+
+        for (let receiver of this.simulator.receivers) {
+            let inter = this.intersectOne(receiver, collidableRegion); //TODO: maybe instead of receiver, use receiver's expanded region
+            if (inter) {
+              return receiver;
+            }
+        }
+        return null;
+    }
+    
     refine() {
         let refinery = this.findRefinery();
         if (this.attachedObj && refinery) {
@@ -1253,6 +1300,7 @@ class Simulator{
         this.tapeLines = [];
         this.obstacles = [];
         this.campsites = [];
+        this.receivers = [];
         this.interactableObjs = [];
         this.ramps = [];
         this.refineries = [];
@@ -1285,6 +1333,8 @@ class Simulator{
         this.refineries = [];
         this.quarries = [];
         this.campsites = [];
+        this.receivers = [];
+        this.quarries = [];
 
         if (objects.tapeLinesData !== undefined) {
             for (let newLine of objects.tapeLinesData) {
@@ -1363,6 +1413,14 @@ class Simulator{
                 this.obstacles.push(new Wall(newCampsite.botL[0], newCampsite.botL[1], newCampsite.w, 0.5, 0, newCampsite.color));
             }
         }
+
+        if (objects.receiversData !== undefined) {
+            for (let receiver of objects.receiversData) {
+                let newReceiver = new Receiver(receiver.x, receiver.y, receiver.w, receiver.h, receiver.color, receiver.buttonColor, receiver.buttonLocation, receiver.limit);
+                this.receivers.push(newReceiver);
+                this.obstacles.push(new Wall(newReceiver.topL[0], newReceiver.topL[1], newReceiver.w, newReceiver.h, 0, newReceiver.color));
+            }
+        }
     }
 
     /**
@@ -1374,9 +1432,10 @@ class Simulator{
             ramps: this.ramps,
             tapeLines: this.tapeLines,
             obstacles: this.obstacles,
-            refineries: this.refineries,
+            campsites: this.campsites,
+            receivers: this.receivers,
             quarries: this.quarries,
-            campsites: this.campsites
+            refineries: this.refineries
         }
         postMessage({objs: objects})
     }

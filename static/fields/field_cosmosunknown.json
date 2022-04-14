@@ -61,5 +61,10 @@
     refineriesData: [
         {x: 88.5, y: 51, highSide: "left"},
         {x: 88.5, y: 78, highSide: "right"}
+    ],
+    receiversData: [
+        {x: 2, y: 2, w: 4, h: 4, color: "blue", buttonColor: "gray", buttonLocation: "bottom"},
+        {x: 186, y: 138, w: 4, h: 4, color: "yellow", buttonColor: "gray", buttonLocation: "top"}
+
     ]
 }
