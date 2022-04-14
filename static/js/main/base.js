@@ -475,7 +475,7 @@ function drawObjs(objs, type) {
             ctx.lineTo(objs[i].pBotR[0]*scaleFactor, objs[i].pBotR[1]*scaleFactor);
             ctx.lineTo(objs[i].pBotL[0]*scaleFactor, objs[i].pBotL[1]*scaleFactor);
             ctx.lineTo(objs[i].pTopL[0]*scaleFactor, objs[i].pTopL[1]*scaleFactor);
-            ctx.fillStyle = "black";
+            ctx.fillStyle = "gray";
             ctx.fill();
 
             //draw box
