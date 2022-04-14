@@ -227,6 +227,23 @@ class Receiver extends Button {
         return this.getCount() < this.limit;
     }
 }
+
+class Refinery extends FieldObj {
+    constructor(x, y, w = 15, h = 15, highSide = "left", color = "gray") {
+        super(x, y, w, h, color);
+        this.highSide = highSide;
+        this.ore = 0;
+    }
+
+    numOre() {
+        return this.ore;
+    }
+
+    addOre() {
+        this.ore += 1;
+    }
+}
+
 class Ore extends InteractableCircle {
     constructor(x, y, type = "stone", radius = 1.1) {
         if (type === "stone") {
