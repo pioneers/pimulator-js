@@ -877,7 +877,7 @@ class RobotClass {
      * @param {String} param - the parameter on the device
      * @param {Float} value - the value to set, bounded by [-1, 1]
      */
-     set_value(device, param, value) {
+    set_value(device, param, value) {
         if (typeof(param) !== "string") {
             console.log("ERROR: get_value() parameter must be a string")
             return
@@ -1384,7 +1384,7 @@ class Simulator{
     /**
      * Loads the student code for the current Simulator
      */
-     loadStudentCode(){
+    loadStudentCode(){
         // Store the local environment into dictionary
         // Ensure the global Robot reflects the same robot Simulator is using
         env['Robot'] = this.robot;

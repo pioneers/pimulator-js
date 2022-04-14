@@ -913,6 +913,9 @@
                                     <label class="btn btn-primary">
                                         <input type="radio" name="options" id="preset1" onclick="uploadPreset(2)"> World Tour (Auto)
                                     </label>
+                                    <label class="btn btn-primary">
+                                        <input type="radio" name="options" id="preset2" onclick="uploadPreset(3)"> Cosmos Unknown
+                                    </label>
                                 </div>
                                 <script>
                                     function uploadPreset(x) {
@@ -923,6 +926,8 @@
                                             xhrPreset.open("GET","/static/fields/field.json?t={{ cache_key }}");
                                         } else if (x == 2){
                                             xhrPreset.open("GET","/static/fields/field_worldtour_auto.json?t={{ cache_key }}");
+                                        } else if (x == 3){
+                                            xhrPreset.open("GET","/static/fields/field_cosmosunkown.json?t={{ cache_key }}");
                                         }
                                         xhrPreset.onload = () => {
                                             objectsCode = xhrPreset.responseText;
